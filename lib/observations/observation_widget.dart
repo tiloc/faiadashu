@@ -16,6 +16,7 @@ class ObservationWidget extends StatelessWidget {
       {Key? key,
       TextStyle? valueStyle,
       TextStyle? unitStyle,
+      TextStyle? codeStyle,
       TextStyle? dateTimeStyle,
       String componentSeparator = ' | ',
       String unknownUnitText = '',
@@ -26,7 +27,8 @@ class ObservationWidget extends StatelessWidget {
             componentSeparator: componentSeparator,
             unknownUnitText: unknownUnitText,
             unknownValueText: unknownValueText),
-        _codeWidget = CodeableConceptWidget(observation.code, key: key),
+        _codeWidget =
+            CodeableConceptWidget(observation.code, style: codeStyle, key: key),
         _dateTimeWidget = FhirDateTimeWidget(
           observation.effectiveDateTime,
           style: dateTimeStyle,

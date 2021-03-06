@@ -6,9 +6,11 @@ import 'package:fhir/r4/general_types/general_types.dart';
 import 'package:fhir/r4/resource_types/clinical/diagnostics/diagnostics.dart';
 import 'package:flutter/material.dart';
 import 'package:widgets_on_fhir/observations/observation_widget.dart';
+import 'package:widgets_on_fhir_example/exhibit_page.dart';
 
-// ignore: use_key_in_widget_constructors
-class ObservationPage extends StatelessWidget {
+class ObservationPage extends ExhibitPage {
+  ObservationPage({Key? key}) : super(key: key);
+
   final observation = Observation(
     effectiveDateTime: FhirDateTime(DateTime.now()),
     code: CodeableConcept(coding: [
@@ -42,14 +44,17 @@ class ObservationPage extends StatelessWidget {
   );
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Observations'),
+  Widget buildExhibit(BuildContext context) {
+    return Column(children: [
+      ObservationWidget(
+        observation,
+        valueStyle: Theme.of(context).textTheme.headline4,
+        codeStyle: Theme.of(context).textTheme.subtitle2,
+        dateTimeStyle: Theme.of(context).textTheme.caption,
       ),
-      body: Column(children: [
-        ObservationWidget(observation),
-      ]),
-    );
+    ]);
   }
+
+  @override
+  String get title => 'Observations';
 }

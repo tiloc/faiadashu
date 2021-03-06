@@ -51,15 +51,19 @@ class _HomePageState extends State<HomePage> {
           ListTile(
             title: const Text('Disclaimers'),
             onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => DisclaimerPage()));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const DisclaimerPage()));
             },
           ),
           ListTile(
             title: const Text('Primitive Types'),
             onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PrimitivePage()));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const PrimitivePage()));
             },
           ),
           ListTile(
