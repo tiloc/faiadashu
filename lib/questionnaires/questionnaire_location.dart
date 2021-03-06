@@ -13,7 +13,7 @@ class QuestionnaireLocation {
   final int level;
 
   /// Go to the first location top-down of the given [Questionnaire].
-  /// Will throw Errors in case that the [Questionnaire] has no items.
+  /// Will throw [Error]s in case this [Questionnaire] has no items.
   QuestionnaireLocation(this.questionnaire)
       : linkId = ArgumentError.checkNotNull(questionnaire.item?.first.linkId),
         questionnaireItem =
@@ -58,29 +58,41 @@ class QuestionnaireLocation {
 
   bool get hasPreviousSibling => siblingIdx > 0;
 
+  QuestionnaireLocation get nextSibling => siblings.elementAt(siblingIdx + 1);
+
   bool get hasParent => parent != null;
 
   bool get hasChildren =>
       (questionnaireItem.item != null) && (questionnaireItem.item!.isNotEmpty);
 
-  const QuestionnaireLocation._(this.questionnaire, this.questionnaireItem,
-      this.linkId, this.parent, this.siblingIdx, this.level);
-}
+  /// Find the [QuestionnaireLocation] that corresponds to the linkId.
+  /// Throws an [Exception] when no such [QuestionnaireLocation] exists.
+  QuestionnaireLocation findByLinkId(String linkId) {
+    return depthFirst().firstWhere(
+        (questionnaireLocation) => questionnaireLocation.linkId == linkId);
+  }
 
-class QuestionnaireLocationIterator {
-  final List<QuestionnaireLocation> locationList = <QuestionnaireLocation>[];
-
-  QuestionnaireLocationIterator.depthFirst(
-      QuestionnaireLocation startLocation) {
-    if (startLocation.hasChildren) {
-      for (final child in startLocation.children) {
-        locationList.addAll(
-            QuestionnaireLocationIterator.depthFirst(child).locationList);
+  /// Build a list of [QuestionnaireLocation] in depth-first order.
+  /// If the current location has siblings, then only following siblings are added.
+  List<QuestionnaireLocation> depthFirst() {
+    final List<QuestionnaireLocation> locationList = <QuestionnaireLocation>[];
+    if (hasChildren) {
+      for (final child in children) {
+        locationList.addAll(child.depthFirst());
       }
     }
 
-    // TODO: Add next siblings
+    var currentSibling = this;
+    while (currentSibling.hasNextSibling) {
+      currentSibling = currentSibling.nextSibling;
+      locationList.addAll(currentSibling.depthFirst());
+    }
+
+    return locationList;
   }
+
+  const QuestionnaireLocation._(this.questionnaire, this.questionnaireItem,
+      this.linkId, this.parent, this.siblingIdx, this.level);
 }
 
 /// Build list of [QuestionnaireLocation] from [QuestionnaireItem] and meta-data.

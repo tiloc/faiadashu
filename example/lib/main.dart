@@ -1,8 +1,9 @@
-import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:widgets_on_fhir/observations/observation_widget.dart';
-import 'package:widgets_on_fhir/primitive_types/date_time_widget.dart';
+
+import 'disclaimer_page.dart';
+import 'observation_page.dart';
+import 'primitive_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -39,50 +40,37 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final observation = Observation(
-    effectiveDateTime: FhirDateTime(DateTime.now()),
-    code: CodeableConcept(coding: [
-      Coding(
-          system: FhirUri('http://loinc.org'),
-          code: Code('55284-4'),
-          display: 'BP sys/dias')
-    ]),
-    component: [
-      ObservationComponent(
-          code: CodeableConcept(
-            coding: [
-              Coding(
-                  system: FhirUri('http://loinc.org'),
-                  code: Code('8480-6'),
-                  display: 'BP sys')
-            ],
-          ),
-          valueQuantity: Quantity(value: Decimal(140.0), unit: 'mmHg')),
-      ObservationComponent(
-          code: CodeableConcept(
-            coding: [
-              Coding(
-                  system: FhirUri('http://loinc.org'),
-                  code: Code('8462-4'),
-                  display: 'BP dias')
-            ],
-          ),
-          valueQuantity: Quantity(value: Decimal(87.0), unit: 'mmHg')),
-    ],
-  );
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Primitive Types'),
+        title: const Text('Widgets on FHIR® Gallery'),
       ),
-      body: Column(children: [
-        FhirDateTimeWidget(FhirDateTime('2002-02-05')),
-        FhirDateTimeWidget(FhirDateTime('2010-02-05 14:02')),
-        FhirDateTimeWidget(FhirDateTime('2010-02')),
-        ObservationWidget(observation),
-      ]),
+      body: ListView(
+        children: [
+          ListTile(
+            title: const Text('Disclaimers'),
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => DisclaimerPage()));
+            },
+          ),
+          ListTile(
+            title: const Text('Primitive Types'),
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => PrimitivePage()));
+            },
+          ),
+          ListTile(
+            title: const Text('Observation'),
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ObservationPage()));
+            },
+          ),
+        ],
+      ),
     );
   }
 }
