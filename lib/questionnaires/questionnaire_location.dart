@@ -1,15 +1,16 @@
 import 'package:fhir/r4.dart';
+import 'package:flutter/foundation.dart';
 import 'package:meta/meta.dart';
 
 /// Visit FHIR [Questionnaire] through linkIds.
 /// Can provide properties of current location and move to adjacent items.
 @immutable
-class QuestionnaireLocation {
+class QuestionnaireLocation with Diagnosticable {
   final Questionnaire questionnaire;
   final QuestionnaireItem questionnaireItem;
   final String linkId;
   final QuestionnaireItem? parent;
-  final int siblingIdx;
+  final int siblingIndex;
   final int level;
 
   /// Go to the first location top-down of the given [Questionnaire].
@@ -19,7 +20,7 @@ class QuestionnaireLocation {
         questionnaireItem =
             ArgumentError.checkNotNull(questionnaire.item?.first),
         parent = null,
-        siblingIdx = 0,
+        siblingIndex = 0,
         level = 0;
 
   /// All siblings at the current level as FHIR [QuestionnaireItem].
@@ -53,12 +54,12 @@ class QuestionnaireLocation {
   }
 
   bool get hasNextSibling {
-    return siblingQuestionnaireItems.length > siblingIdx + 1;
+    return siblingQuestionnaireItems.length > siblingIndex + 1;
   }
 
-  bool get hasPreviousSibling => siblingIdx > 0;
+  bool get hasPreviousSibling => siblingIndex > 0;
 
-  QuestionnaireLocation get nextSibling => siblings.elementAt(siblingIdx + 1);
+  QuestionnaireLocation get nextSibling => siblings.elementAt(siblingIndex + 1);
 
   bool get hasParent => parent != null;
 
@@ -68,31 +69,50 @@ class QuestionnaireLocation {
   /// Find the [QuestionnaireLocation] that corresponds to the linkId.
   /// Throws an [Exception] when no such [QuestionnaireLocation] exists.
   QuestionnaireLocation findByLinkId(String linkId) {
-    return depthFirst().firstWhere(
+    return preOrder().firstWhere(
         (questionnaireLocation) => questionnaireLocation.linkId == linkId);
   }
 
-  /// Build a list of [QuestionnaireLocation] in depth-first order.
-  /// If the current location has siblings, then only following siblings are added.
-  List<QuestionnaireLocation> depthFirst() {
+  List<QuestionnaireLocation> _addChildren() {
     final List<QuestionnaireLocation> locationList = <QuestionnaireLocation>[];
+
+    locationList.add(this);
     if (hasChildren) {
       for (final child in children) {
-        locationList.addAll(child.depthFirst());
+        locationList.addAll(child._addChildren());
       }
-    }
-
-    var currentSibling = this;
-    while (currentSibling.hasNextSibling) {
-      currentSibling = currentSibling.nextSibling;
-      locationList.addAll(currentSibling.depthFirst());
     }
 
     return locationList;
   }
 
+  /// Build a list of [QuestionnaireLocation] in pre-order.
+  /// see: https://en.wikipedia.org/wiki/Tree_traversal
+  List<QuestionnaireLocation> preOrder() {
+    final List<QuestionnaireLocation> locationList = <QuestionnaireLocation>[];
+    locationList.addAll(_addChildren());
+    QuestionnaireLocation currentSibling = this;
+    while (currentSibling.hasNextSibling) {
+      currentSibling = currentSibling.nextSibling;
+      locationList.addAll(currentSibling._addChildren());
+    }
+    return locationList;
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+
+    properties.add(StringProperty('linkId', linkId));
+    properties
+        .add(FlagProperty('children', value: hasChildren, ifTrue: 'children'));
+    properties.add(IntProperty('level', level));
+    properties.add(IntProperty('siblingIndex', siblingIndex));
+    properties.add(IntProperty('siblings', siblings.length));
+  }
+
   const QuestionnaireLocation._(this.questionnaire, this.questionnaireItem,
-      this.linkId, this.parent, this.siblingIdx, this.level);
+      this.linkId, this.parent, this.siblingIndex, this.level);
 }
 
 /// Build list of [QuestionnaireLocation] from [QuestionnaireItem] and meta-data.

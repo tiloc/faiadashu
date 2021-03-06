@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:widgets_on_fhir_example/questionnaire_parser_page.dart';
 
 import 'disclaimer_page.dart';
 import 'observation_page.dart';
@@ -71,6 +72,15 @@ class _HomePageState extends State<HomePage> {
             onTap: () {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => ObservationPage()));
+            },
+          ),
+          ListTile(
+            title: const Text('Questionnaire #1'),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const QuestionnaireParserPage()));
             },
           ),
         ],
