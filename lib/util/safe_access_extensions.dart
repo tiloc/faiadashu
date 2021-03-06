@@ -2,12 +2,14 @@ import 'package:fhir/r4.dart';
 
 extension SafeDisplayQuestionnaireAnswerOptionExtensions
     on QuestionnaireAnswerOption {
+  /// A safeguarded way to get a display value
   String get safeDisplay {
     return valueCoding?.safeDisplay ?? toString();
   }
 }
 
 extension SafeDisplayCodingExtensions on Coding {
+  /// A safeguarded way to get a display value
   String get safeDisplay {
     return display ?? code?.value ?? toString();
   }
@@ -22,6 +24,7 @@ extension SafeDisplayListCodingExtensions on List<Coding> {
 }
 
 extension SafeDisplayCodeableConceptExtension on CodeableConcept {
+  /// A safeguarded way to get a display value
   String get safeDisplay {
     return coding?.firstOrNull?.display ??
         text ??

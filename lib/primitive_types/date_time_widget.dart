@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 /// A [Text] widget built from a FhirDateTime.
-/// Takes the precision into account.
+/// Takes the precision and locale into account.
 class FhirDateTimeWidget extends StatelessWidget {
   final FhirDateTime? dateTime;
   final TextStyle? style;
