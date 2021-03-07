@@ -4,7 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'disclaimer_page.dart';
 import 'observation_page.dart';
 import 'primitive_page.dart';
-import 'questionnaire_parser_page.dart';
+import 'questionnaire_scroller_page.dart';
 import 'questionnaire_stepper_page.dart';
 
 void main() {
@@ -76,12 +76,12 @@ class _HomePageState extends State<HomePage> {
             },
           ),
           ListTile(
-            title: const Text('Questionnaire #1'),
+            title: const Text('Questionnaire Scroller'),
             onTap: () {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => QuestionnaireParserPage()));
+                      builder: (context) => QuestionnaireScrollerPage()));
             },
           ),
           ListTile(

@@ -18,6 +18,14 @@ class _ChoiceItemState extends QuestionnaireItemState<String> {
   _ChoiceItemState() : super(null);
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.location.responseItem != null) {
+      value = widget.location.responseItem!.answer!.first.valueString;
+    }
+  }
+
+  @override
   QuestionnaireResponseItem createResponse() {
     return QuestionnaireResponseItem(
         linkId: widget.location.linkId,

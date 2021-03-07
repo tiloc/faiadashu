@@ -7,9 +7,9 @@ import 'package:widgets_on_fhir/questionnaires/questionnaires.dart';
 import 'exhibit_page.dart';
 import 'phq9_instrument.dart';
 
-class QuestionnaireParserPage extends ExhibitPage {
+class QuestionnaireScrollerPage extends ExhibitPage {
   static const QuestionnaireItemDecorator _decorator = _ItemDecorator();
-  QuestionnaireParserPage({Key? key}) : super(key: key);
+  QuestionnaireScrollerPage({Key? key}) : super(key: key);
 
   final locations = QuestionnaireLocation(Questionnaire.fromJson(
           json.decode(Phq9Instrument.phq9Instrument) as Map<String, dynamic>))
