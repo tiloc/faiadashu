@@ -18,6 +18,8 @@ abstract class QuestionnaireItemState<T>
 
   T? _value;
 
+  Widget buildBodyReadOnly(BuildContext context);
+
   Widget buildBodyEditable(BuildContext context);
 
   QuestionnaireResponseItem createResponse();
@@ -35,8 +37,10 @@ abstract class QuestionnaireItemState<T>
 
   @override
   Widget build(BuildContext context) {
-    return widget.decorator
-        .build(context, widget.location, body: buildBodyEditable(context));
+    return widget.decorator.build(context, widget.location,
+        body: (widget.location.isReadOnly)
+            ? buildBodyReadOnly(context)
+            : buildBodyEditable(context));
   }
 }
 

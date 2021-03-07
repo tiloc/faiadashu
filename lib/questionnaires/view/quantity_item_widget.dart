@@ -17,6 +17,11 @@ class _QuantityItemState extends QuestionnaireItemState {
   _QuantityItemState() : super(null);
 
   @override
+  Widget buildBodyReadOnly(BuildContext context) {
+    return const Text('Read-only Quantity');
+  }
+
+  @override
   Widget buildBodyEditable(BuildContext context) {
     return Text(widget.location.questionnaireItem.text!);
   }

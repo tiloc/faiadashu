@@ -34,6 +34,11 @@ class _ChoiceItemState extends QuestionnaireItemState<String> {
   }
 
   @override
+  Widget buildBodyReadOnly(BuildContext context) {
+    return Text(value ?? '');
+  }
+
+  @override
   Widget buildBodyEditable(BuildContext context) {
     return _buildChoiceAnswers(context, widget.location);
   }

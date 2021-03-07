@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/foundation.dart';
 
@@ -83,6 +84,28 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
   }
 
   QuestionnaireResponseItem? get responseItem => _questionnaireResponseItem;
+
+  bool get isReadOnly {
+    if (questionnaireItem.type == QuestionnaireItemType.group) {
+      return true;
+    }
+
+    if (questionnaireItem.readOnly == Boolean(true)) {
+      return true;
+    }
+
+    if (questionnaireItem.type == QuestionnaireItemType.quantity) {
+      if (questionnaireItem.extension_?.firstWhereOrNull((ext) =>
+              ext.url ==
+              FhirUri(
+                  'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression')) !=
+          null) {
+        return true;
+      }
+    }
+
+    return false;
+  }
 
   LinkedHashMap<String, QuestionnaireLocation> _addChildren() {
     final LinkedHashMap<String, QuestionnaireLocation> locationMap =

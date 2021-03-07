@@ -17,7 +17,7 @@ class _GroupItemState extends QuestionnaireItemState {
   _GroupItemState() : super(null);
 
   @override
-  Widget buildBodyEditable(BuildContext context) {
+  Widget buildBodyReadOnly(BuildContext context) {
     return const SizedBox(
       height: 16.0,
     );
@@ -25,6 +25,12 @@ class _GroupItemState extends QuestionnaireItemState {
 
   @override
   QuestionnaireResponseItem createResponse() {
+    // Not required for a read-only item
+    throw UnimplementedError();
+  }
+
+  @override
+  Widget buildBodyEditable(BuildContext context) {
     // Not required for a read-only item
     throw UnimplementedError();
   }
