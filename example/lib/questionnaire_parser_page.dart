@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:widgets_on_fhir/questionnaires/questionnaires.dart';
 
 import 'exhibit_page.dart';
@@ -10,26 +9,23 @@ import 'phq9_instrument.dart';
 
 class QuestionnaireParserPage extends ExhibitPage {
   static const QuestionnaireItemDecorator _decorator = _ItemDecorator();
-  const QuestionnaireParserPage({Key? key}) : super(key: key);
+  QuestionnaireParserPage({Key? key}) : super(key: key);
+
+  final locations = QuestionnaireLocation(Questionnaire.fromJson(
+          json.decode(Phq9Instrument.phq9Instrument) as Map<String, dynamic>))
+      .preOrder();
 
   @override
   Widget buildExhibit(BuildContext context) {
-    return ChangeNotifierProvider(
-        create: (context) => QuestionnaireLocation(Questionnaire.fromJson(json
-            .decode(Phq9Instrument.phq9Instrument) as Map<String, dynamic>)),
-        child: Consumer<QuestionnaireLocation>(
-            builder: (context, topLocation, child) {
-          final locations = topLocation.preOrder();
-          return ListView.builder(
-              padding: const EdgeInsets.all(8),
-              itemCount: locations.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Center(
-                  child: QuestionnaireItemWidgetFactory.fromQuestionnaireItem(
-                      locations[index], _decorator),
-                );
-              });
-        }));
+    return ListView.builder(
+        padding: const EdgeInsets.all(8),
+        itemCount: locations.length,
+        itemBuilder: (BuildContext context, int index) {
+          return Center(
+            child: QuestionnaireItemWidgetFactory.fromQuestionnaireItem(
+                locations.elementAt(index), _decorator),
+          );
+        });
   }
 
   @override

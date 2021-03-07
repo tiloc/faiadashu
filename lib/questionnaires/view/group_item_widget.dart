@@ -1,3 +1,4 @@
+import 'package:fhir/r4/resource_types/clinical/diagnostics/diagnostics.dart';
 import 'package:flutter/material.dart';
 import 'package:widgets_on_fhir/questionnaires/questionnaires.dart';
 
@@ -13,12 +14,18 @@ class GroupItemWidget extends QuestionnaireItemWidget {
 }
 
 class _GroupItemState extends QuestionnaireItemState {
-  _GroupItemState();
+  _GroupItemState() : super(null);
 
   @override
-  Widget buildBody(BuildContext context) {
+  Widget buildBodyEditable(BuildContext context) {
     return const SizedBox(
       height: 16.0,
     );
+  }
+
+  @override
+  QuestionnaireResponseItem createResponse() {
+    // Not required for a read-only item
+    throw UnimplementedError();
   }
 }

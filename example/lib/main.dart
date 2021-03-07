@@ -80,7 +80,7 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const QuestionnaireParserPage()));
+                      builder: (context) => QuestionnaireParserPage()));
             },
           ),
         ],

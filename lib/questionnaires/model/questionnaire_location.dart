@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:fhir/r4.dart';
 import 'package:flutter/foundation.dart';
 
@@ -6,10 +8,14 @@ import 'package:flutter/foundation.dart';
 class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
   final Questionnaire questionnaire;
   final QuestionnaireItem questionnaireItem;
+  QuestionnaireResponse? questionnaireResponse;
+  QuestionnaireResponseItem? _questionnaireResponseItem;
   final String linkId;
-  final QuestionnaireItem? parent;
+  final QuestionnaireLocation? parent;
   final int siblingIndex;
   final int level;
+
+  LinkedHashMap<String, QuestionnaireLocation>? _orderedItems;
 
   /// Go to the first location top-down of the given [Questionnaire].
   /// Will throw [Error]s in case this [Questionnaire] has no items.
@@ -27,7 +33,7 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
     if (level == 0) {
       return questionnaire.item!;
     } else {
-      return parent!.item!;
+      return parent!.questionnaireItem.item!;
     }
   }
 
@@ -48,7 +54,7 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
 
   List<QuestionnaireLocation> get children {
     return _LocationListBuilder._buildLocationList(
-        questionnaire, childQuestionnaireItems, questionnaireItem, level + 1);
+        questionnaire, childQuestionnaireItems, this, level + 1);
   }
 
   bool get hasNextSibling {
@@ -67,34 +73,50 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
   /// Find the [QuestionnaireLocation] that corresponds to the linkId.
   /// Throws an [Exception] when no such [QuestionnaireLocation] exists.
   QuestionnaireLocation findByLinkId(String linkId) {
-    return preOrder().firstWhere(
-        (questionnaireLocation) => questionnaireLocation.linkId == linkId);
+    _ensureOrderedItems();
+    return _orderedItems![linkId]!;
   }
 
-  List<QuestionnaireLocation> _addChildren() {
-    final List<QuestionnaireLocation> locationList = <QuestionnaireLocation>[];
+  set responseItem(QuestionnaireResponseItem? questionnaireResponseItem) {
+    _questionnaireResponseItem = questionnaireResponseItem;
+    notifyListeners();
+  }
 
-    locationList.add(this);
+  QuestionnaireResponseItem? get responseItem => _questionnaireResponseItem;
+
+  LinkedHashMap<String, QuestionnaireLocation> _addChildren() {
+    final LinkedHashMap<String, QuestionnaireLocation> locationMap =
+        LinkedHashMap<String, QuestionnaireLocation>();
+
+    locationMap[linkId] = this;
     if (hasChildren) {
       for (final child in children) {
-        locationList.addAll(child._addChildren());
+        locationMap.addAll(child._addChildren());
       }
     }
 
-    return locationList;
+    return locationMap;
   }
 
-  /// Build a list of [QuestionnaireLocation] in pre-order.
-  /// see: https://en.wikipedia.org/wiki/Tree_traversal
-  List<QuestionnaireLocation> preOrder() {
-    final List<QuestionnaireLocation> locationList = <QuestionnaireLocation>[];
-    locationList.addAll(_addChildren());
-    QuestionnaireLocation currentSibling = this;
-    while (currentSibling.hasNextSibling) {
-      currentSibling = currentSibling.nextSibling;
-      locationList.addAll(currentSibling._addChildren());
+  void _ensureOrderedItems() {
+    if (_orderedItems == null) {
+      final LinkedHashMap<String, QuestionnaireLocation> locationMap =
+          LinkedHashMap<String, QuestionnaireLocation>();
+      locationMap.addAll(_addChildren());
+      QuestionnaireLocation currentSibling = this;
+      while (currentSibling.hasNextSibling) {
+        currentSibling = currentSibling.nextSibling;
+        locationMap.addAll(currentSibling._addChildren());
+      }
+      _orderedItems = locationMap;
     }
-    return locationList;
+  }
+
+  /// Get an [Iterable] of [QuestionnaireLocation] in pre-order.
+  /// see: https://en.wikipedia.org/wiki/Tree_traversal
+  Iterable<QuestionnaireLocation> preOrder() {
+    _ensureOrderedItems();
+    return _orderedItems!.values;
   }
 
   @override
@@ -118,7 +140,7 @@ class _LocationListBuilder {
   static List<QuestionnaireLocation> _buildLocationList(
       Questionnaire _questionnaire,
       List<QuestionnaireItem> _items,
-      QuestionnaireItem? _parent,
+      QuestionnaireLocation? _parent,
       int _level) {
     int siblingIndex = 0;
     final locationList = <QuestionnaireLocation>[];

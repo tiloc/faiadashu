@@ -1,3 +1,4 @@
+import 'package:fhir/r4/resource_types/clinical/diagnostics/diagnostics.dart';
 import 'package:flutter/material.dart';
 import 'package:widgets_on_fhir/questionnaires/questionnaires.dart';
 
@@ -13,10 +14,16 @@ class QuantityItemWidget extends QuestionnaireItemWidget {
 }
 
 class _QuantityItemState extends QuestionnaireItemState {
-  _QuantityItemState();
+  _QuantityItemState() : super(null);
 
   @override
-  Widget buildBody(BuildContext context) {
+  Widget buildBodyEditable(BuildContext context) {
     return Text(widget.location.questionnaireItem.text!);
+  }
+
+  @override
+  QuestionnaireResponseItem createResponse() {
+    // TODO: implement createResponse
+    throw UnimplementedError();
   }
 }

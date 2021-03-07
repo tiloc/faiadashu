@@ -14,18 +14,24 @@ class ChoiceItemWidget extends QuestionnaireItemWidget {
   State<StatefulWidget> createState() => _ChoiceItemState();
 }
 
-class _ChoiceItemState extends QuestionnaireItemState {
-  String? _choiceSelection;
-
-  _ChoiceItemState();
+class _ChoiceItemState extends QuestionnaireItemState<String> {
+  _ChoiceItemState() : super(null);
 
   @override
-  Widget buildBody(BuildContext context) {
-    return _buildChoiceAnswers(widget.location, context);
+  QuestionnaireResponseItem createResponse() {
+    return QuestionnaireResponseItem(
+        linkId: widget.location.linkId,
+        text: widget.location.questionnaireItem.text,
+        answer: [QuestionnaireResponseAnswer(valueString: value)]);
+  }
+
+  @override
+  Widget buildBodyEditable(BuildContext context) {
+    return _buildChoiceAnswers(context, widget.location);
   }
 
   Widget _buildChoiceAnswers(
-      QuestionnaireLocation location, BuildContext context) {
+      BuildContext context, QuestionnaireLocation location) {
     final element = location.questionnaireItem;
     final questionnaire = location.questionnaire;
 
@@ -55,11 +61,9 @@ class _ChoiceItemState extends QuestionnaireItemState {
               style: Theme.of(context).textTheme.bodyText2,
             ),
             value: concept.code!.toString(),
-            groupValue: _choiceSelection,
-            onChanged: (String? value) {
-              setState(() {
-                _choiceSelection = value;
-              });
+            groupValue: value,
+            onChanged: (String? newValue) {
+              value = newValue;
             }));
       }
     } else {
@@ -69,11 +73,9 @@ class _ChoiceItemState extends QuestionnaireItemState {
               title: Text(choice.safeDisplay,
                   style: Theme.of(context).textTheme.bodyText2),
               value: choice.valueCoding!.code.toString(),
-              groupValue: _choiceSelection,
-              onChanged: (String? value) {
-                setState(() {
-                  _choiceSelection = value;
-                });
+              groupValue: value,
+              onChanged: (String? newValue) {
+                value = newValue;
               }));
         }
       }
