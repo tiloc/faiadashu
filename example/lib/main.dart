@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:widgets_on_fhir_example/questionnaire_parser_page.dart';
 
 import 'disclaimer_page.dart';
 import 'observation_page.dart';
 import 'primitive_page.dart';
+import 'questionnaire_parser_page.dart';
+import 'questionnaire_stepper_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -81,6 +82,15 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => QuestionnaireParserPage()));
+            },
+          ),
+          ListTile(
+            title: const Text('Questionnaire Stepper'),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => QuestionnaireStepperPage()));
             },
           ),
         ],
