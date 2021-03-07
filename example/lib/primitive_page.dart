@@ -1,7 +1,8 @@
 import 'package:fhir/primitive_types/fhir_date_time.dart';
 import 'package:flutter/material.dart';
-import 'package:widgets_on_fhir/primitive_types/date_time_widget.dart';
-import 'package:widgets_on_fhir_example/exhibit_page.dart';
+import 'package:widgets_on_fhir/fhir_types/fhir_types.dart';
+
+import 'exhibit_page.dart';
 
 class PrimitivePage extends ExhibitPage {
   const PrimitivePage({Key? key}) : super(key: key);

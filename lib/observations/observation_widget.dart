@@ -1,8 +1,7 @@
 import 'package:fhir/r4/r4.dart';
 import 'package:flutter/material.dart';
-import 'package:widgets_on_fhir/general_purpose_types/codeable_concept_widget.dart';
 
-import '../primitive_types/date_time_widget.dart';
+import '../fhir_types/fhir_types.dart';
 
 /// Display a single [Observation] with value, code, and timestamp.
 /// Currently only supports observations with valueQuantity,
