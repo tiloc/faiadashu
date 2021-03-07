@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:widgets_on_fhir/questionnaires/questionnaires.dart';
 
 import 'exhibit_page.dart';
@@ -13,19 +14,22 @@ class QuestionnaireParserPage extends ExhibitPage {
 
   @override
   Widget buildExhibit(BuildContext context) {
-    final locations = QuestionnaireLocation(Questionnaire.fromJson(
-            json.decode(Phq9Instrument.phq9Instrument) as Map<String, dynamic>))
-        .preOrder();
-
-    return ListView.builder(
-        padding: const EdgeInsets.all(8),
-        itemCount: locations.length,
-        itemBuilder: (BuildContext context, int index) {
-          return Center(
-            child: QuestionnaireItemWidgetFactory.fromQuestionnaireItem(
-                locations[index], _decorator),
-          );
-        });
+    return ChangeNotifierProvider(
+        create: (context) => QuestionnaireLocation(Questionnaire.fromJson(json
+            .decode(Phq9Instrument.phq9Instrument) as Map<String, dynamic>)),
+        child: Consumer<QuestionnaireLocation>(
+            builder: (context, topLocation, child) {
+          final locations = topLocation.preOrder();
+          return ListView.builder(
+              padding: const EdgeInsets.all(8),
+              itemCount: locations.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Center(
+                  child: QuestionnaireItemWidgetFactory.fromQuestionnaireItem(
+                      locations[index], _decorator),
+                );
+              });
+        }));
   }
 
   @override

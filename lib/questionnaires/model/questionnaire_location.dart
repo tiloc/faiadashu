@@ -1,11 +1,9 @@
 import 'package:fhir/r4.dart';
 import 'package:flutter/foundation.dart';
-import 'package:meta/meta.dart';
 
 /// Visit FHIR [Questionnaire] through linkIds.
 /// Can provide properties of current location and move to adjacent items.
-@immutable
-class QuestionnaireLocation with Diagnosticable {
+class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
   final Questionnaire questionnaire;
   final QuestionnaireItem questionnaireItem;
   final String linkId;
@@ -111,7 +109,7 @@ class QuestionnaireLocation with Diagnosticable {
     properties.add(IntProperty('siblings', siblings.length));
   }
 
-  const QuestionnaireLocation._(this.questionnaire, this.questionnaireItem,
+  QuestionnaireLocation._(this.questionnaire, this.questionnaireItem,
       this.linkId, this.parent, this.siblingIndex, this.level);
 }
 
