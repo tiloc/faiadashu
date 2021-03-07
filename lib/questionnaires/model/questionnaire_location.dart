@@ -85,6 +85,34 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
 
   QuestionnaireResponseItem? get responseItem => _questionnaireResponseItem;
 
+  /// Get a [Decimal] value which can be added to a score.
+  /// Returns null if not applicable (either question unanswered, or wrong type)
+  Decimal? get score {
+    if (responseItem == null) {
+      return null;
+    }
+
+    final ordinalExtension = responseItem
+        ?.answer?.firstOrNull?.valueCoding?.extension_
+        ?.firstWhereOrNull((ext) =>
+            ext.url ==
+            FhirUri(
+                'http://hl7.org/fhir/StructureDefinition/iso21090-CO-value'));
+    if (ordinalExtension == null) {
+      return null;
+    }
+
+    return ordinalExtension.valueDecimal;
+  }
+
+  QuestionnaireLocation get top {
+    if (parent == null) {
+      return this;
+    } else {
+      return parent!.top;
+    }
+  }
+
   bool get isReadOnly {
     if (questionnaireItem.type == QuestionnaireItemType.group) {
       return true;
@@ -95,11 +123,20 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
     }
 
     if (questionnaireItem.type == QuestionnaireItemType.quantity) {
-      if (questionnaireItem.extension_?.firstWhereOrNull((ext) =>
-              ext.url ==
-              FhirUri(
-                  'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression')) !=
+      if (questionnaireItem.extension_?.firstWhereOrNull((ext) {
+            return (ext.url ==
+                    FhirUri(
+                        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression')) ||
+                (ext.url ==
+                    FhirUri(
+                        'http://hl7.org/fhir/StructureDefinition/cqf-expression'));
+          }) !=
           null) {
+        // TODO: Remove
+        for (final loc in top.preOrder()) {
+          print('${loc.linkId} - ${loc.score}');
+        }
+
         return true;
       }
     }
