@@ -7,11 +7,15 @@ import 'package:widgets_on_fhir/questionnaires/questionnaires.dart';
 import 'phq9_instrument.dart';
 
 class QuestionnaireStepperPage extends StatefulWidget {
-  QuestionnaireStepperPage({Key? key}) : super(key: key);
+  late final QuestionnaireLocation top;
+  late final Iterable<QuestionnaireLocation> locations;
 
-  final locations = QuestionnaireLocation(Questionnaire.fromJson(
-          json.decode(Phq9Instrument.phq9Instrument) as Map<String, dynamic>))
-      .preOrder();
+  QuestionnaireStepperPage({Key? key}) : super(key: key) {
+    top = QuestionnaireLocation(Questionnaire.fromJson(
+        json.decode(Phq9Instrument.phq9Instrument) as Map<String, dynamic>));
+
+    locations = top.preOrder();
+  }
 
   @override
   State<StatefulWidget> createState() => _QuestionnaireStepperState();
@@ -51,6 +55,15 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
                 onPressed: () => controller.previousPage(
                     curve: Curves.easeIn,
                     duration: const Duration(milliseconds: 250)),
+              ),
+              ValueListenableBuilder<Decimal?>(
+                builder: (BuildContext context, Decimal? value, Widget? child) {
+                  return Text(
+                    'Score: ${value!.value!.round().toString()}',
+                    style: Theme.of(context).textTheme.headline4,
+                  );
+                },
+                valueListenable: widget.top.totalScoreNotifier!,
               ),
               IconButton(
                 icon: const Icon(Icons.arrow_forward),

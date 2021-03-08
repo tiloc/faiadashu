@@ -88,10 +88,11 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
   /// Get a [Decimal] value which can be added to a score.
   /// Returns null if not applicable (either question unanswered, or wrong type)
   Decimal? get score {
-    if (responseItem == null) {
+    if ((responseItem == null) || isReadOnly) {
       return null;
     }
 
+    // Sum up ordinal values from extensions
     final ordinalExtension = responseItem
         ?.answer?.firstOrNull?.valueCoding?.extension_
         ?.firstWhereOrNull((ext) =>
@@ -113,17 +114,31 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
     }
   }
 
-  bool get isReadOnly {
-    if (questionnaireItem.type == QuestionnaireItemType.group) {
-      return true;
-    }
+  ValueNotifier<Decimal?>? get totalScoreNotifier {
+    final _scoreNotifier = _ScoreNotifier(top);
 
-    if (questionnaireItem.readOnly == Boolean(true)) {
-      return true;
+    final totalScoreLocation =
+        top.preOrder().firstWhereOrNull((location) => location.isTotalScore);
+    if (totalScoreLocation == null) {
+      return null;
+    } else {
+      for (final location in top.preOrder()) {
+        if (!location.isReadOnly) {
+          location.addListener(() => _scoreNotifier.updateScore());
+        }
+      }
+      return _scoreNotifier;
     }
+  }
 
+  void updateScore() {
+    notifyListeners();
+  }
+
+  bool get isTotalScore {
     if (questionnaireItem.type == QuestionnaireItemType.quantity) {
       if (questionnaireItem.extension_?.firstWhereOrNull((ext) {
+            // TODO(tiloc): Right now this assumes that any score is a total score.
             return (ext.url ==
                     FhirUri(
                         'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression')) ||
@@ -132,16 +147,17 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
                         'http://hl7.org/fhir/StructureDefinition/cqf-expression'));
           }) !=
           null) {
-        // TODO: Remove
-        for (final loc in top.preOrder()) {
-          print('${loc.linkId} - ${loc.score}');
-        }
-
         return true;
       }
     }
 
     return false;
+  }
+
+  bool get isReadOnly {
+    return (questionnaireItem.type == QuestionnaireItemType.group) ||
+        questionnaireItem.readOnly == Boolean(true) ||
+        isTotalScore;
   }
 
   LinkedHashMap<String, QuestionnaireLocation> _addChildren() {
@@ -212,5 +228,28 @@ class _LocationListBuilder {
     }
 
     return locationList;
+  }
+}
+
+class _ScoreNotifier extends ValueNotifier<Decimal?> {
+  final QuestionnaireLocation questionnaireLocation;
+  _ScoreNotifier(this.questionnaireLocation) : super(Decimal(0.0)) {
+    updateScore();
+  }
+
+  void updateScore() {
+    print('updating score');
+    // Special handling if this is the total score
+    double sum = 0.0;
+    for (final location in questionnaireLocation.top.preOrder()) {
+      if (!location.isReadOnly) {
+        final points = location.score;
+        if (points != null) {
+          sum += location.score!.value!;
+        }
+      }
+    }
+
+    value = Decimal(sum);
   }
 }

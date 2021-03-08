@@ -29,7 +29,7 @@ class QuestionnaireScrollerPage extends ExhibitPage {
   }
 
   @override
-  String get title => 'Questionnaire Parser';
+  String get title => 'Questionnaire Scroller';
 }
 
 @immutable
