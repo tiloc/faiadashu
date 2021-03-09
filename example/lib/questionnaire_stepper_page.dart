@@ -4,15 +4,13 @@ import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:widgets_on_fhir/questionnaires/questionnaires.dart';
 
-import 'phq9_instrument.dart';
-
 class QuestionnaireStepperPage extends StatefulWidget {
   late final QuestionnaireLocation top;
   late final Iterable<QuestionnaireLocation> locations;
 
-  QuestionnaireStepperPage({Key? key}) : super(key: key) {
+  QuestionnaireStepperPage(String instrument, {Key? key}) : super(key: key) {
     top = QuestionnaireLocation(Questionnaire.fromJson(
-        json.decode(Phq9Instrument.phq9Instrument) as Map<String, dynamic>));
+        json.decode(instrument) as Map<String, dynamic>));
 
     locations = top.preOrder();
   }
@@ -22,7 +20,8 @@ class QuestionnaireStepperPage extends StatefulWidget {
 }
 
 class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
-  static const QuestionnaireItemDecorator _decorator = _ItemDecorator();
+  static const QuestionnaireItemDecorator _decorator =
+      DefaultQuestionnaireItemDecorator();
 
   int step = 0;
 
@@ -74,22 +73,5 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
             ],
           ),
         ]));
-  }
-}
-
-@immutable
-class _ItemDecorator extends QuestionnaireItemDecorator {
-  const _ItemDecorator();
-
-  @override
-  Widget build(BuildContext context, QuestionnaireLocation location,
-      {required Widget body}) {
-    return ListTile(
-      title: Text(location.questionnaireItem.text!,
-          style: (location.level == 0)
-              ? Theme.of(context).textTheme.headline5
-              : Theme.of(context).textTheme.headline6),
-      subtitle: body,
-    );
   }
 }

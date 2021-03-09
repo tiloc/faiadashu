@@ -10,7 +10,9 @@ class QuestionnaireItemWidgetFactory {
       case QuestionnaireItemType.choice:
         return ChoiceItemWidget(location, decorator, key: key);
       case QuestionnaireItemType.quantity:
-        return QuantityItemWidget(location, decorator, key: key);
+      case QuestionnaireItemType.decimal:
+      case QuestionnaireItemType.integer:
+        return NumericalItemWidget(location, decorator, key: key);
       case QuestionnaireItemType.group:
         return GroupItemWidget(location, decorator, key: key);
       default:

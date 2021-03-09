@@ -29,6 +29,7 @@ dependencies:
   intl: ^0.17.0
   meta: ^1.3.0
   pedantic: ^1.11.0
+  simple_html_css: ^3.0.1
 
 dev_dependencies:
   flutter_test:

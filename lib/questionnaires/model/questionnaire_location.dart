@@ -114,6 +114,7 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
     }
   }
 
+  // TODO(tiloc): Carve out scoring
   ValueNotifier<Decimal?>? get totalScoreNotifier {
     final _scoreNotifier = _ScoreNotifier(top);
 
@@ -144,6 +145,9 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
                         'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression')) ||
                 (ext.url ==
                     FhirUri(
+                        'http://hl7.org/fhir/StructureDefinition/questionnaire-unit')) ||
+                (ext.url ==
+                    FhirUri(
                         'http://hl7.org/fhir/StructureDefinition/cqf-expression'));
           }) !=
           null) {
@@ -158,6 +162,16 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
     return (questionnaireItem.type == QuestionnaireItemType.group) ||
         questionnaireItem.readOnly == Boolean(true) ||
         isTotalScore;
+  }
+
+  String? get text {
+    return questionnaireItem.textElement?.extension_
+            ?.firstWhereOrNull((ext) =>
+                ext.url ==
+                FhirUri(
+                    'http://hl7.org/fhir/StructureDefinition/rendering-xhtml'))
+            ?.valueString ??
+        questionnaireItem.text;
   }
 
   LinkedHashMap<String, QuestionnaireLocation> _addChildren() {
@@ -238,7 +252,6 @@ class _ScoreNotifier extends ValueNotifier<Decimal?> {
   }
 
   void updateScore() {
-    print('updating score');
     // Special handling if this is the total score
     double sum = 0.0;
     for (final location in questionnaireLocation.top.preOrder()) {

@@ -5,17 +5,17 @@ import 'package:widgets_on_fhir/questionnaires/questionnaires.dart';
 
 import 'questionnaire_item_widget.dart';
 
-class QuantityItemWidget extends QuestionnaireItemWidget {
-  const QuantityItemWidget(
-      QuestionnaireLocation ocation, QuestionnaireItemDecorator decorator,
+class NumericalItemWidget extends QuestionnaireItemWidget {
+  const NumericalItemWidget(
+      QuestionnaireLocation location, QuestionnaireItemDecorator decorator,
       {Key? key})
-      : super(ocation, decorator, key: key);
+      : super(location, decorator, key: key);
   @override
-  State<StatefulWidget> createState() => _QuantityItemState();
+  State<StatefulWidget> createState() => _NumericalItemState();
 }
 
-class _QuantityItemState extends QuestionnaireItemState {
-  _QuantityItemState() : super(null);
+class _NumericalItemState extends QuestionnaireItemState {
+  _NumericalItemState() : super(null);
 
   @override
   Widget buildBodyReadOnly(BuildContext context) {
@@ -39,7 +39,7 @@ class _QuantityItemState extends QuestionnaireItemState {
       );
     }
 
-    return const Text('Read-only Quantity');
+    return const Text('Read-only Numerical');
   }
 
   @override

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:widgets_on_fhir_example/hf_instrument.dart';
 
 import 'disclaimer_page.dart';
 import 'observation_page.dart';
+import 'phq9_instrument.dart';
 import 'primitive_page.dart';
 import 'questionnaire_scroller_page.dart';
 import 'questionnaire_stepper_page.dart';
@@ -76,21 +78,33 @@ class _HomePageState extends State<HomePage> {
             },
           ),
           ListTile(
-            title: const Text('Questionnaire Scroller'),
+            title: const Text('PHQ9 Questionnaire Scroller'),
             onTap: () {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => QuestionnaireScrollerPage()));
+                      builder: (context) => QuestionnaireScrollerPage(
+                          Phq9Instrument.phq9Instrument)));
             },
           ),
           ListTile(
-            title: const Text('Questionnaire Stepper'),
+            title: const Text('PHQ9 Questionnaire Stepper'),
             onTap: () {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => QuestionnaireStepperPage()));
+                      builder: (context) => QuestionnaireStepperPage(
+                          Phq9Instrument.phq9Instrument)));
+            },
+          ),
+          ListTile(
+            title: const Text('HF Questionnaire Scroller'),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => QuestionnaireScrollerPage(
+                          HFInstrument.hfInstrument)));
             },
           ),
         ],

@@ -5,15 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:widgets_on_fhir/questionnaires/questionnaires.dart';
 
 import 'exhibit_page.dart';
-import 'phq9_instrument.dart';
 
 class QuestionnaireScrollerPage extends ExhibitPage {
-  static const QuestionnaireItemDecorator _decorator = _ItemDecorator();
-  QuestionnaireScrollerPage({Key? key}) : super(key: key);
+  late final QuestionnaireLocation top;
+  late final Iterable<QuestionnaireLocation> locations;
 
-  final locations = QuestionnaireLocation(Questionnaire.fromJson(
-          json.decode(Phq9Instrument.phq9Instrument) as Map<String, dynamic>))
-      .preOrder();
+  static const QuestionnaireItemDecorator _decorator =
+      DefaultQuestionnaireItemDecorator();
+  QuestionnaireScrollerPage(String instrument, {Key? key}) : super(key: key) {
+    top = QuestionnaireLocation(Questionnaire.fromJson(
+        json.decode(instrument) as Map<String, dynamic>));
+
+    locations = top.preOrder();
+  }
 
   @override
   Widget buildExhibit(BuildContext context) {
@@ -30,21 +34,4 @@ class QuestionnaireScrollerPage extends ExhibitPage {
 
   @override
   String get title => 'Questionnaire Scroller';
-}
-
-@immutable
-class _ItemDecorator extends QuestionnaireItemDecorator {
-  const _ItemDecorator();
-
-  @override
-  Widget build(BuildContext context, QuestionnaireLocation location,
-      {required Widget body}) {
-    return ListTile(
-      title: Text(location.questionnaireItem.text!,
-          style: (location.level == 0)
-              ? Theme.of(context).textTheme.headline4
-              : Theme.of(context).textTheme.subtitle1),
-      subtitle: body,
-    );
-  }
 }
