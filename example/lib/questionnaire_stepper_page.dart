@@ -62,7 +62,7 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
                     style: Theme.of(context).textTheme.headline4,
                   );
                 },
-                valueListenable: TotalScoreNotifier(widget.top),
+                valueListenable: TotalScoreAggregator(widget.top),
               ),
               IconButton(
                 icon: const Icon(Icons.arrow_forward),

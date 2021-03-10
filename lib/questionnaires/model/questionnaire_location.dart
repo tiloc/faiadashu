@@ -15,6 +15,7 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
   final QuestionnaireLocation? parent;
   final int siblingIndex;
   final int level;
+  int _revision = 1;
 
   LinkedHashMap<String, QuestionnaireLocation>? _orderedItems;
 
@@ -27,6 +28,14 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
         parent = null,
         siblingIndex = 0,
         level = 0;
+
+  /// Trigger the aggregation of scores, narratives, etc.
+  /// Iterates over all applicable locations and notifies listeners.
+  void aggregate() {
+    for (final location in top.preOrder()) {
+      location.notifyListeners();
+    }
+  }
 
   /// All siblings at the current level as FHIR [QuestionnaireItem].
   /// Includes the current item.
@@ -79,11 +88,21 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
   }
 
   set responseItem(QuestionnaireResponseItem? questionnaireResponseItem) {
-    _questionnaireResponseItem = questionnaireResponseItem;
-    notifyListeners();
+    if (questionnaireResponseItem != _questionnaireResponseItem) {
+      _questionnaireResponseItem = questionnaireResponseItem;
+      bumpTopRevision();
+      notifyListeners();
+    }
   }
 
   QuestionnaireResponseItem? get responseItem => _questionnaireResponseItem;
+
+  void bumpTopRevision() {
+    top._revision += 1;
+    top.notifyListeners();
+  }
+
+  int get revision => _revision;
 
   /// Get a [Decimal] value which can be added to a score.
   /// Returns null if not applicable (either question unanswered, or wrong type)
@@ -144,6 +163,7 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
   }
 
   /// Is this location not changeable by end-users?
+  /// Read-only items might still hold a value, such as a calculated total score.
   bool get isReadOnly {
     return isStatic ||
         questionnaireItem.readOnly == Boolean(true) ||

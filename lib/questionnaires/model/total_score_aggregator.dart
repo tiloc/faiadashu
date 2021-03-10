@@ -5,23 +5,22 @@ import 'package:flutter/material.dart';
 
 import 'questionnaire_location.dart';
 
-/// Notify listeners of the total score of a questionnaire.
+/// Aggregate responses into a total score.
 /// Updates immediately when questionnaire is updated.
 /// Can deal with incomplete questionnaires.
-/// Will return [double.nan] when no score field exists on the questionnaire.
-class TotalScoreNotifier extends ValueNotifier<Decimal> {
+/// Will return 0 when no score field exists on the questionnaire.
+class TotalScoreAggregator extends ValueNotifier<Decimal> {
   final QuestionnaireLocation top;
   late final QuestionnaireLocation? totalScoreLocation;
-  TotalScoreNotifier(QuestionnaireLocation location)
+  TotalScoreAggregator(QuestionnaireLocation location)
       : top = location.top,
-        super(Decimal(double.nan)) {
+        super(Decimal(0.0)) {
     totalScoreLocation =
         top.preOrder().firstWhereOrNull((location) => location.isTotalScore);
     // if there is no total score location then leave value at NaN indefinitely
     if (totalScoreLocation != null) {
-      _updateScore();
       for (final location in top.preOrder()) {
-        if (!location.isReadOnly) {
+        if (!location.isStatic && location != totalScoreLocation) {
           location.addListener(() => _updateScore());
         }
       }
@@ -32,7 +31,7 @@ class TotalScoreNotifier extends ValueNotifier<Decimal> {
     // Special handling if this is the total score
     double sum = 0.0;
     for (final location in top.preOrder()) {
-      if (!location.isReadOnly) {
+      if (location != totalScoreLocation) {
         final points = location.score;
         if (points != null) {
           sum += location.score!.value!;

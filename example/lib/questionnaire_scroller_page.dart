@@ -8,26 +8,19 @@ import 'package:widgets_on_fhir/questionnaires/questionnaires.dart';
 import 'exhibit_page.dart';
 
 class QuestionnaireScrollerPage extends ExhibitPage {
-  late final QuestionnaireLocation top;
-  late final Iterable<QuestionnaireLocation> locations;
-  late final NarrativeNotifier _narrativeNotifier;
-  late final List<Widget> _children;
-
+  final QuestionnaireLocation top;
+  late final NarrativeAggregator nAgg;
   static const QuestionnaireItemDecorator _decorator =
       DefaultQuestionnaireItemDecorator();
-  QuestionnaireScrollerPage(String instrument, {Key? key}) : super(key: key) {
-    top = QuestionnaireLocation(Questionnaire.fromJson(
-        json.decode(instrument) as Map<String, dynamic>));
-
-    locations = top.preOrder();
-
-    _narrativeNotifier = NarrativeNotifier(top);
-
-    _children = locations
-        .map<Widget>((location) => Center(
-            child: QuestionnaireItemWidgetFactory.fromQuestionnaireItem(
-                location, _decorator)))
-        .toList();
+  QuestionnaireScrollerPage(String instrument, {Key? key})
+      : top = QuestionnaireLocation(Questionnaire.fromJson(
+            json.decode(instrument) as Map<String, dynamic>)),
+        super(key: key) {
+    // TODO(tiloc): Would there be any benefit in registering the aggregators with the top location?
+    // TODO(tiloc): This entire sequence looks clunky.
+    TotalScoreAggregator(top);
+    nAgg = NarrativeAggregator(top);
+    top.aggregate();
   }
 
   @override
@@ -36,23 +29,30 @@ class QuestionnaireScrollerPage extends ExhibitPage {
         MediaQuery.of(context).size.height - kToolbarHeight;
     final double itemWidth = MediaQuery.of(context).size.width / 2;
 
-    return GridView.count(
-        crossAxisCount: 2,
-        childAspectRatio: itemWidth / itemHeight,
-        children: [
-          ListView(padding: const EdgeInsets.all(8), children: _children),
-          ValueListenableBuilder<Narrative>(
-            builder: (BuildContext context, Narrative value, Widget? child) {
-              print('Narrative: ${value.div}');
-              return Card(
-                color: Colors.white,
-                child: HTML.toRichText(
-                    context, '<h2>Narrative</h2><p>${value.div}</p>'),
-              );
-            },
-            valueListenable: _narrativeNotifier,
-          ),
-        ]);
+    return QuestionnaireFiller(top,
+        child: Builder(
+            builder: (BuildContext context) => GridView.count(
+                    crossAxisCount: 2,
+                    childAspectRatio: itemWidth / itemHeight,
+                    children: [
+                      ListView.builder(
+                          itemCount:
+                              QuestionnaireFiller.of(context).preOrder.length,
+                          padding: const EdgeInsets.all(8),
+                          itemBuilder: (BuildContext context, int i) {
+                            return QuestionnaireItemWidgetFactory
+                                .fromQuestionnaireItem(
+                                    QuestionnaireFiller.of(context)
+                                        .preOrder
+                                        .elementAt(i),
+                                    _decorator);
+                          }),
+                      Card(
+                        color: Colors.white,
+                        child: HTML.toRichText(context,
+                            '<h2>Narrative</h2><p>${nAgg.value.div}</p>'),
+                      )
+                    ])));
   }
 
   @override

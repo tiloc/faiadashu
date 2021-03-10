@@ -5,10 +5,10 @@ import '../questionnaires.dart';
 
 /// Create a narrative from the responses to a [Questionnaire].
 /// Updates immediately after responses have changed.
-class NarrativeNotifier extends ValueNotifier<Narrative> {
+class NarrativeAggregator extends ValueNotifier<Narrative> {
   final QuestionnaireLocation top;
 
-  NarrativeNotifier(QuestionnaireLocation location)
+  NarrativeAggregator(QuestionnaireLocation location)
       : top = location.top,
         super(_generateNarrative(location.top)) {
     for (final location in top.preOrder()) {

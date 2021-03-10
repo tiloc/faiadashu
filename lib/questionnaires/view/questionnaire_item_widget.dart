@@ -30,7 +30,9 @@ abstract class QuestionnaireItemState<V, W extends QuestionnaireItemWidget>
         _value = newValue;
       });
     }
-    widget.location.responseItem = createResponse();
+    if (!widget.location.isReadOnly) {
+      widget.location.responseItem = createResponse();
+    }
   }
 
   V? get value => _value;
