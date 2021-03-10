@@ -14,7 +14,8 @@ class ChoiceItemWidget extends QuestionnaireItemWidget {
   State<StatefulWidget> createState() => _ChoiceItemState();
 }
 
-class _ChoiceItemState extends QuestionnaireItemState<String> {
+class _ChoiceItemState
+    extends QuestionnaireItemState<String, ChoiceItemWidget> {
   _ChoiceItemState() : super(null);
 
   @override

@@ -55,14 +55,14 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
                     curve: Curves.easeIn,
                     duration: const Duration(milliseconds: 250)),
               ),
-              ValueListenableBuilder<Decimal?>(
-                builder: (BuildContext context, Decimal? value, Widget? child) {
+              ValueListenableBuilder<Decimal>(
+                builder: (BuildContext context, Decimal value, Widget? child) {
                   return Text(
-                    'Score: ${value!.value!.round().toString()}',
+                    'Score: ${value.value!.round().toString()}',
                     style: Theme.of(context).textTheme.headline4,
                   );
                 },
-                valueListenable: widget.top.totalScoreNotifier!,
+                valueListenable: TotalScoreNotifier(widget.top),
               ),
               IconButton(
                 icon: const Icon(Icons.arrow_forward),

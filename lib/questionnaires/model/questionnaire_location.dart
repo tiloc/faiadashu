@@ -114,28 +114,7 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
     }
   }
 
-  // TODO(tiloc): Carve out scoring
-  ValueNotifier<Decimal?>? get totalScoreNotifier {
-    final _scoreNotifier = _ScoreNotifier(top);
-
-    final totalScoreLocation =
-        top.preOrder().firstWhereOrNull((location) => location.isTotalScore);
-    if (totalScoreLocation == null) {
-      return null;
-    } else {
-      for (final location in top.preOrder()) {
-        if (!location.isReadOnly) {
-          location.addListener(() => _scoreNotifier.updateScore());
-        }
-      }
-      return _scoreNotifier;
-    }
-  }
-
-  void updateScore() {
-    notifyListeners();
-  }
-
+  // TODO(tiloc): I would love to move this out, but currently [isReadOnly] depends on it.
   bool get isTotalScore {
     if (questionnaireItem.type == QuestionnaireItemType.quantity) {
       if (questionnaireItem.extension_?.firstWhereOrNull((ext) {
@@ -158,8 +137,15 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
     return false;
   }
 
-  bool get isReadOnly {
+  /// Is this location unable to hold a value?
+  bool get isStatic {
     return (questionnaireItem.type == QuestionnaireItemType.group) ||
+        (questionnaireItem.type == QuestionnaireItemType.display);
+  }
+
+  /// Is this location not changeable by end-users?
+  bool get isReadOnly {
+    return isStatic ||
         questionnaireItem.readOnly == Boolean(true) ||
         isTotalScore;
   }
@@ -242,27 +228,5 @@ class _LocationListBuilder {
     }
 
     return locationList;
-  }
-}
-
-class _ScoreNotifier extends ValueNotifier<Decimal?> {
-  final QuestionnaireLocation questionnaireLocation;
-  _ScoreNotifier(this.questionnaireLocation) : super(Decimal(0.0)) {
-    updateScore();
-  }
-
-  void updateScore() {
-    // Special handling if this is the total score
-    double sum = 0.0;
-    for (final location in questionnaireLocation.top.preOrder()) {
-      if (!location.isReadOnly) {
-        final points = location.score;
-        if (points != null) {
-          sum += location.score!.value!;
-        }
-      }
-    }
-
-    value = Decimal(sum);
   }
 }

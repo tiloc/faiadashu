@@ -5,6 +5,7 @@ import 'package:widgets_on_fhir_example/hf_instrument.dart';
 import 'disclaimer_page.dart';
 import 'observation_page.dart';
 import 'phq9_instrument.dart';
+import 'prapare_instrument.dart';
 import 'primitive_page.dart';
 import 'questionnaire_scroller_page.dart';
 import 'questionnaire_stepper_page.dart';
@@ -105,6 +106,16 @@ class _HomePageState extends State<HomePage> {
                   MaterialPageRoute(
                       builder: (context) => QuestionnaireScrollerPage(
                           HFInstrument.hfInstrument)));
+            },
+          ),
+          ListTile(
+            title: const Text('PRAPARE Questionnaire Scroller'),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => QuestionnaireScrollerPage(
+                          PrapareInstrument.prapareInstrument)));
             },
           ),
         ],

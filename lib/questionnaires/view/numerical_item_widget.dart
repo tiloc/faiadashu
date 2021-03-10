@@ -1,20 +1,27 @@
 import 'package:fhir/primitive_types/decimal.dart';
 import 'package:fhir/r4/resource_types/clinical/diagnostics/diagnostics.dart';
 import 'package:flutter/material.dart';
+import 'package:widgets_on_fhir/questionnaires/model/total_score_notifier.dart';
 import 'package:widgets_on_fhir/questionnaires/questionnaires.dart';
 
 import 'questionnaire_item_widget.dart';
 
 class NumericalItemWidget extends QuestionnaireItemWidget {
-  const NumericalItemWidget(
+  final TotalScoreNotifier? _totalScoreNotifier;
+
+  NumericalItemWidget(
       QuestionnaireLocation location, QuestionnaireItemDecorator decorator,
       {Key? key})
-      : super(location, decorator, key: key);
+      : _totalScoreNotifier =
+            (location.isTotalScore) ? TotalScoreNotifier(location) : null,
+        super(location, decorator, key: key);
+
   @override
   State<StatefulWidget> createState() => _NumericalItemState();
 }
 
-class _NumericalItemState extends QuestionnaireItemState {
+class _NumericalItemState
+    extends QuestionnaireItemState<Decimal, NumericalItemWidget> {
   _NumericalItemState() : super(null);
 
   @override
@@ -35,7 +42,7 @@ class _NumericalItemState extends QuestionnaireItemState {
             ),
           ]));
         },
-        valueListenable: widget.location.top.totalScoreNotifier!,
+        valueListenable: widget._totalScoreNotifier!,
       );
     }
 

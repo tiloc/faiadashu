@@ -1,6 +1,8 @@
 export '../util/safe_access_extensions.dart';
+export 'model/narrative_notifier.dart';
 export 'model/questionnaire_exceptions.dart';
 export 'model/questionnaire_location.dart';
+export 'model/total_score_notifier.dart';
 export 'view/choice_item_widget.dart';
 export 'view/default_questionnaire_item_decorator.dart';
 export 'view/group_item_widget.dart';

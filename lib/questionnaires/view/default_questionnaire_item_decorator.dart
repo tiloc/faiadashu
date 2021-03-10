@@ -17,7 +17,7 @@ class DefaultQuestionnaireItemDecorator extends QuestionnaireItemDecorator {
         : Text(titleText,
             style: (location.level == 0)
                 ? Theme.of(context).textTheme.headline4
-                : Theme.of(context).textTheme.subtitle1);
+                : Theme.of(context).textTheme.headline5);
 
     return ListTile(
       title: titleWidget,

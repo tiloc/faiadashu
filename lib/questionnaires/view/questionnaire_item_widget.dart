@@ -12,11 +12,11 @@ abstract class QuestionnaireItemWidget extends StatefulWidget {
       : super(key: key);
 }
 
-abstract class QuestionnaireItemState<T>
-    extends State<QuestionnaireItemWidget> {
-  QuestionnaireItemState(T? value) : _value = value;
+abstract class QuestionnaireItemState<V, W extends QuestionnaireItemWidget>
+    extends State<W> {
+  QuestionnaireItemState(V? value) : _value = value;
 
-  T? _value;
+  V? _value;
 
   Widget buildBodyReadOnly(BuildContext context);
 
@@ -24,7 +24,7 @@ abstract class QuestionnaireItemState<T>
 
   QuestionnaireResponseItem createResponse();
 
-  set value(T? newValue) {
+  set value(V? newValue) {
     if (mounted) {
       setState(() {
         _value = newValue;
@@ -33,7 +33,7 @@ abstract class QuestionnaireItemState<T>
     widget.location.responseItem = createResponse();
   }
 
-  T? get value => _value;
+  V? get value => _value;
 
   @override
   Widget build(BuildContext context) {
