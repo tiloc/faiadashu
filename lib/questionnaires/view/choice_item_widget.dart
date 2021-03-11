@@ -3,6 +3,7 @@ import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:widgets_on_fhir/questionnaires/questionnaires.dart';
 
+import '../../util/safe_access_extensions.dart';
 import 'questionnaire_item_widget.dart';
 
 class ChoiceItemWidget extends QuestionnaireItemWidget {
@@ -80,10 +81,8 @@ class _ChoiceItemState
           List<FhirExtension>? responseOrdinalExtension;
 
           final FhirExtension? ordinalExtension = concept.extension_
-              ?.firstWhereOrNull((ext) =>
-                  ext.url ==
-                  FhirUri(
-                      'http://hl7.org/fhir/StructureDefinition/ordinalValue'));
+              ?.extensionOrNull(
+                  'http://hl7.org/fhir/StructureDefinition/ordinalValue');
           if (ordinalExtension != null) {
             responseOrdinalExtension = <FhirExtension>[
               FhirExtension(
@@ -104,8 +103,24 @@ class _ChoiceItemState
       }
       throw ArgumentError('ValueSet $key does not contain entry $choice');
     } else {
-      // TODO: Build coding for directly included codes
-      return null;
+      for (final option in element.answerOption!) {
+        if (option.valueCoding!.code.toString() == choice) {
+          final ordinalExtension = option.extension_?.extensionOrNull(
+              'http://hl7.org/fhir/StructureDefinition/ordinalValue');
+          final responseOrdinalExtension = (ordinalExtension != null)
+              ? <FhirExtension>[
+                  FhirExtension(
+                      url: FhirUri(
+                          'http://hl7.org/fhir/StructureDefinition/iso21090-CO-value'),
+                      valueDecimal: ordinalExtension.valueDecimal),
+                ]
+              : null;
+          return option.valueCoding!.copyWith(
+              userSelected: Boolean(true),
+              extension_: responseOrdinalExtension);
+        }
+      }
+      throw ArgumentError('Answer Option does not contain entry $choice');
     }
   }
 

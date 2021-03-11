@@ -1,8 +1,9 @@
 import 'package:collection/collection.dart';
 import 'package:fhir/primitive_types/decimal.dart';
-import 'package:fhir/r4/resource_types/clinical/diagnostics/diagnostics.dart';
+import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
+import '../../util/safe_access_extensions.dart';
 import 'questionnaire_location.dart';
 
 /// Aggregate responses into a total score.
@@ -14,10 +15,10 @@ class TotalScoreAggregator extends ValueNotifier<Decimal> {
   late final QuestionnaireLocation? totalScoreLocation;
   TotalScoreAggregator(QuestionnaireLocation location)
       : top = location.top,
-        super(Decimal(0.0)) {
+        super(Decimal(0)) {
     totalScoreLocation =
         top.preOrder().firstWhereOrNull((location) => location.isTotalScore);
-    // if there is no total score location then leave value at NaN indefinitely
+    // if there is no total score location then leave value at 0 indefinitely
     if (totalScoreLocation != null) {
       for (final location in top.preOrder()) {
         if (!location.isStatic && location != totalScoreLocation) {
@@ -41,9 +42,25 @@ class TotalScoreAggregator extends ValueNotifier<Decimal> {
 
     value = Decimal(sum);
 
-    totalScoreLocation!.responseItem = QuestionnaireResponseItem(
-        linkId: totalScoreLocation!.linkId,
-        text: totalScoreLocation!.questionnaireItem.text,
-        answer: [QuestionnaireResponseAnswer(valueDecimal: value)]);
+    final unit = totalScoreLocation!.questionnaireItem.extension_
+        ?.extensionOrNull(
+            'http://hl7.org/fhir/StructureDefinition/questionnaire-unit')
+        ?.valueCoding
+        ?.display;
+
+    if (unit != null) {
+      totalScoreLocation!.responseItem = QuestionnaireResponseItem(
+          linkId: totalScoreLocation!.linkId,
+          text: totalScoreLocation!.questionnaireItem.text,
+          answer: [
+            QuestionnaireResponseAnswer(
+                valueQuantity: Quantity(value: value, unit: unit))
+          ]);
+    } else {
+      totalScoreLocation!.responseItem = QuestionnaireResponseItem(
+          linkId: totalScoreLocation!.linkId,
+          text: totalScoreLocation!.questionnaireItem.text,
+          answer: [QuestionnaireResponseAnswer(valueDecimal: value)]);
+    }
   }
 }

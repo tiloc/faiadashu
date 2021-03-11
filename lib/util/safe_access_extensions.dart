@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
 
 extension SafeDisplayQuestionnaireAnswerOptionExtensions
@@ -30,6 +31,15 @@ extension SafeDisplayCodeableConceptExtension on CodeableConcept {
         text ??
         coding?.firstOrNull?.code?.value ??
         toString();
+  }
+}
+
+extension ExtensionOrNullExtension on List<FhirExtension> {
+  /// The extension with the given URI, or null
+  FhirExtension? extensionOrNull(String uri) {
+    return firstWhereOrNull((ext) {
+      return ext.url == FhirUri(uri);
+    });
   }
 }
 

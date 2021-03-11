@@ -21,7 +21,12 @@ environment:
   flutter: ^2.0.0
 
 dependencies:
-  fhir: ^0.3.0-nullsafety
+  fhir:
+    git:
+      url: https://github.com/MayJuun/fhir.git
+      path: fhir
+      ref: dev
+
   flutter:
     sdk: flutter
   flutter_localizations:

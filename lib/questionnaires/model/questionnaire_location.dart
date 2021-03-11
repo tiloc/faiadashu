@@ -4,6 +4,8 @@ import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../util/safe_access_extensions.dart';
+
 /// Visit FHIR [Questionnaire] through linkIds.
 /// Can provide properties of current location and move to adjacent items.
 class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
@@ -135,7 +137,8 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
 
   // TODO(tiloc): I would love to move this out, but currently [isReadOnly] depends on it.
   bool get isTotalScore {
-    if (questionnaireItem.type == QuestionnaireItemType.quantity) {
+    if (questionnaireItem.type == QuestionnaireItemType.quantity ||
+        questionnaireItem.type == QuestionnaireItemType.decimal) {
       if (questionnaireItem.extension_?.firstWhereOrNull((ext) {
             // TODO(tiloc): Right now this assumes that any score is a total score.
             return (ext.url ==
@@ -143,12 +146,18 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
                         'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression')) ||
                 (ext.url ==
                     FhirUri(
-                        'http://hl7.org/fhir/StructureDefinition/questionnaire-unit')) ||
-                (ext.url ==
-                    FhirUri(
                         'http://hl7.org/fhir/StructureDefinition/cqf-expression'));
           }) !=
           null) {
+        return true;
+      }
+
+      if (questionnaireItem.extension_
+              ?.extensionOrNull(
+                  'http://hl7.org/fhir/StructureDefinition/questionnaire-unit')
+              ?.valueCoding
+              ?.display ==
+          '{score}') {
         return true;
       }
     }

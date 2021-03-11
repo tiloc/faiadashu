@@ -41,6 +41,9 @@ class NarrativeAggregator extends ValueNotifier<Narrative> {
           div.write('<p>${answer.valueString}</p>');
         } else if (answer.valueDecimal != null) {
           div.write('<p>${answer.valueDecimal.toString()}</p>');
+        } else if (answer.valueQuantity != null) {
+          div.write(
+              '<p>${answer.valueQuantity!.value} ${answer.valueQuantity!.unit}</p>');
         } else if (answer.valueCoding != null) {
           div.write('<p>${answer.valueCoding!.safeDisplay}</p>');
         } else {
