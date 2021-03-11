@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:widgets_on_fhir_example/hf_instrument.dart';
+import 'package:widgets_on_fhir_example/instruments/bluebook.dart';
+import 'package:widgets_on_fhir_example/instruments/hf_instrument.dart';
 
 import 'disclaimer_page.dart';
+import 'instruments/phq9_instrument.dart';
+import 'instruments/prapare_instrument.dart';
 import 'observation_page.dart';
-import 'phq9_instrument.dart';
-import 'prapare_instrument.dart';
 import 'primitive_page.dart';
 import 'questionnaire_scroller_page.dart';
 import 'questionnaire_stepper_page.dart';
@@ -116,6 +117,16 @@ class _HomePageState extends State<HomePage> {
                   MaterialPageRoute(
                       builder: (context) => QuestionnaireScrollerPage(
                           PrapareInstrument.prapareInstrument)));
+            },
+          ),
+          ListTile(
+            title: const Text('Bluebook Questionnaire Scroller'),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => QuestionnaireScrollerPage(
+                          BluebookInstrument.bluebookInstrument)));
             },
           ),
         ],

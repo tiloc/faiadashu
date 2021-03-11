@@ -10,18 +10,22 @@ class DefaultQuestionnaireItemDecorator extends QuestionnaireItemDecorator {
   @override
   Widget build(BuildContext context, QuestionnaireLocation location,
       {required Widget body}) {
-    final titleText = location.text!;
+    final titleText = location.text;
 
-    final titleWidget = (titleText.contains('</'))
-        ? HTML.toRichText(context, titleText)
-        : Text(titleText,
-            style: (location.level == 0)
-                ? Theme.of(context).textTheme.headline4
-                : Theme.of(context).textTheme.headline5);
+    if (titleText != null) {
+      final titleWidget = (titleText.contains('</'))
+          ? HTML.toRichText(context, titleText)
+          : Text(titleText,
+              style: (location.level == 0)
+                  ? Theme.of(context).textTheme.headline4
+                  : Theme.of(context).textTheme.headline5);
 
-    return ListTile(
-      title: titleWidget,
-      subtitle: body,
-    );
+      return ListTile(
+        title: titleWidget,
+        subtitle: body,
+      );
+    } else {
+      return body;
+    }
   }
 }

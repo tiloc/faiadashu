@@ -56,17 +56,27 @@ class _NumericalItemState
       ]));
     }
 
-    return const Text('Read-only Numerical');
+    return Text(value.toString());
   }
 
   @override
   Widget buildBodyEditable(BuildContext context) {
-    return Text(widget.location.questionnaireItem.text!);
+    return TextFormField(
+      decoration:
+          InputDecoration(labelText: widget.location.questionnaireItem.text),
+      keyboardType: TextInputType.number,
+      onChanged: (content) {
+        value = Decimal(content);
+        createResponse();
+      },
+    );
   }
 
   @override
   QuestionnaireResponseItem createResponse() {
-    // TODO: implement createResponse
-    throw UnimplementedError();
+    return QuestionnaireResponseItem(
+        linkId: widget.location.linkId,
+        text: widget.location.questionnaireItem.text,
+        answer: [QuestionnaireResponseAnswer(valueDecimal: value)]);
   }
 }

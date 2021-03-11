@@ -47,7 +47,6 @@ class NarrativeAggregator extends ValueNotifier<Narrative> {
         } else if (answer.valueCoding != null) {
           div.write('<p>${answer.valueCoding!.safeDisplay}</p>');
         } else {
-          print('Narrative generation not fully supported');
           div.write('<p>${answer.toString()}</p>');
         }
         returnValue = true;
