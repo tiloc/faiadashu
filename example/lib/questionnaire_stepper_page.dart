@@ -5,17 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:widgets_on_fhir/questionnaires/questionnaires.dart';
 
 class QuestionnaireStepperPage extends StatefulWidget {
-  late final QuestionnaireLocation top;
-  late final Iterable<QuestionnaireLocation> locations;
+  final QuestionnaireLocation top;
 
-  QuestionnaireStepperPage(String instrument, {Key? key}) : super(key: key) {
-    top = QuestionnaireLocation(Questionnaire.fromJson(
-        json.decode(instrument) as Map<String, dynamic>));
-
-    locations = top.preOrder();
-    TotalScoreAggregator(top);
-    top.aggregate();
-  }
+  QuestionnaireStepperPage(String instrument, {Key? key})
+      : top = QuestionnaireLocation(Questionnaire.fromJson(
+            json.decode(instrument) as Map<String, dynamic>)),
+        super(key: key) {}
 
   @override
   State<StatefulWidget> createState() => _QuestionnaireStepperState();
@@ -32,12 +27,11 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
     final controller = PageController();
 
     return QuestionnaireFiller(widget.top,
+        aggregators: [TotalScoreAggregator()],
         child: Builder(
             builder: (BuildContext context) => Scaffold(
                 appBar: AppBar(
-                  title: Text(
-                      widget.locations.elementAt(0).questionnaire.title ??
-                          'Untitled'),
+                  title: Text(widget.top.questionnaire.title ?? 'Untitled'),
                 ),
                 body: Column(children: [
                   Expanded(
@@ -66,7 +60,8 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
                             style: Theme.of(context).textTheme.headline4,
                           );
                         },
-                        valueListenable: TotalScoreAggregator(widget.top),
+                        valueListenable: QuestionnaireFiller.of(context)
+                            .aggregator<TotalScoreAggregator>(),
                       ),
                       IconButton(
                         icon: const Icon(Icons.arrow_forward),

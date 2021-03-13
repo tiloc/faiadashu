@@ -7,23 +7,17 @@ import 'package:widgets_on_fhir/questionnaires/questionnaires.dart';
 
 class QuestionnaireScrollerPage extends StatelessWidget {
   final QuestionnaireLocation top;
-  late final NarrativeAggregator nAgg;
   static const QuestionnaireItemDecorator _decorator =
       DefaultQuestionnaireItemDecorator();
   QuestionnaireScrollerPage(String instrument, {Key? key})
       : top = QuestionnaireLocation(Questionnaire.fromJson(
             json.decode(instrument) as Map<String, dynamic>)),
-        super(key: key) {
-    // TODO(tiloc): Would there be any benefit in registering the aggregators with the top location?
-    // TODO(tiloc): This entire sequence looks clunky.
-    TotalScoreAggregator(top);
-    nAgg = NarrativeAggregator(top);
-    top.aggregate();
-  }
+        super(key: key) {}
 
   @override
   Widget build(BuildContext context) {
     return QuestionnaireFiller(top,
+        aggregators: [TotalScoreAggregator(), NarrativeAggregator()],
         child: Builder(
             builder: (BuildContext context) => Scaffold(
                   appBar: AppBar(
@@ -45,8 +39,8 @@ class QuestionnaireScrollerPage extends StatelessWidget {
                   ),
                   endDrawer: Card(
                     color: Colors.white,
-                    child: HTML.toRichText(
-                        context, '<h2>Narrative</h2><p>${nAgg.value.div}</p>'),
+                    child: HTML.toRichText(context,
+                        '<h2>Narrative</h2><p>${QuestionnaireFiller.of(context).aggregator<NarrativeAggregator>().value.div}</p>'),
                   ),
                   body: ListView.builder(
                       itemCount: QuestionnaireFiller.of(context)

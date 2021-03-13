@@ -1,16 +1,20 @@
 import 'package:fhir/r4.dart';
-import 'package:flutter/material.dart';
+import 'package:widgets_on_fhir/questionnaires/model/aggregator.dart';
 
 import '../questionnaires.dart';
 
 /// Create a narrative from the responses to a [Questionnaire].
 /// Updates immediately after responses have changed.
-class NarrativeAggregator extends ValueNotifier<Narrative> {
-  final QuestionnaireLocation top;
+class NarrativeAggregator extends Aggregator<Narrative> {
+  NarrativeAggregator()
+      : super(Narrative(
+            div: '<div xmlns="http://www.w3.org/1999/xhtml"></div>',
+            status: NarrativeStatus.empty));
 
-  NarrativeAggregator(QuestionnaireLocation location)
-      : top = location.top,
-        super(_generateNarrative(location.top)) {
+  @override
+  void init(QuestionnaireLocation location) {
+    super.init(location);
+
     for (final location in top.preOrder()) {
       if (!location.isStatic) {
         location.addListener(() => _updateNarrative());

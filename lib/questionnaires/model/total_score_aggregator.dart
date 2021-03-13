@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:fhir/primitive_types/decimal.dart';
 import 'package:fhir/r4.dart';
-import 'package:flutter/material.dart';
+import 'package:widgets_on_fhir/questionnaires/model/aggregator.dart';
 
 import '../../util/safe_access_extensions.dart';
 import 'questionnaire_location.dart';
@@ -10,12 +10,14 @@ import 'questionnaire_location.dart';
 /// Updates immediately when questionnaire is updated.
 /// Can deal with incomplete questionnaires.
 /// Will return 0 when no score field exists on the questionnaire.
-class TotalScoreAggregator extends ValueNotifier<Decimal> {
-  final QuestionnaireLocation top;
+class TotalScoreAggregator extends Aggregator<Decimal> {
   late final QuestionnaireLocation? totalScoreLocation;
-  TotalScoreAggregator(QuestionnaireLocation location)
-      : top = location.top,
-        super(Decimal(0)) {
+  TotalScoreAggregator() : super(Decimal(0));
+
+  @override
+  void init(QuestionnaireLocation location) {
+    super.init(location);
+
     totalScoreLocation =
         top.preOrder().firstWhereOrNull((location) => location.isTotalScore);
     // if there is no total score location then leave value at 0 indefinitely
