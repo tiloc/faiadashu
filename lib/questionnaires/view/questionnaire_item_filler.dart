@@ -1,20 +1,22 @@
 import 'package:fhir/r4/r4.dart';
 import 'package:flutter/material.dart';
-import 'package:widgets_on_fhir/questionnaires/questionnaires.dart';
 
-/// A Widget to work with an individual [QuestionnaireItem].
+import '../questionnaires.dart';
+
+/// A Widget to fill an individual [QuestionnaireItem].
 /// The [decorator] is used to adapt the output style to the needs of the app.
-abstract class QuestionnaireItemWidget extends StatefulWidget {
+abstract class QuestionnaireItemFiller extends StatefulWidget {
   final QuestionnaireLocation location;
   final QuestionnaireItemDecorator decorator;
 
-  const QuestionnaireItemWidget(this.location, this.decorator, {Key? key})
+  const QuestionnaireItemFiller(this.location, this.decorator, {Key? key})
       : super(key: key);
 }
 
-abstract class QuestionnaireItemState<V, W extends QuestionnaireItemWidget>
+abstract class QuestionnaireItemState<V, W extends QuestionnaireItemFiller>
     extends State<W> {
   QuestionnaireItemState(V? value) : _value = value;
+  final focusNode = FocusNode();
 
   V? _value;
 
@@ -22,7 +24,17 @@ abstract class QuestionnaireItemState<V, W extends QuestionnaireItemWidget>
 
   Widget buildBodyEditable(BuildContext context);
 
-  QuestionnaireResponseItem createResponse();
+  QuestionnaireResponseItem? createResponse() {
+    final answer = createAnswer();
+    return (answer != null)
+        ? QuestionnaireResponseItem(
+            linkId: widget.location.linkId,
+            text: widget.location.questionnaireItem.text,
+            answer: [answer])
+        : null;
+  }
+
+  QuestionnaireResponseAnswer? createAnswer();
 
   set value(V? newValue) {
     if (mounted) {

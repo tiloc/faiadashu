@@ -49,16 +49,13 @@ class QuestionnaireScrollerPage extends StatelessWidget {
                         context, '<h2>Narrative</h2><p>${nAgg.value.div}</p>'),
                   ),
                   body: ListView.builder(
-                      itemCount:
-                          QuestionnaireFiller.of(context).preOrder.length,
+                      itemCount: QuestionnaireFiller.of(context)
+                          .surveyLocations
+                          .length,
                       padding: const EdgeInsets.all(8),
                       itemBuilder: (BuildContext context, int i) {
-                        return QuestionnaireItemWidgetFactory
-                            .fromQuestionnaireItem(
-                                QuestionnaireFiller.of(context)
-                                    .preOrder
-                                    .elementAt(i),
-                                _decorator);
+                        return QuestionnaireFiller.of(context)
+                            .itemFillerAt(i, _decorator);
                       }),
                 )));
   }

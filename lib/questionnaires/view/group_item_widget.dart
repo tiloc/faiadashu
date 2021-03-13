@@ -1,10 +1,9 @@
 import 'package:fhir/r4/resource_types/clinical/diagnostics/diagnostics.dart';
 import 'package:flutter/material.dart';
-import 'package:widgets_on_fhir/questionnaires/questionnaires.dart';
 
-import 'questionnaire_item_widget.dart';
+import '../questionnaires.dart';
 
-class GroupItemWidget extends QuestionnaireItemWidget {
+class GroupItemWidget extends QuestionnaireItemFiller {
   const GroupItemWidget(
       QuestionnaireLocation location, QuestionnaireItemDecorator decorator,
       {Key? key})
@@ -24,8 +23,8 @@ class _GroupItemState extends QuestionnaireItemState {
   }
 
   @override
-  QuestionnaireResponseItem createResponse() {
-    // Not required for a read-only item
+  QuestionnaireResponseAnswer? createAnswer() {
+    // Not required for a static item
     throw UnimplementedError();
   }
 

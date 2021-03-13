@@ -1,12 +1,11 @@
 import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
-import 'package:widgets_on_fhir/questionnaires/questionnaires.dart';
 
 import '../../util/safe_access_extensions.dart';
-import 'questionnaire_item_widget.dart';
+import '../questionnaires.dart';
 
-class ChoiceItemWidget extends QuestionnaireItemWidget {
+class ChoiceItemWidget extends QuestionnaireItemFiller {
   const ChoiceItemWidget(
       QuestionnaireLocation location, QuestionnaireItemDecorator decorator,
       {Key? key})
@@ -29,14 +28,8 @@ class _ChoiceItemState
   }
 
   @override
-  QuestionnaireResponseItem createResponse() {
-    return QuestionnaireResponseItem(
-        linkId: widget.location.linkId,
-        text: widget.location.questionnaireItem.text,
-        answer: [
-          QuestionnaireResponseAnswer(valueCoding: _buildCodingByChoice(value))
-        ]);
-  }
+  QuestionnaireResponseAnswer? createAnswer() =>
+      QuestionnaireResponseAnswer(valueCoding: _buildCodingByChoice(value));
 
   @override
   Widget buildBodyReadOnly(BuildContext context) {

@@ -140,13 +140,11 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
     if (questionnaireItem.type == QuestionnaireItemType.quantity ||
         questionnaireItem.type == QuestionnaireItemType.decimal) {
       if (questionnaireItem.extension_?.firstWhereOrNull((ext) {
-            // TODO(tiloc): Right now this assumes that any score is a total score.
-            return (ext.url ==
-                    FhirUri(
-                        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression')) ||
-                (ext.url ==
-                    FhirUri(
-                        'http://hl7.org/fhir/StructureDefinition/cqf-expression'));
+            // TODO(tiloc): Right now this assumes that any calculation is a total score.
+            return {
+              'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression',
+              'http://hl7.org/fhir/StructureDefinition/cqf-expression'
+            }.contains(ext.url?.value.toString());
           }) !=
           null) {
         return true;

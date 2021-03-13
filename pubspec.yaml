@@ -21,6 +21,7 @@ environment:
   flutter: ^2.0.0
 
 dependencies:
+  date_time_picker: ^2.0.0
   fhir:
     git:
       url: https://github.com/MayJuun/fhir.git

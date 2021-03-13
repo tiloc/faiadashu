@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:widgets_on_fhir/questionnaires/model/questionnaire_location.dart';
+import 'package:widgets_on_fhir/questionnaires/questionnaires.dart';
+
+import '../model/questionnaire_location.dart';
+import 'questionnaire_item_filler_factory.dart';
 
 class QuestionnaireFiller extends StatefulWidget {
   final Widget child;
@@ -20,9 +23,9 @@ class QuestionnaireFiller extends StatefulWidget {
 }
 
 class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
-  int revision;
+  int _revision = -1;
 
-  _QuestionnaireFillerState({this.revision = -1});
+  _QuestionnaireFillerState();
 
   @override
   void initState() {
@@ -31,21 +34,21 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
   }
 
   void _onTopChange() {
-    onRevisionChange(widget.topLocation.revision);
+    _onRevisionChange(widget.topLocation.revision);
   }
 
-  void onRevisionChange(int newRevision) {
+  void _onRevisionChange(int newRevision) {
     setState(() {
-      revision = newRevision;
+      _revision = newRevision;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return QuestionnaireFillerData(
+    return QuestionnaireFillerData._(
       widget.topLocation,
-      revision: revision,
-      onRevisionChange: onRevisionChange,
+      revision: _revision,
+      onRevisionChange: _onRevisionChange,
       child: widget.child,
     );
   }
@@ -53,18 +56,25 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
 
 class QuestionnaireFillerData extends InheritedWidget {
   final QuestionnaireLocation topLocation;
-  final Iterable<QuestionnaireLocation> preOrder;
-  final int revision;
-  final ValueChanged<int>? onRevisionChange;
+  final Iterable<QuestionnaireLocation> surveyLocations;
+  final int _revision;
+  // TODO(tiloc) is it worth the extra complexity of this being nullable?
+  late final List<QuestionnaireItemFiller?> _itemFillers;
+  final ValueChanged<int> _onRevisionChange;
 
-  QuestionnaireFillerData(
+  QuestionnaireFillerData._(
     this.topLocation, {
     Key? key,
-    this.revision = -1,
-    this.onRevisionChange,
+    required int revision,
+    required ValueChanged<int> onRevisionChange,
     required Widget child,
-  })   : preOrder = topLocation.preOrder(),
-        super(key: key, child: child);
+  })   : surveyLocations = topLocation.preOrder(),
+        _revision = revision,
+        _onRevisionChange = onRevisionChange,
+        super(key: key, child: child) {
+    _itemFillers =
+        List<QuestionnaireItemFiller?>.filled(surveyLocations.length, null);
+  }
 
   static QuestionnaireFillerData of(BuildContext context) {
     final result =
@@ -73,9 +83,29 @@ class QuestionnaireFillerData extends InheritedWidget {
     return result!;
   }
 
+  List<QuestionnaireItemFiller> itemFillers(
+      QuestionnaireItemDecorator decorator) {
+    for (int i = 0; i < _itemFillers.length; i++) {
+      if (_itemFillers[i] == null) {
+        _itemFillers[i] = itemFillerAt(i, decorator);
+      }
+    }
+
+    return _itemFillers
+        .map<QuestionnaireItemFiller>(
+            (itemFiller) => ArgumentError.checkNotNull(itemFiller))
+        .toList();
+  }
+
+  QuestionnaireItemFiller itemFillerAt(
+      int index, QuestionnaireItemDecorator decorator) {
+    return QuestionnaireItemFillerFactory.fromQuestionnaireItem(
+        surveyLocations.elementAt(index), decorator);
+  }
+
   @override
   bool updateShouldNotify(QuestionnaireFillerData oldWidget) {
-    return oldWidget.revision != revision ||
-        oldWidget.onRevisionChange != onRevisionChange;
+    return oldWidget._revision != _revision ||
+        oldWidget._onRevisionChange != _onRevisionChange;
   }
 }

@@ -13,6 +13,8 @@ class QuestionnaireStepperPage extends StatefulWidget {
         json.decode(instrument) as Map<String, dynamic>));
 
     locations = top.preOrder();
+    TotalScoreAggregator(top);
+    top.aggregate();
   }
 
   @override
@@ -28,50 +30,52 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
   @override
   Widget build(BuildContext context) {
     final controller = PageController();
-    return Scaffold(
-        appBar: AppBar(
-          title: Text(
-              widget.locations.elementAt(0).questionnaire.title ?? 'Untitled'),
-        ),
-        body: Column(children: [
-          Expanded(
-            child: PageView(
-              /// [PageView.scrollDirection] defaults to [Axis.horizontal].
-              /// Use [Axis.vertical] to scroll vertically.
-              controller: controller,
-              children: widget.locations
-                  .map<Widget>((location) =>
-                      QuestionnaireItemWidgetFactory.fromQuestionnaireItem(
-                          location, _decorator))
-                  .toList(),
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () => controller.previousPage(
-                    curve: Curves.easeIn,
-                    duration: const Duration(milliseconds: 250)),
-              ),
-              ValueListenableBuilder<Decimal>(
-                builder: (BuildContext context, Decimal value, Widget? child) {
-                  return Text(
-                    'Score: ${value.value!.round().toString()}',
-                    style: Theme.of(context).textTheme.headline4,
-                  );
-                },
-                valueListenable: TotalScoreAggregator(widget.top),
-              ),
-              IconButton(
-                icon: const Icon(Icons.arrow_forward),
-                onPressed: () => controller.nextPage(
-                    curve: Curves.easeIn,
-                    duration: const Duration(milliseconds: 250)),
-              ),
-            ],
-          ),
-        ]));
+
+    return QuestionnaireFiller(widget.top,
+        child: Builder(
+            builder: (BuildContext context) => Scaffold(
+                appBar: AppBar(
+                  title: Text(
+                      widget.locations.elementAt(0).questionnaire.title ??
+                          'Untitled'),
+                ),
+                body: Column(children: [
+                  Expanded(
+                    child: PageView(
+                      /// [PageView.scrollDirection] defaults to [Axis.horizontal].
+                      /// Use [Axis.vertical] to scroll vertically.
+                      controller: controller,
+                      children: QuestionnaireFiller.of(context)
+                          .itemFillers(_decorator),
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: () => controller.previousPage(
+                            curve: Curves.easeIn,
+                            duration: const Duration(milliseconds: 250)),
+                      ),
+                      ValueListenableBuilder<Decimal>(
+                        builder: (BuildContext context, Decimal value,
+                            Widget? child) {
+                          return Text(
+                            'Score: ${value.value!.round().toString()}',
+                            style: Theme.of(context).textTheme.headline4,
+                          );
+                        },
+                        valueListenable: TotalScoreAggregator(widget.top),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.arrow_forward),
+                        onPressed: () => controller.nextPage(
+                            curve: Curves.easeIn,
+                            duration: const Duration(milliseconds: 250)),
+                      ),
+                    ],
+                  ),
+                ]))));
   }
 }

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:simple_html_css/simple_html_css.dart';
-import 'package:widgets_on_fhir/questionnaires/questionnaires.dart';
+
+import '../questionnaires.dart';
 
 @immutable
 class DefaultQuestionnaireItemDecorator extends QuestionnaireItemDecorator {

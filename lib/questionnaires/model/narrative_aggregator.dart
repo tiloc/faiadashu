@@ -35,6 +35,7 @@ class NarrativeAggregator extends ValueNotifier<Narrative> {
       returnValue = true;
     }
 
+    // TODO(tiloc): Should the conversion from answer to text rather live in classes for the individual types?
     if (item.answer != null) {
       for (final answer in item.answer!) {
         if (answer.valueString != null) {
@@ -46,6 +47,14 @@ class NarrativeAggregator extends ValueNotifier<Narrative> {
               '<p>${answer.valueQuantity!.value} ${answer.valueQuantity!.unit}</p>');
         } else if (answer.valueCoding != null) {
           div.write('<p>${answer.valueCoding!.safeDisplay}</p>');
+        } else if (answer.valueDateTime != null) {
+          div.write('<p>${answer.valueDateTime}</p>');
+        } else if (answer.valueDate != null) {
+          div.write('<p>${answer.valueDate}</p>');
+        } else if (answer.valueTime != null) {
+          div.write('<p>${answer.valueTime}</p>');
+        } else if (answer.valueBoolean != null) {
+          div.write('<p>${answer.valueBoolean}</p>');
         } else {
           div.write('<p>${answer.toString()}</p>');
         }
