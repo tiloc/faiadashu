@@ -6,13 +6,11 @@ import 'package:simple_html_css/simple_html_css.dart';
 import 'package:widgets_on_fhir/questionnaires/questionnaires.dart';
 
 class QuestionnaireScrollerPage extends StatelessWidget {
-  final QuestionnaireLocation top;
-  static const QuestionnaireItemDecorator _decorator =
-      DefaultQuestionnaireItemDecorator();
+  final QuestionnaireTopLocation top;
   QuestionnaireScrollerPage(String instrument, {Key? key})
-      : top = QuestionnaireLocation(Questionnaire.fromJson(
+      : top = QuestionnaireTopLocation.fromQuestionnaire(Questionnaire.fromJson(
             json.decode(instrument) as Map<String, dynamic>)),
-        super(key: key) {}
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -48,8 +46,7 @@ class QuestionnaireScrollerPage extends StatelessWidget {
                           .length,
                       padding: const EdgeInsets.all(8),
                       itemBuilder: (BuildContext context, int i) {
-                        return QuestionnaireFiller.of(context)
-                            .itemFillerAt(i, _decorator);
+                        return QuestionnaireFiller.of(context).itemFillerAt(i);
                       }),
                 )));
   }

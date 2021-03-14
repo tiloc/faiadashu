@@ -6,6 +6,72 @@ import 'package:flutter/foundation.dart';
 
 import '../../util/safe_access_extensions.dart';
 
+class QuestionnaireTopLocation extends QuestionnaireLocation {
+  final Map<String, QuestionnaireLocation> _cachedItems = {};
+
+  /// Create the first location top-down of the given [Questionnaire].
+  /// Will throw [Error]s in case this [Questionnaire] has no items.
+  QuestionnaireTopLocation.fromQuestionnaire(Questionnaire questionnaire)
+      : super._(
+            questionnaire,
+            null,
+            ArgumentError.checkNotNull(questionnaire.item?.first),
+            ArgumentError.checkNotNull(questionnaire.item?.first.linkId),
+            null,
+            0,
+            0) {
+    _top = this;
+    // This will set up the traversal order and fill up the cache.
+    _ensureOrderedItems();
+  }
+
+  void bumpRevision() {
+    _revision += 1;
+    notifyListeners();
+  }
+
+  int get revision => _revision;
+
+  /// Find the [QuestionnaireLocation] that corresponds to the linkId.
+  /// Throws an [Exception] when no such [QuestionnaireLocation] exists.
+  QuestionnaireLocation findByLinkId(String linkId) {
+    return _orderedItems![linkId]!;
+  }
+
+  /// Trigger the aggregation of scores, narratives, etc.
+  /// Iterates over all applicable locations and notifies listeners.
+  void aggregate() {
+    for (final location in preOrder()) {
+      location.notifyListeners();
+    }
+  }
+
+  /// Calculate the current enablement status of all items.
+  void _calculateAllEnabled() {
+    for (final location in preOrder()) {
+      location._enabled = true;
+    }
+
+    for (final location in preOrder()) {
+      location._calculateEnabled();
+    }
+    bumpRevision();
+  }
+
+  /// Activate the "enableWhen" behaviors.
+  void activateEnableWhen() {
+    for (final location in top.preOrder()) {
+      location.forEnableWhens((qew) {
+        top
+            .findByLinkId(qew.question!)
+            .addListener(() => _calculateAllEnabled());
+      });
+    }
+
+    _calculateAllEnabled();
+  }
+}
+
 /// Visit FHIR [Questionnaire] through linkIds.
 /// Can provide properties of current location and move to adjacent items.
 class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
@@ -15,27 +81,46 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
   QuestionnaireResponseItem? _questionnaireResponseItem;
   final String linkId;
   final QuestionnaireLocation? parent;
+  late QuestionnaireTopLocation? _top;
   final int siblingIndex;
   final int level;
   int _revision = 1;
 
+  QuestionnaireTopLocation get top => _top!;
+
   LinkedHashMap<String, QuestionnaireLocation>? _orderedItems;
 
-  /// Go to the first location top-down of the given [Questionnaire].
-  /// Will throw [Error]s in case this [Questionnaire] has no items.
-  QuestionnaireLocation(this.questionnaire)
-      : linkId = ArgumentError.checkNotNull(questionnaire.item?.first.linkId),
-        questionnaireItem =
-            ArgumentError.checkNotNull(questionnaire.item?.first),
-        parent = null,
-        siblingIndex = 0,
-        level = 0;
+  void _disableWithChildren() {
+    _enabled = false;
+    for (final child in children) {
+      child._disableWithChildren();
+    }
+  }
 
-  /// Trigger the aggregation of scores, narratives, etc.
-  /// Iterates over all applicable locations and notifies listeners.
-  void aggregate() {
-    for (final location in top.preOrder()) {
-      location.notifyListeners();
+  /// Calculate the current enablement status of this item.
+  /// Sets the [enabled] property and returns true if status has changed.
+  void _calculateEnabled() {
+    forEnableWhens((qew) {
+      if (qew.operator_ == QuestionnaireEnableWhenOperator.exists) {
+        if (top.findByLinkId(qew.question!).responseItem == null) {
+          _disableWithChildren();
+        }
+      } else {
+        print('Unsupported operator: ${qew.operator_}.');
+      }
+    });
+  }
+
+  bool _enabled = true;
+  bool get enabled => _enabled;
+
+  /// Iterate over all enableWhen conditions and do something with them.
+  void forEnableWhens(void Function(QuestionnaireEnableWhen qew) f) {
+    final enableWhens = questionnaireItem.enableWhen;
+    if ((enableWhens != null) && enableWhens.isNotEmpty) {
+      for (final enableWhen in enableWhens) {
+        f.call(enableWhen);
+      }
     }
   }
 
@@ -61,12 +146,12 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
 
   List<QuestionnaireLocation> get siblings {
     return _LocationListBuilder._buildLocationList(
-        questionnaire, siblingQuestionnaireItems, parent, level);
+        questionnaire, top, siblingQuestionnaireItems, parent, level);
   }
 
   List<QuestionnaireLocation> get children {
     return _LocationListBuilder._buildLocationList(
-        questionnaire, childQuestionnaireItems, this, level + 1);
+        questionnaire, top, childQuestionnaireItems, this, level + 1);
   }
 
   bool get hasNextSibling {
@@ -82,29 +167,16 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
   bool get hasChildren =>
       (questionnaireItem.item != null) && (questionnaireItem.item!.isNotEmpty);
 
-  /// Find the [QuestionnaireLocation] that corresponds to the linkId.
-  /// Throws an [Exception] when no such [QuestionnaireLocation] exists.
-  QuestionnaireLocation findByLinkId(String linkId) {
-    _ensureOrderedItems();
-    return _orderedItems![linkId]!;
-  }
-
   set responseItem(QuestionnaireResponseItem? questionnaireResponseItem) {
+    print('Set responseItem: $questionnaireResponseItem');
     if (questionnaireResponseItem != _questionnaireResponseItem) {
       _questionnaireResponseItem = questionnaireResponseItem;
-      bumpTopRevision();
+      top.bumpRevision();
       notifyListeners();
     }
   }
 
   QuestionnaireResponseItem? get responseItem => _questionnaireResponseItem;
-
-  void bumpTopRevision() {
-    top._revision += 1;
-    top.notifyListeners();
-  }
-
-  int get revision => _revision;
 
   /// Get a [Decimal] value which can be added to a score.
   /// Returns null if not applicable (either question unanswered, or wrong type)
@@ -116,10 +188,8 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
     // Sum up ordinal values from extensions
     final ordinalExtension = responseItem
         ?.answer?.firstOrNull?.valueCoding?.extension_
-        ?.firstWhereOrNull((ext) =>
-            ext.url ==
-            FhirUri(
-                'http://hl7.org/fhir/StructureDefinition/iso21090-CO-value'));
+        ?.extensionOrNull(
+            'http://hl7.org/fhir/StructureDefinition/iso21090-CO-value');
     if (ordinalExtension == null) {
       return null;
     }
@@ -127,20 +197,10 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
     return ordinalExtension.valueDecimal;
   }
 
-  QuestionnaireLocation get top {
-    if (parent == null) {
-      return this;
-    } else {
-      return parent!.top;
-    }
-  }
-
-  // TODO(tiloc): I would love to move this out, but currently [isReadOnly] depends on it.
-  bool get isTotalScore {
+  bool get isCalculatedExpression {
     if (questionnaireItem.type == QuestionnaireItemType.quantity ||
         questionnaireItem.type == QuestionnaireItemType.decimal) {
       if (questionnaireItem.extension_?.firstWhereOrNull((ext) {
-            // TODO(tiloc): Right now this assumes that any calculation is a total score.
             return {
               'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression',
               'http://hl7.org/fhir/StructureDefinition/cqf-expression'
@@ -174,15 +234,13 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
   bool get isReadOnly {
     return isStatic ||
         questionnaireItem.readOnly == Boolean(true) ||
-        isTotalScore;
+        isCalculatedExpression;
   }
 
   String? get text {
     return questionnaireItem.textElement?.extension_
-            ?.firstWhereOrNull((ext) =>
-                ext.url ==
-                FhirUri(
-                    'http://hl7.org/fhir/StructureDefinition/rendering-xhtml'))
+            ?.extensionOrNull(
+                'http://hl7.org/fhir/StructureDefinition/rendering-xhtml')
             ?.valueString ??
         questionnaireItem.text;
   }
@@ -234,14 +292,37 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
     properties.add(IntProperty('siblings', siblings.length));
   }
 
-  QuestionnaireLocation._(this.questionnaire, this.questionnaireItem,
-      this.linkId, this.parent, this.siblingIndex, this.level);
+  QuestionnaireLocation._(
+      this.questionnaire,
+      QuestionnaireTopLocation? top,
+      this.questionnaireItem,
+      this.linkId,
+      this.parent,
+      this.siblingIndex,
+      this.level) {
+    _top = top;
+  }
+
+  factory QuestionnaireLocation._cached(
+      Questionnaire questionnaire,
+      QuestionnaireTopLocation top,
+      QuestionnaireItem questionnaireItem,
+      String linkId,
+      QuestionnaireLocation? parent,
+      int siblingIndex,
+      int level) {
+    return top._cachedItems.putIfAbsent(
+        linkId,
+        () => QuestionnaireLocation._(questionnaire, top, questionnaireItem,
+            linkId, parent, siblingIndex, level));
+  }
 }
 
 /// Build list of [QuestionnaireLocation] from [QuestionnaireItem] and meta-data.
 class _LocationListBuilder {
   static List<QuestionnaireLocation> _buildLocationList(
       Questionnaire _questionnaire,
+      QuestionnaireTopLocation top,
       List<QuestionnaireItem> _items,
       QuestionnaireLocation? _parent,
       int _level) {
@@ -249,8 +330,8 @@ class _LocationListBuilder {
     final locationList = <QuestionnaireLocation>[];
 
     for (final item in _items) {
-      locationList.add(QuestionnaireLocation._(
-          _questionnaire, item, item.linkId!, _parent, siblingIndex, _level));
+      locationList.add(QuestionnaireLocation._cached(_questionnaire, top, item,
+          item.linkId!, _parent, siblingIndex, _level));
       siblingIndex++;
     }
 

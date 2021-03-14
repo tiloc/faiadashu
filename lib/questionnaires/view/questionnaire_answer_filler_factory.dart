@@ -3,48 +3,50 @@ import 'package:flutter/material.dart';
 
 import '../questionnaires.dart';
 
-class QuestionnaireItemFillerFactory {
-  static QuestionnaireItemFiller fromQuestionnaireItem(
-      QuestionnaireLocation location, QuestionnaireItemDecorator decorator,
-      {Key? key}) {
+class QuestionnaireAnswerFillerFactory {
+  static QuestionnaireAnswerFiller fromQuestionnaireItem(
+      QuestionnaireLocation location,
+      QuestionnaireResponseState responseState,
+      int answerIndex) {
     switch (location.questionnaireItem.type!) {
       case QuestionnaireItemType.choice:
       case QuestionnaireItemType.open_choice:
-        return ChoiceItemWidget(location, decorator, key: key);
+        return ChoiceItemAnswer(location, responseState, answerIndex);
       case QuestionnaireItemType.quantity:
       case QuestionnaireItemType.decimal:
       case QuestionnaireItemType.integer:
-        return NumericalItemWidget(location, decorator, key: key);
+        return NumericalItemAnswer(location, responseState, answerIndex);
       case QuestionnaireItemType.string:
       case QuestionnaireItemType.text:
-        return StringItemWidget(location, decorator, key: key);
+        return StringItemAnswer(location, responseState, answerIndex);
       case QuestionnaireItemType.group:
-        return GroupItemWidget(location, decorator, key: key);
+        return GroupItemAnswer(location, responseState, answerIndex);
       case QuestionnaireItemType.date:
       case QuestionnaireItemType.datetime:
       case QuestionnaireItemType.time:
-        return DateTimeItemWidget(location, decorator, key: key);
+        return DateTimeItemAnswer(location, responseState, answerIndex);
       case QuestionnaireItemType.boolean:
-        return BooleanItemWidget(location, decorator, key: key);
+        return BooleanItemAnswer(location, responseState, answerIndex);
       case QuestionnaireItemType.display:
       case QuestionnaireItemType.attachment:
       case QuestionnaireItemType.unknown:
       case QuestionnaireItemType.reference:
       case QuestionnaireItemType.url:
-        return _UnsupportedItemWidget(location);
+        return _UnsupportedItem(location, responseState, answerIndex);
     }
   }
 }
 
-class _UnsupportedItemWidget extends QuestionnaireItemFiller {
-  const _UnsupportedItemWidget(QuestionnaireLocation location, {Key? key})
-      : super(location, const DefaultQuestionnaireItemDecorator(), key: key);
+class _UnsupportedItem extends QuestionnaireAnswerFiller {
+  const _UnsupportedItem(QuestionnaireLocation location,
+      QuestionnaireResponseState responseState, int answerIndex)
+      : super(location, responseState, answerIndex);
 
   @override
   State<StatefulWidget> createState() => _UnsupportedItemState();
 }
 
-class _UnsupportedItemState extends State<_UnsupportedItemWidget> {
+class _UnsupportedItemState extends State<_UnsupportedItem> {
   @override
   Widget build(BuildContext context) {
     return Card(

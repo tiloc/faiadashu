@@ -18,8 +18,9 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
   void init(QuestionnaireLocation location) {
     super.init(location);
 
-    totalScoreLocation =
-        top.preOrder().firstWhereOrNull((location) => location.isTotalScore);
+    totalScoreLocation = top
+        .preOrder()
+        .firstWhereOrNull((location) => location.isCalculatedExpression);
     // if there is no total score location then leave value at 0 indefinitely
     if (totalScoreLocation != null) {
       for (final location in top.preOrder()) {

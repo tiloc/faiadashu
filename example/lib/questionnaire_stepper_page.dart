@@ -5,21 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:widgets_on_fhir/questionnaires/questionnaires.dart';
 
 class QuestionnaireStepperPage extends StatefulWidget {
-  final QuestionnaireLocation top;
+  final QuestionnaireTopLocation top;
 
   QuestionnaireStepperPage(String instrument, {Key? key})
-      : top = QuestionnaireLocation(Questionnaire.fromJson(
+      : top = QuestionnaireTopLocation.fromQuestionnaire(Questionnaire.fromJson(
             json.decode(instrument) as Map<String, dynamic>)),
-        super(key: key) {}
+        super(key: key);
 
   @override
   State<StatefulWidget> createState() => _QuestionnaireStepperState();
 }
 
 class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
-  static const QuestionnaireItemDecorator _decorator =
-      DefaultQuestionnaireItemDecorator();
-
   int step = 0;
 
   @override
@@ -39,8 +36,7 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
                       /// [PageView.scrollDirection] defaults to [Axis.horizontal].
                       /// Use [Axis.vertical] to scroll vertically.
                       controller: controller,
-                      children: QuestionnaireFiller.of(context)
-                          .itemFillers(_decorator),
+                      children: QuestionnaireFiller.of(context).itemFillers(),
                     ),
                   ),
                   Row(

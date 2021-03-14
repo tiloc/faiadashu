@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:widgets_on_fhir/questionnaires/model/aggregator.dart';
-import 'package:widgets_on_fhir/questionnaires/questionnaires.dart';
 
+import '../model/aggregator.dart';
 import '../model/questionnaire_location.dart';
-import 'questionnaire_item_filler_factory.dart';
+import '../questionnaires.dart';
 
 class QuestionnaireFiller extends StatefulWidget {
   final Widget child;
-  final QuestionnaireLocation topLocation;
+  final QuestionnaireTopLocation topLocation;
   final List<Aggregator>? _aggregators;
 
   QuestionnaireFiller(this.topLocation,
@@ -21,6 +20,7 @@ class QuestionnaireFiller extends StatefulWidget {
     }
 
     topLocation.aggregate();
+    topLocation.activateEnableWhen();
   }
 
   static QuestionnaireFillerData of(BuildContext context) {
@@ -106,11 +106,10 @@ class QuestionnaireFillerData extends InheritedWidget {
     return result!;
   }
 
-  List<QuestionnaireItemFiller> itemFillers(
-      QuestionnaireItemDecorator decorator) {
+  List<QuestionnaireItemFiller> itemFillers() {
     for (int i = 0; i < _itemFillers.length; i++) {
       if (_itemFillers[i] == null) {
-        _itemFillers[i] = itemFillerAt(i, decorator);
+        _itemFillers[i] = itemFillerAt(i);
       }
     }
 
@@ -120,11 +119,9 @@ class QuestionnaireFillerData extends InheritedWidget {
         .toList();
   }
 
-  QuestionnaireItemFiller itemFillerAt(
-      int index, QuestionnaireItemDecorator decorator) {
-    _itemFillers[index] ??=
-        QuestionnaireItemFillerFactory.fromQuestionnaireItem(
-            surveyLocations.elementAt(index), decorator);
+  QuestionnaireItemFiller itemFillerAt(int index) {
+    _itemFillers[index] ??= QuestionnaireItemFiller.fromQuestionnaireItem(
+        surveyLocations.elementAt(index));
 
     return _itemFillers[index]!;
   }

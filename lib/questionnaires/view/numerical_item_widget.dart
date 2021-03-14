@@ -3,18 +3,18 @@ import 'package:flutter/material.dart';
 
 import '../questionnaires.dart';
 
-class NumericalItemWidget extends QuestionnaireItemFiller {
-  const NumericalItemWidget(
-      QuestionnaireLocation location, QuestionnaireItemDecorator decorator,
+class NumericalItemAnswer extends QuestionnaireAnswerFiller {
+  const NumericalItemAnswer(QuestionnaireLocation location,
+      QuestionnaireResponseState responseState, int answerIndex,
       {Key? key})
-      : super(location, decorator, key: key);
+      : super(location, responseState, answerIndex, key: key);
 
   @override
-  State<StatefulWidget> createState() => _NumericalItemState();
+  State<NumericalItemAnswer> createState() => _NumericalItemState();
 }
 
 class _NumericalItemState
-    extends QuestionnaireItemState<Decimal, NumericalItemWidget> {
+    extends QuestionnaireAnswerState<Decimal, NumericalItemAnswer> {
   _NumericalItemState() : super(null);
 
   @override
@@ -24,7 +24,7 @@ class _NumericalItemState
       value = widget.location.responseItem!.answer!.first.valueDecimal ??
           widget.location.responseItem!.answer!.first.valueQuantity?.value;
     }
-    if (widget.location.isTotalScore) {
+    if (widget.location.isCalculatedExpression) {
       widget.location.top.addListener(() => _questionnaireChanged());
     }
   }
@@ -37,8 +37,8 @@ class _NumericalItemState
   }
 
   @override
-  Widget buildBodyReadOnly(BuildContext context) {
-    if (widget.location.isTotalScore) {
+  Widget buildReadOnly(BuildContext context) {
+    if (widget.location.isCalculatedExpression) {
       return Center(
           child: Column(children: [
         const SizedBox(height: 32),
@@ -57,19 +57,18 @@ class _NumericalItemState
   }
 
   @override
-  Widget buildBodyEditable(BuildContext context) {
+  Widget buildEditable(BuildContext context) {
     return TextFormField(
       decoration:
           InputDecoration(labelText: widget.location.questionnaireItem.text),
       keyboardType: TextInputType.number,
       onChanged: (content) {
         value = Decimal(content);
-        createResponse();
       },
     );
   }
 
   @override
-  QuestionnaireResponseAnswer? createAnswer() =>
+  QuestionnaireResponseAnswer? fillAnswer() =>
       QuestionnaireResponseAnswer(valueDecimal: value);
 }

@@ -61,6 +61,7 @@
         <entry key="fhir">
           <value>
             <list>
+              <option value="$USER_HOME$/.pub-cache/git/fhir-b098547c4bd1c6d893b7e04c0786149d7ff8cfd7/fhir/lib" />
               <option value="$USER_HOME$/.pub-cache/git/fhir-90832c2ee9b0aea559ae319b2e9b0113dcf2697b/fhir/lib" />
             </list>
           </value>
@@ -251,6 +252,7 @@
     </properties>
     <CLASSES>
       <root url="file://$USER_HOME$/.pub-cache/git/fhir-90832c2ee9b0aea559ae319b2e9b0113dcf2697b/fhir/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/git/fhir-b098547c4bd1c6d893b7e04c0786149d7ff8cfd7/fhir/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/async-2.5.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/boolean_selector-2.1.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/characters-1.1.0/lib" />

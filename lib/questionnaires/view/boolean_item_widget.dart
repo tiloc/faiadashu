@@ -4,26 +4,26 @@ import 'package:flutter/material.dart';
 
 import '../questionnaires.dart';
 
-class BooleanItemWidget extends QuestionnaireItemFiller {
-  const BooleanItemWidget(
-      QuestionnaireLocation location, QuestionnaireItemDecorator decorator,
+class BooleanItemAnswer extends QuestionnaireAnswerFiller {
+  const BooleanItemAnswer(QuestionnaireLocation location,
+      QuestionnaireResponseState responseState, int answerIndex,
       {Key? key})
-      : super(location, decorator, key: key);
+      : super(location, responseState, answerIndex, key: key);
   @override
   State<StatefulWidget> createState() => _BooleanItemState();
 }
 
 class _BooleanItemState
-    extends QuestionnaireItemState<Boolean, BooleanItemWidget> {
+    extends QuestionnaireAnswerState<Boolean, BooleanItemAnswer> {
   _BooleanItemState() : super(null);
 
   @override
-  Widget buildBodyReadOnly(BuildContext context) {
+  Widget buildReadOnly(BuildContext context) {
     return Text(value?.toString() ?? '');
   }
 
   @override
-  Widget buildBodyEditable(BuildContext context) {
+  Widget buildEditable(BuildContext context) {
     return Checkbox(
       value: value?.value,
       tristate: true,
@@ -34,6 +34,6 @@ class _BooleanItemState
   }
 
   @override
-  QuestionnaireResponseAnswer? createAnswer() =>
+  QuestionnaireResponseAnswer? fillAnswer() =>
       (value != null) ? QuestionnaireResponseAnswer(valueBoolean: value) : null;
 }

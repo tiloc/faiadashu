@@ -2,39 +2,38 @@ import 'package:fhir/r4/resource_types/clinical/diagnostics/diagnostics.dart';
 import 'package:flutter/material.dart';
 
 import '../questionnaires.dart';
-import 'questionnaire_item_filler.dart';
+import 'questionnaire_answer_filler.dart';
 
-class StringItemWidget extends QuestionnaireItemFiller {
-  const StringItemWidget(
-      QuestionnaireLocation location, QuestionnaireItemDecorator decorator,
+class StringItemAnswer extends QuestionnaireAnswerFiller {
+  const StringItemAnswer(QuestionnaireLocation location,
+      QuestionnaireResponseState responseState, int answerIndex,
       {Key? key})
-      : super(location, decorator, key: key);
+      : super(location, responseState, answerIndex, key: key);
   @override
   State<StatefulWidget> createState() => _StringItemState();
 }
 
 class _StringItemState
-    extends QuestionnaireItemState<String, StringItemWidget> {
+    extends QuestionnaireAnswerState<String, StringItemAnswer> {
   _StringItemState() : super(null);
 
   @override
-  Widget buildBodyReadOnly(BuildContext context) {
+  Widget buildReadOnly(BuildContext context) {
     return Text(value ?? '');
   }
 
   @override
-  Widget buildBodyEditable(BuildContext context) {
+  Widget buildEditable(BuildContext context) {
     return TextFormField(
       decoration:
           InputDecoration(labelText: widget.location.questionnaireItem.text),
       onChanged: (content) {
         value = content;
-        createResponse();
       },
     );
   }
 
   @override
-  QuestionnaireResponseAnswer? createAnswer() =>
+  QuestionnaireResponseAnswer? fillAnswer() =>
       QuestionnaireResponseAnswer(valueString: value);
 }

@@ -5,17 +5,17 @@ import 'package:flutter/material.dart';
 import '../../util/safe_access_extensions.dart';
 import '../questionnaires.dart';
 
-class ChoiceItemWidget extends QuestionnaireItemFiller {
-  const ChoiceItemWidget(
-      QuestionnaireLocation location, QuestionnaireItemDecorator decorator,
+class ChoiceItemAnswer extends QuestionnaireAnswerFiller {
+  const ChoiceItemAnswer(QuestionnaireLocation location,
+      QuestionnaireResponseState responseState, int answerIndex,
       {Key? key})
-      : super(location, decorator, key: key);
+      : super(location, responseState, answerIndex, key: key);
   @override
   State<StatefulWidget> createState() => _ChoiceItemState();
 }
 
 class _ChoiceItemState
-    extends QuestionnaireItemState<String, ChoiceItemWidget> {
+    extends QuestionnaireAnswerState<String, ChoiceItemAnswer> {
   _ChoiceItemState() : super(null);
 
   @override
@@ -28,16 +28,17 @@ class _ChoiceItemState
   }
 
   @override
-  QuestionnaireResponseAnswer? createAnswer() =>
-      QuestionnaireResponseAnswer(valueCoding: _buildCodingByChoice(value));
+  QuestionnaireResponseAnswer? fillAnswer() => (value == null)
+      ? null
+      : QuestionnaireResponseAnswer(valueCoding: _buildCodingByChoice(value));
 
   @override
-  Widget buildBodyReadOnly(BuildContext context) {
+  Widget buildReadOnly(BuildContext context) {
     return Text(value ?? '');
   }
 
   @override
-  Widget buildBodyEditable(BuildContext context) {
+  Widget buildEditable(BuildContext context) {
     return _buildChoiceAnswers(context);
   }
 
@@ -122,6 +123,17 @@ class _ChoiceItemState
     final questionnaire = widget.location.questionnaire;
 
     final choices = <RadioListTile>[];
+    choices.add(RadioListTile<String?>(
+        title: Text(
+          '---',
+          style: Theme.of(context).textTheme.bodyText2,
+        ),
+        value: null,
+        groupValue: value,
+        onChanged: (String? newValue) {
+          value = newValue;
+        }));
+
     if (element.answerValueSet != null) {
       final key = element.answerValueSet!.value!
           .toString()

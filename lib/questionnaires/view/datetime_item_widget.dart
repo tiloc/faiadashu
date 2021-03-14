@@ -4,28 +4,28 @@ import 'package:fhir/r4/resource_types/clinical/diagnostics/diagnostics.dart';
 import 'package:flutter/material.dart';
 
 import '../questionnaires.dart';
-import 'questionnaire_item_filler.dart';
+import 'questionnaire_answer_filler.dart';
 
-class DateTimeItemWidget extends QuestionnaireItemFiller {
-  const DateTimeItemWidget(
-      QuestionnaireLocation location, QuestionnaireItemDecorator decorator,
+class DateTimeItemAnswer extends QuestionnaireAnswerFiller {
+  const DateTimeItemAnswer(QuestionnaireLocation location,
+      QuestionnaireResponseState responseState, int answerIndex,
       {Key? key})
-      : super(location, decorator, key: key);
+      : super(location, responseState, answerIndex, key: key);
   @override
   State<StatefulWidget> createState() => _DateTimeItemState();
 }
 
 class _DateTimeItemState
-    extends QuestionnaireItemState<FhirDateTime, DateTimeItemWidget> {
+    extends QuestionnaireAnswerState<FhirDateTime, DateTimeItemAnswer> {
   _DateTimeItemState() : super(null);
 
   @override
-  Widget buildBodyReadOnly(BuildContext context) {
+  Widget buildReadOnly(BuildContext context) {
     return Text(value?.value.toString() ?? '-');
   }
 
   @override
-  Widget buildBodyEditable(BuildContext context) {
+  Widget buildEditable(BuildContext context) {
     return DateTimePicker(
       type: ArgumentError.checkNotNull(const {
         QuestionnaireItemType.date: DateTimePickerType.date,
@@ -37,12 +37,11 @@ class _DateTimeItemState
       initialDate: value?.value,
       onChanged: (content) {
         value = FhirDateTime(content);
-        createResponse();
       },
     );
   }
 
   @override
-  QuestionnaireResponseAnswer? createAnswer() =>
+  QuestionnaireResponseAnswer? fillAnswer() =>
       QuestionnaireResponseAnswer(valueDateTime: value);
 }
