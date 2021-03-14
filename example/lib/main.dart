@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:widgets_on_fhir_example/instruments/bluebook.dart';
-import 'package:widgets_on_fhir_example/instruments/hf_instrument.dart';
 
 import 'disclaimer_page.dart';
+import 'instruments/bluebook.dart';
+import 'instruments/hf_instrument.dart';
 import 'instruments/phq9_instrument.dart';
 import 'instruments/prapare_instrument.dart';
+import 'instruments/sdc_demo.dart';
 import 'observation_page.dart';
 import 'primitive_page.dart';
 import 'questionnaire_scroller_page.dart';
@@ -77,6 +78,16 @@ class _HomePageState extends State<HomePage> {
             onTap: () {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => ObservationPage()));
+            },
+          ),
+          ListTile(
+            title: const Text('SDC Demo Scroller'),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => QuestionnaireScrollerPage(
+                          SDCDemoInstrument.sdcDemoInstrument)));
             },
           ),
           ListTile(

@@ -168,8 +168,14 @@ class _ChoiceItemState
     } else {
       if (element.answerOption != null) {
         for (final choice in element.answerOption!) {
+          final optionPrefix = choice.extension_
+              ?.extensionOrNull(
+                  'http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix')
+              ?.valueString;
+          final optionPrefixDisplay =
+              (optionPrefix != null) ? '$optionPrefix ' : '';
           choices.add(RadioListTile<String>(
-              title: Text(choice.safeDisplay,
+              title: Text('$optionPrefixDisplay${choice.safeDisplay}',
                   style: Theme.of(context).textTheme.bodyText2),
               value: choice.valueCoding!.code.toString(),
               groupValue: value,

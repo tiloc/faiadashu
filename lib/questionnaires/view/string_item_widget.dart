@@ -36,6 +36,7 @@ class _StringItemState
       onChanged: (content) {
         value = content;
       },
+      maxLength: widget.location.questionnaireItem.maxLength?.value,
     );
   }
 
