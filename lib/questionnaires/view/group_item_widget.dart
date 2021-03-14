@@ -6,16 +6,16 @@ import '../questionnaires.dart';
 // TODO(tiloc): Answers for static items shouldn't exist
 
 class GroupItemAnswer extends QuestionnaireAnswerFiller {
-  const GroupItemAnswer(QuestionnaireLocation location,
-      QuestionnaireResponseState responseState, int answerIndex,
+  const GroupItemAnswer(
+      QuestionnaireLocation location, AnswerLocation answerLocation,
       {Key? key})
-      : super(location, responseState, answerIndex, key: key);
+      : super(location, answerLocation, key: key);
   @override
   State<StatefulWidget> createState() => _GroupItemState();
 }
 
 class _GroupItemState extends QuestionnaireAnswerState {
-  _GroupItemState() : super(null);
+  _GroupItemState();
 
   @override
   Widget buildReadOnly(BuildContext context) {

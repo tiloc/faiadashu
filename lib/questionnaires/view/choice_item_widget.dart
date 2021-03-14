@@ -6,23 +6,24 @@ import '../../util/safe_access_extensions.dart';
 import '../questionnaires.dart';
 
 class ChoiceItemAnswer extends QuestionnaireAnswerFiller {
-  const ChoiceItemAnswer(QuestionnaireLocation location,
-      QuestionnaireResponseState responseState, int answerIndex,
+  const ChoiceItemAnswer(
+      QuestionnaireLocation location, AnswerLocation answerLocation,
       {Key? key})
-      : super(location, responseState, answerIndex, key: key);
+      : super(location, answerLocation, key: key);
   @override
   State<StatefulWidget> createState() => _ChoiceItemState();
 }
 
 class _ChoiceItemState
     extends QuestionnaireAnswerState<String, ChoiceItemAnswer> {
-  _ChoiceItemState() : super(null);
+  _ChoiceItemState();
 
   @override
   void initState() {
     super.initState();
     if (widget.location.responseItem != null) {
-      value = widget.location.responseItem!.answer!.first.valueCoding?.code
+      initialValue = widget
+          .location.responseItem!.answer!.first.valueCoding?.code
           .toString();
     }
   }

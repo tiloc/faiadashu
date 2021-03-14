@@ -5,17 +5,23 @@ import '../questionnaires.dart';
 import 'questionnaire_answer_filler.dart';
 
 class StringItemAnswer extends QuestionnaireAnswerFiller {
-  const StringItemAnswer(QuestionnaireLocation location,
-      QuestionnaireResponseState responseState, int answerIndex,
+  const StringItemAnswer(
+      QuestionnaireLocation location, AnswerLocation answerLocation,
       {Key? key})
-      : super(location, responseState, answerIndex, key: key);
+      : super(location, answerLocation, key: key);
   @override
   State<StatefulWidget> createState() => _StringItemState();
 }
 
 class _StringItemState
     extends QuestionnaireAnswerState<String, StringItemAnswer> {
-  _StringItemState() : super(null);
+  _StringItemState();
+
+  @override
+  void initState() {
+    super.initState();
+    initialValue = widget.answerLocation.answer?.valueString;
+  }
 
   @override
   Widget buildReadOnly(BuildContext context) {

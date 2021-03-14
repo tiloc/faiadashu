@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import '../questionnaires.dart';
 
 class NumericalItemAnswer extends QuestionnaireAnswerFiller {
-  const NumericalItemAnswer(QuestionnaireLocation location,
-      QuestionnaireResponseState responseState, int answerIndex,
+  const NumericalItemAnswer(
+      QuestionnaireLocation location, AnswerLocation answerLocation,
       {Key? key})
-      : super(location, responseState, answerIndex, key: key);
+      : super(location, answerLocation, key: key);
 
   @override
   State<NumericalItemAnswer> createState() => _NumericalItemState();
@@ -15,13 +15,13 @@ class NumericalItemAnswer extends QuestionnaireAnswerFiller {
 
 class _NumericalItemState
     extends QuestionnaireAnswerState<Decimal, NumericalItemAnswer> {
-  _NumericalItemState() : super(null);
+  _NumericalItemState();
 
   @override
   void initState() {
     super.initState();
     if (widget.location.responseItem != null) {
-      value = widget.location.responseItem!.answer!.first.valueDecimal ??
+      initialValue = widget.location.responseItem!.answer!.first.valueDecimal ??
           widget.location.responseItem!.answer!.first.valueQuantity?.value;
     }
     if (widget.location.isCalculatedExpression) {

@@ -5,42 +5,40 @@ import '../questionnaires.dart';
 
 class QuestionnaireAnswerFillerFactory {
   static QuestionnaireAnswerFiller fromQuestionnaireItem(
-      QuestionnaireLocation location,
-      QuestionnaireResponseState responseState,
-      int answerIndex) {
+      QuestionnaireLocation location, AnswerLocation answerLocation) {
     switch (location.questionnaireItem.type!) {
       case QuestionnaireItemType.choice:
       case QuestionnaireItemType.open_choice:
-        return ChoiceItemAnswer(location, responseState, answerIndex);
+        return ChoiceItemAnswer(location, answerLocation);
       case QuestionnaireItemType.quantity:
       case QuestionnaireItemType.decimal:
       case QuestionnaireItemType.integer:
-        return NumericalItemAnswer(location, responseState, answerIndex);
+        return NumericalItemAnswer(location, answerLocation);
       case QuestionnaireItemType.string:
       case QuestionnaireItemType.text:
-        return StringItemAnswer(location, responseState, answerIndex);
+        return StringItemAnswer(location, answerLocation);
       case QuestionnaireItemType.group:
-        return GroupItemAnswer(location, responseState, answerIndex);
+        return GroupItemAnswer(location, answerLocation);
       case QuestionnaireItemType.date:
       case QuestionnaireItemType.datetime:
       case QuestionnaireItemType.time:
-        return DateTimeItemAnswer(location, responseState, answerIndex);
+        return DateTimeItemAnswer(location, answerLocation);
       case QuestionnaireItemType.boolean:
-        return BooleanItemAnswer(location, responseState, answerIndex);
+        return BooleanItemAnswer(location, answerLocation);
       case QuestionnaireItemType.display:
       case QuestionnaireItemType.attachment:
       case QuestionnaireItemType.unknown:
       case QuestionnaireItemType.reference:
       case QuestionnaireItemType.url:
-        return _UnsupportedItem(location, responseState, answerIndex);
+        return _UnsupportedItem(location, answerLocation);
     }
   }
 }
 
 class _UnsupportedItem extends QuestionnaireAnswerFiller {
-  const _UnsupportedItem(QuestionnaireLocation location,
-      QuestionnaireResponseState responseState, int answerIndex)
-      : super(location, responseState, answerIndex);
+  const _UnsupportedItem(
+      QuestionnaireLocation location, AnswerLocation answerLocation)
+      : super(location, answerLocation);
 
   @override
   State<StatefulWidget> createState() => _UnsupportedItemState();

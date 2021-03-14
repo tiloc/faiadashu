@@ -6,11 +6,9 @@ import '../questionnaires.dart';
 /// A Widget to fill an individual [QuestionnaireResponseAnswer].
 abstract class QuestionnaireAnswerFiller extends StatefulWidget {
   final QuestionnaireLocation location;
-  final QuestionnaireResponseState responseState;
-  final int answerIndex;
+  final AnswerLocation answerLocation;
 
-  const QuestionnaireAnswerFiller(
-      this.location, this.responseState, this.answerIndex,
+  const QuestionnaireAnswerFiller(this.location, this.answerLocation,
       {Key? key})
       : super(key: key);
 }
@@ -19,7 +17,7 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller>
     extends State<W> {
   V? _value;
 
-  QuestionnaireAnswerState(V? value) : _value = value;
+  QuestionnaireAnswerState();
 
   Widget buildReadOnly(BuildContext context);
 
@@ -33,9 +31,12 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller>
         _value = newValue;
       });
 
-      widget.responseState.fillAnswer(widget.answerIndex, fillAnswer());
+      widget.answerLocation.stashAnswer(fillAnswer());
     }
   }
+
+  // ignore: avoid_setters_without_getters
+  set initialValue(V? initialValue) => _value = initialValue;
 
   V? get value => _value;
 

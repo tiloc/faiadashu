@@ -5,17 +5,23 @@ import 'package:flutter/material.dart';
 import '../questionnaires.dart';
 
 class BooleanItemAnswer extends QuestionnaireAnswerFiller {
-  const BooleanItemAnswer(QuestionnaireLocation location,
-      QuestionnaireResponseState responseState, int answerIndex,
+  const BooleanItemAnswer(
+      QuestionnaireLocation location, AnswerLocation answerLocation,
       {Key? key})
-      : super(location, responseState, answerIndex, key: key);
+      : super(location, answerLocation, key: key);
   @override
   State<StatefulWidget> createState() => _BooleanItemState();
 }
 
 class _BooleanItemState
     extends QuestionnaireAnswerState<Boolean, BooleanItemAnswer> {
-  _BooleanItemState() : super(null);
+  _BooleanItemState();
+
+  @override
+  void initState() {
+    super.initState();
+    initialValue = widget.answerLocation.answer?.valueBoolean;
+  }
 
   @override
   Widget buildReadOnly(BuildContext context) {

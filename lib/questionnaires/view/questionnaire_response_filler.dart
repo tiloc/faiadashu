@@ -23,15 +23,21 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
   @override
   void initState() {
     super.initState();
+    // TODO(tiloc): This is currently limited to a single answer
     _answerFillers = [
       QuestionnaireAnswerFillerFactory.fromQuestionnaireItem(
-          widget.location, this, 0)
+          widget.location, AnswerLocation._(this, 0))
     ];
 
-    _answers = [null];
+    final int? answerCount = widget.location.responseItem?.answer?.length;
+    if (answerCount != null && answerCount > 0) {
+      _answers = [widget.location.responseItem!.answer![0]];
+    } else {
+      _answers = [null];
+    }
   }
 
-  void fillAnswer(int answerIndex, QuestionnaireResponseAnswer? answer) {
+  void stashAnswer(int answerIndex, QuestionnaireResponseAnswer? answer) {
     // TODO(tiloc): This can only handle a single answer
     value = [answer];
   }
@@ -62,4 +68,21 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
   Widget build(BuildContext context) {
     return _answerFillers[0];
   }
+}
+
+/// A cubbyhole where [QuestionnaireAnswerFiller]s can stash their result.
+class AnswerLocation {
+  final QuestionnaireResponseState _responseState;
+  final int _answerIndex;
+  const AnswerLocation._(
+      QuestionnaireResponseState responseState, int answerIndex)
+      : _responseState = responseState,
+        _answerIndex = answerIndex;
+
+  void stashAnswer(QuestionnaireResponseAnswer? answer) {
+    _responseState.stashAnswer(_answerIndex, answer);
+  }
+
+  QuestionnaireResponseAnswer? get answer =>
+      _responseState._answers[_answerIndex];
 }

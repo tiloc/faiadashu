@@ -7,17 +7,23 @@ import '../questionnaires.dart';
 import 'questionnaire_answer_filler.dart';
 
 class DateTimeItemAnswer extends QuestionnaireAnswerFiller {
-  const DateTimeItemAnswer(QuestionnaireLocation location,
-      QuestionnaireResponseState responseState, int answerIndex,
+  const DateTimeItemAnswer(
+      QuestionnaireLocation location, AnswerLocation answerLocation,
       {Key? key})
-      : super(location, responseState, answerIndex, key: key);
+      : super(location, answerLocation, key: key);
   @override
   State<StatefulWidget> createState() => _DateTimeItemState();
 }
 
 class _DateTimeItemState
     extends QuestionnaireAnswerState<FhirDateTime, DateTimeItemAnswer> {
-  _DateTimeItemState() : super(null);
+  _DateTimeItemState();
+
+  @override
+  void initState() {
+    super.initState();
+    initialValue = widget.answerLocation.answer?.valueDateTime;
+  }
 
   @override
   Widget buildReadOnly(BuildContext context) {
@@ -34,7 +40,7 @@ class _DateTimeItemState
       }[widget.location.questionnaireItem.type]),
       firstDate: DateTime(1860),
       lastDate: DateTime(2050),
-      initialDate: value?.value,
+      initialValue: value?.toString(),
       onChanged: (content) {
         value = FhirDateTime(content);
       },

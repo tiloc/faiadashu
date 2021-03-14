@@ -168,7 +168,6 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
       (questionnaireItem.item != null) && (questionnaireItem.item!.isNotEmpty);
 
   set responseItem(QuestionnaireResponseItem? questionnaireResponseItem) {
-    print('Set responseItem: $questionnaireResponseItem');
     if (questionnaireResponseItem != _questionnaireResponseItem) {
       _questionnaireResponseItem = questionnaireResponseItem;
       top.bumpRevision();
