@@ -5,7 +5,12 @@ extension SafeDisplayQuestionnaireAnswerOptionExtensions
     on QuestionnaireAnswerOption {
   /// A safeguarded way to get a display value
   String get safeDisplay {
-    return valueCoding?.safeDisplay ?? toString();
+    return valueString ?? valueCoding?.safeDisplay ?? toString();
+  }
+
+  /// The coded value for the option, take from either valueString or valueCoding
+  String get optionCode {
+    return valueString ?? valueCoding!.code.toString();
   }
 }
 

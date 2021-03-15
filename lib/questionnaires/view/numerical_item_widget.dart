@@ -49,8 +49,8 @@ class _NumericalItemState
 
   void _questionnaireChanged() {
     if (widget.location.responseItem != null) {
-      value = widget.location.responseItem!.answer!.first.valueDecimal ??
-          widget.location.responseItem!.answer!.first.valueQuantity?.value;
+      value = widget.answerLocation.answer?.valueDecimal ??
+          widget.answerLocation.answer?.valueQuantity?.value;
     }
   }
 
