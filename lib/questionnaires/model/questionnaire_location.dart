@@ -180,6 +180,7 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
   /// Get a [Decimal] value which can be added to a score.
   /// Returns null if not applicable (either question unanswered, or wrong type)
   Decimal? get score {
+    // TODO(tiloc): isReadOnly is probably the wrong condition?
     if ((responseItem == null) || isReadOnly) {
       return null;
     }
@@ -229,18 +230,50 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
   }
 
   /// Is this location not changeable by end-users?
-  /// Read-only items might still hold a value, such as a calculated total score.
+  /// Read-only items might still hold a value, such as a calculated value.
   bool get isReadOnly {
     return isStatic ||
         questionnaireItem.readOnly == Boolean(true) ||
         isCalculatedExpression;
   }
 
+  bool get isHidden {
+    return (questionnaireItem.extension_
+                ?.extensionOrNull(
+                    'http://hl7.org/fhir/StructureDefinition/questionnaire-hidden')
+                ?.valueBoolean
+                ?.value ==
+            true) ||
+        isHelp;
+  }
+
+  bool get isHelp {
+    return questionnaireItem.extension_
+            ?.extensionOrNull(
+                'http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl')
+            ?.valueCodeableConcept
+            ?.coding
+            ?.firstOrNull
+            ?.code
+            ?.value ==
+        'help';
+  }
+
+  R? applyIfExists<R, T>(R Function(T?) f, T? arg) =>
+      (arg == null) ? null : f(arg);
+
   String? get text {
     return questionnaireItem.textElement?.extension_
             ?.extensionOrNull(
                 'http://hl7.org/fhir/StructureDefinition/rendering-xhtml')
             ?.valueString ??
+        applyIfExists<String, String>(
+            (renderingStyle) =>
+                '<div style="$renderingStyle">${questionnaireItem.text}</div>',
+            questionnaireItem.textElement?.extension_
+                ?.extensionOrNull(
+                    'http://hl7.org/fhir/StructureDefinition/rendering-style')
+                ?.valueString) ??
         questionnaireItem.text;
   }
 

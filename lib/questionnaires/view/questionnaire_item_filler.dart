@@ -26,14 +26,16 @@ class QuestionnaireItemFiller extends StatefulWidget {
 class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
   @override
   Widget build(BuildContext context) {
-    return AnimatedSwitcher(
-        duration: const Duration(milliseconds: 500),
-        child: widget.location.enabled
-            ? ListTile(
-                title: widget._titleWidget,
-                subtitle: widget._responseFiller,
-              )
-            : const SizedBox());
+    return (!widget.location.isHidden)
+        ? AnimatedSwitcher(
+            duration: const Duration(milliseconds: 500),
+            child: widget.location.enabled
+                ? ListTile(
+                    title: widget._titleWidget,
+                    subtitle: widget._responseFiller,
+                  )
+                : const SizedBox())
+        : const SizedBox();
   }
 }
 

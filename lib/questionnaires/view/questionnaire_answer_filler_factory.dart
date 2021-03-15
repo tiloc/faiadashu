@@ -17,15 +17,15 @@ class QuestionnaireAnswerFillerFactory {
       case QuestionnaireItemType.string:
       case QuestionnaireItemType.text:
         return StringItemAnswer(location, answerLocation);
+      case QuestionnaireItemType.display:
       case QuestionnaireItemType.group:
-        return GroupItemAnswer(location, answerLocation);
+        return StaticItemAnswer(location, answerLocation);
       case QuestionnaireItemType.date:
       case QuestionnaireItemType.datetime:
       case QuestionnaireItemType.time:
         return DateTimeItemAnswer(location, answerLocation);
       case QuestionnaireItemType.boolean:
         return BooleanItemAnswer(location, answerLocation);
-      case QuestionnaireItemType.display:
       case QuestionnaireItemType.attachment:
       case QuestionnaireItemType.unknown:
       case QuestionnaireItemType.reference:

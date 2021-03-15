@@ -51,8 +51,10 @@ class QuestionnaireScrollerPage extends StatelessWidget {
                                 controller: _narrativeScrollController,
                                 child: Container(
                                     padding: const EdgeInsets.all(16.0),
-                                    child: HTML.toRichText(context,
-                                        '<h2>Narrative</h2><p>${QuestionnaireFiller.of(context).aggregator<NarrativeAggregator>().value.div}</p>')),
+                                    child: Builder(
+                                        builder: (context) => HTML.toRichText(
+                                            context,
+                                            '<h2>Narrative</h2><p>${QuestionnaireFiller.of(context).aggregator<NarrativeAggregator>().value.div}</p>'))),
                               )))),
                   body: Scrollbar(
                     isAlwaysShown: true,

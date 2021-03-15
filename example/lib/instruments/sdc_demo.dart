@@ -12,6 +12,35 @@ class SDCDemoInstrument {
     "date": "2021-03-14",
     "publisher": "HL7 International - FHIR Infrastructure Work Group",
     "item": [
+              {
+            "linkId": "123523-renderstyle",
+            "type": "string",
+            "text": "Enter your First Name",
+            "_text": {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/rendering-style",
+                  "valueString": "color:green;"
+                }
+              ]
+            }
+          },
+          {
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+                "valueBoolean": true
+              }
+            ],
+            "linkId": "1.0-hidden",
+            "text": "Form ID",
+            "type": "string"
+          },
+          {
+            "linkId": "1.1-hidden",
+            "text": "Event ID",
+            "type": "string"
+          },
       {
         "linkId": "1",
         "text": "Please answer Yes or No to each of the following questions:",

@@ -5,8 +5,8 @@ import '../questionnaires.dart';
 
 // TODO(tiloc): Answers for static items shouldn't exist
 
-class GroupItemAnswer extends QuestionnaireAnswerFiller {
-  const GroupItemAnswer(
+class StaticItemAnswer extends QuestionnaireAnswerFiller {
+  const StaticItemAnswer(
       QuestionnaireLocation location, AnswerLocation answerLocation,
       {Key? key})
       : super(location, answerLocation, key: key);
