@@ -51,8 +51,9 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
   /// Fill the response with all the answers which are not null.
   /// Return null if no such answers exist.
   QuestionnaireResponseItem? fillResponse() {
-    final filledAnswers = (_answers.where((answer) => answer != null)
-            as Iterable<QuestionnaireResponseAnswer>)
+    final filledAnswers = _answers
+        .where((answer) => answer != null)
+        .map<QuestionnaireResponseAnswer>((answer) => answer!)
         .toList(growable: false);
 
     if (filledAnswers.isEmpty) {

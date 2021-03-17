@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:developer' as developer;
 
 import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
@@ -26,6 +27,7 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
   }
 
   void bumpRevision() {
+    developer.log('QuestionnaireTopLocation.bumpRevision', level: 500);
     _revision += 1;
     notifyListeners();
   }
@@ -52,16 +54,9 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
     return _orderedItems![linkId]!;
   }
 
-  /// Trigger the aggregation of scores, narratives, etc.
-  /// Iterates over all applicable locations and notifies listeners.
-  void aggregate() {
-    for (final location in preOrder()) {
-      location.notifyListeners();
-    }
-  }
-
-  /// Calculate the current enablement status of all items.
-  void _calculateAllEnabled() {
+  /// Update the current enablement status of all items.
+  void updateEnableWhen() {
+    developer.log('updateEnableWhen()', level: 500);
     for (final location in preOrder()) {
       location._enabled = true;
     }
@@ -74,15 +69,13 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
 
   /// Activate the "enableWhen" behaviors.
   void activateEnableWhen() {
-    for (final location in top.preOrder()) {
+    for (final location in preOrder()) {
       location.forEnableWhens((qew) {
-        top
-            .findByLinkId(qew.question!)
-            .addListener(() => _calculateAllEnabled());
+        findByLinkId(qew.question!).addListener(() => updateEnableWhen());
       });
     }
 
-    _calculateAllEnabled();
+    updateEnableWhen();
   }
 }
 
@@ -120,7 +113,7 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
           _disableWithChildren();
         }
       } else {
-        print('Unsupported operator: ${qew.operator_}.');
+        developer.log('Unsupported operator: ${qew.operator_}.', level: 900);
       }
     });
   }

@@ -16,10 +16,10 @@ class QuestionnaireFiller extends StatefulWidget {
     if (aggregators != null) {
       for (final aggregator in aggregators) {
         aggregator.init(topLocation);
+        aggregator.aggregate();
       }
     }
 
-    topLocation.aggregate();
     topLocation.activateEnableWhen();
   }
 
@@ -68,7 +68,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
 }
 
 class QuestionnaireFillerData extends InheritedWidget {
-  final QuestionnaireLocation topLocation;
+  final QuestionnaireTopLocation topLocation;
   final Iterable<QuestionnaireLocation> surveyLocations;
   final int _revision;
   late final List<QuestionnaireItemFiller?> _itemFillers;

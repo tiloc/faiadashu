@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:fhir/r4.dart';
 import 'package:widgets_on_fhir/questionnaires/model/aggregator.dart';
 
@@ -12,12 +14,12 @@ class NarrativeAggregator extends Aggregator<Narrative> {
             status: NarrativeStatus.empty));
 
   @override
-  void init(QuestionnaireLocation location) {
-    super.init(location);
+  void init(QuestionnaireTopLocation topLocation) {
+    super.init(topLocation);
 
-    for (final location in top.preOrder()) {
+    for (final location in topLocation.preOrder()) {
       if (!location.isStatic) {
-        location.addListener(() => _updateNarrative());
+        location.addListener(() => aggregate());
       }
     }
   }
@@ -27,6 +29,10 @@ class NarrativeAggregator extends Aggregator<Narrative> {
     final item = location.responseItem;
 
     if (item == null) {
+      return false;
+    }
+
+    if (!location.enabled) {
       return false;
     }
 
@@ -83,7 +89,11 @@ class NarrativeAggregator extends Aggregator<Narrative> {
         status: generated ? NarrativeStatus.generated : NarrativeStatus.empty);
   }
 
-  void _updateNarrative() {
-    value = _generateNarrative(top);
+  @override
+  void aggregate() {
+    developer.log('NarrativeAggregator.aggregate', level: 500);
+    topLocation
+        .updateEnableWhen(); // TODO: Should this be manually invoked? Or should every bumpRevision result in a recalc?
+    value = _generateNarrative(topLocation);
   }
 }

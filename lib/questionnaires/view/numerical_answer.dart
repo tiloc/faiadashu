@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -42,35 +44,10 @@ class _NumericalAnswerState
       initialValue = widget.location.responseItem!.answer!.first.valueDecimal ??
           widget.location.responseItem!.answer!.first.valueQuantity?.value;
     }
-    if (widget.location.isCalculatedExpression) {
-      widget.location.top.addListener(() => _questionnaireChanged());
-    }
-  }
-
-  void _questionnaireChanged() {
-    if (widget.location.responseItem != null) {
-      value = widget.answerLocation.answer?.valueDecimal ??
-          widget.answerLocation.answer?.valueQuantity?.value;
-    }
   }
 
   @override
   Widget buildReadOnly(BuildContext context) {
-    if (widget.location.isCalculatedExpression) {
-      return Center(
-          child: Column(children: [
-        const SizedBox(height: 32),
-        Text(
-          'Total Score',
-          style: Theme.of(context).textTheme.headline3,
-        ),
-        Text(
-          value?.value?.round().toString() ?? '0',
-          style: Theme.of(context).textTheme.headline1,
-        ),
-      ]));
-    }
-
     return Text(value.toString());
   }
 
@@ -88,7 +65,10 @@ class _NumericalAnswerState
     );
   }
 
+  /// TODO: Support for quantity
   @override
-  QuestionnaireResponseAnswer? fillAnswer() =>
-      QuestionnaireResponseAnswer(valueDecimal: value);
+  QuestionnaireResponseAnswer? fillAnswer() {
+    developer.log('fillAnswer: $value');
+    QuestionnaireResponseAnswer(valueDecimal: value);
+  }
 }

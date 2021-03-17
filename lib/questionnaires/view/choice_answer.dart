@@ -240,8 +240,6 @@ class _ChoiceAnswerState
                       null,
                   onChanged: (bool? newValue) {
                     value = _fillToggledValue(choice.optionCode);
-                    print(
-                        'Toggling ${choice.optionCode}'); // TODO(tiloc) Toggle for real!
                   })
               : RadioListTile<String>(
                   title: Text(optionTitle,

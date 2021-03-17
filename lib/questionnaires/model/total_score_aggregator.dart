@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:collection/collection.dart';
 import 'package:fhir/primitive_types/decimal.dart';
 import 'package:fhir/r4.dart';
@@ -15,34 +17,42 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
   TotalScoreAggregator() : super(Decimal(0));
 
   @override
-  void init(QuestionnaireLocation location) {
-    super.init(location);
+  void init(QuestionnaireTopLocation topLocation) {
+    super.init(topLocation);
 
-    totalScoreLocation = top
+    totalScoreLocation = topLocation
         .preOrder()
         .firstWhereOrNull((location) => location.isCalculatedExpression);
     // if there is no total score location then leave value at 0 indefinitely
     if (totalScoreLocation != null) {
-      for (final location in top.preOrder()) {
+      for (final location in topLocation.preOrder()) {
         if (!location.isStatic && location != totalScoreLocation) {
-          location.addListener(() => _updateScore());
+          location.addListener(() => aggregate());
         }
       }
     }
   }
 
-  void _updateScore() {
+  @override
+  void aggregate() {
+    if (totalScoreLocation == null) {
+      return;
+    }
+
+    developer.log('totalScore.aggregrate', level: 500);
     // Special handling if this is the total score
     double sum = 0.0;
-    for (final location in top.preOrder()) {
+    for (final location in topLocation.preOrder()) {
       if (location != totalScoreLocation) {
         final points = location.score;
+        developer.log('Adding $location: $points');
         if (points != null) {
-          sum += location.score!.value!;
+          sum += points.value!;
         }
       }
     }
 
+    developer.log('sum: $sum', level: 500);
     value = Decimal(sum);
 
     final unit = totalScoreLocation!.questionnaireItem.extension_

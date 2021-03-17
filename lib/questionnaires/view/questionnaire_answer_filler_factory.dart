@@ -13,7 +13,9 @@ class QuestionnaireAnswerFillerFactory {
       case QuestionnaireItemType.quantity:
       case QuestionnaireItemType.decimal:
       case QuestionnaireItemType.integer:
-        return NumericalAnswer(location, answerLocation);
+        return (location.isCalculatedExpression)
+            ? StaticItem(location, answerLocation)
+            : NumericalAnswer(location, answerLocation);
       case QuestionnaireItemType.string:
       case QuestionnaireItemType.text:
         return StringAnswer(location, answerLocation);
