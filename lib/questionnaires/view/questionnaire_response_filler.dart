@@ -48,14 +48,20 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
     value = answers ?? [];
   }
 
+  /// Fill the response with all the answers which are not null.
+  /// Return null if no such answers exist.
   QuestionnaireResponseItem? fillResponse() {
-    final answer = _answers[0];
-    return (answer != null)
-        ? QuestionnaireResponseItem(
-            linkId: widget.location.linkId,
-            text: widget.location.questionnaireItem.text,
-            answer: [answer])
-        : null;
+    final filledAnswers = (_answers.where((answer) => answer != null)
+            as Iterable<QuestionnaireResponseAnswer>)
+        .toList(growable: false);
+
+    if (filledAnswers.isEmpty) {
+      return null;
+    }
+    return QuestionnaireResponseItem(
+        linkId: widget.location.linkId,
+        text: widget.location.questionnaireItem.text,
+        answer: filledAnswers);
   }
 
   set value(List<QuestionnaireResponseAnswer?> newValue) {

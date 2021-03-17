@@ -31,11 +31,9 @@ class _ChoiceAnswerState
   }
 
   @override
-  QuestionnaireResponseAnswer? fillAnswer() => (value == null)
-      ? null
-      : QuestionnaireResponseAnswer(
-          valueCoding: _fillCodingByChoice(
-              value?.firstCode)); // TODO(tiloc): .firstCode can throw NPE
+  QuestionnaireResponseAnswer? fillAnswer() {
+    throw UnsupportedError('Choice Answer will always return choice answers.');
+  }
 
   @override
   List<QuestionnaireResponseAnswer>? fillChoiceAnswers() {
@@ -44,17 +42,17 @@ class _ChoiceAnswerState
     }
 
     // TODO(tiloc): Should the order of the codings be in the order of the choices?
-    // TODO(tiloc): This is probably insufficient (missing ordinal values, etc.)
     // TODO(tiloc): Support open free text (should always come last?)
     return value!.coding
-        ?.map<QuestionnaireResponseAnswer>(
-            (coding) => QuestionnaireResponseAnswer(valueCoding: coding))
+        ?.map<QuestionnaireResponseAnswer>((coding) =>
+            QuestionnaireResponseAnswer(
+                valueCoding: _fillCodingByChoice(coding.code!.value)))
         .toList();
   }
 
   @override
   bool hasChoiceAnswers() {
-    return value?.coding?.isNotEmpty ?? false;
+    return true;
   }
 
   @override
@@ -73,6 +71,8 @@ class _ChoiceAnswerState
         : null;
   }
 
+  /// Turn on/off the checkbox with the provided [toggleValue].
+  /// Used in repeating items.
   CodeableConcept? _fillToggledValue(String? toggleValue) {
     if (toggleValue == null) {
       return null;
