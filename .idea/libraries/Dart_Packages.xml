@@ -61,6 +61,7 @@
         <entry key="fhir">
           <value>
             <list>
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir-0.4.0/lib" />
               <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir-0.3.0-nullsafety.2/lib" />
             </list>
           </value>
@@ -68,6 +69,7 @@
         <entry key="fhir_yaml">
           <value>
             <list>
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_yaml-0.4.0/lib" />
               <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_yaml-0.3.0-nullsafety.1/lib" />
             </list>
           </value>
@@ -259,7 +261,9 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/date_time_picker-2.0.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fake_async-1.2.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir-0.3.0-nullsafety.2/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir-0.4.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_yaml-0.3.0-nullsafety.1/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_yaml-0.4.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/freezed_annotation-0.14.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/html_unescape-2.0.0-nullsafety.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/intl-0.17.0/lib" />
