@@ -1,4 +1,5 @@
-class DataFormatException implements Exception {
+/// [Questionnaire] is internally inconsistent or invalid.
+class QuestionnaireFormatException implements Exception {
   /// A human-readable message
   final String message;
 
@@ -7,5 +8,5 @@ class DataFormatException implements Exception {
 
   /// A throwable
   final dynamic? cause;
-  DataFormatException(this.message, this.element, [this.cause]);
+  QuestionnaireFormatException(this.message, this.element, [this.cause]);
 }

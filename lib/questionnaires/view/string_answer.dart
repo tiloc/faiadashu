@@ -4,18 +4,18 @@ import 'package:flutter/material.dart';
 import '../questionnaires.dart';
 import 'questionnaire_answer_filler.dart';
 
-class StringItemAnswer extends QuestionnaireAnswerFiller {
-  const StringItemAnswer(
+class StringAnswer extends QuestionnaireAnswerFiller {
+  const StringAnswer(
       QuestionnaireLocation location, AnswerLocation answerLocation,
       {Key? key})
       : super(location, answerLocation, key: key);
   @override
-  State<StatefulWidget> createState() => _StringItemState();
+  State<StatefulWidget> createState() => _StringAnswerState();
 }
 
-class _StringItemState
-    extends QuestionnaireAnswerState<String, StringItemAnswer> {
-  _StringItemState();
+class _StringAnswerState
+    extends QuestionnaireAnswerState<String, StringAnswer> {
+  _StringAnswerState();
 
   @override
   void initState() {

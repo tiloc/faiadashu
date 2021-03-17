@@ -30,6 +30,20 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
     notifyListeners();
   }
 
+  /// Find a contained element by its id.
+  /// Id may start with a leading '#', which will be stripped.
+  /// [elementId] == null will return null.
+  Resource? findContainedByElementId(String? elementId) {
+    if (elementId == null) {
+      return null;
+    }
+    final key = elementId.startsWith('#')
+        ? elementId.substring(1)
+        : elementId; // Strip leading #
+    return questionnaire.contained
+        ?.firstWhereOrNull((element) => key == element.id?.toString());
+  }
+
   int get revision => _revision;
 
   /// Find the [QuestionnaireLocation] that corresponds to the linkId.

@@ -38,8 +38,14 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
   }
 
   void stashAnswer(int answerIndex, QuestionnaireResponseAnswer? answer) {
-    // TODO(tiloc): This can only handle a single answer
+    // TODO(tiloc): Handle a list of answers.
     value = [answer];
+  }
+
+  /// Special functionality to allow choice and open-choice items with "repeats".
+  void stashChoiceAnswers(
+      int answerIndex, List<QuestionnaireResponseAnswer?>? answers) {
+    value = answers ?? [];
   }
 
   QuestionnaireResponseItem? fillResponse() {
@@ -66,11 +72,13 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
 
   @override
   Widget build(BuildContext context) {
+    // TODO(tiloc) show a list of answers, and buttons to add/remove if repeat
     return _answerFillers[0];
   }
 }
 
-/// A cubbyhole where [QuestionnaireAnswerFiller]s can stash their result.
+/// A place where [QuestionnaireAnswerFiller]s can stash their result.
+/// Provides isolation from underlying response filler and answers.
 class AnswerLocation {
   final QuestionnaireResponseState _responseState;
   final int _answerIndex;
@@ -81,6 +89,11 @@ class AnswerLocation {
 
   void stashAnswer(QuestionnaireResponseAnswer? answer) {
     _responseState.stashAnswer(_answerIndex, answer);
+  }
+
+  /// Special functionality to allow choice and open-choice items with "repeats".
+  void stashChoiceAnswers(List<QuestionnaireResponseAnswer?>? answers) {
+    _responseState.stashChoiceAnswers(_answerIndex, answers);
   }
 
   QuestionnaireResponseAnswer? get answer =>

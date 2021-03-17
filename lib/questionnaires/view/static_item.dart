@@ -3,19 +3,17 @@ import 'package:flutter/material.dart';
 
 import '../questionnaires.dart';
 
-// TODO(tiloc): Answers for static items shouldn't exist
-
-class StaticItemAnswer extends QuestionnaireAnswerFiller {
-  const StaticItemAnswer(
+class StaticItem extends QuestionnaireAnswerFiller {
+  const StaticItem(
       QuestionnaireLocation location, AnswerLocation answerLocation,
       {Key? key})
       : super(location, answerLocation, key: key);
   @override
-  State<StatefulWidget> createState() => _GroupItemState();
+  State<StatefulWidget> createState() => _StaticItemState();
 }
 
-class _GroupItemState extends QuestionnaireAnswerState {
-  _GroupItemState();
+class _StaticItemState extends QuestionnaireAnswerState {
+  _StaticItemState();
 
   @override
   Widget buildReadOnly(BuildContext context) {

@@ -29,13 +29,17 @@ extension SafeDisplayListCodingExtensions on List<Coding> {
   }
 }
 
-extension SafeDisplayCodeableConceptExtension on CodeableConcept {
+extension SafeCodeableConceptExtension on CodeableConcept {
   /// A safeguarded way to get a display value
   String get safeDisplay {
     return coding?.firstOrNull?.display ??
         text ??
         coding?.firstOrNull?.code?.value ??
         toString();
+  }
+
+  String get firstCode {
+    return ArgumentError.checkNotNull(coding?.firstOrNull?.code?.value);
   }
 }
 

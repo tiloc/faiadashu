@@ -71,7 +71,6 @@ class QuestionnaireFillerData extends InheritedWidget {
   final QuestionnaireLocation topLocation;
   final Iterable<QuestionnaireLocation> surveyLocations;
   final int _revision;
-  // TODO(tiloc) is it worth the extra complexity of this being nullable?
   late final List<QuestionnaireItemFiller?> _itemFillers;
   final ValueChanged<int> _onRevisionChange;
   final List<Aggregator>? _aggregators;

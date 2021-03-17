@@ -5,22 +5,22 @@ import 'package:intl/intl.dart';
 
 import '../questionnaires.dart';
 
-class NumericalItemAnswer extends QuestionnaireAnswerFiller {
-  const NumericalItemAnswer(
+class NumericalAnswer extends QuestionnaireAnswerFiller {
+  const NumericalAnswer(
       QuestionnaireLocation location, AnswerLocation answerLocation,
       {Key? key})
       : super(location, answerLocation, key: key);
 
   @override
-  State<NumericalItemAnswer> createState() => _NumericalItemState();
+  State<NumericalAnswer> createState() => _NumericalAnswerState();
 }
 
-class _NumericalItemState
-    extends QuestionnaireAnswerState<Decimal, NumericalItemAnswer> {
+class _NumericalAnswerState
+    extends QuestionnaireAnswerState<Decimal, NumericalAnswer> {
   late final TextInputFormatter _numberInputFormatter;
   late final NumberFormat _numberFormat;
 
-  _NumericalItemState();
+  _NumericalAnswerState();
 
   @override
   void initState() {

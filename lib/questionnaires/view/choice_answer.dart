@@ -1,44 +1,65 @@
-import 'dart:convert';
-
 import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
-import 'package:simple_html_css/simple_html_css.dart';
+import 'package:widgets_on_fhir/questionnaires/view/xhtml.dart';
 
 import '../../util/safe_access_extensions.dart';
 import '../questionnaires.dart';
 
-// TODO(tiloc): How to properly model "repeats" here? Technically this is a single control with numerous answers + open-choice texts
-// Maybe have a dedicated ResponseFiller for this? or pimp up AnswerLocation to support multiple answers?
-class ChoiceItemAnswer extends QuestionnaireAnswerFiller {
-  const ChoiceItemAnswer(
+class ChoiceAnswer extends QuestionnaireAnswerFiller {
+  // This class abuses CodeableConcept to model multiple choice and open choice.
+
+  const ChoiceAnswer(
       QuestionnaireLocation location, AnswerLocation answerLocation,
       {Key? key})
       : super(location, answerLocation, key: key);
   @override
-  State<StatefulWidget> createState() => _ChoiceItemState();
+  State<StatefulWidget> createState() => _ChoiceAnswerState();
 }
 
-class _ChoiceItemState
-    extends QuestionnaireAnswerState<String, ChoiceItemAnswer> {
-  _ChoiceItemState();
+class _ChoiceAnswerState
+    extends QuestionnaireAnswerState<CodeableConcept, ChoiceAnswer> {
+  _ChoiceAnswerState();
 
   @override
   void initState() {
     super.initState();
     if (widget.location.responseItem != null) {
-      initialValue = widget.answerLocation.answer?.valueCoding?.code.toString();
+      initialValue = _fillValue(
+          widget.answerLocation.answer?.valueCoding?.code.toString());
     }
   }
 
   @override
   QuestionnaireResponseAnswer? fillAnswer() => (value == null)
       ? null
-      : QuestionnaireResponseAnswer(valueCoding: _buildCodingByChoice(value));
+      : QuestionnaireResponseAnswer(
+          valueCoding: _fillCodingByChoice(
+              value?.firstCode)); // TODO(tiloc): .firstCode can throw NPE
+
+  @override
+  List<QuestionnaireResponseAnswer>? fillChoiceAnswers() {
+    if (value == null) {
+      return null;
+    }
+
+    // TODO(tiloc): Should the order of the codings be in the order of the choices?
+    // TODO(tiloc): This is probably insufficient (missing ordinal values, etc.)
+    // TODO(tiloc): Support open free text (should always come last?)
+    return value!.coding
+        ?.map<QuestionnaireResponseAnswer>(
+            (coding) => QuestionnaireResponseAnswer(valueCoding: coding))
+        .toList();
+  }
+
+  @override
+  bool hasChoiceAnswers() {
+    return value?.coding?.isNotEmpty ?? false;
+  }
 
   @override
   Widget buildReadOnly(BuildContext context) {
-    return Text(value ?? '');
+    return Text(value?.toString() ?? '');
   }
 
   @override
@@ -46,8 +67,31 @@ class _ChoiceItemState
     return _buildChoiceAnswers(context);
   }
 
-  // TODO(tiloc): Return the entire QuestionnaireResponseAnswer
-  Coding? _buildCodingByChoice(String? choice) {
+  CodeableConcept? _fillValue(String? newValue) {
+    return (newValue != null)
+        ? CodeableConcept(coding: [Coding(code: Code(newValue))])
+        : null;
+  }
+
+  CodeableConcept? _fillToggledValue(String? toggleValue) {
+    if (toggleValue == null) {
+      return null;
+    }
+    if ((value == null) || (value!.coding == null)) {
+      return CodeableConcept(coding: [Coding(code: Code(toggleValue))]);
+    }
+
+    final entryIndex = value!.coding!
+        .indexWhere((coding) => coding.code?.value == toggleValue);
+    if (entryIndex == -1) {
+      return CodeableConcept(
+          coding: [...value!.coding!, Coding(code: Code(toggleValue))]);
+    } else {
+      return CodeableConcept(coding: value!.coding!..removeAt(entryIndex));
+    }
+  }
+
+  Coding? _fillCodingByChoice(String? choice) {
     if (choice == null) {
       return null;
     }
@@ -70,7 +114,7 @@ class _ChoiceItemState
       final List<ValueSetConcept>? valueSetConcepts = valueSetInclude?.concept;
 
       if (valueSetConcepts == null) {
-        throw DataFormatException(
+        throw QuestionnaireFormatException(
             'Questionnaire does not contain referenced ValueSet $key',
             questionnaire);
       }
@@ -114,10 +158,12 @@ class _ChoiceItemState
                       valueDecimal: ordinalExtension.valueDecimal),
                 ]
               : null;
-          // TODO(tiloc) this could also be a valueString. Bang-op is wrong!
-          return option.valueCoding!.copyWith(
-              userSelected: Boolean(true),
-              extension_: responseOrdinalExtension);
+          // As per the spec there should always be a valueCoding, but SDC examples use valueString
+          return (option.valueCoding != null)
+              ? option.valueCoding!.copyWith(
+                  userSelected: Boolean(true),
+                  extension_: responseOrdinalExtension)
+              : Coding(display: option.valueString);
         }
       }
       throw ArgumentError('Answer Option does not contain entry $choice');
@@ -125,54 +171,39 @@ class _ChoiceItemState
   }
 
   Widget? _styledChoice(BuildContext context, QuestionnaireAnswerOption qao) {
-    final xhtml = qao.valueStringElement?.extension_
-        ?.extensionOrNull(
-            'http://hl7.org/fhir/StructureDefinition/rendering-xhtml')
-        ?.valueString;
-    if (xhtml == null) {
-      return null;
-    }
-    const imgBase64Prefix = "<img src='data:image/png;base64,";
-    if (xhtml.startsWith(imgBase64Prefix)) {
-      final base64String =
-          xhtml.substring(imgBase64Prefix.length, xhtml.length - "'/>".length);
-      return Image.memory(base64.decode(base64String));
-    } else {
-      return HTML.toRichText(context, xhtml);
-    }
+    return Xhtml.buildFromExtension(
+        context, qao.valueStringElement?.extension_);
   }
 
   Widget _buildChoiceAnswers(BuildContext context) {
-    final element = widget.location.questionnaireItem;
+    final qi = widget.location.questionnaireItem;
     final questionnaire = widget.location.questionnaire;
 
     final choices = <Widget>[];
-    if (element.repeats?.value == false) {
+    // TODO(tiloc): What broke this? Not showing anymore!
+    if ((qi.repeats?.value ?? false) == false) {
       choices.add(RadioListTile<String?>(
           title: Text(
             '---',
             style: Theme.of(context).textTheme.bodyText2,
           ),
           value: null,
-          groupValue: value,
+          groupValue: value?.firstCode,
           onChanged: (String? newValue) {
-            value = newValue;
+            value = _fillValue(newValue);
           }));
     }
-    if (element.answerValueSet != null) {
-      final key = element.answerValueSet!.value!
-          .toString()
-          .substring(1); // Strip off leading '#'
-      final List<ValueSetConcept>? valueSetConcepts = (questionnaire.contained
-                  ?.firstWhereOrNull((element) => key == element.id?.toString())
-              as ValueSet?)
-          ?.compose
-          ?.include
-          .firstOrNull
-          ?.concept;
+    if (qi.answerValueSet != null) {
+      final key = qi.answerValueSet?.value?.toString();
+      final List<ValueSetConcept>? valueSetConcepts =
+          (widget.location.top.findContainedByElementId(key) as ValueSet?)
+              ?.compose
+              ?.include
+              .firstOrNull
+              ?.concept;
 
       if (valueSetConcepts == null) {
-        throw DataFormatException(
+        throw QuestionnaireFormatException(
             'Questionnaire does not contain referenced ValueSet $key',
             questionnaire);
       }
@@ -184,14 +215,14 @@ class _ChoiceItemState
               style: Theme.of(context).textTheme.bodyText2,
             ),
             value: concept.code!.toString(),
-            groupValue: value,
+            groupValue: value?.firstCode,
             onChanged: (String? newValue) {
-              value = newValue;
+              value = _fillValue(newValue);
             }));
       }
     } else {
-      if (element.answerOption != null) {
-        for (final choice in element.answerOption!) {
+      if (qi.answerOption != null) {
+        for (final choice in qi.answerOption!) {
           final optionPrefix = choice.extension_
               ?.extensionOrNull(
                   'http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix')
@@ -200,20 +231,26 @@ class _ChoiceItemState
               (optionPrefix != null) ? '$optionPrefix ' : '';
           final optionTitle = '$optionPrefixDisplay${choice.safeDisplay}';
 
-          choices.add((element.repeats?.value == true)
+          choices.add((qi.repeats?.value == true)
               ? CheckboxListTile(
                   title: Text(optionTitle,
                       style: Theme.of(context).textTheme.bodyText2),
-                  value: true, // TODO(tiloc): Much work to do here...
-                  onChanged: (bool? newValue) {})
+                  value: value?.coding?.firstWhereOrNull((coding) =>
+                          coding.code?.value == choice.optionCode) !=
+                      null,
+                  onChanged: (bool? newValue) {
+                    value = _fillToggledValue(choice.optionCode);
+                    print(
+                        'Toggling ${choice.optionCode}'); // TODO(tiloc) Toggle for real!
+                  })
               : RadioListTile<String>(
                   title: Text(optionTitle,
                       style: Theme.of(context).textTheme.bodyText2),
                   secondary: _styledChoice(context, choice),
                   value: choice.optionCode,
-                  groupValue: value,
+                  groupValue: value?.firstCode,
                   onChanged: (String? newValue) {
-                    value = newValue;
+                    value = _fillValue(newValue);
                   }));
         }
       }

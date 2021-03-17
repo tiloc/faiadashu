@@ -8,18 +8,18 @@ import '../../util/safe_access_extensions.dart';
 import '../questionnaires.dart';
 import 'questionnaire_answer_filler.dart';
 
-class DateTimeItemAnswer extends QuestionnaireAnswerFiller {
-  const DateTimeItemAnswer(
+class DateTimeAnswer extends QuestionnaireAnswerFiller {
+  const DateTimeAnswer(
       QuestionnaireLocation location, AnswerLocation answerLocation,
       {Key? key})
       : super(location, answerLocation, key: key);
   @override
-  State<StatefulWidget> createState() => _DateTimeItemState();
+  State<StatefulWidget> createState() => _DateTimeAnswerState();
 }
 
-class _DateTimeItemState
-    extends QuestionnaireAnswerState<FhirDateTime, DateTimeItemAnswer> {
-  _DateTimeItemState();
+class _DateTimeAnswerState
+    extends QuestionnaireAnswerState<FhirDateTime, DateTimeAnswer> {
+  _DateTimeAnswerState();
 
   @override
   void initState() {

@@ -25,13 +25,23 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller>
 
   QuestionnaireResponseAnswer? fillAnswer();
 
+  List<QuestionnaireResponseAnswer>? fillChoiceAnswers() {
+    throw UnimplementedError('fillChoiceAnswers not implemented.');
+  }
+
+  bool hasChoiceAnswers() => false;
+
   set value(V? newValue) {
     if (mounted) {
       setState(() {
         _value = newValue;
       });
 
-      widget.answerLocation.stashAnswer(fillAnswer());
+      if (hasChoiceAnswers()) {
+        widget.answerLocation.stashChoiceAnswers(fillChoiceAnswers());
+      } else {
+        widget.answerLocation.stashAnswer(fillAnswer());
+      }
     }
   }
 

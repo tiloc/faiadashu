@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 
 import '../questionnaires.dart';
 
-class BooleanItemAnswer extends QuestionnaireAnswerFiller {
-  const BooleanItemAnswer(
+class BooleanAnswer extends QuestionnaireAnswerFiller {
+  const BooleanAnswer(
       QuestionnaireLocation location, AnswerLocation answerLocation,
       {Key? key})
       : super(location, answerLocation, key: key);
@@ -14,7 +14,7 @@ class BooleanItemAnswer extends QuestionnaireAnswerFiller {
 }
 
 class _BooleanItemState
-    extends QuestionnaireAnswerState<Boolean, BooleanItemAnswer> {
+    extends QuestionnaireAnswerState<Boolean, BooleanAnswer> {
   _BooleanItemState();
 
   @override
