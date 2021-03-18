@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:widgets_on_fhir_example/instruments/mds_ipa_instrument.dart';
 
 import 'disclaimer_page.dart';
 import 'instruments/bluebook.dart';
@@ -138,6 +139,16 @@ class _HomePageState extends State<HomePage> {
                   MaterialPageRoute(
                       builder: (context) => QuestionnaireScrollerPage(
                           BluebookInstrument.bluebookInstrument)));
+            },
+          ),
+          ListTile(
+            title: const Text('MDS 3.0 IPA 1.10 Questionnaire Scroller'),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => QuestionnaireScrollerPage(
+                          Mds30Ipa110Instrument.mds30Ipa110Instrument)));
             },
           ),
         ],

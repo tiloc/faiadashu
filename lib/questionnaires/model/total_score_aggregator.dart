@@ -9,12 +9,13 @@ import '../../util/safe_access_extensions.dart';
 import 'questionnaire_location.dart';
 
 /// Aggregate responses into a total score.
-/// Updates immediately when questionnaire is updated.
+/// Updates immediately when questionnaire is updated and [autoAggregate] is true.
 /// Can deal with incomplete questionnaires.
 /// Will return 0 when no score field exists on the questionnaire.
 class TotalScoreAggregator extends Aggregator<Decimal> {
   late final QuestionnaireLocation? totalScoreLocation;
-  TotalScoreAggregator() : super(Decimal(0));
+  TotalScoreAggregator({bool autoAggregate = true})
+      : super(Decimal(0), autoAggregate: autoAggregate);
 
   @override
   void init(QuestionnaireTopLocation topLocation) {
@@ -24,19 +25,21 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
         .preOrder()
         .firstWhereOrNull((location) => location.isCalculatedExpression);
     // if there is no total score location then leave value at 0 indefinitely
-    if (totalScoreLocation != null) {
-      for (final location in topLocation.preOrder()) {
-        if (!location.isStatic && location != totalScoreLocation) {
-          location.addListener(() => aggregate());
+    if (autoAggregate) {
+      if (totalScoreLocation != null) {
+        for (final location in topLocation.preOrder()) {
+          if (!location.isStatic && location != totalScoreLocation) {
+            location.addListener(() => aggregate(notifyListeners: true));
+          }
         }
       }
     }
   }
 
   @override
-  void aggregate() {
+  Decimal? aggregate({bool notifyListeners = false}) {
     if (totalScoreLocation == null) {
-      return;
+      return null;
     }
 
     developer.log('totalScore.aggregrate', level: 500);
@@ -53,7 +56,10 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
     }
 
     developer.log('sum: $sum', level: 500);
-    value = Decimal(sum);
+    final result = Decimal(sum);
+    if (notifyListeners) {
+      value = result;
+    }
 
     final unit = totalScoreLocation!.questionnaireItem.extension_
         ?.extensionOrNull(
@@ -75,5 +81,7 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
           text: totalScoreLocation!.questionnaireItem.text,
           answer: [QuestionnaireResponseAnswer(valueDecimal: value)]);
     }
+
+    return result;
   }
 }

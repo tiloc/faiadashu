@@ -16,7 +16,7 @@ class QuestionnaireFiller extends StatefulWidget {
     if (aggregators != null) {
       for (final aggregator in aggregators) {
         aggregator.init(topLocation);
-        aggregator.aggregate();
+        aggregator.aggregate(notifyListeners: true);
       }
     }
 

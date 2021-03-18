@@ -1,8 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
 
-extension SafeDisplayQuestionnaireAnswerOptionExtensions
-    on QuestionnaireAnswerOption {
+extension SafeQuestionnaireAnswerOptionExtensions on QuestionnaireAnswerOption {
   /// A safeguarded way to get a display value
   String get safeDisplay {
     return valueString ?? valueCoding?.safeDisplay ?? toString();
@@ -14,14 +13,14 @@ extension SafeDisplayQuestionnaireAnswerOptionExtensions
   }
 }
 
-extension SafeDisplayCodingExtensions on Coding {
+extension SafeCodingExtensions on Coding {
   /// A safeguarded way to get a display value
   String get safeDisplay {
     return display ?? code?.value ?? toString();
   }
 }
 
-extension SafeDisplayListCodingExtensions on List<Coding> {
+extension SafeListCodingExtensions on List<Coding> {
   /// A safeguarded way to get a display value or empty string
   String get safeDisplay {
     if (isEmpty) return '';

@@ -3,6 +3,7 @@ import 'dart:developer' as developer;
 
 import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
+import 'package:fhir/r4/resource_types/resource_types.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../util/safe_access_extensions.dart';
@@ -26,10 +27,13 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
     _ensureOrderedItems();
   }
 
-  void bumpRevision() {
-    developer.log('QuestionnaireTopLocation.bumpRevision', level: 500);
+  void bumpRevision({bool notifyListeners = true}) {
+    developer.log('QuestionnaireTopLocation.bumpRevision $notifyListeners',
+        level: 500);
     _revision += 1;
-    notifyListeners();
+    if (notifyListeners) {
+      this.notifyListeners();
+    }
   }
 
   /// Find a contained element by its id.
@@ -54,8 +58,11 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
     return _orderedItems![linkId]!;
   }
 
+  QuestionnaireResponseStatus responseStatus =
+      QuestionnaireResponseStatus.unknown;
+
   /// Update the current enablement status of all items.
-  void updateEnableWhen() {
+  void updateEnableWhen({bool notifyListeners = true}) {
     developer.log('updateEnableWhen()', level: 500);
     for (final location in preOrder()) {
       location._enabled = true;
@@ -64,7 +71,7 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
     for (final location in preOrder()) {
       location._calculateEnabled();
     }
-    bumpRevision();
+    bumpRevision(notifyListeners: notifyListeners);
   }
 
   /// Activate the "enableWhen" behaviors.

@@ -8,18 +8,22 @@ import '../questionnaires.dart';
 /// Create a narrative from the responses to a [Questionnaire].
 /// Updates immediately after responses have changed.
 class NarrativeAggregator extends Aggregator<Narrative> {
-  NarrativeAggregator()
-      : super(Narrative(
-            div: '<div xmlns="http://www.w3.org/1999/xhtml"></div>',
-            status: NarrativeStatus.empty));
+  NarrativeAggregator({bool autoAggregate = true})
+      : super(
+            Narrative(
+                div: '<div xmlns="http://www.w3.org/1999/xhtml"></div>',
+                status: NarrativeStatus.empty),
+            autoAggregate: autoAggregate);
 
   @override
   void init(QuestionnaireTopLocation topLocation) {
     super.init(topLocation);
 
-    for (final location in topLocation.preOrder()) {
-      if (!location.isStatic) {
-        location.addListener(() => aggregate());
+    if (autoAggregate) {
+      for (final location in topLocation.preOrder()) {
+        if (!location.isStatic) {
+          location.addListener(() => aggregate(notifyListeners: true));
+        }
       }
     }
   }
@@ -51,7 +55,11 @@ class NarrativeAggregator extends Aggregator<Narrative> {
         if (answer.valueString != null) {
           div.write('<p>${answer.valueString}</p>');
         } else if (answer.valueDecimal != null) {
-          div.write('<p>${answer.valueDecimal.toString()}</p>');
+          if (location.isCalculatedExpression) {
+            div.write('<h3>${answer.valueDecimal.toString()}</h3>');
+          } else {
+            div.write('<p>${answer.valueDecimal.toString()}</p>');
+          }
         } else if (answer.valueQuantity != null) {
           div.write(
               '<p>${answer.valueQuantity!.value} ${answer.valueQuantity!.unit}</p>');
@@ -90,10 +98,16 @@ class NarrativeAggregator extends Aggregator<Narrative> {
   }
 
   @override
-  void aggregate() {
+  Narrative? aggregate({bool notifyListeners = false}) {
     developer.log('NarrativeAggregator.aggregate', level: 500);
-    topLocation
-        .updateEnableWhen(); // TODO: Should this be manually invoked? Or should every bumpRevision result in a recalc?
-    value = _generateNarrative(topLocation);
+    // Manually invoke the update, because the order matters and enableWhen calcs need to come after answer value updates.
+    topLocation.updateEnableWhen(
+        notifyListeners:
+            notifyListeners); // TODO: Should this be manually invoked? Or should every bumpRevision result in a recalc?
+    final result = _generateNarrative(topLocation);
+    if (notifyListeners) {
+      value = result;
+    }
+    return result;
   }
 }
