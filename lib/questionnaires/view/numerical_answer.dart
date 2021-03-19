@@ -48,6 +48,7 @@ class _NumericalAnswerState
 
   @override
   Widget buildReadOnly(BuildContext context) {
+    // TODO: international number formatting
     return Text(value.toString());
   }
 
@@ -60,7 +61,11 @@ class _NumericalAnswerState
       inputFormatters: [_numberInputFormatter],
       keyboardType: TextInputType.number,
       onChanged: (content) {
-        value = Decimal(content);
+        if (content.trim().isEmpty) {
+          value = null;
+        } else {
+          value = Decimal(content);
+        }
       },
     );
   }
@@ -68,7 +73,7 @@ class _NumericalAnswerState
   /// TODO: Support for quantity
   @override
   QuestionnaireResponseAnswer? fillAnswer() {
-    developer.log('fillAnswer: $value');
-    QuestionnaireResponseAnswer(valueDecimal: value);
+    developer.log('fillAnswer: $value', level: LogLevel.debug);
+    return QuestionnaireResponseAnswer(valueDecimal: value);
   }
 }

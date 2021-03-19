@@ -180,7 +180,6 @@ class _ChoiceAnswerState
     final questionnaire = widget.location.questionnaire;
 
     final choices = <Widget>[];
-    // TODO(tiloc): What broke this? Not showing anymore!
     if ((qi.repeats?.value ?? false) == false) {
       choices.add(RadioListTile<String?>(
           title: Text(

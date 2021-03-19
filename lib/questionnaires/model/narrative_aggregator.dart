@@ -1,13 +1,19 @@
 import 'dart:developer' as developer;
 
 import 'package:fhir/r4.dart';
-import 'package:widgets_on_fhir/questionnaires/model/aggregator.dart';
 
 import '../questionnaires.dart';
+import 'aggregator.dart';
 
 /// Create a narrative from the responses to a [Questionnaire].
 /// Updates immediately after responses have changed.
 class NarrativeAggregator extends Aggregator<Narrative> {
+  // TODO: This is currently entirely ineffective. topLocation.revision is always 1-x revisions ahead.
+  // Revision of topLocation when _narrative was calculated
+  int _revision = -1;
+  // Cached narrative
+  Narrative? _narrative;
+
   NarrativeAggregator({bool autoAggregate = true})
       : super(
             Narrative(
@@ -19,12 +25,11 @@ class NarrativeAggregator extends Aggregator<Narrative> {
   void init(QuestionnaireTopLocation topLocation) {
     super.init(topLocation);
 
+    _revision = -1;
+    _narrative = null;
+
     if (autoAggregate) {
-      for (final location in topLocation.preOrder()) {
-        if (!location.isStatic) {
-          location.addListener(() => aggregate(notifyListeners: true));
-        }
-      }
+      topLocation.addListener(() => aggregate(notifyListeners: true));
     }
   }
 
@@ -72,7 +77,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
         } else if (answer.valueTime != null) {
           div.write('<p>${answer.valueTime}</p>');
         } else if (answer.valueBoolean != null) {
-          div.write('<p>${answer.valueBoolean}</p>');
+          div.write('<p>${(answer.valueBoolean!.value!) ? '[X]' : '[ ]'}</p>');
         } else {
           div.write('<p>${answer.toString()}</p>');
         }
@@ -99,15 +104,22 @@ class NarrativeAggregator extends Aggregator<Narrative> {
 
   @override
   Narrative? aggregate({bool notifyListeners = false}) {
-    developer.log('NarrativeAggregator.aggregate', level: 500);
+    developer.log(
+        '$this.aggregate (topRev: ${topLocation.revision}, rev: $_revision)',
+        level: LogLevel.trace);
+    if (topLocation.revision == _revision) {
+      developer.log('Regurgitating narrative revision $_revision');
+      return _narrative;
+    }
     // Manually invoke the update, because the order matters and enableWhen calcs need to come after answer value updates.
     topLocation.updateEnableWhen(
         notifyListeners:
-            notifyListeners); // TODO: Should this be manually invoked? Or should every bumpRevision result in a recalc?
-    final result = _generateNarrative(topLocation);
+            false); // TODO: setting this to true will result in endless refresh and stack overflow
+    _narrative = _generateNarrative(topLocation);
+    _revision = topLocation.revision;
     if (notifyListeners) {
-      value = result;
+      value = _narrative!;
     }
-    return result;
+    return _narrative;
   }
 }

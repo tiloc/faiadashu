@@ -58,6 +58,7 @@ class _HomePageState extends State<HomePage> {
         children: [
           ListTile(
             title: const Text('Disclaimers'),
+            subtitle: const Text('Legalese'),
             onTap: () {
               Navigator.push(
                   context,
@@ -67,6 +68,8 @@ class _HomePageState extends State<HomePage> {
           ),
           ListTile(
             title: const Text('Primitive Types'),
+            subtitle: const Text(
+                'Formatted, internationalized text output of FHIR primitive types.'),
             onTap: () {
               Navigator.push(
                   context,
@@ -76,6 +79,8 @@ class _HomePageState extends State<HomePage> {
           ),
           ListTile(
             title: const Text('Observation'),
+            subtitle: const Text(
+                'Formatted, internationalized text output of observations.'),
             onTap: () {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => ObservationPage()));
@@ -83,6 +88,7 @@ class _HomePageState extends State<HomePage> {
           ),
           ListTile(
             title: const Text('SDC Demo Scroller'),
+            subtitle: const Text('A gallery of SDC feature support.'),
             onTap: () {
               Navigator.push(
                   context,
@@ -93,6 +99,8 @@ class _HomePageState extends State<HomePage> {
           ),
           ListTile(
             title: const Text('PHQ9 Questionnaire Scroller'),
+            subtitle:
+                const Text('Simple choice-based survey with a total score.'),
             onTap: () {
               Navigator.push(
                   context,
@@ -103,6 +111,8 @@ class _HomePageState extends State<HomePage> {
           ),
           ListTile(
             title: const Text('PHQ9 Questionnaire Stepper'),
+            subtitle:
+                const Text('Simple choice-based survey with a total score.'),
             onTap: () {
               Navigator.push(
                   context,
@@ -113,6 +123,7 @@ class _HomePageState extends State<HomePage> {
           ),
           ListTile(
             title: const Text('HF Questionnaire Scroller'),
+            subtitle: const Text('A heart failure survey with a total score.'),
             onTap: () {
               Navigator.push(
                   context,
@@ -123,6 +134,7 @@ class _HomePageState extends State<HomePage> {
           ),
           ListTile(
             title: const Text('PRAPARE Questionnaire Scroller'),
+            subtitle: const Text('Real-world, mixed-type survey from the US'),
             onTap: () {
               Navigator.push(
                   context,
@@ -133,6 +145,8 @@ class _HomePageState extends State<HomePage> {
           ),
           ListTile(
             title: const Text('Bluebook Questionnaire Scroller'),
+            subtitle:
+                const Text('Real-world, mixed-type survey from Australia'),
             onTap: () {
               Navigator.push(
                   context,
@@ -143,6 +157,8 @@ class _HomePageState extends State<HomePage> {
           ),
           ListTile(
             title: const Text('MDS 3.0 IPA 1.10 Questionnaire Scroller'),
+            subtitle: const Text(
+                'This is a 1MB stress-test and will currently break/hang.'),
             onTap: () {
               Navigator.push(
                   context,

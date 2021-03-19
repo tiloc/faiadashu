@@ -6,10 +6,11 @@ import 'package:fhir/r4.dart';
 import 'package:fhir/r4/resource_types/resource_types.dart';
 import 'package:flutter/foundation.dart';
 
-import '../../util/safe_access_extensions.dart';
+import '../../util/util.dart';
 
 class QuestionnaireTopLocation extends QuestionnaireLocation {
   final Map<String, QuestionnaireLocation> _cachedItems = {};
+  List<QuestionnaireLocation>? _enabledWhens;
 
   /// Create the first location top-down of the given [Questionnaire].
   /// Will throw [Error]s in case this [Questionnaire] has no items.
@@ -25,12 +26,27 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
     _top = this;
     // This will set up the traversal order and fill up the cache.
     _ensureOrderedItems();
+
+    for (final location in preOrder()) {
+      final enableWhens = location.questionnaireItem.enableWhen;
+      if ((enableWhens != null) && enableWhens.isNotEmpty) {
+        if (_enabledWhens == null) {
+          _enabledWhens = [location];
+        } else {
+          _enabledWhens!.add(location);
+        }
+      }
+    }
+
+    developer.log('_enabledWhens: $_enabledWhens', level: 500);
   }
 
   void bumpRevision({bool notifyListeners = true}) {
-    developer.log('QuestionnaireTopLocation.bumpRevision $notifyListeners',
+    final newRevision = _revision + 1;
+    developer.log(
+        'QuestionnaireTopLocation.bumpRevision $notifyListeners: $_revision -> $newRevision',
         level: 500);
-    _revision += 1;
+    _revision = newRevision;
     if (notifyListeners) {
       this.notifyListeners();
     }
@@ -63,15 +79,38 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
 
   /// Update the current enablement status of all items.
   void updateEnableWhen({bool notifyListeners = true}) {
-    developer.log('updateEnableWhen()', level: 500);
-    for (final location in preOrder()) {
+    if (_enabledWhens == null) {
+      developer.log('updateEnableWhen: no conditional items',
+          level: LogLevel.trace);
+      return;
+    }
+    developer.log('updateEnableWhen()', level: LogLevel.trace);
+
+    final previouslyEnabled = List<bool>.generate(
+        preOrder().length, (index) => preOrder().elementAt(index).enabled,
+        growable: false);
+    developer.log('prevEnabled: $previouslyEnabled', level: LogLevel.trace);
+    for (final location in _enabledWhens!) {
       location._enabled = true;
     }
 
-    for (final location in preOrder()) {
+    bool _changed = false;
+    int i = 0;
+    for (final location in _enabledWhens!) {
       location._calculateEnabled();
+      if (location.enabled != previouslyEnabled.elementAt(i)) {
+        _changed = true;
+        developer.log(
+            'enabled changed @ $location: ${previouslyEnabled.elementAt(i)} -> ${location.enabled}',
+            level: LogLevel.trace);
+      }
+      i++;
     }
-    bumpRevision(notifyListeners: notifyListeners);
+    if (_changed) {
+      bumpRevision(notifyListeners: notifyListeners);
+    } else {
+      developer.log('enableWhen unchanged.', level: LogLevel.debug);
+    }
   }
 
   /// Activate the "enableWhen" behaviors.
@@ -112,7 +151,7 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
   }
 
   /// Calculate the current enablement status of this item.
-  /// Sets the [enabled] property and returns true if status has changed.
+  /// Sets the [enabled] property
   void _calculateEnabled() {
     forEnableWhens((qew) {
       if (qew.operator_ == QuestionnaireEnableWhenOperator.exists) {
@@ -120,7 +159,8 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
           _disableWithChildren();
         }
       } else {
-        developer.log('Unsupported operator: ${qew.operator_}.', level: 900);
+        developer.log('Unsupported operator: ${qew.operator_}.',
+            level: LogLevel.warn);
       }
     });
   }
@@ -182,6 +222,8 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
       (questionnaireItem.item != null) && (questionnaireItem.item!.isNotEmpty);
 
   set responseItem(QuestionnaireResponseItem? questionnaireResponseItem) {
+    developer.log('set responseItem $questionnaireResponseItem',
+        level: LogLevel.debug);
     if (questionnaireResponseItem != _questionnaireResponseItem) {
       _questionnaireResponseItem = questionnaireResponseItem;
       top.bumpRevision();
