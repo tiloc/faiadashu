@@ -3,11 +3,9 @@ import 'dart:developer' as developer;
 import 'package:fhir/r4.dart';
 
 import '../questionnaires.dart';
-import 'aggregator.dart';
 
 class QuestionnaireResponseAggregator
     extends Aggregator<QuestionnaireResponse> {
-  // TODO(tiloc): Enable autoAggregate behavior
   /// [autoAggregate] defaults to false for this one!
   QuestionnaireResponseAggregator({bool autoAggregate = false})
       : super(QuestionnaireResponse(), autoAggregate: autoAggregate);
@@ -16,6 +14,10 @@ class QuestionnaireResponseAggregator
   @override
   void init(QuestionnaireTopLocation topLocation) {
     super.init(topLocation);
+
+    if (autoAggregate) {
+      topLocation.addListener(() => aggregate(notifyListeners: true));
+    }
   }
 
   QuestionnaireResponseItem _fromGroupItem(QuestionnaireLocation location) {
