@@ -8,8 +8,13 @@ class QuestionnaireStepperPage extends StatefulWidget {
   final QuestionnaireTopLocation top;
 
   QuestionnaireStepperPage(String instrument, {Key? key})
-      : top = QuestionnaireTopLocation.fromQuestionnaire(Questionnaire.fromJson(
-            json.decode(instrument) as Map<String, dynamic>)),
+      : top = QuestionnaireTopLocation.fromQuestionnaire(
+          Questionnaire.fromJson(
+              json.decode(instrument) as Map<String, dynamic>),
+          aggregators: [
+            TotalScoreAggregator(),
+          ],
+        ),
         super(key: key);
 
   @override
@@ -24,7 +29,6 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
     final controller = PageController();
 
     return QuestionnaireFiller(widget.top,
-        aggregators: [TotalScoreAggregator()],
         child: Builder(
             builder: (BuildContext context) => Scaffold(
                 appBar: AppBar(

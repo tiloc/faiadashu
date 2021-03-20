@@ -51,9 +51,7 @@ class QuestionnaireResponseAggregator
       }
     }
 
-    // TODO: How could I get at the one from the QuestionnaireFiller when I have no context?
-    final narrativeAggregator = NarrativeAggregator(autoAggregate: false)
-      ..init(topLocation);
+    final narrativeAggregator = topLocation.aggregator<NarrativeAggregator>();
 
     final questionnaireResponse = QuestionnaireResponse(
         status: topLocation.responseStatus,

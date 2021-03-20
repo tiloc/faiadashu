@@ -7,15 +7,19 @@ import 'package:fhir/r4/resource_types/resource_types.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../util/util.dart';
+import 'aggregator.dart';
 
 class QuestionnaireTopLocation extends QuestionnaireLocation {
   final Map<String, QuestionnaireLocation> _cachedItems = {};
   List<QuestionnaireLocation>? _enabledWhens;
+  final List<Aggregator>? _aggregators;
 
   /// Create the first location top-down of the given [Questionnaire].
   /// Will throw [Error]s in case this [Questionnaire] has no items.
-  QuestionnaireTopLocation.fromQuestionnaire(Questionnaire questionnaire)
-      : super._(
+  QuestionnaireTopLocation.fromQuestionnaire(Questionnaire questionnaire,
+      {List<Aggregator>? aggregators})
+      : _aggregators = aggregators,
+        super._(
             questionnaire,
             null,
             ArgumentError.checkNotNull(questionnaire.item?.first),
@@ -39,6 +43,22 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
     }
 
     developer.log('_enabledWhens: $_enabledWhens', level: 500);
+
+    if (aggregators != null) {
+      for (final aggregator in aggregators) {
+        aggregator.init(this);
+        aggregator.aggregate(notifyListeners: true);
+      }
+    }
+
+    activateEnableWhen();
+  }
+
+  T aggregator<T extends Aggregator>() {
+    if (_aggregators == null) {
+      throw StateError('Aggregators have not been specified in constructor.');
+    }
+    return (_aggregators?.firstWhere((aggregator) => aggregator is T) as T?)!;
   }
 
   void bumpRevision({bool notifyListeners = true}) {

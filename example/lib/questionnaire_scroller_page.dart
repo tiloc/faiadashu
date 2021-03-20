@@ -10,8 +10,14 @@ class QuestionnaireScrollerPage extends StatefulWidget {
   // TODO(tiloc): Move JSON parsing into background thread and make widget state dependent on its completion
   QuestionnaireScrollerPage(String instrument, {Key? key})
       : topLocation = QuestionnaireTopLocation.fromQuestionnaire(
-            Questionnaire.fromJson(
-                json.decode(instrument) as Map<String, dynamic>)),
+          Questionnaire.fromJson(
+              json.decode(instrument) as Map<String, dynamic>),
+          aggregators: [
+            TotalScoreAggregator(),
+            NarrativeAggregator(),
+            QuestionnaireResponseAggregator()
+          ],
+        ),
         super(key: key);
 
   @override
@@ -28,12 +34,6 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
   @override
   Widget build(BuildContext context) {
     return QuestionnaireFiller(widget.topLocation,
-        aggregators: [
-          // TODO(tiloc): Is it better to move aggregators to topLocation? Makes it easier to access them without context.
-          TotalScoreAggregator(),
-          NarrativeAggregator(),
-          QuestionnaireResponseAggregator()
-        ],
         child: Builder(
             builder: (BuildContext context) => Scaffold(
                   appBar: AppBar(

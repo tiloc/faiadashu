@@ -7,21 +7,9 @@ import '../questionnaires.dart';
 class QuestionnaireFiller extends StatefulWidget {
   final Widget child;
   final QuestionnaireTopLocation topLocation;
-  final List<Aggregator>? _aggregators;
 
-  QuestionnaireFiller(this.topLocation,
-      {Key? key, required this.child, List<Aggregator>? aggregators})
-      : _aggregators = aggregators,
-        super(key: key) {
-    if (aggregators != null) {
-      for (final aggregator in aggregators) {
-        aggregator.init(topLocation);
-        aggregator.aggregate(notifyListeners: true);
-      }
-    }
-
-    topLocation.activateEnableWhen();
-  }
+  const QuestionnaireFiller(this.topLocation, {Key? key, required this.child})
+      : super(key: key);
 
   static QuestionnaireFillerData of(BuildContext context) {
     final result =
@@ -61,7 +49,6 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
       widget.topLocation,
       revision: _revision,
       onRevisionChange: _onRevisionChange,
-      aggregators: widget._aggregators,
       child: widget.child,
     );
   }
@@ -73,29 +60,23 @@ class QuestionnaireFillerData extends InheritedWidget {
   final int _revision;
   late final List<QuestionnaireItemFiller?> _itemFillers;
   final ValueChanged<int> _onRevisionChange;
-  final List<Aggregator>? _aggregators;
 
   QuestionnaireFillerData._(
     this.topLocation, {
     Key? key,
     required int revision,
-    required List<Aggregator>? aggregators,
     required ValueChanged<int> onRevisionChange,
     required Widget child,
   })   : surveyLocations = topLocation.preOrder(),
         _revision = revision,
         _onRevisionChange = onRevisionChange,
-        _aggregators = aggregators,
         super(key: key, child: child) {
     _itemFillers =
         List<QuestionnaireItemFiller?>.filled(surveyLocations.length, null);
   }
 
   T aggregator<T extends Aggregator>() {
-    if (_aggregators == null) {
-      throw StateError('Aggregators have not been specified in constructor.');
-    }
-    return (_aggregators?.firstWhere((aggregator) => aggregator is T) as T?)!;
+    return topLocation.aggregator<T>();
   }
 
   static QuestionnaireFillerData of(BuildContext context) {
