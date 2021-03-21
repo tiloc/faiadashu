@@ -8,7 +8,6 @@ import 'aggregator.dart';
 /// Create a narrative from the responses to a [Questionnaire].
 /// Updates immediately after responses have changed.
 class NarrativeAggregator extends Aggregator<Narrative> {
-  // TODO: This is currently entirely ineffective. topLocation.revision is always 1-x revisions ahead.
   // Revision of topLocation when _narrative was calculated
   int _revision = -1;
   // Cached narrative

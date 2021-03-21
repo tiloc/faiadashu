@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:fhir/r4.dart';
 
+// ignore: avoid_classes_with_only_static_members
 class FhirValueSet {
   // TODO: Caching
   static ValueSet? getValueSet(String uri) {

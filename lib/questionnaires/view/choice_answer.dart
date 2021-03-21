@@ -35,9 +35,8 @@ class _ChoiceAnswerState
     _buildAnswerOptions();
 
     if (widget.location.responseItem != null) {
-      // TODO: Use _answerOptions
       initialValue = _fillValue(
-          widget.answerLocation.answer?.valueCoding?.code.toString());
+          _choiceStringFromCoding(widget.answerLocation.answer?.valueCoding));
     }
   }
 
@@ -52,13 +51,16 @@ class _ChoiceAnswerState
       return null;
     }
 
-    // TODO(tiloc): Should the order of the codings be in the order of the choices?
+    // TODO(tiloc): Return the order of the codings in the order of the choices
     // TODO(tiloc): Support open free text (should always come last?)
-    return value!.coding
-        ?.map<QuestionnaireResponseAnswer>((coding) =>
-            QuestionnaireResponseAnswer(
-                valueCoding: _fillCodingByChoice(coding.code!.value)))
-        .toList();
+    return value!.coding?.map<QuestionnaireResponseAnswer>((coding) {
+      // Some answers may only be a display, not have a code
+      return coding.code != null
+          ? QuestionnaireResponseAnswer(
+              valueCoding:
+                  _answerOptions[_choiceStringFromCoding(coding)]!.valueCoding)
+          : QuestionnaireResponseAnswer(valueCoding: coding);
+    }).toList();
   }
 
   @override
@@ -68,7 +70,7 @@ class _ChoiceAnswerState
 
   @override
   Widget buildReadOnly(BuildContext context) {
-    return Text(value?.toString() ?? '');
+    return Text(value?.safeDisplay ?? '-');
   }
 
   @override
@@ -78,7 +80,7 @@ class _ChoiceAnswerState
 
   CodeableConcept? _fillValue(String? newValue) {
     return (newValue != null)
-        ? CodeableConcept(coding: [Coding(code: Code(newValue))])
+        ? CodeableConcept(coding: [_answerOptions[newValue]!.valueCoding!])
         : null;
   }
 
@@ -89,25 +91,17 @@ class _ChoiceAnswerState
       return null;
     }
     if ((value == null) || (value!.coding == null)) {
-      return CodeableConcept(coding: [Coding(code: Code(toggleValue))]);
+      return _fillValue(toggleValue);
     }
 
     final entryIndex = value!.coding!
         .indexWhere((coding) => coding.code?.value == toggleValue);
     if (entryIndex == -1) {
-      return CodeableConcept(
-          coding: [...value!.coding!, Coding(code: Code(toggleValue))]);
+      return value!.copyWith(
+          coding: [...value!.coding!, ..._fillValue(toggleValue)!.coding!]);
     } else {
       return CodeableConcept(coding: value!.coding!..removeAt(entryIndex));
     }
-  }
-
-  Coding? _fillCodingByChoice(String? choice) {
-    if (choice == null) {
-      return null;
-    }
-
-    return _answerOptions[choice]!.valueCoding;
   }
 
   Widget? _styledChoice(BuildContext context, QuestionnaireAnswerOption qao) {
@@ -135,6 +129,42 @@ class _ChoiceAnswerState
     return responseOrdinalExtension;
   }
 
+  String? _choiceStringFromCoding(Coding? coding) {
+    if (coding == null) {
+      return null;
+    }
+    final choiceString =
+        (coding.code != null) ? coding.code?.value : coding.display;
+
+    if (choiceString == null) {
+      throw QuestionnaireFormatException(
+          'Insufficient info for choice string in $coding', coding);
+    } else {
+      return choiceString;
+    }
+  }
+
+  String? _choiceStringFromCodings(List<Coding>? codings) {
+    if (codings == null) {
+      return null;
+    }
+
+    final coding = codings.firstOrNull;
+    return _choiceStringFromCoding(coding);
+  }
+
+  /// Extract a string from a [CodeableConcept].
+  /// Can be used as groupValue in checkboxes/radiobuttons, or as a key in maps
+  /// Throws when Questionnaire is malformed.
+  /// Returns null if [codeableConcept] is null
+  String? _choiceString(CodeableConcept? codeableConcept) {
+    if (codeableConcept == null) {
+      return null;
+    }
+    return _choiceStringFromCodings(
+        ArgumentError.checkNotNull(codeableConcept.coding));
+  }
+
   /// Convert [ValueSet]s or [QuestionnaireAnswerOption]s to normalized [QuestionnaireAnswerOption]s
   void _buildAnswerOptions() {
     final qi = widget.location.questionnaireItem;
@@ -159,34 +189,56 @@ class _ChoiceAnswerState
             questionnaire);
       }
 
-      final ValueSetInclude? valueSetInclude =
-          valueSet.compose?.include.firstOrNull;
+      final List<ValueSetContains>? valueSetContains =
+          valueSet.expansion?.contains;
 
-      if (valueSetInclude == null) {
-        throw QuestionnaireFormatException(
-            'Include in ValueSet $key does not exist.', qi);
-      }
+      if (valueSetContains != null) {
+        // Expansion has preference over includes. They are not additive.
+        for (final contains in valueSetContains) {
+          _answerOptions.addEntries([
+            MapEntry<String, QuestionnaireAnswerOption>(
+                contains.code!.toString(),
+                QuestionnaireAnswerOption(
+                    valueCoding: Coding(
+                        system: contains.system,
+                        code: contains.code,
+                        userSelected: Boolean(true),
+                        display: contains.display,
+                        extension_:
+                            _buildOrdinalExtension(contains.extension_))))
+          ]);
+        }
+      } else {
+        final ValueSetInclude? valueSetInclude =
+            valueSet.compose?.include.firstOrNull;
 
-      final List<ValueSetConcept> valueSetConcepts =
-          valueSetInclude.concept ?? [];
+        if (valueSetInclude == null) {
+          throw QuestionnaireFormatException(
+              'Include in ValueSet $key does not exist.', qi);
+        }
 
-      if (valueSetConcepts.isEmpty) {
-        developer.log('Concepts in ValueSet $key is empty.',
-            level: LogLevel.warn);
-      }
+        final List<ValueSetConcept> valueSetConcepts =
+            valueSetInclude.concept ?? [];
 
-      for (final concept in valueSetConcepts) {
-        _answerOptions.addEntries([
-          MapEntry<String, QuestionnaireAnswerOption>(
-              concept.code!.toString(),
-              QuestionnaireAnswerOption(
-                  valueCoding: Coding(
-                      system: valueSetInclude.system,
-                      code: concept.code,
-                      userSelected: Boolean(true),
-                      display: concept.display,
-                      extension_: _buildOrdinalExtension(concept.extension_))))
-        ]);
+        if (valueSetConcepts.isEmpty) {
+          developer.log('Concepts in ValueSet $key is empty.',
+              level: LogLevel.warn);
+        }
+
+        for (final concept in valueSetConcepts) {
+          _answerOptions.addEntries([
+            MapEntry<String, QuestionnaireAnswerOption>(
+                concept.code!.toString(),
+                QuestionnaireAnswerOption(
+                    valueCoding: Coding(
+                        system: valueSetInclude.system,
+                        code: concept.code,
+                        userSelected: Boolean(true),
+                        display: concept.display,
+                        extension_:
+                            _buildOrdinalExtension(concept.extension_))))
+          ]);
+        }
       }
     } else {
       if (qi.answerOption != null) {
@@ -218,7 +270,7 @@ class _ChoiceAnswerState
             style: Theme.of(context).textTheme.bodyText2,
           ),
           value: null,
-          groupValue: value?.firstCode,
+          groupValue: _choiceString(value),
           onChanged: (String? newValue) {
             value = _fillValue(newValue);
           }));
@@ -247,7 +299,7 @@ class _ChoiceAnswerState
                   style: Theme.of(context).textTheme.bodyText2),
               secondary: _styledChoice(context, choice),
               value: choice.optionCode,
-              groupValue: value?.firstCode,
+              groupValue: _choiceString(value),
               onChanged: (String? newValue) {
                 value = _fillValue(newValue);
               }));

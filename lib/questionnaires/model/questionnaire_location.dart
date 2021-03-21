@@ -3,7 +3,6 @@ import 'dart:developer' as developer;
 
 import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
-import 'package:fhir/r4/resource_types/resource_types.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../util/util.dart';
@@ -175,14 +174,40 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
   /// Calculate the current enablement status of this item.
   /// Sets the [enabled] property
   void _calculateEnabled() {
+    if (questionnaireItem.enableBehavior != null &&
+        questionnaireItem.enableBehavior !=
+            QuestionnaireItemEnableBehavior.any) {
+      developer.log(
+          'Unsupported enableBehavior: ${questionnaireItem.enableBehavior}',
+          name: logTag,
+          level: LogLevel.warn);
+    }
     forEnableWhens((qew) {
-      if (qew.operator_ == QuestionnaireEnableWhenOperator.exists) {
-        if (top.findByLinkId(qew.question!).responseItem == null) {
-          _disableWithChildren();
-        }
-      } else {
-        developer.log('Unsupported operator: ${qew.operator_}.',
-            name: logTag, level: LogLevel.warn);
+      switch (qew.operator_) {
+        case QuestionnaireEnableWhenOperator.exists:
+          if (top.findByLinkId(qew.question!).responseItem == null) {
+            _disableWithChildren();
+          }
+          break;
+        case QuestionnaireEnableWhenOperator.eq:
+          final responseCoding = top
+              .findByLinkId(qew.question!)
+              .responseItem
+              ?.answer
+              ?.firstOrNull
+              ?.valueCoding;
+          // TODO: More sophistication? System, cardinality, etc.
+          if (responseCoding?.code != qew.answerCoding?.code) {
+            developer.log(
+                'enableWhen: no equality $responseCoding != ${qew.answerCoding}',
+                level: LogLevel.debug,
+                name: logTag);
+            _disableWithChildren();
+          }
+          break;
+        default:
+          developer.log('Unsupported operator: ${qew.operator_}.',
+              name: logTag, level: LogLevel.warn);
       }
     });
   }
