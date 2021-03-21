@@ -41,6 +41,9 @@ class _StringAnswerState
   }
 
   @override
-  QuestionnaireResponseAnswer? fillAnswer() =>
-      QuestionnaireResponseAnswer(valueString: value);
+  QuestionnaireResponseAnswer? fillAnswer() {
+    return (value != null && value!.isNotEmpty)
+        ? QuestionnaireResponseAnswer(valueString: value)
+        : null;
+  }
 }

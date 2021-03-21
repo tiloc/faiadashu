@@ -42,7 +42,8 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
       }
     }
 
-    developer.log('_enabledWhens: $_enabledWhens', level: 500);
+    developer.log('_enabledWhens: $_enabledWhens',
+        name: logTag, level: LogLevel.debug);
 
     if (aggregators != null) {
       for (final aggregator in aggregators) {
@@ -65,7 +66,8 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
     final newRevision = _revision + 1;
     developer.log(
         'QuestionnaireTopLocation.bumpRevision $notifyListeners: $_revision -> $newRevision',
-        level: 500);
+        level: LogLevel.debug,
+        name: logTag);
     _revision = newRevision;
     if (notifyListeners) {
       this.notifyListeners();
@@ -101,35 +103,34 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
   void updateEnableWhen({bool notifyListeners = true}) {
     if (_enabledWhens == null) {
       developer.log('updateEnableWhen: no conditional items',
-          level: LogLevel.trace);
+          name: logTag, level: LogLevel.trace);
       return;
     }
-    developer.log('updateEnableWhen()', level: LogLevel.trace);
+    developer.log('updateEnableWhen()', name: logTag, level: LogLevel.trace);
 
     final previouslyEnabled = List<bool>.generate(
         preOrder().length, (index) => preOrder().elementAt(index).enabled,
         growable: false);
-    developer.log('prevEnabled: $previouslyEnabled', level: LogLevel.trace);
-    for (final location in _enabledWhens!) {
+    developer.log('prevEnabled: $previouslyEnabled',
+        name: logTag, level: LogLevel.trace);
+    for (final location in preOrder()) {
       location._enabled = true;
     }
 
-    bool _changed = false;
-    int i = 0;
     for (final location in _enabledWhens!) {
       location._calculateEnabled();
-      if (location.enabled != previouslyEnabled.elementAt(i)) {
-        _changed = true;
-        developer.log(
-            'enabled changed @ $location: ${previouslyEnabled.elementAt(i)} -> ${location.enabled}',
-            level: LogLevel.trace);
-      }
-      i++;
     }
-    if (_changed) {
+    final afterEnabled = List<bool>.generate(
+        preOrder().length, (index) => preOrder().elementAt(index).enabled,
+        growable: false);
+    developer.log('afterEnabled: $afterEnabled',
+        name: logTag, level: LogLevel.trace);
+
+    if (!listEquals(previouslyEnabled, afterEnabled)) {
       bumpRevision(notifyListeners: notifyListeners);
     } else {
-      developer.log('enableWhen unchanged.', level: LogLevel.debug);
+      developer.log('enableWhen unchanged.',
+          level: LogLevel.debug, name: logTag);
     }
   }
 
@@ -158,6 +159,7 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
   final int siblingIndex;
   final int level;
   int _revision = 1;
+  late final String logTag;
 
   QuestionnaireTopLocation get top => _top!;
 
@@ -180,7 +182,7 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
         }
       } else {
         developer.log('Unsupported operator: ${qew.operator_}.',
-            level: LogLevel.warn);
+            name: logTag, level: LogLevel.warn);
       }
     });
   }
@@ -243,7 +245,7 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
 
   set responseItem(QuestionnaireResponseItem? questionnaireResponseItem) {
     developer.log('set responseItem $questionnaireResponseItem',
-        level: LogLevel.debug);
+        name: logTag, level: LogLevel.debug);
     if (questionnaireResponseItem != _questionnaireResponseItem) {
       _questionnaireResponseItem = questionnaireResponseItem;
       top.bumpRevision();
@@ -324,15 +326,24 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
   }
 
   bool get isHelp {
-    return questionnaireItem.extension_
-            ?.extensionOrNull(
-                'http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl')
-            ?.valueCodeableConcept
-            ?.coding
-            ?.firstOrNull
-            ?.code
-            ?.value ==
-        'help';
+    return (questionnaireItem.extension_
+                ?.extensionOrNull(
+                    'http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl')
+                ?.valueCodeableConcept
+                ?.coding
+                ?.firstOrNull
+                ?.code
+                ?.value ==
+            'help') ||
+        (questionnaireItem.extension_
+                ?.extensionOrNull(
+                    'http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory')
+                ?.valueCodeableConcept
+                ?.coding
+                ?.firstOrNull
+                ?.code
+                ?.value ==
+            'help');
   }
 
   R? applyIfExists<R, T>(R Function(T?) f, T? arg) =>
@@ -408,6 +419,8 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
       this.parent,
       this.siblingIndex,
       this.level) {
+    // ignore: no_runtimetype_tostring
+    logTag = 'wof.${runtimeType.toString()}';
     _top = top;
   }
 

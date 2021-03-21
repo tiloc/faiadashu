@@ -7,7 +7,7 @@ extension SafeQuestionnaireAnswerOptionExtensions on QuestionnaireAnswerOption {
     return valueString ?? valueCoding?.safeDisplay ?? toString();
   }
 
-  /// The coded value for the option, take from either valueString or valueCoding
+  /// The coded value for the option, taken from either valueString or valueCoding
   String get optionCode {
     return valueString ?? valueCoding!.code.toString();
   }

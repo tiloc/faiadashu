@@ -11,7 +11,26 @@ class SDCDemoInstrument {
     ],
     "date": "2021-03-14",
     "publisher": "HL7 International - FHIR Infrastructure Work Group",
-    "item": [
+    "item": [{
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://hl7.org/fhir/questionnaire-display-category",
+                      "code": "security",
+                      "display": "Security"
+                    }
+                  ],
+                  "text": "The text provides guidance on how the information will be handled from a security perspective."
+                }
+              }
+            ],
+            "linkId": "1.0-security",
+            "text": "ALL QUESTIONS CONTAINED IN THIS QUESTIONNAIRE ARE OPTIONAL AND WILL BE KEPT STRICTLY CONFIDENTIAL.",
+            "type": "display"
+          },
               {
             "linkId": "123523-renderstyle",
             "type": "string",
@@ -255,7 +274,104 @@ class SDCDemoInstrument {
                   }
                 }
               ]
-            }
+            },
+            {
+            "linkId": "4.2.b",
+            "type": "group",
+            "item": [
+              {
+                "linkId": "4.2.b.1",
+                "text": "Choose Gender",
+                "type": "choice",
+                "answerValueSet": "http://hl7.org/fhir/ValueSet/administrative-gender"
+              },
+              {
+                "linkId": "4.2.b.2",
+                "text": "Are you pregnant? (enableWhen = gender is Female)",
+                "type": "choice",
+                "enableWhen": [
+                  {
+                    "question": "4.2.b.1",
+                    "operator": "=",
+                    "answerCoding": {
+                      "system": "http://hl7.org/fhir/administrative-gender",
+                      "code": "female"
+                    }
+                  }
+                ],
+                "answerValueSet": "http://hl7.org/fhir/ValueSet/yesnodontknow"
+              },
+              {
+                "linkId": "4.2.b.3",
+                "text": "Are you diabetic? (enableWhen = gender is Female)",
+                "type": "choice",
+                "enableWhen": [
+                  {
+                    "question": "4.2.b.1",
+                    "operator": "=",
+                    "answerCoding": {
+                      "system": "http://hl7.org/fhir/administrative-gender",
+                      "code": "female"
+                    }
+                  }
+                ],
+                "answerValueSet": "http://hl7.org/fhir/ValueSet/yesnodontknow"
+              },
+              {
+                "linkId": "4.2.b.4",
+                "text": "Have you been diagnosed with Gestational Diabetes? (enableBehavior = only when pregnant and diabetic)",
+                "type": "choice",
+                "enableWhen": [
+                  {
+                    "question": "4.2.b.2",
+                    "operator": "=",
+                    "answerCoding": {
+                      "system": "http://terminology.hl7.org/CodeSystem/v2-0136",
+                      "code": "Y"
+                    }
+                  },
+                  {
+                    "question": "4.2.b.3",
+                    "operator": "=",
+                    "answerCoding": {
+                      "system": "http://terminology.hl7.org/CodeSystem/v2-0136",
+                      "code": "Y"
+                    }
+                  }
+                ],
+                "enableBehavior": "all",
+                "answerValueSet": "http://hl7.org/fhir/ValueSet/yesnodontknow"
+              },
+              {
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/StructureDefinition/entryFormat",
+                    "valueString": "MM/DD/YYYY"
+                  }
+                ],
+                "linkId": "4.2.b.5",
+                "text": "Enter your birthdate (MM/DD/YYYY)",
+                "type": "date",
+                "answerValueSet": "http://hl7.org/fhir/ValueSet/administrative-gender"
+              },
+              {
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression",
+                    "valueExpression": {
+                      "description": "if last 2 questions were answered",
+                      "language": "text/fhirpath",
+                      "expression": "%resource.repeats(item).where(linkId='4.2.b.1').answer.valueCoding.code ='female' and today().toString().substring(0, 4).toInteger() - %resource.repeats(item).where(linkId='4.2.b.5').answer.toString().substring(0, 4).toInteger() >= 40"
+                    }
+                  }
+                ],
+                "linkId": "4.2.b.6",
+                "text": "Have you had mammogram before?(enableWhenExpression = only when gender is female and age > 40)",
+                "type": "choice",
+                "answerValueSet": "http://hl7.org/fhir/ValueSet/yesnodontknow"
+              }
+            ]
+          }
     ]
   }
 ''';

@@ -1,6 +1,10 @@
+import 'dart:collection';
+import 'dart:developer' as developer;
+
 import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
+import 'package:widgets_on_fhir/questionnaires/valueset/fhir_valueset.dart';
 import 'package:widgets_on_fhir/questionnaires/view/xhtml.dart';
 
 import '../../util/safe_access_extensions.dart';
@@ -19,12 +23,19 @@ class ChoiceAnswer extends QuestionnaireAnswerFiller {
 
 class _ChoiceAnswerState
     extends QuestionnaireAnswerState<CodeableConcept, ChoiceAnswer> {
+  // ignore: prefer_collection_literals
+  final _answerOptions = LinkedHashMap<String, QuestionnaireAnswerOption>();
+
   _ChoiceAnswerState();
 
   @override
   void initState() {
     super.initState();
+
+    _buildAnswerOptions();
+
     if (widget.location.responseItem != null) {
+      // TODO: Use _answerOptions
       initialValue = _fillValue(
           widget.answerLocation.answer?.valueCoding?.code.toString());
     }
@@ -96,78 +107,7 @@ class _ChoiceAnswerState
       return null;
     }
 
-    final element = widget.location.questionnaireItem;
-    final questionnaire = widget.location.questionnaire;
-
-    if (element.answerValueSet != null) {
-      final key = element.answerValueSet!.value!
-          .toString()
-          .substring(1); // Strip off leading '#'
-
-      final ValueSetInclude? valueSetInclude = (questionnaire.contained
-                  ?.firstWhereOrNull((element) => key == element.id?.toString())
-              as ValueSet?)
-          ?.compose
-          ?.include
-          .firstOrNull;
-
-      final List<ValueSetConcept>? valueSetConcepts = valueSetInclude?.concept;
-
-      if (valueSetConcepts == null) {
-        throw QuestionnaireFormatException(
-            'Questionnaire does not contain referenced ValueSet $key',
-            questionnaire);
-      }
-
-      for (final concept in valueSetConcepts) {
-        if (concept.code!.value == choice) {
-          List<FhirExtension>? responseOrdinalExtension;
-
-          final FhirExtension? ordinalExtension = concept.extension_
-              ?.extensionOrNull(
-                  'http://hl7.org/fhir/StructureDefinition/ordinalValue');
-          if (ordinalExtension != null) {
-            responseOrdinalExtension = <FhirExtension>[
-              FhirExtension(
-                  url: FhirUri(
-                      'http://hl7.org/fhir/StructureDefinition/iso21090-CO-value'),
-                  valueDecimal: ordinalExtension.valueDecimal),
-            ];
-          }
-          final coding = Coding(
-              system: valueSetInclude!.system,
-              code: concept.code,
-              userSelected: Boolean(true),
-              display: concept.display,
-              extension_: responseOrdinalExtension);
-
-          return coding;
-        }
-      }
-      throw ArgumentError('ValueSet $key does not contain entry $choice');
-    } else {
-      for (final option in element.answerOption!) {
-        if (option.optionCode == choice) {
-          final ordinalExtension = option.extension_?.extensionOrNull(
-              'http://hl7.org/fhir/StructureDefinition/ordinalValue');
-          final responseOrdinalExtension = (ordinalExtension != null)
-              ? <FhirExtension>[
-                  FhirExtension(
-                      url: FhirUri(
-                          'http://hl7.org/fhir/StructureDefinition/iso21090-CO-value'),
-                      valueDecimal: ordinalExtension.valueDecimal),
-                ]
-              : null;
-          // As per the spec there should always be a valueCoding, but SDC examples use valueString
-          return (option.valueCoding != null)
-              ? option.valueCoding!.copyWith(
-                  userSelected: Boolean(true),
-                  extension_: responseOrdinalExtension)
-              : Coding(display: option.valueString);
-        }
-      }
-      throw ArgumentError('Answer Option does not contain entry $choice');
-    }
+    return _answerOptions[choice]!.valueCoding;
   }
 
   Widget? _styledChoice(BuildContext context, QuestionnaireAnswerOption qao) {
@@ -175,9 +115,100 @@ class _ChoiceAnswerState
         context, qao.valueStringElement?.extension_);
   }
 
-  Widget _buildChoiceAnswers(BuildContext context) {
+  // Take the existing extensions that might contain information about
+  // ordinal values and convert them from ordinalValue to iso21090-CO-value
+  List<FhirExtension>? _buildOrdinalExtension(
+      List<FhirExtension>? inExtension) {
+    List<FhirExtension>? responseOrdinalExtension;
+
+    final FhirExtension? ordinalExtension = inExtension?.extensionOrNull(
+        'http://hl7.org/fhir/StructureDefinition/ordinalValue');
+    if (ordinalExtension != null) {
+      responseOrdinalExtension = <FhirExtension>[
+        FhirExtension(
+            url: FhirUri(
+                'http://hl7.org/fhir/StructureDefinition/iso21090-CO-value'),
+            valueDecimal: ordinalExtension.valueDecimal),
+      ];
+    }
+
+    return responseOrdinalExtension;
+  }
+
+  /// Convert [ValueSet]s or [QuestionnaireAnswerOption]s to normalized [QuestionnaireAnswerOption]s
+  void _buildAnswerOptions() {
     final qi = widget.location.questionnaireItem;
     final questionnaire = widget.location.questionnaire;
+
+    if (qi.answerValueSet != null) {
+      final key = qi.answerValueSet?.value?.toString();
+      if (key == null) {
+        throw QuestionnaireFormatException(
+            'Questionnaire choice item does not specify a key', qi);
+      }
+      final isValueSetContained = key.startsWith('#');
+      final ValueSet? valueSet = isValueSetContained
+          ? widget.location.top.findContainedByElementId(key) as ValueSet?
+          : FhirValueSet.getValueSet(key);
+
+      if (valueSet == null) {
+        throw QuestionnaireFormatException(
+            isValueSetContained
+                ? 'Questionnaire does not contain referenced ValueSet $key'
+                : 'External ValueSet $key cannot be located.',
+            questionnaire);
+      }
+
+      final ValueSetInclude? valueSetInclude =
+          valueSet.compose?.include.firstOrNull;
+
+      if (valueSetInclude == null) {
+        throw QuestionnaireFormatException(
+            'Include in ValueSet $key does not exist.', qi);
+      }
+
+      final List<ValueSetConcept> valueSetConcepts =
+          valueSetInclude.concept ?? [];
+
+      if (valueSetConcepts.isEmpty) {
+        developer.log('Concepts in ValueSet $key is empty.',
+            level: LogLevel.warn);
+      }
+
+      for (final concept in valueSetConcepts) {
+        _answerOptions.addEntries([
+          MapEntry<String, QuestionnaireAnswerOption>(
+              concept.code!.toString(),
+              QuestionnaireAnswerOption(
+                  valueCoding: Coding(
+                      system: valueSetInclude.system,
+                      code: concept.code,
+                      userSelected: Boolean(true),
+                      display: concept.display,
+                      extension_: _buildOrdinalExtension(concept.extension_))))
+        ]);
+      }
+    } else {
+      if (qi.answerOption != null) {
+        _answerOptions.addEntries(qi.answerOption!.map<
+            MapEntry<String, QuestionnaireAnswerOption>>((qao) => MapEntry<
+                String, QuestionnaireAnswerOption>(
+            qao.optionCode,
+            qao.copyWith(
+                valueCoding: (qao.valueCoding != null)
+                    ? qao.valueCoding!.copyWith(
+                        userSelected: Boolean(true),
+                        extension_: _buildOrdinalExtension(qao.extension_))
+                    : Coding(
+                        // The spec only allows valueCoding, but real-world incl. valueString
+                        display: qao.valueString,
+                        userSelected: Boolean(true))))));
+      }
+    }
+  }
+
+  Widget _buildChoiceAnswers(BuildContext context) {
+    final qi = widget.location.questionnaireItem;
 
     final choices = <Widget>[];
     if ((qi.repeats?.value ?? false) == false) {
@@ -192,65 +223,34 @@ class _ChoiceAnswerState
             value = _fillValue(newValue);
           }));
     }
-    if (qi.answerValueSet != null) {
-      final key = qi.answerValueSet?.value?.toString();
-      final List<ValueSetConcept>? valueSetConcepts =
-          (widget.location.top.findContainedByElementId(key) as ValueSet?)
-              ?.compose
-              ?.include
-              .firstOrNull
-              ?.concept;
+    for (final choice in _answerOptions.values) {
+      final optionPrefix = choice.extension_
+          ?.extensionOrNull(
+              'http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix')
+          ?.valueString;
+      final optionPrefixDisplay =
+          (optionPrefix != null) ? '$optionPrefix ' : '';
+      final optionTitle = '$optionPrefixDisplay${choice.safeDisplay}';
 
-      if (valueSetConcepts == null) {
-        throw QuestionnaireFormatException(
-            'Questionnaire does not contain referenced ValueSet $key',
-            questionnaire);
-      }
-
-      for (final concept in valueSetConcepts) {
-        choices.add(RadioListTile<String>(
-            title: Text(
-              concept.display!,
-              style: Theme.of(context).textTheme.bodyText2,
-            ),
-            value: concept.code!.toString(),
-            groupValue: value?.firstCode,
-            onChanged: (String? newValue) {
-              value = _fillValue(newValue);
-            }));
-      }
-    } else {
-      if (qi.answerOption != null) {
-        for (final choice in qi.answerOption!) {
-          final optionPrefix = choice.extension_
-              ?.extensionOrNull(
-                  'http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix')
-              ?.valueString;
-          final optionPrefixDisplay =
-              (optionPrefix != null) ? '$optionPrefix ' : '';
-          final optionTitle = '$optionPrefixDisplay${choice.safeDisplay}';
-
-          choices.add((qi.repeats?.value == true)
-              ? CheckboxListTile(
-                  title: Text(optionTitle,
-                      style: Theme.of(context).textTheme.bodyText2),
-                  value: value?.coding?.firstWhereOrNull((coding) =>
-                          coding.code?.value == choice.optionCode) !=
-                      null,
-                  onChanged: (bool? newValue) {
-                    value = _fillToggledValue(choice.optionCode);
-                  })
-              : RadioListTile<String>(
-                  title: Text(optionTitle,
-                      style: Theme.of(context).textTheme.bodyText2),
-                  secondary: _styledChoice(context, choice),
-                  value: choice.optionCode,
-                  groupValue: value?.firstCode,
-                  onChanged: (String? newValue) {
-                    value = _fillValue(newValue);
-                  }));
-        }
-      }
+      choices.add((qi.repeats?.value == true)
+          ? CheckboxListTile(
+              title: Text(optionTitle,
+                  style: Theme.of(context).textTheme.bodyText2),
+              value: value?.coding?.firstWhereOrNull(
+                      (coding) => coding.code?.value == choice.optionCode) !=
+                  null,
+              onChanged: (bool? newValue) {
+                value = _fillToggledValue(choice.optionCode);
+              })
+          : RadioListTile<String>(
+              title: Text(optionTitle,
+                  style: Theme.of(context).textTheme.bodyText2),
+              secondary: _styledChoice(context, choice),
+              value: choice.optionCode,
+              groupValue: value?.firstCode,
+              onChanged: (String? newValue) {
+                value = _fillValue(newValue);
+              }));
     }
 
     return Column(

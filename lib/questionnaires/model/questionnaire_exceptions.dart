@@ -9,4 +9,9 @@ class QuestionnaireFormatException implements Exception {
   /// A throwable
   final dynamic? cause;
   QuestionnaireFormatException(this.message, this.element, [this.cause]);
+
+  @override
+  String toString() {
+    return '$message: $element';
+  }
 }
