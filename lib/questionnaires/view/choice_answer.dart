@@ -305,8 +305,17 @@ class _ChoiceAnswerState
               }));
     }
 
-    return Column(
-      children: choices,
-    );
+    if (qi.extension_
+            ?.extensionOrNull(
+                'http://hl7.org/fhir/StructureDefinition/questionnaire-choiceOrientation')
+            ?.valueCode
+            ?.value ==
+        'horizontal') {
+      return Table(children: [TableRow(children: choices)]);
+    } else {
+      return Column(
+        children: choices,
+      );
+    }
   }
 }
