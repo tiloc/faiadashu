@@ -67,6 +67,8 @@ class NarrativeAggregator extends Aggregator<Narrative> {
         } else if (answer.valueQuantity != null) {
           div.write(
               '<p>${answer.valueQuantity!.value} ${answer.valueQuantity!.unit}</p>');
+        } else if (answer.valueInteger != null) {
+          div.write('<p>${answer.valueInteger!.value}</p>');
         } else if (answer.valueCoding != null) {
           div.write('<p>${answer.valueCoding!.safeDisplay}</p>');
         } else if (answer.valueDateTime != null) {

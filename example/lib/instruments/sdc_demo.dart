@@ -379,7 +379,44 @@ class SDCDemoInstrument {
                         "answerValueSet": "http://hl7.org/fhir/ValueSet/yesnodontknow"
                     }
                 ]
-            }
+            },
+            {
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://hl7.org/fhir/questionnaire-item-control",
+                      "code": "slider",
+                      "display": "Slider"
+                    }
+                  ],
+                  "text": "A control where an axis is displayed between the high and low values and the control can be visually manipulated to select a value anywhere on the axis."
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue",
+                "valueInteger": 10
+              },
+              {
+                "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+                "valueInteger": 0
+              },
+              {
+                "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+                "valueInteger": 100
+              }
+            ],
+            "linkId": "3.1",
+            "text": "Rate your doctor:",
+            "type": "integer",
+            "initial": [
+              {
+                "valueInteger": 50
+              }
+            ]
+          }
         ]
     }
 ''';

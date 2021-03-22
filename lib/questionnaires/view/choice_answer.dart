@@ -306,11 +306,12 @@ class _ChoiceAnswerState
     }
 
     if (qi.extension_
-            ?.extensionOrNull(
-                'http://hl7.org/fhir/StructureDefinition/questionnaire-choiceOrientation')
-            ?.valueCode
-            ?.value ==
-        'horizontal') {
+                ?.extensionOrNull(
+                    'http://hl7.org/fhir/StructureDefinition/questionnaire-choiceOrientation')
+                ?.valueCode
+                ?.value ==
+            'horizontal' &&
+        MediaQuery.of(context).size.width > 750) {
       return Table(children: [TableRow(children: choices)]);
     } else {
       return Column(

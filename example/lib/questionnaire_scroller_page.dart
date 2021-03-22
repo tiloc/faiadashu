@@ -111,12 +111,25 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
                     child: ListView.builder(
                         controller: _listScrollController,
                         itemCount: QuestionnaireFiller.of(context)
-                            .surveyLocations
-                            .length,
+                                .surveyLocations
+                                .length +
+                            1,
                         padding: const EdgeInsets.all(8),
                         itemBuilder: (BuildContext context, int i) {
-                          return QuestionnaireFiller.of(context)
-                              .itemFillerAt(i);
+                          if (i <
+                              QuestionnaireFiller.of(context)
+                                  .surveyLocations
+                                  .length) {
+                            return QuestionnaireFiller.of(context)
+                                .itemFillerAt(i);
+                          } else {
+                            // TODO: Allow adding a different final element
+                            // Give some extra scrolling-space at the bottom.
+                            // Otherwise Complete button overlaps final element.
+                            return const SizedBox(
+                              height: 80,
+                            );
+                          }
                         }),
                   ),
                 )));

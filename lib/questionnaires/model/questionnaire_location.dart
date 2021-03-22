@@ -4,6 +4,7 @@ import 'dart:developer' as developer;
 import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/foundation.dart';
+import 'package:widgets_on_fhir/questionnaires/model/questionnaire_exceptions.dart';
 
 import '../../util/util.dart';
 import 'aggregator.dart';
@@ -26,6 +27,8 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
             null,
             0,
             0) {
+    developer.log('QuestionnaireTopLocation.fromQuestionnaire',
+        level: LogLevel.debug, name: logTag);
     _top = this;
     // This will set up the traversal order and fill up the cache.
     _ensureOrderedItems();
@@ -390,9 +393,12 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
   }
 
   LinkedHashMap<String, QuestionnaireLocation> _addChildren() {
+    developer.log('_addChildren $linkId', level: LogLevel.trace, name: logTag);
     final LinkedHashMap<String, QuestionnaireLocation> locationMap =
         LinkedHashMap<String, QuestionnaireLocation>();
-
+    if (locationMap.containsKey(linkId)) {
+      throw QuestionnaireFormatException('Duplicate linkId: $linkId', this);
+    }
     locationMap[linkId] = this;
     if (hasChildren) {
       for (final child in children) {
@@ -411,7 +417,12 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
       QuestionnaireLocation currentSibling = this;
       while (currentSibling.hasNextSibling) {
         currentSibling = currentSibling.nextSibling;
-        locationMap.addAll(currentSibling._addChildren());
+        if (locationMap.containsKey(currentSibling.linkId)) {
+          throw QuestionnaireFormatException(
+              'Duplicate linkId $linkId', currentSibling);
+        } else {
+          locationMap.addAll(currentSibling._addChildren());
+        }
       }
       _orderedItems = locationMap;
     }
