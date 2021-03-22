@@ -42,9 +42,18 @@ class _NumericalAnswerState
             ?.value ==
         'slider';
 
+    final minValueExtension = widget.location.questionnaireItem.extension_
+        ?.extensionOrNull('http://hl7.org/fhir/StructureDefinition/minValue');
+    final maxValueExtension = widget.location.questionnaireItem.extension_
+        ?.extensionOrNull('http://hl7.org/fhir/StructureDefinition/maxValue');
+    _minValue = minValueExtension?.valueDecimal?.value ??
+        minValueExtension?.valueInteger?.value?.toDouble() ??
+        0.0;
+    _maxValue = maxValueExtension?.valueDecimal?.value ??
+        maxValueExtension?.valueInteger?.value?.toDouble() ??
+        (_isSlider ? 100.0 : double.maxFinite);
+
     if (_isSlider) {
-      _minValue = 0.0;
-      _maxValue = 100.0;
       final sliderStepValue = widget.location.questionnaireItem.extension_
           ?.extensionOrNull(
               'http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue')
@@ -54,8 +63,7 @@ class _NumericalAnswerState
           ? ((_maxValue - _minValue) / sliderStepValue).round()
           : null;
     } else {
-      _minValue = 0.0;
-      _maxValue = double.maxFinite;
+      // TODO: Evaluate max decimal places, max length, etc.
     }
     // TODO: Build a number format based on item and SDC properties.
     _numberFormat = NumberFormat('############.0##');
@@ -70,6 +78,7 @@ class _NumericalAnswerState
       }
     });
 
+    // TODO: look at initialValue extension
     Quantity? existingValue;
     final firstAnswer = widget.location.responseItem?.answer?.firstOrNull;
     if (firstAnswer != null) {
