@@ -30,13 +30,16 @@ class _BooleanItemState
 
   @override
   Widget buildEditable(BuildContext context) {
-    return Checkbox(
-      value: value?.value,
-      tristate: true,
-      onChanged: (newValue) {
-        value = (newValue != null) ? Boolean(newValue) : null;
-      },
-    );
+    return Container(
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.only(top: 8, bottom: 8),
+        child: Checkbox(
+          value: value?.value,
+          tristate: true,
+          onChanged: (newValue) {
+            value = (newValue != null) ? Boolean(newValue) : null;
+          },
+        ));
   }
 
   @override

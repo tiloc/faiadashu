@@ -312,11 +312,15 @@ class _ChoiceAnswerState
                 ?.value ==
             'horizontal' &&
         MediaQuery.of(context).size.width > 750) {
-      return Table(children: [TableRow(children: choices)]);
+      return Card(
+          margin: const EdgeInsets.only(top: 8, bottom: 8),
+          child: Table(children: [TableRow(children: choices)]));
     } else {
-      return Column(
-        children: choices,
-      );
+      return Card(
+          margin: const EdgeInsets.only(top: 8, bottom: 8),
+          child: Column(
+            children: choices,
+          ));
     }
   }
 }

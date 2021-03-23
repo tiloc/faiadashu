@@ -1,5 +1,6 @@
 import 'dart:developer' as developer;
 
+import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_html_css/simple_html_css.dart';
 
@@ -68,18 +69,12 @@ class QuestionnaireItemFillerTitleWidget extends StatelessWidget {
   const QuestionnaireItemFillerTitleWidget(this.location, {Key? key})
       : super(key: key);
 
-  TextStyle? _styleForLevel(BuildContext context, int level) {
+  TextStyle? _styleForLocation(
+      BuildContext context, QuestionnaireLocation location) {
     final textTheme = Theme.of(context).textTheme;
-    switch (level) {
-      case 0:
-        return textTheme.headline4;
-      case 1:
-        return textTheme.headline5;
-      case 2:
-        return textTheme.headline6;
-      default:
-        return textTheme.subtitle1;
-    }
+    return location.questionnaireItem.type == QuestionnaireItemType.group
+        ? textTheme.headline5
+        : textTheme.subtitle1!.copyWith(fontWeight: FontWeight.w600);
   }
 
   @override
@@ -91,7 +86,7 @@ class QuestionnaireItemFillerTitleWidget extends StatelessWidget {
             : Container(
                 padding: const EdgeInsets.only(top: 8.0),
                 child: Text(titleText,
-                    style: _styleForLevel(context, location.level)))
+                    style: _styleForLocation(context, location)))
         : const SizedBox();
   }
 }

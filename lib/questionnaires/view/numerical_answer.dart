@@ -20,17 +20,21 @@ class NumericalAnswer extends QuestionnaireAnswerFiller {
 class _NumericalAnswerState
     extends QuestionnaireAnswerState<Quantity, NumericalAnswer> {
   late final TextInputFormatter _numberInputFormatter;
-  late final NumberFormat _numberFormat;
+  late final NumberFormat _numberInputFormat;
   late final bool _isSlider;
   late final double _minValue;
   late final double _maxValue;
+  late final int _maxDecimal;
   late final int? _divisions;
+  late final String logTag;
 
   _NumericalAnswerState();
 
   @override
   void initState() {
     super.initState();
+    // ignore: no_runtimetype_tostring
+    logTag = 'wof.${runtimeType.toString()}';
 
     _isSlider = widget.location.questionnaireItem.extension_
             ?.extensionOrNull(
@@ -62,16 +66,47 @@ class _NumericalAnswerState
       _divisions = (sliderStepValue != null)
           ? ((_maxValue - _minValue) / sliderStepValue).round()
           : null;
-    } else {
-      // TODO: Evaluate max decimal places, max length, etc.
     }
-    // TODO: Build a number format based on item and SDC properties.
-    _numberFormat = NumberFormat('############.0##');
+    // TODO: Evaluate max length
+    switch (widget.location.questionnaireItem.type) {
+      case QuestionnaireItemType.integer:
+        _maxDecimal = 0;
+        break;
+      case QuestionnaireItemType.decimal:
+      case QuestionnaireItemType.quantity:
+        // TODO: Evaluate special extensions for quantities
+        _maxDecimal = widget.location.questionnaireItem.extension_
+                ?.extensionOrNull(
+                    'http://hl7.org/fhir/StructureDefinition/maxDecimalPlaces')
+                ?.valueInteger
+                ?.value ??
+            3; // this is just an assumption what makes sense to your average human...
+        break;
+      default:
+        throw StateError(
+            'item.type cannot be ${widget.location.questionnaireItem.type}');
+    }
 
+    // Build a number format based on item and SDC properties.
+    final maxIntegerDigits = (_maxValue != double.maxFinite)
+        ? '############'.substring(0, _maxValue.toInt().toString().length)
+        : '############';
+    final maxFractionDigits =
+        (_maxDecimal != 0) ? '.0#####'.substring(0, _maxDecimal + 1) : '';
+    _numberInputFormat = NumberFormat('$maxIntegerDigits$maxFractionDigits');
+
+    developer.log(
+        'input format for ${widget.location.linkId}: "$_numberInputFormat"',
+        level: LogLevel.debug);
+
+    // TODO: The format doesn't really restrict what can be entered.
     _numberInputFormatter =
         TextInputFormatter.withFunction((oldValue, newValue) {
+      if (newValue.text.isEmpty) {
+        return newValue;
+      }
       try {
-        _numberFormat.parse(newValue.text);
+        _numberInputFormat.parse(newValue.text);
         return newValue;
       } catch (_) {
         return oldValue;
@@ -113,19 +148,38 @@ class _NumericalAnswerState
               value = Quantity(value: Decimal(sliderValue));
             },
           )
-        : TextFormField(
-            decoration: InputDecoration(
-                labelText: widget.location.questionnaireItem.text),
-            inputFormatters: [_numberInputFormatter],
-            keyboardType: TextInputType.number,
-            onChanged: (content) {
-              if (content.trim().isEmpty) {
-                value = null;
-              } else {
-                value = Quantity(value: Decimal(content));
-              }
-            },
-          );
+        : Container(
+            padding: const EdgeInsets.only(top: 8, bottom: 8),
+            child: TextFormField(
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+              ),
+              inputFormatters: [_numberInputFormatter],
+              keyboardType: TextInputType.number,
+              validator: (inputValue) {
+                if (inputValue == null || inputValue.isEmpty) {
+                  return null;
+                }
+                final number = double.tryParse(inputValue);
+                if (number == null) {
+                  return '$inputValue is not a valid number.';
+                }
+                if (number > _maxValue) {
+                  return 'Enter a number up to $_maxValue.';
+                }
+                if (number < _minValue) {
+                  return 'Enter a number $_minValue, or higher.';
+                }
+              },
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              onChanged: (content) {
+                if (content.trim().isEmpty) {
+                  value = null;
+                } else {
+                  value = Quantity(value: Decimal(content));
+                }
+              },
+            ));
   }
 
   @override

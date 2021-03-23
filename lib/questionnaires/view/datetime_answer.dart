@@ -46,19 +46,22 @@ class _DateTimeAnswerState
 
   @override
   Widget buildEditable(BuildContext context) {
-    return DateTimePicker(
-      type: ArgumentError.checkNotNull(const {
-        QuestionnaireItemType.date: DateTimePickerType.date,
-        QuestionnaireItemType.datetime: DateTimePickerType.dateTime,
-        QuestionnaireItemType.time: DateTimePickerType.time,
-      }[widget.location.questionnaireItem.type]),
-      firstDate: DateTime(1860),
-      lastDate: DateTime(2050),
-      initialValue: value?.toString(),
-      onChanged: (content) {
-        value = FhirDateTime(content);
-      },
-    );
+    return Container(
+        padding: const EdgeInsets.only(top: 8, bottom: 8),
+        child: DateTimePicker(
+          decoration: const InputDecoration(border: OutlineInputBorder()),
+          type: ArgumentError.checkNotNull(const {
+            QuestionnaireItemType.date: DateTimePickerType.date,
+            QuestionnaireItemType.datetime: DateTimePickerType.dateTime,
+            QuestionnaireItemType.time: DateTimePickerType.time,
+          }[widget.location.questionnaireItem.type]),
+          firstDate: DateTime(1860),
+          lastDate: DateTime(2050),
+          initialValue: value?.toString(),
+          onChanged: (content) {
+            value = FhirDateTime(content);
+          },
+        ));
   }
 
   @override

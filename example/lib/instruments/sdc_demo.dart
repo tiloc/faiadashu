@@ -416,6 +416,25 @@ class SDCDemoInstrument {
                 "valueInteger": 50
               }
             ]
+          },
+          {
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+                "valueDecimal": 1
+              },
+              {
+                "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+                "valueDecimal": 100
+              },
+              {
+                "url": "http://hl7.org/fhir/StructureDefinition/maxDecimalPlaces",
+                "valueInteger": 2
+              }
+            ],
+            "linkId": "1-weightkgminmaxdec",
+            "type": "decimal",
+            "text": "Enter your weight in kg"
           }
         ]
     }

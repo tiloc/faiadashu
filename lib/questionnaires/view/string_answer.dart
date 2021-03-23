@@ -30,14 +30,17 @@ class _StringAnswerState
 
   @override
   Widget buildEditable(BuildContext context) {
-    return TextFormField(
-      decoration:
-          InputDecoration(labelText: widget.location.questionnaireItem.text),
-      onChanged: (content) {
-        value = content;
-      },
-      maxLength: widget.location.questionnaireItem.maxLength?.value,
-    );
+    return Container(
+        padding: const EdgeInsets.only(top: 8, bottom: 8),
+        child: TextFormField(
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+          ),
+          onChanged: (content) {
+            value = content;
+          },
+          maxLength: widget.location.questionnaireItem.maxLength?.value,
+        ));
   }
 
   @override
