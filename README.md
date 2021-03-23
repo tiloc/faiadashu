@@ -17,9 +17,11 @@ Support is currently focussed on FHIR R4.
 
 Supports numerous features from Questionnaire and SDC profile.
 
-![Screenshot](./doc/png/screenshot.png)
+![Screenshot](./doc/png/github-teaser.gif)
 
-![Demo Video](https://github.com/tiloc/fire_widgets/blob/f53a13cbecb707c51534b4bacdd52d72be291506/doc/movies/sdc-example.mp4)
+**Click link below for narrated longer video**
+
+[Demo Video](https://github.com/tiloc/fire_widgets/blob/f53a13cbecb707c51534b4bacdd52d72be291506/doc/movies/sdc-example.mp4)
 
 ### Disclaimers
 Flutter and the related logo are trademarks of Google LLC. We are not endorsed by or affiliated with Google LLC.
