@@ -8,6 +8,19 @@ This is a UI add-on to the pure Dart "fhir" libraries: https://pub.dev/packages/
 ### Support for the FHIR specification
 Support is currently focussed on FHIR R4.
 
+### Features
+#### Minor things
+* Formatted output of dates / times
+* Formatted output of observations
+
+#### The Major Thing: Filler widget for Questionnaires
+
+Supports numerous features from Questionnaire and SDC profile.
+
+![Screenshot](./doc/png/screenshot.png)
+
+![Demo Video](https://github.com/tiloc/fire_widgets/blob/f53a13cbecb707c51534b4bacdd52d72be291506/doc/movies/sdc-example.mp4)
+
 ### Disclaimers
 Flutter and the related logo are trademarks of Google LLC. We are not endorsed by or affiliated with Google LLC.
 
