@@ -1,8 +1,10 @@
 import 'dart:developer' as developer;
 
 import 'package:fhir/primitive_types/decimal.dart';
+import 'package:fhir/r4.dart';
 import 'package:fhir/r4/resource_types/clinical/diagnostics/diagnostics.dart';
 import 'package:flutter/material.dart';
+import 'package:simple_html_css/simple_html_css.dart';
 
 import '../../util/safe_access_extensions.dart';
 import '../questionnaires.dart';
@@ -52,9 +54,35 @@ class _StaticItemState extends QuestionnaireAnswerState {
     }
   }
 
+  final _nullExtension = FhirExtension();
+
+  /// Return a feedback string according to the Danish eHealth Sundhed DK spec.
+  String? findDanishFeedback(int? score) {
+    if (score == null) {
+      return null;
+    }
+    final matchExtension =
+        widget.location.questionnaireItem.extension_?.firstWhere((ext) {
+      return (ext.url?.value.toString() ==
+              'http://ehealth.sundhed.dk/fhir/StructureDefinition/ehealth-questionnaire-feedback') &&
+          (ext.extension_!.extensionOrNull('min')!.valueInteger!.value! <=
+              score) &&
+          (ext.extension_!.extensionOrNull('max')!.valueInteger!.value! >=
+              score);
+    }, orElse: () => _nullExtension);
+
+    if (matchExtension == _nullExtension) {
+      return null;
+    } else {
+      return matchExtension!.extension_!.extensionOrNull('value')!.valueString;
+    }
+  }
+
   @override
   Widget buildReadOnly(BuildContext context) {
     if (widget.location.isCalculatedExpression) {
+      final score = calcResult?.value?.round();
+      final feedback = findDanishFeedback(score);
       return Center(
           child: Column(children: [
         const SizedBox(height: 32),
@@ -63,9 +91,10 @@ class _StaticItemState extends QuestionnaireAnswerState {
           style: Theme.of(context).textTheme.headline3,
         ),
         Text(
-          calcResult?.value?.round().toString() ?? '0',
+          score?.toString() ?? '0',
           style: Theme.of(context).textTheme.headline1,
         ),
+        if (feedback != null) HTML.toRichText(context, feedback),
       ]));
     }
 

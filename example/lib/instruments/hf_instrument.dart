@@ -1,6 +1,6 @@
 class HFInstrument {
-  static const hfInstrument = '''
-  {
+  static const hfInstrument = r'''
+{
     "status": "draft",
     "resourceType": "Questionnaire",
     "meta": {
@@ -1042,8 +1042,58 @@ class HFInstrument {
                 "valueCoding": {
                   "display": "{score}"
                 }
-              }
-            ],
+              },                     {
+                    "url": "http://ehealth.sundhed.dk/fhir/StructureDefinition/ehealth-questionnaire-feedback",
+                    "extension": [
+                          {
+                            "url": "min",
+                            "valueInteger": 0
+                          },
+                          {
+                            "url": "max",
+                            "valueInteger": 11
+                          },
+                          {
+                            "url": "value",
+                            "valueString": "<h1 style='color: white; font-size:16px; background-color: rgb(34,139,34); font-weight:400;)'>Helsetilsynet til Ullensaker ønsker deg en lykkelig dag!<\/h1>"
+                          }
+                    ]
+                  },
+                                 {
+                    "url": "http://ehealth.sundhed.dk/fhir/StructureDefinition/ehealth-questionnaire-feedback",
+                    "extension": [
+                          {
+                            "url": "min",
+                            "valueInteger": 12
+                          },
+                          {
+                            "url": "max",
+                            "valueInteger": 15
+                          },
+                          {
+                            "url": "value",
+                            "valueString": "<h1 style='color: white; font-size:16px; background-color: rgb(255,197,0); font-weight:400;)'>Drikk mye te.<\/h1>"
+                          }
+                    ]
+                  },
+                  {
+                    "url": "http://ehealth.sundhed.dk/fhir/StructureDefinition/ehealth-questionnaire-feedback",
+                    "extension": [
+                          {
+                            "url": "min",
+                            "valueInteger": 16
+                          },
+                          {
+                            "url": "max",
+                            "valueInteger": 999
+                          },
+                          {
+                            "url": "value",
+                            "valueString": "<h1 style='color: white; font-size:24px; background-color: rgb(255,0,0); font-weight:600;)'>Kontakt legen din umiddelbart!<\/h1>"
+                          }
+                    ]
+                  }
+             ],
             "required": false,
             "linkId": "/86924-8",
             "text": "Overall summary score",
