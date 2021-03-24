@@ -305,6 +305,9 @@ class _ChoiceAnswerState
               }));
     }
 
+    // @darshankawar: Uncomment the following line to provoke issue https://github.com/flutter/flutter/issues/78745
+    // return Table(children: [TableRow(children: choices)]);
+
     if (qi.extension_
                 ?.extensionOrNull(
                     'http://hl7.org/fhir/StructureDefinition/questionnaire-choiceOrientation')
