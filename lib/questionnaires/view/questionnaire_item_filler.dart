@@ -7,7 +7,7 @@ import 'package:simple_html_css/simple_html_css.dart';
 import '../questionnaires.dart';
 
 class QuestionnaireItemFiller extends StatefulWidget {
-  final Widget _titleWidget;
+  final Widget? _titleWidget;
   final QuestionnaireLocation location;
   final QuestionnaireResponseFiller _responseFiller;
   late final String logTag;
@@ -20,8 +20,7 @@ class QuestionnaireItemFiller extends StatefulWidget {
   }
 
   QuestionnaireItemFiller._(this.location, this._responseFiller, {Key? key})
-      : _titleWidget = QuestionnaireItemFillerTitleWidget(location),
-        // ignore: no_runtimetype_tostring
+      : _titleWidget = QuestionnaireItemFillerTitleWidget.forLocation(location),
         super(key: key) {
     // ignore: no_runtimetype_tostring
     logTag = 'wof.${runtimeType.toString()}';
@@ -66,7 +65,12 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
                         },
                         children: [
                           TableRow(children: [
-                            widget._titleWidget,
+                            if (widget._titleWidget != null)
+                              Container(
+                                  padding: const EdgeInsets.only(top: 8),
+                                  child: widget._titleWidget)
+                            else
+                              Container(),
                             widget._responseFiller
                           ])
                         ],
@@ -83,8 +87,16 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
 
 class QuestionnaireItemFillerTitleWidget extends StatelessWidget {
   final QuestionnaireLocation location;
-  const QuestionnaireItemFillerTitleWidget(this.location, {Key? key})
+  const QuestionnaireItemFillerTitleWidget._(this.location, {Key? key})
       : super(key: key);
+
+  static Widget? forLocation(QuestionnaireLocation location, {Key? key}) {
+    if (location.text == null) {
+      return null;
+    } else {
+      return QuestionnaireItemFillerTitleWidget._(location, key: key);
+    }
+  }
 
   TextStyle? _styleForLocation(
       BuildContext context, QuestionnaireLocation location) {

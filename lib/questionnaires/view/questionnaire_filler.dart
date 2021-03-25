@@ -1,4 +1,9 @@
+import 'dart:convert';
+import 'dart:developer' as developer;
+
+import 'package:fhir/r4/resource_types/specialized/definitional_artifacts/definitional_artifacts.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 import '../model/aggregator.dart';
 import '../model/questionnaire_location.dart';
@@ -6,10 +11,31 @@ import '../questionnaires.dart';
 
 class QuestionnaireFiller extends StatefulWidget {
   final Widget child;
-  final QuestionnaireTopLocation topLocation;
+  final Future<QuestionnaireTopLocation> Function(dynamic param) loaderFuture;
+  final dynamic loaderParam;
+  static const String logTag = 'wof.QuestionnaireFiller';
 
-  const QuestionnaireFiller(this.topLocation, {Key? key, required this.child})
-      : super(key: key);
+  static Future<QuestionnaireTopLocation> _loadFromAsset(
+      dynamic assetPath) async {
+    developer.log('Enter _loadFromAsset', level: LogLevel.trace, name: logTag);
+    final instrumentString = await rootBundle.loadString(assetPath.toString());
+    final jsonQuestionnaire =
+        json.decode(instrumentString) as Map<String, dynamic>;
+    return QuestionnaireTopLocation.fromQuestionnaire(
+      Questionnaire.fromJson(jsonQuestionnaire),
+      aggregators: [
+        TotalScoreAggregator(),
+        NarrativeAggregator(),
+        QuestionnaireResponseAggregator()
+      ],
+    );
+  }
+
+  QuestionnaireFiller.fromAsset(this.loaderParam,
+      {Key? key, required this.child})
+      // ignore: avoid_field_initializers_in_const_classes
+      : loaderFuture = _loadFromAsset,
+        super(key: key);
 
   static QuestionnaireFillerData of(BuildContext context) {
     final result =
@@ -23,56 +49,86 @@ class QuestionnaireFiller extends StatefulWidget {
 }
 
 class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
-  int _revision = -1;
+  late final Future<QuestionnaireTopLocation> builderFuture;
+  QuestionnaireTopLocation? _topLocation;
+  void Function()? _onTopChangeListenerFunction;
+  late final String logTag;
 
-  _QuestionnaireFillerState();
+  _QuestionnaireFillerState() {
+    // ignore: no_runtimetype_tostring
+    logTag = 'wof.${runtimeType.toString()}';
+  }
 
   @override
   void initState() {
     super.initState();
-    widget.topLocation.addListener(() => _onTopChange());
+    builderFuture = widget.loaderFuture.call(widget.loaderParam);
+  }
+
+  @override
+  void dispose() {
+    developer.log('dispose', level: LogLevel.trace, name: logTag);
+
+    if (_onTopChangeListenerFunction != null && _topLocation != null) {
+      _topLocation!.removeListener(_onTopChangeListenerFunction!);
+      _topLocation = null;
+      _onTopChangeListenerFunction = null;
+    }
+    super.dispose();
   }
 
   void _onTopChange() {
-    _onRevisionChange(widget.topLocation.revision);
-  }
-
-  void _onRevisionChange(int newRevision) {
-    setState(() {
-      _revision = newRevision;
-    });
+    developer.log('_onTopChange', level: LogLevel.trace, name: logTag);
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return QuestionnaireFillerData._(
-      widget.topLocation,
-      revision: _revision,
-      onRevisionChange: _onRevisionChange,
-      child: widget.child,
-    );
+    developer.log('Enter build()', level: LogLevel.trace, name: logTag);
+    return FutureBuilder<QuestionnaireTopLocation>(
+        future: builderFuture,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            developer.log('FutureBuilder hasData',
+                level: LogLevel.debug, name: logTag);
+            _topLocation = snapshot.data;
+            if (_onTopChangeListenerFunction == null) {
+              _onTopChangeListenerFunction = () => _onTopChange();
+              _topLocation!.addListener(_onTopChangeListenerFunction!);
+            }
+            return QuestionnaireFillerData._(
+              _topLocation!,
+              child: widget.child,
+            );
+          } else {
+            developer.log('FutureBuilder still waiting for data...',
+                level: LogLevel.debug, name: logTag);
+            return const CircularProgressIndicator();
+          }
+        });
   }
 }
 
 class QuestionnaireFillerData extends InheritedWidget {
   final QuestionnaireTopLocation topLocation;
   final Iterable<QuestionnaireLocation> surveyLocations;
-  final int _revision;
   late final List<QuestionnaireItemFiller?> _itemFillers;
-  final ValueChanged<int> _onRevisionChange;
+  late final int _revision;
+  late final String logTag;
 
   QuestionnaireFillerData._(
     this.topLocation, {
     Key? key,
-    required int revision,
-    required ValueChanged<int> onRevisionChange,
     required Widget child,
-  })   : surveyLocations = topLocation.preOrder(),
-        _revision = revision,
-        _onRevisionChange = onRevisionChange,
+  })   : _revision = topLocation.revision,
+        surveyLocations = topLocation.preOrder(),
+        _itemFillers = List<QuestionnaireItemFiller?>.filled(
+            topLocation.preOrder().length, null),
         super(key: key, child: child) {
-    _itemFillers =
-        List<QuestionnaireItemFiller?>.filled(surveyLocations.length, null);
+    // ignore: no_runtimetype_tostring
+    logTag = 'wof.${runtimeType.toString()}';
   }
 
   T aggregator<T extends Aggregator>() {
@@ -108,7 +164,6 @@ class QuestionnaireFillerData extends InheritedWidget {
 
   @override
   bool updateShouldNotify(QuestionnaireFillerData oldWidget) {
-    return oldWidget._revision != _revision ||
-        oldWidget._onRevisionChange != _onRevisionChange;
+    return oldWidget._revision != _revision;
   }
 }
