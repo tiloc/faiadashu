@@ -79,15 +79,42 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
   /// Find a contained element by its id.
   /// Id may start with a leading '#', which will be stripped.
   /// [elementId] == null will return null.
+  /// Will throw [QuestionnaireFormatException] if [elementId] cannot be found.
   Resource? findContainedByElementId(String? elementId) {
     if (elementId == null) {
       return null;
     }
+
+    if (questionnaire.contained == null) {
+      throw QuestionnaireFormatException(
+          'Questionnaire does not have contained elements.', questionnaire);
+    }
+
     final key = elementId.startsWith('#')
         ? elementId.substring(1)
         : elementId; // Strip leading #
-    return questionnaire.contained
-        ?.firstWhereOrNull((element) => key == element.id?.toString());
+
+    for (final resource in questionnaire.contained!) {
+      if (key == resource.id?.toString()) {
+        return resource;
+      }
+
+      if (resource.resourceType == R4ResourceType.Bundle) {
+        final entries = (resource as Bundle).entry;
+        if (entries == null) {
+          continue;
+        }
+        for (final entry in entries) {
+          if (key == entry.resource?.id?.toString()) {
+            return entry.resource;
+          }
+        }
+      }
+    }
+
+    throw QuestionnaireFormatException(
+        'Questionnaire does not contain element with id #$elementId',
+        questionnaire.contained);
   }
 
   int get revision => _revision;

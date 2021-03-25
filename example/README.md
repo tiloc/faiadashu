@@ -1,16 +1,12 @@
 # example
 
-A new Flutter project.
+An example app to show off the Widgets on FHIR® collection.
 
-## Getting Started
+Use the menu to explore the widgets.
 
-This project is a starting point for a Flutter application.
+## Disclaimer
+This material contains the following artwork:
 
-A few resources to get you started if this is your first Flutter project:
+*"Sectional Anatomy of the Heart with Path of Blood Flow"*
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+licensed from Blausen Medical Communications, Inc. under the Creative Commons Attribution 3.0 Unported license (https://creativecommons.org/licenses/by/3.0/deed.en)

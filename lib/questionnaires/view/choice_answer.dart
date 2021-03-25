@@ -106,7 +106,7 @@ class _ChoiceAnswerState
 
   Widget? _styledChoice(BuildContext context, QuestionnaireAnswerOption qao) {
     return Xhtml.buildFromExtension(
-        context, qao.valueStringElement?.extension_);
+        context, widget.location.top, qao.valueStringElement?.extension_);
   }
 
   // Take the existing extensions that might contain information about
@@ -305,9 +305,6 @@ class _ChoiceAnswerState
                 value = _fillValue(newValue);
               }));
     }
-
-    // @darshankawar: Uncomment the following line to provoke issue https://github.com/flutter/flutter/issues/78745
-    // return Table(children: [TableRow(children: choices)]);
 
     if (qi.extension_
                 ?.extensionOrNull(
