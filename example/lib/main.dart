@@ -1,17 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:widgets_on_fhir_example/instruments/mds_ipa_instrument.dart';
+import 'package:widgets_on_fhir/questionnaires/questionnaires.dart';
 
 import 'disclaimer_page.dart';
-import 'instruments/bluebook.dart';
-import 'instruments/hf_instrument.dart';
-import 'instruments/phq9_instrument.dart';
-import 'instruments/prapare_instrument.dart';
-import 'instruments/sdc_demo.dart';
 import 'observation_page.dart';
 import 'primitive_page.dart';
-import 'questionnaire_scroller_page.dart';
-import 'questionnaire_stepper_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -93,8 +86,9 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => QuestionnaireScrollerPage(
-                          SDCDemoInstrument.sdcDemoInstrument)));
+                      builder: (context) =>
+                          const QuestionnaireScrollerPage.fromAsset(
+                              'assets/instruments/sdc_demo.json')));
             },
           ),
           ListTile(
@@ -105,8 +99,9 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => QuestionnaireScrollerPage(
-                          Phq9Instrument.phq9Instrument)));
+                      builder: (context) =>
+                          const QuestionnaireScrollerPage.fromAsset(
+                              'assets/instruments/phq9_instrument.json')));
             },
           ),
           ListTile(
@@ -117,8 +112,9 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => QuestionnaireStepperPage(
-                          Phq9Instrument.phq9Instrument)));
+                      builder: (context) =>
+                          const QuestionnaireStepperPage.fromAsset(
+                              'assets/instruments/phq9_instrument.json')));
             },
           ),
           ListTile(
@@ -128,8 +124,9 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => QuestionnaireScrollerPage(
-                          HFInstrument.hfInstrument)));
+                      builder: (context) =>
+                          const QuestionnaireScrollerPage.fromAsset(
+                              'assets/instruments/hf_instrument.json')));
             },
           ),
           ListTile(
@@ -139,8 +136,9 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => QuestionnaireScrollerPage(
-                          PrapareInstrument.prapareInstrument)));
+                      builder: (context) =>
+                          const QuestionnaireScrollerPage.fromAsset(
+                              'assets/instruments/prapare_instrument.json')));
             },
           ),
           ListTile(
@@ -151,20 +149,9 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => QuestionnaireScrollerPage(
-                          BluebookInstrument.bluebookInstrument)));
-            },
-          ),
-          ListTile(
-            title: const Text('MDS 3.0 IPA 1.10 Questionnaire Scroller'),
-            subtitle: const Text(
-                'This is a 1MB stress-test and will currently break/hang.'),
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => QuestionnaireScrollerPage(
-                          Mds30Ipa110Instrument.mds30Ipa110Instrument)));
+                      builder: (context) =>
+                          const QuestionnaireScrollerPage.fromAsset(
+                              'assets/instruments/bluebook.json')));
             },
           ),
         ],

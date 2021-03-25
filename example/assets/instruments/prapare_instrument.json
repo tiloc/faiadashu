@@ -1,6 +1,4 @@
-class PrapareInstrument {
-  static const prapareInstrument = '''
-  {
+{
   "status": "draft",
   "resourceType": "Questionnaire",
   "meta": {
@@ -1228,6 +1226,4 @@ class PrapareInstrument {
       ]
     }
   ]
-}
-  ''';
 }

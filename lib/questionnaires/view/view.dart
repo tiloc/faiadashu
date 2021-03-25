@@ -8,5 +8,7 @@ export 'questionnaire_filler.dart';
 export 'questionnaire_item_filler.dart';
 export 'questionnaire_item_filler.dart';
 export 'questionnaire_response_filler.dart';
+export 'questionnaire_scroller_page.dart';
+export 'questionnaire_stepper_page.dart';
 export 'static_item.dart';
 export 'string_answer.dart';

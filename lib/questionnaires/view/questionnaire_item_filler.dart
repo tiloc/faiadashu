@@ -45,6 +45,8 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
         ?.firstOrNull
         ?.code
         ?.value;
+
+    // TODO: Add this to title widget as a WidgetSpan?
     final leading = (displayCategory == 'instructions')
         ? const Icon(Icons.info)
         : (displayCategory == 'security')
@@ -54,11 +56,26 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
         ? AnimatedSwitcher(
             duration: const Duration(milliseconds: 500),
             child: widget.location.enabled
-                ? ListTile(
-                    leading: leading,
-                    title: widget._titleWidget,
-                    subtitle: widget._responseFiller,
-                  )
+                ? (MediaQuery.of(context).size.width > 1000)
+                    ? Table(
+                        columnWidths: {
+                          0: FixedColumnWidth(
+                              MediaQuery.of(context).size.width / 3.2),
+                          1: FixedColumnWidth(
+                              MediaQuery.of(context).size.width / 3.2 * 2)
+                        },
+                        children: [
+                          TableRow(children: [
+                            widget._titleWidget,
+                            widget._responseFiller
+                          ])
+                        ],
+                      )
+                    : ListTile(
+                        leading: leading,
+                        title: widget._titleWidget,
+                        subtitle: widget._responseFiller,
+                      )
                 : const SizedBox())
         : const SizedBox();
   }

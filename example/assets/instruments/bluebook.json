@@ -1,6 +1,4 @@
-class BluebookInstrument {
-  static const bluebookInstrument = '''
-  {
+{
   "resourceType": "Questionnaire",
   "id": "bb",
   "url": "http://hl7.org/fhir/Questionnaire/bb",
@@ -139,6 +137,4 @@ class BluebookInstrument {
       ]
     }
   ]
-}
-''';
 }

@@ -283,6 +283,7 @@ class _ChoiceAnswerState
       final optionPrefixDisplay =
           (optionPrefix != null) ? '$optionPrefix ' : '';
       final optionTitle = '$optionPrefixDisplay${choice.safeDisplay}';
+      final styledChoice = _styledChoice(context, choice);
 
       choices.add((qi.repeats?.value == true)
           ? CheckboxListTile(
@@ -297,7 +298,7 @@ class _ChoiceAnswerState
           : RadioListTile<String>(
               title: Text(optionTitle,
                   style: Theme.of(context).textTheme.bodyText2),
-              secondary: _styledChoice(context, choice),
+              secondary: styledChoice,
               value: choice.optionCode,
               groupValue: _choiceString(value),
               onChanged: (String? newValue) {
