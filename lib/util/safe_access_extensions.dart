@@ -43,7 +43,7 @@ extension SafeCodeableConceptExtension on CodeableConcept {
 
   bool containsCoding(String? system, String code) {
     return coding?.firstWhereOrNull((_coding) =>
-            (_coding.code.toString() == code) &&
+            (_coding.code?.toString() == code) &&
             (_coding.system?.toString() == system)) !=
         null;
   }
@@ -72,7 +72,7 @@ extension SafeQuestionnaireItemExtension on QuestionnaireItem {
                 'http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl')
             ?.valueCodeableConcept
             ?.containsCoding('http://hl7.org/fhir/questionnaire-item-control',
-                itemControl) !=
-        null;
+                itemControl) ??
+        false;
   }
 }
