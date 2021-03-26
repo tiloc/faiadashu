@@ -4,10 +4,11 @@ import 'dart:developer' as developer;
 import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/foundation.dart';
-import 'package:widgets_on_fhir/questionnaires/model/questionnaire_exceptions.dart';
 
 import '../../util/util.dart';
+import '../view/xhtml.dart';
 import 'aggregator.dart';
+import 'questionnaire_exceptions.dart';
 
 class QuestionnaireTopLocation extends QuestionnaireLocation {
   final Map<String, QuestionnaireLocation> _cachedItems = {};
@@ -401,22 +402,14 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
             'help');
   }
 
-  R? applyIfExists<R, T>(R Function(T?) f, T? arg) =>
-      (arg == null) ? null : f(arg);
+  String? get titleText {
+    final title = Xhtml.toXhtml(
+        questionnaireItem.text, questionnaireItem.textElement?.extension_);
 
-  String? get text {
-    return questionnaireItem.textElement?.extension_
-            ?.extensionOrNull(
-                'http://hl7.org/fhir/StructureDefinition/rendering-xhtml')
-            ?.valueString ??
-        applyIfExists<String, String>(
-            (renderingStyle) =>
-                '<div style="$renderingStyle">${questionnaireItem.text}</div>',
-            questionnaireItem.textElement?.extension_
-                ?.extensionOrNull(
-                    'http://hl7.org/fhir/StructureDefinition/rendering-style')
-                ?.valueString) ??
-        questionnaireItem.text;
+    final prefix = Xhtml.toXhtml(
+        questionnaireItem.prefix, questionnaireItem.prefixElement?.extension_);
+
+    return (prefix != null) ? '$prefix $title' : title;
   }
 
   LinkedHashMap<String, QuestionnaireLocation> _addChildren() {

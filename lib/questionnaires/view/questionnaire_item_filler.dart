@@ -16,11 +16,13 @@ class QuestionnaireItemFiller extends StatefulWidget {
   factory QuestionnaireItemFiller.fromQuestionnaireItem(
       QuestionnaireLocation location) {
     return QuestionnaireItemFiller._(
-        location, QuestionnaireResponseFiller(location));
+        // TODO: Error handling for failed response filler creation
+        location,
+        QuestionnaireResponseFiller(location));
   }
 
   QuestionnaireItemFiller._(this.location, this._responseFiller, {Key? key})
-      : _titleWidget = QuestionnaireItemFillerTitleWidget.forLocation(location),
+      : _titleWidget = QuestionnaireItemFillerTitle.forLocation(location),
         super(key: key) {
     // ignore: no_runtimetype_tostring
     logTag = 'wof.${runtimeType.toString()}';
@@ -36,21 +38,7 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
     developer.log(
         'build ${widget.location.linkId} hidden: ${widget.location.isHidden}, enabled: ${widget.location.enabled}',
         level: LogLevel.debug);
-    final displayCategory = widget.location.questionnaireItem.extension_
-        ?.extensionOrNull(
-            'http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory')
-        ?.valueCodeableConcept
-        ?.coding
-        ?.firstOrNull
-        ?.code
-        ?.value;
 
-    // TODO: Add this to title widget as a WidgetSpan?
-    final leading = (displayCategory == 'instructions')
-        ? const Icon(Icons.info)
-        : (displayCategory == 'security')
-            ? const Icon(Icons.lock)
-            : null;
     return (!widget.location.isHidden)
         ? AnimatedSwitcher(
             duration: const Duration(milliseconds: 500),
@@ -76,7 +64,6 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
                         ],
                       )
                     : ListTile(
-                        leading: leading,
                         title: widget._titleWidget,
                         subtitle: widget._responseFiller,
                       )
@@ -85,37 +72,75 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
   }
 }
 
-class QuestionnaireItemFillerTitleWidget extends StatelessWidget {
+class QuestionnaireItemFillerTitle extends StatelessWidget {
   final QuestionnaireLocation location;
-  const QuestionnaireItemFillerTitleWidget._(this.location, {Key? key})
+  const QuestionnaireItemFillerTitle._(this.location, {Key? key})
       : super(key: key);
 
   static Widget? forLocation(QuestionnaireLocation location, {Key? key}) {
-    if (location.text == null) {
+    if (location.titleText == null) {
       return null;
     } else {
-      return QuestionnaireItemFillerTitleWidget._(location, key: key);
+      return QuestionnaireItemFillerTitle._(location, key: key);
     }
-  }
-
-  TextStyle? _styleForLocation(
-      BuildContext context, QuestionnaireLocation location) {
-    final textTheme = Theme.of(context).textTheme;
-    return location.questionnaireItem.type == QuestionnaireItemType.group
-        ? textTheme.headline5
-        : textTheme.subtitle1!.copyWith(fontWeight: FontWeight.w600);
   }
 
   @override
   Widget build(BuildContext context) {
-    final titleText = location.text;
-    return (titleText != null)
-        ? (titleText.contains('</'))
-            ? HTML.toRichText(context, titleText)
-            : Container(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Text(titleText,
-                    style: _styleForLocation(context, location)))
-        : const SizedBox();
+    final leading = QuestionnaireItemFillerTitleLeading.forLocation(location);
+
+    final styleTag =
+        (location.questionnaireItem.type == QuestionnaireItemType.group)
+            ? 'h2'
+            : 'b';
+
+    final titleText = location.titleText;
+    return Container(
+        padding: const EdgeInsets.only(top: 8.0),
+        child: Text.rich(TextSpan(children: <InlineSpan>[
+          if (leading != null) WidgetSpan(child: leading),
+          if (titleText != null)
+            HTML.toTextSpan(context, '<$styleTag>$titleText</$styleTag>'),
+        ])));
+  }
+}
+
+class QuestionnaireItemFillerTitleLeading extends StatelessWidget {
+  final QuestionnaireLocation location;
+  final String category;
+  const QuestionnaireItemFillerTitleLeading._(this.location, this.category,
+      {Key? key})
+      : super(key: key);
+
+  static Widget? forLocation(QuestionnaireLocation location, {Key? key}) {
+    final displayCategory = location.questionnaireItem.extension_
+        ?.extensionOrNull(
+            'http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory')
+        ?.valueCodeableConcept
+        ?.coding
+        ?.firstOrNull
+        ?.code
+        ?.value;
+
+    if (displayCategory == null) {
+      return null;
+    }
+
+    return ((displayCategory == 'instructions') ||
+            (displayCategory == 'security'))
+        ? QuestionnaireItemFillerTitleLeading._(location, displayCategory,
+            key: key)
+        : null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final leading = (category == 'instructions')
+        ? const Icon(Icons.info)
+        : (category == 'security')
+            ? const Icon(Icons.lock)
+            : const Icon(Icons.help_center_outlined); // Error / unclear
+
+    return leading;
   }
 }

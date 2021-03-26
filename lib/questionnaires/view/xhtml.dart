@@ -7,7 +7,7 @@ import 'package:widgets_on_fhir/questionnaires/model/model.dart';
 
 import '../../util/safe_access_extensions.dart';
 
-/// Build Widgets from Xhtml
+/// Extract Xhtml from SDC extensions and build Widgets from Xhtml.
 class Xhtml {
   static Widget? buildFromString(
       BuildContext context, QuestionnaireTopLocation topLocation, String? xhtml,
@@ -43,5 +43,25 @@ class Xhtml {
         ?.valueString;
 
     return Xhtml.buildFromString(context, topLocation, xhtml);
+  }
+
+  static String? toXhtml(String? plainText, List<FhirExtension>? extension) {
+    final xhtml = extension
+        ?.extensionOrNull(
+            'http://hl7.org/fhir/StructureDefinition/rendering-xhtml')
+        ?.valueString;
+
+    final renderingStyle = extension
+        ?.extensionOrNull(
+            'http://hl7.org/fhir/StructureDefinition/rendering-style')
+        ?.valueString;
+
+    return (xhtml != null)
+        ? ((renderingStyle != null)
+            ? '<div style="$renderingStyle">$xhtml</div>'
+            : xhtml)
+        : (renderingStyle != null)
+            ? '<div style="$renderingStyle">$plainText</div>'
+            : plainText;
   }
 }

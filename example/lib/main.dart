@@ -92,6 +92,19 @@ class _HomePageState extends State<HomePage> {
             },
           ),
           ListTile(
+            title: const Text('SDC Profile Example Render'),
+            subtitle: const Text(
+                'The reference questionnaire for SDC render features.'),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          const QuestionnaireScrollerPage.fromAsset(
+                              'assets/instruments/sdc-example-render.json')));
+            },
+          ),
+          ListTile(
             title: const Text('PHQ9 Questionnaire Scroller'),
             subtitle:
                 const Text('Simple choice-based survey with a total score.'),

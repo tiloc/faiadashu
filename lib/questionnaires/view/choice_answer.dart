@@ -32,7 +32,7 @@ class _ChoiceAnswerState
   void initState() {
     super.initState();
 
-    _buildAnswerOptions();
+    _createAnswerOptions();
 
     if (widget.location.responseItem != null) {
       initialValue = _fillValue(
@@ -111,7 +111,7 @@ class _ChoiceAnswerState
 
   // Take the existing extensions that might contain information about
   // ordinal values and convert them from ordinalValue to iso21090-CO-value
-  List<FhirExtension>? _buildOrdinalExtension(
+  List<FhirExtension>? _createOrdinalExtension(
       List<FhirExtension>? inExtension) {
     List<FhirExtension>? responseOrdinalExtension;
 
@@ -127,6 +127,24 @@ class _ChoiceAnswerState
     }
 
     return responseOrdinalExtension;
+  }
+
+  List<FhirExtension>? _createOptionPrefixExtension(
+      List<FhirExtension>? inExtension) {
+    List<FhirExtension>? responseOptionPrefixExtension;
+
+    final FhirExtension? labelExtension = inExtension?.extensionOrNull(
+        'http://hl7.org/fhir/StructureDefinition/valueset-label');
+    if (labelExtension != null) {
+      responseOptionPrefixExtension = <FhirExtension>[
+        FhirExtension(
+            url: FhirUri(
+                'http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix'),
+            valueString: labelExtension.valueString),
+      ];
+    }
+
+    return responseOptionPrefixExtension;
   }
 
   String? _choiceStringFromCoding(Coding? coding) {
@@ -166,7 +184,7 @@ class _ChoiceAnswerState
   }
 
   /// Convert [ValueSet]s or [QuestionnaireAnswerOption]s to normalized [QuestionnaireAnswerOption]s
-  void _buildAnswerOptions() {
+  void _createAnswerOptions() {
     final qi = widget.location.questionnaireItem;
     final questionnaire = widget.location.questionnaire;
 
@@ -199,13 +217,15 @@ class _ChoiceAnswerState
             MapEntry<String, QuestionnaireAnswerOption>(
                 contains.code!.toString(),
                 QuestionnaireAnswerOption(
+                    extension_:
+                        _createOptionPrefixExtension(contains.extension_),
                     valueCoding: Coding(
                         system: contains.system,
                         code: contains.code,
                         userSelected: Boolean(true),
                         display: contains.display,
                         extension_:
-                            _buildOrdinalExtension(contains.extension_))))
+                            _createOrdinalExtension(contains.extension_))))
           ]);
         }
       } else {
@@ -230,13 +250,15 @@ class _ChoiceAnswerState
             MapEntry<String, QuestionnaireAnswerOption>(
                 concept.code!.toString(),
                 QuestionnaireAnswerOption(
+                    extension_:
+                        _createOptionPrefixExtension(concept.extension_),
                     valueCoding: Coding(
                         system: valueSetInclude.system,
                         code: concept.code,
                         userSelected: Boolean(true),
                         display: concept.display,
                         extension_:
-                            _buildOrdinalExtension(concept.extension_))))
+                            _createOrdinalExtension(concept.extension_))))
           ]);
         }
       }
@@ -250,7 +272,7 @@ class _ChoiceAnswerState
                 valueCoding: (qao.valueCoding != null)
                     ? qao.valueCoding!.copyWith(
                         userSelected: Boolean(true),
-                        extension_: _buildOrdinalExtension(qao.extension_))
+                        extension_: _createOrdinalExtension(qao.extension_))
                     : Coding(
                         // The spec only allows valueCoding, but real-world incl. valueString
                         display: qao.valueString,

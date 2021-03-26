@@ -34,7 +34,7 @@ class QuestionnaireResponseAggregator
     }
 
     return QuestionnaireResponseItem(
-        linkId: location.linkId, text: location.text, item: nestedItems);
+        linkId: location.linkId, text: location.titleText, item: nestedItems);
   }
 
   @override
