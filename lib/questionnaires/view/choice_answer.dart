@@ -283,9 +283,11 @@ class _ChoiceAnswerState
 
   Widget _buildChoiceAnswers(BuildContext context) {
     final qi = widget.location.questionnaireItem;
+    final isCheckBox = qi.isItemControl('check-box');
+    final isMultipleChoice = (qi.repeats?.value ?? isCheckBox) == true;
 
     final choices = <Widget>[];
-    if ((qi.repeats?.value ?? false) == false) {
+    if (!isMultipleChoice) {
       choices.add(RadioListTile<String?>(
           title: Text(
             '---',
@@ -307,7 +309,7 @@ class _ChoiceAnswerState
       final optionTitle = '$optionPrefixDisplay${choice.safeDisplay}';
       final styledChoice = _styledChoice(context, choice);
 
-      choices.add((qi.repeats?.value == true)
+      choices.add(isMultipleChoice
           ? CheckboxListTile(
               title: Text(optionTitle,
                   style: Theme.of(context).textTheme.bodyText2),

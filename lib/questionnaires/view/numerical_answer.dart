@@ -36,15 +36,7 @@ class _NumericalAnswerState
     // ignore: no_runtimetype_tostring
     logTag = 'wof.${runtimeType.toString()}';
 
-    _isSlider = widget.location.questionnaireItem.extension_
-            ?.extensionOrNull(
-                'http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl')
-            ?.valueCodeableConcept
-            ?.coding
-            ?.firstOrNull
-            ?.code
-            ?.value ==
-        'slider';
+    _isSlider = widget.location.questionnaireItem.isItemControl('slider');
 
     final minValueExtension = widget.location.questionnaireItem.extension_
         ?.extensionOrNull('http://hl7.org/fhir/StructureDefinition/minValue');

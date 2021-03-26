@@ -382,15 +382,7 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
   }
 
   bool get isHelp {
-    return (questionnaireItem.extension_
-                ?.extensionOrNull(
-                    'http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl')
-                ?.valueCodeableConcept
-                ?.coding
-                ?.firstOrNull
-                ?.code
-                ?.value ==
-            'help') ||
+    return questionnaireItem.isItemControl('help') ||
         (questionnaireItem.extension_
                 ?.extensionOrNull(
                     'http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory')
