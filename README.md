@@ -1,7 +1,7 @@
 [![style: lint](https://img.shields.io/badge/style-lint-4BC0F5.svg)](https://pub.dev/packages/lint)
 
 # Widgets on FHIR®
-Build healthcare apps fast, using the Flutter™ SDK and following the FHIR® standard.
+Build healthcare apps fast, using the Flutter™ SDK and following the HL7® FHIR® standard.
 
 This is a UI add-on to the pure Dart "fhir" libraries: https://pub.dev/packages/fhir
 
