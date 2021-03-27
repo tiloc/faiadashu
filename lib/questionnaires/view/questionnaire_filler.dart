@@ -94,6 +94,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
             developer.log('FutureBuilder hasData',
                 level: LogLevel.debug, name: logTag);
             _topLocation = snapshot.data;
+            // TODO: There has got to be a more elegant way! Goal is to register the lister exactly once, after the future has completed.
             if (_onTopChangeListenerFunction == null) {
               _onTopChangeListenerFunction = () => _onTopChange();
               _topLocation!.addListener(_onTopChangeListenerFunction!);

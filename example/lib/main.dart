@@ -43,6 +43,12 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
+    final fab = FloatingActionButton.extended(
+      label: const Text('Complete'),
+      icon: const Icon(Icons.thumb_up),
+      onPressed: () {},
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Widgets on FHIR® Gallery'),
@@ -86,9 +92,9 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          const QuestionnaireScrollerPage.fromAsset(
-                              'assets/instruments/sdc_demo.json')));
+                      builder: (context) => QuestionnaireScrollerPage.fromAsset(
+                          'assets/instruments/sdc_demo.json',
+                          floatingActionButton: fab)));
             },
           ),
           ListTile(

@@ -1,17 +1,30 @@
 import 'dart:math';
 
+import 'package:fhir/r4.dart' show Questionnaire;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../questionnaires.dart';
 import 'narrative_drawer.dart';
+import 'questionnaire_cover_page.dart';
 
 /// Fill a questionnaire through a vertically scrolling input form.
 class QuestionnaireScrollerPage extends StatefulWidget {
   final String loaderParam;
+  final Widget? floatingActionButton;
+  final List<Widget>? frontMatter;
+  final List<Widget>? backMatter;
 
-  const QuestionnaireScrollerPage.fromAsset(this.loaderParam, {Key? key})
+  const QuestionnaireScrollerPage.fromAsset(this.loaderParam,
+      {this.floatingActionButton,
+      this.frontMatter,
+      this.backMatter = const [
+        SizedBox(
+          height: 80,
+        )
+      ],
+      Key? key})
       : super(key: key);
 
   @override
@@ -51,64 +64,100 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
 
   @override
   Widget build(BuildContext context) {
-    return QuestionnaireFiller.fromAsset(widget.loaderParam,
-        child: Builder(
-            // TODO: Can this Builder be hidden inside the QuestionnaireFiller for extra ease of use? First attempt failed.
-            builder: (BuildContext context) => Scaffold(
-                appBar: AppBar(
-                  leading: Builder(
-                    builder: (BuildContext context) {
-                      return IconButton(
-                        icon: const Icon(Icons.arrow_back),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      );
-                    },
-                  ),
-                  title: Text(QuestionnaireFiller.of(context)
-                          .topLocation
-                          .questionnaire
-                          .title ??
-                      'Survey'),
-                ),
-                endDrawer: const NarrativeDrawer(),
-                floatingActionButton: FloatingActionButton.extended(
-                  label: const Text('Complete'),
-                  icon: const Icon(Icons.thumb_up),
-                  onPressed: () {},
-                ),
-                body: RawKeyboardListener(
-                  autofocus: true,
-                  focusNode: _focusNode,
-                  onKey: _handleKeyEvent,
-                  child: Scrollbar(
-                    isAlwaysShown: true,
-                    controller: _listScrollController,
-                    child: ListView.builder(
-                        controller: _listScrollController,
-                        itemCount: QuestionnaireFiller.of(context)
-                                .surveyLocations
-                                .length +
-                            1,
-                        padding: const EdgeInsets.all(8),
-                        itemBuilder: (BuildContext context, int i) {
-                          if (i <
-                              QuestionnaireFiller.of(context)
-                                  .surveyLocations
-                                  .length) {
-                            return QuestionnaireFiller.of(context)
-                                .itemFillerAt(i);
-                          } else {
-                            // TODO: Allow adding a different final element
-                            // Give some extra scrolling-space at the bottom.
-                            // Otherwise Complete button overlaps final element.
-                            return const SizedBox(
-                              height: 80,
-                            );
-                          }
-                        }),
-                  ),
-                ))));
+    return QuestionnaireFiller.fromAsset(widget.loaderParam, child: Builder(
+        // TODO: Can this Builder be hidden inside the QuestionnaireFiller for extra ease of use? First attempt failed.
+        builder: (BuildContext context) {
+      final mainMatterLength =
+          QuestionnaireFiller.of(context).surveyLocations.length;
+      final frontMatterLength = widget.frontMatter?.length ?? 0;
+      final backMatterLength = widget.backMatter?.length ?? 0;
+      final totalLength =
+          frontMatterLength + mainMatterLength + backMatterLength;
+
+      final questionnaire =
+          QuestionnaireFiller.of(context).topLocation.questionnaire;
+
+      return Scaffold(
+          appBar: AppBar(
+            leading: Builder(
+              builder: (BuildContext context) {
+                return IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                );
+              },
+            ),
+            title: Row(children: [
+              Text(questionnaire.title ?? 'Survey'),
+              const Spacer(),
+              IconButton(
+                icon: const Icon(Icons.help_outline),
+                onPressed: () {
+                  _showQuestionnaireInfo(context, questionnaire);
+                },
+              ),
+            ]),
+          ),
+          endDrawer: const NarrativeDrawer(),
+          floatingActionButton: widget.floatingActionButton,
+          body: RawKeyboardListener(
+            autofocus: true,
+            focusNode: _focusNode,
+            onKey: _handleKeyEvent,
+            child: Scrollbar(
+              isAlwaysShown: true,
+              controller: _listScrollController,
+              child: ListView.builder(
+                  controller: _listScrollController,
+                  itemCount: totalLength,
+                  padding: const EdgeInsets.all(8),
+                  itemBuilder: (BuildContext context, int i) {
+                    final frontMatterIndex = (i < frontMatterLength) ? i : -1;
+                    final mainMatterIndex = (i >= frontMatterLength &&
+                            i < (frontMatterLength + mainMatterLength))
+                        ? (i - frontMatterLength)
+                        : -1;
+                    final backMatterIndex =
+                        (i >= (frontMatterLength + mainMatterLength) &&
+                                i < totalLength)
+                            ? (i - (frontMatterLength + mainMatterLength))
+                            : -1;
+                    if (mainMatterIndex != -1) {
+                      return QuestionnaireFiller.of(context).itemFillerAt(i);
+                    } else if (backMatterIndex != -1) {
+                      return widget.backMatter![backMatterIndex];
+                    } else if (frontMatterIndex != -1) {
+                      return widget.frontMatter![frontMatterIndex];
+                    } else {
+                      throw StateError('ListView index out of bounds: $i');
+                    }
+                  }),
+            ),
+          ));
+    }));
+  }
+
+  Future<void> _showQuestionnaireInfo(
+      BuildContext context, Questionnaire questionnaire) async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Info'),
+            content: QuestionnaireCoverPage(questionnaire),
+            actions: <Widget>[
+              OutlinedButton(
+                onPressed: () {
+                  setState(() {
+                    Navigator.pop(context);
+                  });
+                },
+                child: const Text('Dismiss'),
+              ),
+            ],
+          );
+        });
   }
 }
