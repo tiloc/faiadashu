@@ -64,8 +64,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
 
   @override
   Widget build(BuildContext context) {
-    return QuestionnaireFiller.fromAsset(widget.loaderParam, child: Builder(
-        // TODO: Can this Builder be hidden inside the QuestionnaireFiller for extra ease of use? First attempt failed.
+    return QuestionnaireFiller.fromAsset(widget.loaderParam,
         builder: (BuildContext context) {
       final mainMatterLength =
           QuestionnaireFiller.of(context).surveyLocations.length;
@@ -136,7 +135,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
                   }),
             ),
           ));
-    }));
+    });
   }
 
   Future<void> _showQuestionnaireInfo(

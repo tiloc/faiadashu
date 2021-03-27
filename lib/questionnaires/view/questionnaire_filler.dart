@@ -10,7 +10,7 @@ import '../model/questionnaire_location.dart';
 import '../questionnaires.dart';
 
 class QuestionnaireFiller extends StatefulWidget {
-  final Widget child;
+  final WidgetBuilder builder;
   final Future<QuestionnaireTopLocation> Function(dynamic param) loaderFuture;
   final dynamic loaderParam;
   static const String logTag = 'wof.QuestionnaireFiller';
@@ -32,7 +32,7 @@ class QuestionnaireFiller extends StatefulWidget {
   }
 
   QuestionnaireFiller.fromAsset(this.loaderParam,
-      {Key? key, required this.child})
+      {Key? key, required this.builder})
       // ignore: avoid_field_initializers_in_const_classes
       : loaderFuture = _loadFromAsset,
         super(key: key);
@@ -101,7 +101,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
             }
             return QuestionnaireFillerData._(
               _topLocation!,
-              child: widget.child,
+              builder: widget.builder,
             );
           } else {
             developer.log('FutureBuilder still waiting for data...',
@@ -122,12 +122,12 @@ class QuestionnaireFillerData extends InheritedWidget {
   QuestionnaireFillerData._(
     this.topLocation, {
     Key? key,
-    required Widget child,
+    required WidgetBuilder builder,
   })   : _revision = topLocation.revision,
         surveyLocations = topLocation.preOrder(),
         _itemFillers = List<QuestionnaireItemFiller?>.filled(
             topLocation.preOrder().length, null),
-        super(key: key, child: child) {
+        super(key: key, child: Builder(builder: builder)) {
     // ignore: no_runtimetype_tostring
     logTag = 'wof.${runtimeType.toString()}';
   }
