@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
+import 'package:widgets_on_fhir/logging/logging.dart';
 import 'package:widgets_on_fhir/questionnaires/model/aggregator.dart';
 
 import '../../fhir_types/fhir_types_extensions.dart';
@@ -14,8 +15,12 @@ import 'questionnaire_location.dart';
 /// Will return 0 when no score field exists on the questionnaire.
 class TotalScoreAggregator extends Aggregator<Decimal> {
   late final QuestionnaireLocation? totalScoreLocation;
+  late final String logTag;
   TotalScoreAggregator({bool autoAggregate = true})
-      : super(Decimal(0), autoAggregate: autoAggregate);
+      : super(Decimal(0), autoAggregate: autoAggregate) {
+    // ignore: no_runtimetype_tostring
+    logTag = 'wof.${runtimeType.toString()}';
+  }
 
   @override
   void init(QuestionnaireTopLocation topLocation) {
@@ -42,20 +47,21 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
       return null;
     }
 
-    developer.log('totalScore.aggregrate', level: 500);
+    developer.log('totalScore.aggregrate', level: LogLevel.debug, name: logTag);
     // Special handling if this is the total score
     double sum = 0.0;
     for (final location in topLocation.preOrder()) {
       if (location != totalScoreLocation) {
         final points = location.score;
-        developer.log('Adding $location: $points');
+        developer.log('Adding $location: $points',
+            level: LogLevel.trace, name: logTag);
         if (points != null) {
           sum += points.value!;
         }
       }
     }
 
-    developer.log('sum: $sum', level: 500);
+    developer.log('sum: $sum', level: LogLevel.debug, name: logTag);
     final result = Decimal(sum);
     if (notifyListeners) {
       value = result;
