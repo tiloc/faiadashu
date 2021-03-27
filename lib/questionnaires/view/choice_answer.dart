@@ -200,11 +200,14 @@ class _ChoiceAnswerState
           : FhirValueSet.getValueSet(key);
 
       if (valueSet == null) {
-        throw QuestionnaireFormatException(
-            isValueSetContained
-                ? 'Questionnaire does not contain referenced ValueSet $key'
-                : 'External ValueSet $key cannot be located.',
-            questionnaire);
+        if (isValueSetContained) {
+          throw QuestionnaireFormatException(
+              'Questionnaire does not contain referenced ValueSet $key',
+              questionnaire.contained);
+        } else {
+          throw QuestionnaireFormatException(
+              'External ValueSet $key cannot be located.', qi);
+        }
       }
 
       final List<ValueSetContains>? valueSetContains =

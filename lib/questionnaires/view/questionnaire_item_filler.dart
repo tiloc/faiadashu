@@ -33,11 +33,19 @@ class QuestionnaireItemFiller extends StatefulWidget {
 }
 
 class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
+  late final String logTag;
+
+  QuestionnaireItemFillerState() {
+    // ignore: no_runtimetype_tostring
+    logTag = 'wof.${runtimeType.toString()}';
+  }
+
   @override
   Widget build(BuildContext context) {
     developer.log(
         'build ${widget.location.linkId} hidden: ${widget.location.isHidden}, enabled: ${widget.location.enabled}',
-        level: LogLevel.debug);
+        level: LogLevel.debug,
+        name: logTag);
 
     return (!widget.location.isHidden)
         ? AnimatedSwitcher(
