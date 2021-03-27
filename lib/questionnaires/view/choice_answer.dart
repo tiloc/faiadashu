@@ -104,11 +104,6 @@ class _ChoiceAnswerState
     }
   }
 
-  Widget? _styledChoice(BuildContext context, QuestionnaireAnswerOption qao) {
-    return Xhtml.buildFromExtension(
-        context, widget.location.top, qao.valueStringElement?.extension_);
-  }
-
   // Take the existing extensions that might contain information about
   // ordinal values and convert them from ordinalValue to iso21090-CO-value
   List<FhirExtension>? _createOrdinalExtension(
@@ -310,12 +305,13 @@ class _ChoiceAnswerState
       final optionPrefixDisplay =
           (optionPrefix != null) ? '$optionPrefix ' : '';
       final optionTitle = '$optionPrefixDisplay${choice.safeDisplay}';
-      final styledChoice = _styledChoice(context, choice);
+      final styledOptionTitle = Xhtml.toWidget(context, widget.location.top,
+          optionTitle, choice.valueStringElement?.extension_,
+          width: 100, height: 100);
 
       choices.add(isMultipleChoice
           ? CheckboxListTile(
-              title: Text(optionTitle,
-                  style: Theme.of(context).textTheme.bodyText2),
+              title: styledOptionTitle,
               value: value?.coding?.firstWhereOrNull(
                       (coding) => coding.code?.value == choice.optionCode) !=
                   null,
@@ -323,9 +319,7 @@ class _ChoiceAnswerState
                 value = _fillToggledValue(choice.optionCode);
               })
           : RadioListTile<String>(
-              title: Text(optionTitle,
-                  style: Theme.of(context).textTheme.bodyText2),
-              secondary: styledChoice,
+              title: styledOptionTitle,
               value: choice.optionCode,
               groupValue: _choiceString(value),
               onChanged: (String? newValue) {
