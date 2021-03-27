@@ -2,6 +2,8 @@ import 'dart:developer' as developer;
 
 import 'package:fhir/r4.dart';
 
+import '../../fhir_types/fhir_types_extensions.dart';
+import '../../logging/log_level.dart';
 import '../questionnaires.dart';
 import 'aggregator.dart';
 

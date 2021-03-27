@@ -1,3 +1,4 @@
+/// Logging levels to be used with `dart:developer` log method.
 class LogLevel {
   /// Tracing output: finely granular following of method enter/leave, intermediate checkpoints
   static const trace = 300;

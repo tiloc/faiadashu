@@ -1,7 +1,7 @@
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
-import '../util/safe_access_extensions.dart';
+import 'fhir_types_extensions.dart';
 
 class CodeableConceptWidget extends StatelessWidget {
   final Widget _widget;

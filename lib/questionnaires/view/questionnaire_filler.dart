@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
 
-import 'package:fhir/r4/resource_types/specialized/definitional_artifacts/definitional_artifacts.dart';
+import 'package:fhir/r4/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
+import '../../logging/logging.dart';
 import '../model/aggregator.dart';
 import '../model/questionnaire_location.dart';
 import '../questionnaires.dart';

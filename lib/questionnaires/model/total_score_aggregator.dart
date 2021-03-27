@@ -1,11 +1,10 @@
 import 'dart:developer' as developer;
 
 import 'package:collection/collection.dart';
-import 'package:fhir/primitive_types/decimal.dart';
 import 'package:fhir/r4.dart';
 import 'package:widgets_on_fhir/questionnaires/model/aggregator.dart';
 
-import '../../util/safe_access_extensions.dart';
+import '../../fhir_types/fhir_types_extensions.dart';
 import 'questionnaire_location.dart';
 
 /// Aggregate responses into a total score.

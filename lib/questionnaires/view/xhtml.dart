@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:simple_html_css/simple_html_css.dart';
 import 'package:widgets_on_fhir/questionnaires/model/model.dart';
 
-import '../../util/safe_access_extensions.dart';
+import '../../fhir_types/fhir_types_extensions.dart';
 
 /// Extract Xhtml from SDC extensions and build Widgets from Xhtml.
 class Xhtml {

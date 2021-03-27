@@ -3,6 +3,7 @@ import 'dart:developer' as developer;
 import 'package:fhir/r4/r4.dart';
 import 'package:flutter/material.dart';
 
+import '../../logging/logging.dart';
 import '../questionnaires.dart';
 
 /// A Widget to fill an individual [QuestionnaireResponseAnswer].

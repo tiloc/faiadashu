@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
+import '../../fhir_types/fhir_types_extensions.dart';
+import '../../logging/logging.dart';
 import '../questionnaires.dart';
 
 class NumericalAnswer extends QuestionnaireAnswerFiller {

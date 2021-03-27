@@ -4,6 +4,8 @@ import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_html_css/simple_html_css.dart';
 
+import '../../fhir_types/fhir_types_extensions.dart';
+import '../../logging/logging.dart';
 import '../questionnaires.dart';
 
 class QuestionnaireItemFiller extends StatefulWidget {
@@ -12,7 +14,6 @@ class QuestionnaireItemFiller extends StatefulWidget {
   final QuestionnaireResponseFiller _responseFiller;
   late final String logTag;
 
-  // TODO(tiloc): Should a key be created?
   factory QuestionnaireItemFiller.fromQuestionnaireItem(
       QuestionnaireLocation location) {
     return QuestionnaireItemFiller._(
@@ -105,11 +106,14 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
     final titleText = location.titleText;
     return Container(
         padding: const EdgeInsets.only(top: 8.0),
-        child: Text.rich(TextSpan(children: <InlineSpan>[
-          if (leading != null) WidgetSpan(child: leading),
-          if (titleText != null)
-            HTML.toTextSpan(context, '<$styleTag>$titleText</$styleTag>'),
-        ])));
+        child: Text.rich(
+          TextSpan(children: <InlineSpan>[
+            if (leading != null) WidgetSpan(child: leading),
+            if (titleText != null)
+              HTML.toTextSpan(context, '<$styleTag>$titleText</$styleTag>'),
+          ]),
+          semanticsLabel: titleText,
+        ));
   }
 }
 
