@@ -56,7 +56,10 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
     if (aggregators != null) {
       for (final aggregator in aggregators) {
         aggregator.init(this);
-        aggregator.aggregate(notifyListeners: true);
+        // Assumption: aggregators that don't autoAggregate will have their aggregate method invoked manually when it matters.
+        if (aggregator.autoAggregate) {
+          aggregator.aggregate(null, notifyListeners: true);
+        }
       }
     }
 

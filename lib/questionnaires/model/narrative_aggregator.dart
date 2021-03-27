@@ -1,4 +1,5 @@
 import 'dart:developer' as developer;
+import 'dart:ui';
 
 import 'package:fhir/r4.dart';
 
@@ -15,27 +16,23 @@ class NarrativeAggregator extends Aggregator<Narrative> {
   // Cached narrative
   Narrative? _narrative;
 
-  NarrativeAggregator({bool autoAggregate = true})
-      : super(
-            Narrative(
-                div: '<div xmlns="http://www.w3.org/1999/xhtml"></div>',
-                status: NarrativeStatus.empty),
-            autoAggregate: autoAggregate);
+  static final emptyNarrative = Narrative(
+      div: '<div xmlns="http://www.w3.org/1999/xhtml"></div>',
+      status: NarrativeStatus.empty);
+
+  NarrativeAggregator()
+      : super(NarrativeAggregator.emptyNarrative, autoAggregate: false);
 
   @override
   void init(QuestionnaireTopLocation topLocation) {
     super.init(topLocation);
 
     _revision = -1;
-    _narrative = null;
-
-    if (autoAggregate) {
-      topLocation.addListener(() => aggregate(notifyListeners: true));
-    }
+    _narrative = value;
   }
 
   static bool _addResponseItemToDiv(
-      StringBuffer div, QuestionnaireLocation location) {
+      StringBuffer div, QuestionnaireLocation location, Locale locale) {
     final item = location.responseItem;
 
     if (item == null) {
@@ -74,7 +71,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
         } else if (answer.valueCoding != null) {
           div.write('<p>${answer.valueCoding!.safeDisplay}</p>');
         } else if (answer.valueDateTime != null) {
-          div.write('<p>${answer.valueDateTime}</p>');
+          div.write('<p>${answer.valueDateTime!.format(locale)}</p>');
         } else if (answer.valueDate != null) {
           div.write('<p>${answer.valueDate}</p>');
         } else if (answer.valueTime != null) {
@@ -91,13 +88,14 @@ class NarrativeAggregator extends Aggregator<Narrative> {
     return returnValue;
   }
 
-  static Narrative _generateNarrative(QuestionnaireLocation topLocation) {
+  static Narrative _generateNarrative(
+      QuestionnaireLocation topLocation, Locale locale) {
     final div = StringBuffer('<div xmlns="http://www.w3.org/1999/xhtml">');
 
     bool generated = false;
 
     for (final location in topLocation.preOrder()) {
-      generated = generated | _addResponseItemToDiv(div, location);
+      generated = generated | _addResponseItemToDiv(div, location, locale);
     }
     div.write('</div>');
     return Narrative(
@@ -106,7 +104,9 @@ class NarrativeAggregator extends Aggregator<Narrative> {
   }
 
   @override
-  Narrative? aggregate({bool notifyListeners = false}) {
+  Narrative? aggregate(Locale? locale, {bool notifyListeners = false}) {
+    ArgumentError.checkNotNull(locale, 'locale');
+
     developer.log(
         '$this.aggregate (topRev: ${topLocation.revision}, rev: $_revision)',
         level: LogLevel.trace);
@@ -117,8 +117,8 @@ class NarrativeAggregator extends Aggregator<Narrative> {
     // Manually invoke the update, because the order matters and enableWhen calcs need to come after answer value updates.
     topLocation.updateEnableWhen(
         notifyListeners:
-            false); // TODO: setting this to true will result in endless refresh and stack overflow
-    _narrative = _generateNarrative(topLocation);
+            false); // TODO: setting this to true would result in endless refresh and stack overflow
+    _narrative = _generateNarrative(topLocation, locale!);
     _revision = topLocation.revision;
     if (notifyListeners) {
       value = _narrative!;

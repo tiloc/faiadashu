@@ -32,7 +32,7 @@ class QuestionnaireFiller extends StatefulWidget {
     );
   }
 
-  QuestionnaireFiller.fromAsset(this.loaderParam,
+  const QuestionnaireFiller.fromAsset(this.loaderParam,
       {Key? key, required this.builder})
       // ignore: avoid_field_initializers_in_const_classes
       : loaderFuture = _loadFromAsset,

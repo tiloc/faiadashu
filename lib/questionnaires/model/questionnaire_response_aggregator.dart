@@ -1,4 +1,5 @@
 import 'dart:developer' as developer;
+import 'dart:ui';
 
 import 'package:fhir/r4.dart';
 
@@ -6,18 +7,13 @@ import '../questionnaires.dart';
 
 class QuestionnaireResponseAggregator
     extends Aggregator<QuestionnaireResponse> {
-  /// [autoAggregate] defaults to false for this one!
-  QuestionnaireResponseAggregator({bool autoAggregate = false})
-      : super(QuestionnaireResponse(), autoAggregate: autoAggregate);
+  QuestionnaireResponseAggregator()
+      : super(QuestionnaireResponse(), autoAggregate: false);
 
   /// Initialize the aggregator.
   @override
   void init(QuestionnaireTopLocation topLocation) {
     super.init(topLocation);
-
-    if (autoAggregate) {
-      topLocation.addListener(() => aggregate(notifyListeners: true));
-    }
   }
 
   QuestionnaireResponseItem _fromGroupItem(QuestionnaireLocation location) {
@@ -38,7 +34,8 @@ class QuestionnaireResponseAggregator
   }
 
   @override
-  QuestionnaireResponse? aggregate({bool notifyListeners = false}) {
+  QuestionnaireResponse? aggregate(Locale? locale,
+      {bool notifyListeners = false}) {
     developer.log('QuestionnaireResponse.aggregrate', level: 500);
 
     final responseItems = <QuestionnaireResponseItem>[];
@@ -59,7 +56,7 @@ class QuestionnaireResponseAggregator
         status: topLocation.responseStatus,
         item: responseItems,
         authored: FhirDateTime(DateTime.now()),
-        text: narrativeAggregator.aggregate());
+        text: narrativeAggregator.aggregate(locale));
 
     if (notifyListeners) {
       value = questionnaireResponse;

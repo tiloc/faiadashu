@@ -1,4 +1,5 @@
 import 'dart:developer' as developer;
+import 'dart:ui';
 
 import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
@@ -28,7 +29,7 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
       if (totalScoreLocation != null) {
         for (final location in topLocation.preOrder()) {
           if (!location.isStatic && location != totalScoreLocation) {
-            location.addListener(() => aggregate(notifyListeners: true));
+            location.addListener(() => aggregate(null, notifyListeners: true));
           }
         }
       }
@@ -36,7 +37,7 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
   }
 
   @override
-  Decimal? aggregate({bool notifyListeners = false}) {
+  Decimal? aggregate(Locale? locale, {bool notifyListeners = false}) {
     if (totalScoreLocation == null) {
       return null;
     }

@@ -24,6 +24,8 @@ class _NarrativeDrawerState extends State<NarrativeDrawer> {
 
   @override
   Widget build(BuildContext context) {
+    final locale = Localizations.localeOf(context);
+
     return Card(
       margin: const EdgeInsets.all(8.0),
       color: Colors.white,
@@ -49,12 +51,13 @@ class _NarrativeDrawerState extends State<NarrativeDrawer> {
                       ? HTML.toRichText(
                           context,
                           QuestionnaireFiller.of(context)
-                              .aggregator<NarrativeAggregator>()
-                              .value
-                              .div)
+                                  .aggregator<NarrativeAggregator>()
+                                  .aggregate(locale)
+                                  ?.div ??
+                              NarrativeAggregator.emptyNarrative.div)
                       : Text(jsonEncode(QuestionnaireFiller.of(context)
                           .aggregator<QuestionnaireResponseAggregator>()
-                          .aggregate()
+                          .aggregate(locale)
                           ?.toJson())),
                   value: _drawerMode,
                   onChanged: (newState) {

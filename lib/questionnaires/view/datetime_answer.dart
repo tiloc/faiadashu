@@ -55,6 +55,7 @@ class _DateTimeAnswerState
             QuestionnaireItemType.datetime: DateTimePickerType.dateTime,
             QuestionnaireItemType.time: DateTimePickerType.time,
           }[widget.location.questionnaireItem.type]),
+          locale: Localizations.localeOf(context),
           firstDate: DateTime(1860),
           lastDate: DateTime(2050),
           initialValue: value?.toString(),
