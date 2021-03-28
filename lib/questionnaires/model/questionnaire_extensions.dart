@@ -1,11 +1,13 @@
+import 'dart:ui';
+
 import 'package:fhir/r4.dart';
 
 import '../../fhir_types/fhir_types_extensions.dart';
 
-extension SafeQuestionnaireAnswerOptionExtensions on QuestionnaireAnswerOption {
-  /// A safeguarded way to get a display value
-  String get safeDisplay {
-    return valueString ?? valueCoding?.safeDisplay ?? toString();
+extension WoFQuestionnaireAnswerOptionExtensions on QuestionnaireAnswerOption {
+  /// Localized access to  display value
+  String localizedDisplay(Locale locale) {
+    return valueString ?? valueCoding?.localizedDisplay(locale) ?? toString();
   }
 
   /// The coded value for the option, taken from either valueString or valueCoding
@@ -14,7 +16,7 @@ extension SafeQuestionnaireAnswerOptionExtensions on QuestionnaireAnswerOption {
   }
 }
 
-extension SafeQuestionnaireItemExtension on QuestionnaireItem {
+extension WoFQuestionnaireItemExtension on QuestionnaireItem {
   bool isItemControl(String itemControl) {
     return extension_
             ?.extensionOrNull(

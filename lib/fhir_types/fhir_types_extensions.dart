@@ -32,23 +32,42 @@ extension WoFDateTimeExtension on FhirDateTime {
 }
 
 extension WoFCodingExtension on Coding {
-  /// A safeguarded way to get a display value
-  String get safeDisplay {
+  /// Localized access to display value
+  String localizedDisplay(Locale locale) {
+    // TODO: Carve this out to be used in other places (titles).
+    final translationExtension = displayElement?.extension_?.firstWhereOrNull(
+        (transExt) =>
+            transExt.url ==
+                FhirUri(
+                    'http://hl7.org/fhir/StructureDefinition/translation') &&
+            transExt.extension_?.firstWhereOrNull((ext) =>
+                    (ext.url == FhirUri('lang')) &&
+                    (ext.valueCode?.value == locale.languageCode)) !=
+                null);
+
+    if (translationExtension != null) {
+      final contentString = translationExtension.extension_
+          ?.extensionOrNull('content')
+          ?.valueString;
+
+      return ArgumentError.checkNotNull(contentString);
+    }
+
     return display ?? code?.value ?? toString();
   }
 }
 
 extension WoFListCodingExtension on List<Coding> {
-  /// A safeguarded way to get a display value or empty string
-  String get safeDisplay {
+  /// Localized access to display value or empty string
+  String localizedDisplay(Locale locale) {
     if (isEmpty) return '';
-    return first.safeDisplay;
+    return first.localizedDisplay(locale);
   }
 }
 
 extension WoFCodeableConceptExtension on CodeableConcept {
-  /// A safeguarded way to get a display value
-  String get safeDisplay {
+  /// Localized access to display value
+  String localizedDisplay(Locale locale) {
     return coding?.firstOrNull?.display ??
         text ??
         coding?.firstOrNull?.code?.value ??

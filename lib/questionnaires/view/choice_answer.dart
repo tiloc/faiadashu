@@ -71,7 +71,8 @@ class _ChoiceAnswerState
 
   @override
   Widget buildReadOnly(BuildContext context) {
-    return Text(value?.safeDisplay ?? '-');
+    return Text(
+        value?.localizedDisplay(Localizations.localeOf(context)) ?? '-');
   }
 
   @override
@@ -305,7 +306,8 @@ class _ChoiceAnswerState
           ?.valueString;
       final optionPrefixDisplay =
           (optionPrefix != null) ? '$optionPrefix ' : '';
-      final optionTitle = '$optionPrefixDisplay${choice.safeDisplay}';
+      final optionTitle =
+          '$optionPrefixDisplay${choice.localizedDisplay(Localizations.localeOf(context))}';
       final styledOptionTitle = Xhtml.toWidget(context, widget.location.top,
           optionTitle, choice.valueStringElement?.extension_,
           width: 100, height: 100);

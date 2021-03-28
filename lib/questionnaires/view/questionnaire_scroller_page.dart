@@ -76,6 +76,8 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
       final questionnaire =
           QuestionnaireFiller.of(context).topLocation.questionnaire;
 
+      print(MediaQuery.of(context).size.width);
+
       return Scaffold(
           appBar: AppBar(
             leading: Builder(
@@ -89,7 +91,14 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
               },
             ),
             title: Row(children: [
-              Text(questionnaire.title ?? 'Survey'),
+              SizedBox(
+                width: MediaQuery.of(context).size.width - 200,
+                child: Text(
+                  questionnaire.title ?? 'Survey',
+                  maxLines: 2,
+                  softWrap: true,
+                ),
+              ),
               const Spacer(),
               IconButton(
                 icon: const Icon(Icons.help_outline),

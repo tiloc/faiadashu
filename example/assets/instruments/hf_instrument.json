@@ -16,13 +16,13 @@
       "type": "group",
       "code": [
         {
-          "code": "86923-0",
+          "code": "hfcode-923-0",
           "display": "Heartfailure Questionnaire - 8 items",
-          "system": "http://loinc.org"
+          "system": "http://oink.org"
         }
       ],
       "required": false,
-      "linkId": "/86923-0",
+      "linkId": "/hfcode-923-0",
       "text": "Please indicate how much you are limited by heart failure (shortness of breath or fatigue) in your ability to do the following activities over the past 2 weeks.",
       "_text": {
         "extension": [
@@ -37,9 +37,9 @@
           "type": "choice",
           "code": [
             {
-              "code": "86483-V",
+              "code": "hfcode-IV83-V",
               "display": "Showering or bathing",
-              "system": "http://loinc.org"
+              "system": "http://oink.org"
             }
           ],
           "extension": [
@@ -58,7 +58,7 @@
             }
           ],
           "required": false,
-          "linkId": "/86483-V",
+          "linkId": "/hfcode-IV83-V",
           "text": "Showering or bathing",
           "_text": {
             "extension": [
@@ -81,8 +81,25 @@
                 }
               ],
               "valueCoding": {
-                "code": "CODE-II-7701-4",
-                "display": "Extremely limited"
+                "code": "CODE-II-7701-IV",
+                "display": "Extremely limited",
+                "_display" : {
+                  "extension" : [
+                    {
+                      "extension" : [
+                        {
+                          "url" : "lang",
+                          "valueCode" : "de"
+                        },
+                        {
+                          "url" : "content",
+                          "valueString" : "Äußerst eingeschränkt"
+                        }
+                      ],
+                      "url" : "http://hl7.org/fhir/StructureDefinition/translation"
+                    }
+                  ]
+                }
               }
             },
             {
@@ -171,9 +188,9 @@
           "type": "choice",
           "code": [
             {
-              "code": "86474-4",
+              "code": "hfcode-IV74-IV",
               "display": "Walking 1 block on level ground",
-              "system": "http://loinc.org"
+              "system": "http://oink.org"
             }
           ],
           "extension": [
@@ -192,7 +209,7 @@
             }
           ],
           "required": false,
-          "linkId": "/86474-4",
+          "linkId": "/hfcode-IV74-IV",
           "text": "Walking 1 block on level ground",
           "answerOption": [
             {
@@ -207,7 +224,7 @@
                 }
               ],
               "valueCoding": {
-                "code": "CODE-II-7701-4",
+                "code": "CODE-II-7701-IV",
                 "display": "Extremely limited"
               }
             },
@@ -297,9 +314,9 @@
           "type": "choice",
           "code": [
             {
-              "code": "86477-7",
+              "code": "hfcode-IV77-7",
               "display": "Hurrying or jogging (as if to catch a bus)",
-              "system": "http://loinc.org"
+              "system": "http://oink.org"
             }
           ],
           "extension": [
@@ -318,7 +335,7 @@
             }
           ],
           "required": false,
-          "linkId": "/86477-7",
+          "linkId": "/hfcode-IV77-7",
           "text": "Hurrying or jogging (as if to catch a bus)",
           "answerOption": [
             {
@@ -333,7 +350,7 @@
                 }
               ],
               "valueCoding": {
-                "code": "CODE-II-7701-4",
+                "code": "CODE-II-7701-IV",
                 "display": "Extremely limited"
               }
             },
@@ -423,9 +440,9 @@
           "type": "choice",
           "code": [
             {
-              "code": "86479-3",
+              "code": "hfcode-IV79-3",
               "display": "Over the past 2 weeks, how many times did you have swelling in your feet, ankles or legs when you woke up in the morning?",
-              "system": "http://loinc.org"
+              "system": "http://oink.org"
             }
           ],
           "extension": [
@@ -444,7 +461,7 @@
             }
           ],
           "required": false,
-          "linkId": "/86479-3",
+          "linkId": "/hfcode-IV79-3",
           "text": "Over the past 2 weeks, how many times did you have swelling in your feet, ankles or legs when you woke up in the morning?",
           "answerOption": [
             {
@@ -475,7 +492,7 @@
                 }
               ],
               "valueCoding": {
-                "code": "CODE-II-7720-4",
+                "code": "CODE-II-7720-IV",
                 "display": "3 or more times a week, but not every day"
               }
             },
@@ -533,9 +550,9 @@
           "type": "choice",
           "code": [
             {
-              "code": "86481-9",
+              "code": "hfcode-IV81-9",
               "display": "Over the past 2 weeks, on average, how many times has fatigue limited your ability to do what you want?",
-              "system": "http://loinc.org"
+              "system": "http://oink.org"
             }
           ],
           "extension": [
@@ -554,7 +571,7 @@
             }
           ],
           "required": false,
-          "linkId": "/86481-9",
+          "linkId": "/hfcode-IV81-9",
           "text": "Over the past 2 weeks, on average, how many times has fatigue limited your ability to do what you want?",
           "answerOption": [
             {
@@ -569,7 +586,7 @@
                 }
               ],
               "valueCoding": {
-                "code": "CODE-6154-4",
+                "code": "CODE-6154-IV",
                 "display": "All of the time"
               }
             },
@@ -675,9 +692,9 @@
           "type": "choice",
           "code": [
             {
-              "code": "86472-8",
+              "code": "hfcode-IV72-8",
               "display": "Over the past 2 weeks, on average, how many times has shortness of breath limited your ability to do what you wanted?",
-              "system": "http://loinc.org"
+              "system": "http://oink.org"
             }
           ],
           "extension": [
@@ -696,7 +713,7 @@
             }
           ],
           "required": false,
-          "linkId": "/86472-8",
+          "linkId": "/hfcode-IV72-8",
           "text": "Over the past 2 weeks, on average, how many times has shortness of breath limited your ability to do what you wanted?",
           "answerOption": [
             {
@@ -711,7 +728,7 @@
                 }
               ],
               "valueCoding": {
-                "code": "CODE-6154-4",
+                "code": "CODE-6154-IV",
                 "display": "All of the time"
               }
             },
@@ -817,9 +834,9 @@
           "type": "choice",
           "code": [
             {
-              "code": "86485-0",
+              "code": "hfcode-IV85-0",
               "display": "Over the past 2 weeks, on average, how many times have you been forced to sleep sitting up in a chair or with at least 3 pillows to prop you up because of shortness of breath?",
-              "system": "http://loinc.org"
+              "system": "http://oink.org"
             }
           ],
           "extension": [
@@ -838,7 +855,7 @@
             }
           ],
           "required": false,
-          "linkId": "/86485-0",
+          "linkId": "/hfcode-IV85-0",
           "text": "Over the past 2 weeks, on average, how many times have you been forced to sleep sitting up in a chair or with at least 3 pillows to prop you up because of shortness of breath?",
           "answerOption": [
             {
@@ -869,7 +886,7 @@
                 }
               ],
               "valueCoding": {
-                "code": "CODE-II-7720-4",
+                "code": "CODE-II-7720-IV",
                 "display": "3 or more times a week, but not every day"
               }
             },
@@ -927,9 +944,9 @@
           "type": "choice",
           "code": [
             {
-              "code": "86488-4",
+              "code": "hfcode-IV88-IV",
               "display": "Over the past 2 weeks, how much has your heart failure limited your enjoyment of life?",
-              "system": "http://loinc.org"
+              "system": "http://oink.org"
             }
           ],
           "extension": [
@@ -948,7 +965,7 @@
             }
           ],
           "required": false,
-          "linkId": "/86488-4",
+          "linkId": "/hfcode-IV88-IV",
           "text": "Over the past 2 weeks, how much has your heart failure limited your enjoyment of life?",
           "answerOption": [
             {
@@ -1037,9 +1054,9 @@
           "type": "decimal",
           "code": [
             {
-              "code": "86924-8",
+              "code": "hfcode-924-8",
               "display": "Overall summary score",
-              "system": "http://loinc.org"
+              "system": "http://oink.org"
             }
           ],
           "extension": [
@@ -1102,13 +1119,13 @@
             }
           ],
           "required": false,
-          "linkId": "/86924-8",
+          "linkId": "/hfcode-924-8",
           "text": "Overall summary score",
           "item": [
             {
               "text": "Overall summary score is the sum of responses from all 8 items, with lower scores indicating more significant disease impact. Changes in the summary score are predictive of changes in health status for patients with heart failure.",
               "type": "display",
-              "linkId": "/86924-8-help",
+              "linkId": "/hfcode-924-8-help",
               "extension": [
                 {
                   "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
@@ -1130,7 +1147,7 @@
         {
           "text": "The Heartfailure Questionnaire is a short questionnaire",
           "type": "display",
-          "linkId": "/86923-0-help",
+          "linkId": "/hfcode-923-0-help",
           "extension": [
             {
               "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",

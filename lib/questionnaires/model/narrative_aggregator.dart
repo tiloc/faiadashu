@@ -69,7 +69,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
         } else if (answer.valueInteger != null) {
           div.write('<p>${answer.valueInteger!.value}</p>');
         } else if (answer.valueCoding != null) {
-          div.write('<p>${answer.valueCoding!.safeDisplay}</p>');
+          div.write('<p>${answer.valueCoding!.localizedDisplay(locale)}</p>');
         } else if (answer.valueDateTime != null) {
           div.write('<p>${answer.valueDateTime!.format(locale)}</p>');
         } else if (answer.valueDate != null) {
