@@ -1,8 +1,8 @@
 import 'package:fhir/r4/resource_types/clinical/diagnostics/diagnostics.dart';
 import 'package:flutter/material.dart';
 
-import '../questionnaires.dart';
-import 'questionnaire_answer_filler.dart';
+import '../../../questionnaires.dart';
+import '../questionnaire_answer_filler.dart';
 
 class StringAnswer extends QuestionnaireAnswerFiller {
   const StringAnswer(

@@ -45,6 +45,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
 
   void _handleKeyEvent(RawKeyEvent event) {
     final offset = _listScrollController.offset;
+    // TODO: Allegedly there is a way to get at the scroll offset for paging and lines.
     const pageHeight = 200;
     if (event.logicalKey == LogicalKeyboardKey.pageUp) {
       setState(() {
@@ -75,8 +76,6 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
 
       final questionnaire =
           QuestionnaireFiller.of(context).topLocation.questionnaire;
-
-      print(MediaQuery.of(context).size.width);
 
       return Scaffold(
           appBar: AppBar(

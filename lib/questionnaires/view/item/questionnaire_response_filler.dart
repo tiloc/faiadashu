@@ -1,7 +1,8 @@
 import 'package:fhir/r4/r4.dart';
 import 'package:flutter/material.dart';
 
-import '../questionnaires.dart';
+import '../../questionnaires.dart';
+import 'questionnaire_answer_filler_factory.dart';
 
 /// A Widget to fill a [QuestionnaireResponseItem].
 class QuestionnaireResponseFiller extends StatefulWidget {

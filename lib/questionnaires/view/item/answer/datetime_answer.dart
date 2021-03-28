@@ -4,9 +4,9 @@ import 'package:fhir/r4/resource_types/clinical/diagnostics/diagnostics.dart';
 import 'package:flutter/material.dart';
 import 'package:widgets_on_fhir/fhir_types/date_time_widget.dart';
 
-import '../../fhir_types/fhir_types_extensions.dart';
-import '../questionnaires.dart';
-import 'questionnaire_answer_filler.dart';
+import '../../../../fhir_types/fhir_types_extensions.dart';
+import '../../../questionnaires.dart';
+import '../questionnaire_answer_filler.dart';
 
 class DateTimeAnswer extends QuestionnaireAnswerFiller {
   const DateTimeAnswer(

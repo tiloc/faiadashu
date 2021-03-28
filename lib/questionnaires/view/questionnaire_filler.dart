@@ -6,8 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 import '../../logging/logging.dart';
-import '../model/aggregator.dart';
-import '../model/questionnaire_location.dart';
 import '../questionnaires.dart';
 
 class QuestionnaireFiller extends StatefulWidget {

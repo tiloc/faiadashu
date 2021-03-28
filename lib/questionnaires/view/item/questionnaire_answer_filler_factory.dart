@@ -1,7 +1,9 @@
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
-import '../questionnaires.dart';
+import '../../model/questionnaire_location.dart';
+import 'answer/answer.dart';
+import 'item.dart';
 
 class QuestionnaireAnswerFillerFactory {
   static QuestionnaireAnswerFiller fromQuestionnaireItem(

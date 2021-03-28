@@ -4,9 +4,9 @@ import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_html_css/simple_html_css.dart';
 
-import '../../fhir_types/fhir_types_extensions.dart';
-import '../../logging/logging.dart';
-import '../questionnaires.dart';
+import '../../../fhir_types/fhir_types_extensions.dart';
+import '../../../logging/logging.dart';
+import '../../questionnaires.dart';
 
 class QuestionnaireItemFiller extends StatefulWidget {
   final Widget? _titleWidget;
