@@ -98,10 +98,18 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     final leading = QuestionnaireItemFillerTitleLeading.forLocation(location);
 
-    final styleTag =
+    final requiredTag =
+        (location.questionnaireItem.required_?.value == true) ? '*' : '';
+
+    final openStyleTag =
         (location.questionnaireItem.type == QuestionnaireItemType.group)
-            ? 'h2'
-            : 'b';
+            ? '<h2>'
+            : '<b>';
+
+    final closeStyleTag =
+        (location.questionnaireItem.type == QuestionnaireItemType.group)
+            ? '</h2>'
+            : '$requiredTag</b>';
 
     final titleText = location.titleText;
     return Container(
@@ -110,7 +118,7 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
           TextSpan(children: <InlineSpan>[
             if (leading != null) WidgetSpan(child: leading),
             if (titleText != null)
-              HTML.toTextSpan(context, '<$styleTag>$titleText</$styleTag>'),
+              HTML.toTextSpan(context, '$openStyleTag$titleText$closeStyleTag'),
           ]),
           semanticsLabel: titleText,
         ));

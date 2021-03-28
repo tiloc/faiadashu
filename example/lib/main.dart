@@ -111,6 +111,19 @@ class _HomePageState extends State<HomePage> {
             },
           ),
           ListTile(
+            title: const Text('Argonaut Questionnaire Sampler'),
+            subtitle: const Text(
+                'Reference sample from the Argonaut Questionnaire Implementation Guide.'),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          const QuestionnaireScrollerPage.fromAsset(
+                              'assets/instruments/argonaut_sampler.json')));
+            },
+          ),
+          ListTile(
             title: const Text('PHQ9 Questionnaire Scroller'),
             subtitle:
                 const Text('Simple choice-based survey with a total score.'),

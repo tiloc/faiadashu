@@ -1,3 +1,4 @@
+import 'package:fhir/r4.dart';
 import 'package:fhir/r4/resource_types/clinical/diagnostics/diagnostics.dart';
 import 'package:flutter/material.dart';
 
@@ -33,6 +34,10 @@ class _StringAnswerState
     return Container(
         padding: const EdgeInsets.only(top: 8, bottom: 8),
         child: TextFormField(
+          maxLines: (widget.location.questionnaireItem.type ==
+                  QuestionnaireItemType.text)
+              ? 4
+              : 1,
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
           ),

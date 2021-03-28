@@ -170,7 +170,7 @@
     },
     {
       "linkId": "2.3.b",
-      "text": "Email*",
+      "text": "Email",
       "type": "string",
       "required": true
     },
