@@ -105,7 +105,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
           } else {
             developer.log('FutureBuilder still waiting for data...',
                 level: LogLevel.debug, name: logTag);
-            return const CircularProgressIndicator();
+            return const QuestionnaireLoadingIndicator();
           }
         });
   }
