@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:simple_html_css/simple_html_css.dart';
-import 'package:widgets_on_fhir/fhir_types/fhir_types.dart';
 
+import '../../fhir_types/fhir_types.dart';
 import '../model/narrative_aggregator.dart';
 import '../model/questionnaire_response_aggregator.dart';
 import 'questionnaire_filler.dart';

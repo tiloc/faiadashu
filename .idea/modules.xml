@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/fire_widgets.iml" filepath="$PROJECT_DIR$/fire_widgets.iml" />
+      <module fileurl="file://$PROJECT_DIR$/fire_dash.iml" filepath="$PROJECT_DIR$/fire_dash.iml" />
       <module fileurl="file://$PROJECT_DIR$/android/fire_widgets_android.iml" filepath="$PROJECT_DIR$/android/fire_widgets_android.iml" />
     </modules>
   </component>

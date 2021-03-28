@@ -3,10 +3,10 @@ import 'dart:ui';
 
 import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
-import 'package:widgets_on_fhir/logging/logging.dart';
-import 'package:widgets_on_fhir/questionnaires/model/aggregator.dart';
 
 import '../../fhir_types/fhir_types_extensions.dart';
+import '../../logging/logging.dart';
+import '../../questionnaires/model/aggregator.dart';
 import 'questionnaire_location.dart';
 
 /// Aggregate responses into a total score.

@@ -1,7 +1,8 @@
 import 'package:fhir/r4.dart' show Questionnaire;
 import 'package:flutter/material.dart';
 import 'package:simple_html_css/simple_html_css.dart';
-import 'package:widgets_on_fhir/questionnaires/view/xhtml.dart';
+
+import 'xhtml.dart';
 
 class QuestionnaireCoverPage extends StatelessWidget {
   final Questionnaire questionnaire;

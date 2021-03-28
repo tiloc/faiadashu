@@ -1,6 +1,6 @@
+import 'package:fire_dash/questionnaires/questionnaires.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:widgets_on_fhir/questionnaires/questionnaires.dart';
 
 import 'disclaimer_page.dart';
 import 'observation_page.dart';
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Widgets on FHIR® Example',
+      title: 'Fire Dash [(ファイアダッシュ)] Gallery',
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -51,7 +51,7 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Widgets on FHIR® Gallery'),
+        title: const Text('Fire Dash Gallery'),
       ),
       body: ListView(
         children: [

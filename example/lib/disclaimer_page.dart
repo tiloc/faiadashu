@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:widgets_on_fhir_example/exhibit_page.dart';
+
+import 'exhibit_page.dart';
 
 class DisclaimerPage extends ExhibitPage {
   const DisclaimerPage({Key? key}) : super(key: key);
@@ -20,5 +21,5 @@ class DisclaimerPage extends ExhibitPage {
   }
 
   @override
-  String get title => 'Widgets on FHIR® Disclaimers';
+  String get title => 'Fire Dash Disclaimers';
 }

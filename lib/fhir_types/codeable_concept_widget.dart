@@ -7,7 +7,7 @@ class CodeableConceptWidget extends StatelessWidget {
   final CodeableConcept codeableConcept;
   final TextStyle? style;
 
-  CodeableConceptWidget(this.codeableConcept, {this.style, Key? key})
+  const CodeableConceptWidget(this.codeableConcept, {this.style, Key? key})
       : super(key: key);
 
   @override

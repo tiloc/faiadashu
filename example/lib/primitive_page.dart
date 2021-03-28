@@ -1,6 +1,6 @@
 import 'package:fhir/primitive_types/fhir_date_time.dart';
+import 'package:fire_dash/fhir_types/fhir_types.dart';
 import 'package:flutter/material.dart';
-import 'package:widgets_on_fhir/fhir_types/fhir_types.dart';
 
 import 'exhibit_page.dart';
 

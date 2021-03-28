@@ -1,4 +1,4 @@
-name: widgets_on_fhir_example
+name: fire_dash_example
 
 environment:
   sdk: '>=2.12.0 <3.0.0'
@@ -6,17 +6,14 @@ environment:
 
 dependencies:
   fhir: ^0.4.0
-#    git:
-#      url: https://github.com/MayJuun/fhir.git
-#      path: fhir
-#      ref: dev
+
+  fire_dash:
+    path: ..
 
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  widgets_on_fhir:
-    path: ..
 
 dev_dependencies:
   lint: ^1.0.0

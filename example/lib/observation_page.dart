@@ -4,9 +4,10 @@ import 'package:fhir/primitive_types/fhir_date_time.dart';
 import 'package:fhir/primitive_types/fhir_uri.dart';
 import 'package:fhir/r4/general_types/general_types.dart';
 import 'package:fhir/r4/resource_types/clinical/diagnostics/diagnostics.dart';
+import 'package:fire_dash/observations/observation_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:widgets_on_fhir/observations/observation_widget.dart';
-import 'package:widgets_on_fhir_example/exhibit_page.dart';
+
+import 'exhibit_page.dart';
 
 class ObservationPage extends ExhibitPage {
   ObservationPage({Key? key}) : super(key: key);

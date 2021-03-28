@@ -1,6 +1,6 @@
-# example
+# Fire Dash Example
 
-An example app to show off the Widgets on FHIR® collection.
+An example app to show off the Fire Dash widgets.
 
 Use the menu to explore the widgets.
 
