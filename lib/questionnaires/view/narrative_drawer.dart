@@ -1,7 +1,6 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:simple_html_css/simple_html_css.dart';
+import 'package:widgets_on_fhir/fhir_types/fhir_types.dart';
 
 import '../model/narrative_aggregator.dart';
 import '../model/questionnaire_response_aggregator.dart';
@@ -55,10 +54,16 @@ class _NarrativeDrawerState extends State<NarrativeDrawer> {
                                   .aggregate(locale)
                                   ?.div ??
                               NarrativeAggregator.emptyNarrative.div)
-                      : Text(jsonEncode(QuestionnaireFiller.of(context)
+                      : ResourceJsonTree(
+                          QuestionnaireFiller.of(context)
+                              .aggregator<QuestionnaireResponseAggregator>()
+                              .aggregate(locale)
+                              ?.toJson(),
+                        ),
+/*                      : Text(jsonEncode(QuestionnaireFiller.of(context)
                           .aggregator<QuestionnaireResponseAggregator>()
                           .aggregate(locale)
-                          ?.toJson())),
+                          ?.toJson())), */
                   value: _drawerMode,
                   onChanged: (newState) {
                     setState(() {
