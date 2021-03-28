@@ -476,7 +476,7 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
       this.siblingIndex,
       this.level) {
     // ignore: no_runtimetype_tostring
-    logTag = 'wof.${runtimeType.toString()}';
+    logTag = 'fdash.${runtimeType.toString()}';
     _top = top;
   }
 

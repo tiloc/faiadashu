@@ -12,7 +12,7 @@ class QuestionnaireFiller extends StatefulWidget {
   final WidgetBuilder builder;
   final Future<QuestionnaireTopLocation> Function(dynamic param) loaderFuture;
   final dynamic loaderParam;
-  static const String logTag = 'wof.QuestionnaireFiller';
+  static const String logTag = 'fdash.QuestionnaireFiller';
 
   static Future<QuestionnaireTopLocation> _loadFromAsset(
       dynamic assetPath) async {
@@ -55,7 +55,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
 
   _QuestionnaireFillerState() {
     // ignore: no_runtimetype_tostring
-    logTag = 'wof.${runtimeType.toString()}';
+    logTag = 'fdash.${runtimeType.toString()}';
   }
 
   @override
@@ -128,7 +128,7 @@ class QuestionnaireFillerData extends InheritedWidget {
             topLocation.preOrder().length, null),
         super(key: key, child: Builder(builder: builder)) {
     // ignore: no_runtimetype_tostring
-    logTag = 'wof.${runtimeType.toString()}';
+    logTag = 'fdash.${runtimeType.toString()}';
   }
 
   T aggregator<T extends Aggregator>() {

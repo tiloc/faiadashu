@@ -36,7 +36,7 @@ class _NumericalAnswerState
   void initState() {
     super.initState();
     // ignore: no_runtimetype_tostring
-    logTag = 'wof.${runtimeType.toString()}';
+    logTag = 'fdash.${runtimeType.toString()}';
 
     _isSlider = widget.location.questionnaireItem.isItemControl('slider');
 

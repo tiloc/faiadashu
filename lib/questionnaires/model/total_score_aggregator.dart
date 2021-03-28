@@ -19,7 +19,7 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
   TotalScoreAggregator({bool autoAggregate = true})
       : super(Decimal(0), autoAggregate: autoAggregate) {
     // ignore: no_runtimetype_tostring
-    logTag = 'wof.${runtimeType.toString()}';
+    logTag = 'fdash.${runtimeType.toString()}';
   }
 
   @override

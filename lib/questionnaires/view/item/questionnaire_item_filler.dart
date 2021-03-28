@@ -26,7 +26,7 @@ class QuestionnaireItemFiller extends StatefulWidget {
       : _titleWidget = QuestionnaireItemFillerTitle.forLocation(location),
         super(key: key) {
     // ignore: no_runtimetype_tostring
-    logTag = 'wof.${runtimeType.toString()}';
+    logTag = 'fdash.${runtimeType.toString()}';
   }
 
   @override
@@ -38,7 +38,7 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
 
   QuestionnaireItemFillerState() {
     // ignore: no_runtimetype_tostring
-    logTag = 'wof.${runtimeType.toString()}';
+    logTag = 'fdash.${runtimeType.toString()}';
   }
 
   @override
