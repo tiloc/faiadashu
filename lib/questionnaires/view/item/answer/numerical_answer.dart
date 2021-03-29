@@ -132,6 +132,12 @@ class _NumericalAnswerState
   @override
   Widget buildEditable(BuildContext context) {
     // TODO(tiloc): Do not hardcode . as separator
+    // TODO: Do not hardcode unit
+    final unit = (widget.location.questionnaireItem.type ==
+            QuestionnaireItemType.quantity)
+        ? 'kg'
+        : null;
+
     return _isSlider
         ? Slider(
             min: _minValue,
@@ -144,36 +150,48 @@ class _NumericalAnswerState
           )
         : Container(
             padding: const EdgeInsets.only(top: 8, bottom: 8),
-            child: TextFormField(
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-              ),
-              inputFormatters: [_numberInputFormatter],
-              keyboardType: TextInputType.number,
-              validator: (inputValue) {
-                if (inputValue == null || inputValue.isEmpty) {
-                  return null;
-                }
-                final number = double.tryParse(inputValue);
-                if (number == null) {
-                  return '$inputValue is not a valid number.';
-                }
-                if (number > _maxValue) {
-                  return 'Enter a number up to $_maxValue.';
-                }
-                if (number < _minValue) {
-                  return 'Enter a number $_minValue, or higher.';
-                }
-              },
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              onChanged: (content) {
-                if (content.trim().isEmpty) {
-                  value = null;
-                } else {
-                  value = Quantity(value: Decimal(content));
-                }
-              },
-            ));
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Expanded(
+                  child: TextFormField(
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                ),
+                inputFormatters: [_numberInputFormatter],
+                keyboardType: TextInputType.number,
+                validator: (inputValue) {
+                  if (inputValue == null || inputValue.isEmpty) {
+                    return null;
+                  }
+                  final number = double.tryParse(inputValue);
+                  if (number == null) {
+                    return '$inputValue is not a valid number.';
+                  }
+                  if (number > _maxValue) {
+                    return 'Enter a number up to $_maxValue.';
+                  }
+                  if (number < _minValue) {
+                    return 'Enter a number $_minValue, or higher.';
+                  }
+                },
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                onChanged: (content) {
+                  if (content.trim().isEmpty) {
+                    value = null;
+                  } else {
+                    value = Quantity(value: Decimal(content));
+                  }
+                },
+              )),
+              if (unit != null)
+                Container(
+                    alignment: Alignment.topRight,
+                    padding: const EdgeInsets.only(left: 8, top: 20),
+                    width: 48,
+                    child: Text(
+                      'kg',
+                      style: Theme.of(context).textTheme.subtitle1,
+                    )),
+            ]));
   }
 
   @override

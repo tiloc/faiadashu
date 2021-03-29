@@ -51,7 +51,19 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Fire Dash Gallery'),
+        title: Builder(
+          builder: (BuildContext context) => RichText(
+            text: TextSpan(
+              text: 'Fire Dash [(ファイアダッシュ)] —\n',
+              style: DefaultTextStyle.of(context).style,
+              children: const <TextSpan>[
+                TextSpan(
+                    text: 'Widgets for Digital Health',
+                    style: TextStyle(fontSize: 12)),
+              ],
+            ),
+          ),
+        ),
       ),
       body: ListView(
         children: [
