@@ -56,16 +56,16 @@ class NarrativeAggregator extends Aggregator<Narrative> {
       returnValue = true;
     }
 
-    // TODO(tiloc): Should the conversion from answer to text rather live in classes for the individual types?
+    // TODO(tiloc): Create further extensions for formatting
     if (item.answer != null) {
       for (final answer in item.answer!) {
         if (answer.valueString != null) {
           div.write('<p>${answer.valueString}</p>');
         } else if (answer.valueDecimal != null) {
           if (location.isCalculatedExpression) {
-            div.write('<h3>${answer.valueDecimal.toString()}</h3>');
+            div.write('<h3>${answer.valueDecimal!.format(locale)}</h3>');
           } else {
-            div.write('<p>${answer.valueDecimal.toString()}</p>');
+            div.write('<p>${answer.valueDecimal!.format(locale)}</p>');
           }
         } else if (answer.valueQuantity != null) {
           div.write('<p>${answer.valueQuantity!.format(locale)}</p>');
