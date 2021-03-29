@@ -10,6 +10,8 @@
 * Formatted and localized output of clinical observations
 * Localized output of clinical codings
 * Development tree view for clinical and administrative data structures
+  
+![Screenshot](./doc/png/observations.png)
 
 #### The Major Thing: Filler widget for Questionnaires
 

@@ -23,10 +23,11 @@ class MyApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
       ],
       supportedLocales: [
-        Locale('en', ''),
-        Locale('de', ''),
-        Locale('es', ''),
-        Locale('ar', ''),
+        Locale('en'),
+        Locale('de'),
+//        Locale('jp'),  // TODO: Support for Japanese is semi-broken in Flutter
+        Locale('es'),
+        Locale('ar'),
       ],
       home: HomePage(),
     );

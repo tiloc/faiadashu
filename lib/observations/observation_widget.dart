@@ -1,5 +1,8 @@
+import 'dart:collection';
+
 import 'package:fhir/r4/r4.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../fhir_types/fhir_types.dart';
 
@@ -71,6 +74,9 @@ class ObservationValueWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final Widget valueWidget;
 
+    final decimalFormat =
+        NumberFormat.decimalPattern(Localizations.localeOf(context).toString());
+
     if (_observation.valueQuantity != null) {
       final valueString = _observation.valueQuantity!.value.toString();
       final unitString = _observation.valueQuantity?.unit ??
@@ -83,18 +89,30 @@ class ObservationValueWidget extends StatelessWidget {
     } else if (_observation.component != null &&
         _observation.component!.isNotEmpty) {
       final componentText = StringBuffer();
-      for (final component in _observation.component!) {
-        final valueString =
-            component.valueQuantity?.value?.toString() ?? unknownValueText;
-        final unitString = component.valueQuantity?.unit ??
-            component.valueQuantity?.code ??
-            unknownUnitText;
-        if (componentText.isEmpty) {
-          componentText.write('$valueString $unitString');
-        } else {
-          componentText.write('$componentSeparator$valueString $unitString');
+      String? currentUnit;
+      final componentIterator =
+          HasNextIterator(_observation.component!.iterator);
+      do {
+        final ObservationComponent component = componentIterator.next();
+        final unitString =
+            ' ${component.valueQuantity?.unit ?? component.valueQuantity?.code ?? unknownUnitText}';
+        // Avoid duplicate output of same unit:
+        // emit unit only when it is different from unit of previous component
+        if (currentUnit != null && unitString != currentUnit) {
+          componentText.write(currentUnit);
         }
-      }
+        currentUnit = unitString;
+
+        final valueString = (component.valueQuantity?.value != null)
+            ? decimalFormat.format(component.valueQuantity?.value!.value)
+            : unknownValueText;
+        if (componentText.isEmpty) {
+          componentText.write(valueString);
+        } else {
+          componentText.write('$componentSeparator$valueString');
+        }
+      } while (componentIterator.hasNext);
+      componentText.write(currentUnit);
       valueWidget = Text(
         componentText.toString(),
         style: valueStyle,
