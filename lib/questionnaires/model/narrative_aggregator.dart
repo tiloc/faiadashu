@@ -122,7 +122,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
     // Manually invoke the update, because the order matters and enableWhen calcs need to come after answer value updates.
     topLocation.updateEnableWhen(
         notifyListeners:
-            false); // TODO: setting this to true would result in endless refresh and stack overflow
+            false); // Setting this to true might result in endless refresh and stack overflow
     _narrative = _generateNarrative(topLocation, locale!);
     _revision = topLocation.revision;
     if (notifyListeners) {
