@@ -52,11 +52,11 @@ class _NumericalAnswerState
         (_isSlider ? 100.0 : double.maxFinite);
 
     if (_isSlider) {
-      final sliderStepValue = widget.location.questionnaireItem.extension_
-          ?.extensionOrNull(
-              'http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue')
-          ?.valueInteger
-          ?.value;
+      final sliderStepValueExtension =
+          widget.location.questionnaireItem.extension_?.extensionOrNull(
+              'http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue');
+      final sliderStepValue = sliderStepValueExtension?.valueDecimal?.value ??
+          sliderStepValueExtension?.valueInteger?.value?.toDouble();
       _divisions = (sliderStepValue != null)
           ? ((_maxValue - _minValue) / sliderStepValue).round()
           : null;
@@ -129,14 +129,57 @@ class _NumericalAnswerState
     return Text(value.toString());
   }
 
+  Widget _buildDropDownFromUnits(BuildContext context, List<Coding> units) {
+    if (units.length == 1) {
+      return Container(
+          alignment: Alignment.topLeft,
+          padding: const EdgeInsets.only(left: 8, top: 16),
+          width: 96,
+          child: Text(
+            units.first.localizedDisplay(Localizations.localeOf(context)),
+            style: Theme.of(context).textTheme.subtitle1,
+          ));
+    }
+
+    return Container(
+        padding: const EdgeInsets.only(left: 8),
+        width: 96,
+        child: DropdownButton<String>(
+          value: value?.unit,
+          onChanged: (String? newValue) {
+            value = (value != null)
+                ? value!.copyWith(unit: newValue)
+                : Quantity(unit: newValue);
+          },
+          items: units.map<DropdownMenuItem<String>>((Coding value) {
+            return DropdownMenuItem<String>(
+              value: value.code!.value,
+              child:
+                  Text(value.localizedDisplay(Localizations.localeOf(context))),
+            );
+          }).toList(),
+        ));
+  }
+
   @override
   Widget buildEditable(BuildContext context) {
-    // TODO(tiloc): Do not hardcode . as separator
-    // TODO: Do not hardcode unit
-    final unit = (widget.location.questionnaireItem.type ==
+    // TODO: WIP - support for units - Build Codings from ValueSet
+    final unit = widget.location.questionnaireItem.unit;
+    final units = (widget.location.questionnaireItem.type ==
             QuestionnaireItemType.quantity)
-        ? 'kg'
-        : null;
+        ? <Coding>[
+            Coding(
+                system: FhirUri('http://unitsofmeasure.org'), code: Code('kg')),
+            Coding(
+                system: FhirUri('http://unitsofmeasure.org'),
+                code: Code('[lb_av]'),
+                display: 'lb'),
+            Coding(
+                system: FhirUri('http://unitsofmeasure.org'), code: Code('g'))
+          ]
+        : (unit != null)
+            ? [Coding(code: Code(unit))]
+            : null;
 
     return _isSlider
         ? Slider(
@@ -162,6 +205,7 @@ class _NumericalAnswerState
                   if (inputValue == null || inputValue.isEmpty) {
                     return null;
                   }
+                  // TODO: Internationalize
                   final number = double.tryParse(inputValue);
                   if (number == null) {
                     return '$inputValue is not a valid number.';
@@ -182,15 +226,8 @@ class _NumericalAnswerState
                   }
                 },
               )),
-              if (unit != null)
-                Container(
-                    alignment: Alignment.topRight,
-                    padding: const EdgeInsets.only(left: 8, top: 20),
-                    width: 48,
-                    child: Text(
-                      'kg',
-                      style: Theme.of(context).textTheme.subtitle1,
-                    )),
+              if (units != null && units.isNotEmpty)
+                _buildDropDownFromUnits(context, units)
             ]));
   }
 

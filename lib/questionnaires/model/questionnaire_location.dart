@@ -352,12 +352,8 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
         return true;
       }
 
-      if (questionnaireItem.extension_
-              ?.extensionOrNull(
-                  'http://hl7.org/fhir/StructureDefinition/questionnaire-unit')
-              ?.valueCoding
-              ?.display ==
-          '{score}') {
+      if (questionnaireItem.readOnly == Boolean(true) &&
+          questionnaireItem.unit == '{score}') {
         return true;
       }
     }

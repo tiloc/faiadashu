@@ -4,7 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
 import 'package:intl/intl.dart';
 
-extension WoFDateTimeExtension on FhirDateTime {
+extension FDashDateTimeExtension on FhirDateTime {
   String format(Locale locale, {String defaultText = ''}) {
     final languageCode = locale.languageCode;
     if (precision != DateTimePrecision.INVALID) {
@@ -31,7 +31,7 @@ extension WoFDateTimeExtension on FhirDateTime {
   }
 }
 
-extension WoFCodingExtension on Coding {
+extension FDashCodingExtension on Coding {
   /// Localized access to display value
   String localizedDisplay(Locale locale) {
     // TODO: Carve this out to be used in other places (titles).
@@ -57,7 +57,7 @@ extension WoFCodingExtension on Coding {
   }
 }
 
-extension WoFListCodingExtension on List<Coding> {
+extension FDashListCodingExtension on List<Coding> {
   /// Localized access to display value or empty string
   String localizedDisplay(Locale locale) {
     if (isEmpty) return '';
@@ -65,7 +65,7 @@ extension WoFListCodingExtension on List<Coding> {
   }
 }
 
-extension WoFCodeableConceptExtension on CodeableConcept {
+extension FDashCodeableConceptExtension on CodeableConcept {
   /// Localized access to display value
   String localizedDisplay(Locale locale) {
     return coding?.firstOrNull?.display ??
@@ -82,7 +82,7 @@ extension WoFCodeableConceptExtension on CodeableConcept {
   }
 }
 
-extension WoFListFhirExtensionExtension on List<FhirExtension> {
+extension FDashListFhirExtensionExtension on List<FhirExtension> {
   /// The extension with the given URI, or null
   FhirExtension? extensionOrNull(String uri) {
     return firstWhereOrNull((ext) {
@@ -91,7 +91,7 @@ extension WoFListFhirExtensionExtension on List<FhirExtension> {
   }
 }
 
-extension WoFListExtension<T> on List<T> {
+extension FDashListExtension<T> on List<T> {
   /// The first element of a list, or null if it is empty
   T? get firstOrNull {
     return isEmpty ? null : first;

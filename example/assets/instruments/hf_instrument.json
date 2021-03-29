@@ -1052,6 +1052,7 @@
         },
         {
           "type": "decimal",
+          "readOnly": true,
           "code": [
             {
               "code": "hfcode-924-8",

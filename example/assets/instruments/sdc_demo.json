@@ -203,11 +203,45 @@
         {
           "url": "http://hl7.org/fhir/StructureDefinition/maxDecimalPlaces",
           "valueInteger": 2
+        },
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unit",
+          "valueCoding": {
+            "code": "kg",
+            "display": "kg"
+          }
         }
       ],
       "linkId": "100000",
       "type": "decimal",
       "text": "Enter your weight in kg"
+    },
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unitValueSet",
+          "valueCanonical": "http://hl7.org/fhir/ValueSet/ucum-bodyweight"
+        },
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-minQuantity",
+          "valueQuantity": {
+            "value": 10,
+            "system": "http://unitsofmeasure.org",
+            "code": "kg"
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-maxQuantity",
+          "valueQuantity": {
+            "value": 100,
+            "system": "http://unitsofmeasure.org",
+            "code": "kg"
+          }
+        }
+      ],
+      "linkId": "2.8.b-weight-quantity",
+      "text": "Body Weight",
+      "type": "quantity"
     },
     {
       "linkId": "123523.35235",
@@ -465,6 +499,53 @@
           "valueInteger": 50
         }
       ]
+    },
+    {
+      "type": "decimal",
+      "code": [
+        {
+          "code": "38214-3",
+          "display": "Pain severity Score VAS",
+          "system": "http://loinc.org"
+        }
+      ],
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+          "valueDecimal": 0
+        },
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+          "valueDecimal": 10
+        },
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unit",
+          "valueCoding": {
+            "display": "{score}"
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "slider",
+                "display": "Slider"
+              }
+            ],
+            "text": "A control where an axis is displayed between the high and low values and the control can be visually manipulated to select a value anywhere on the axis."
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue",
+          "valueDecimal": 0.1
+        }
+      ],
+      "required": false,
+      "linkId": "/38214-3",
+      "text": "Pain severity Score VAS"
     }
   ]
 }
+

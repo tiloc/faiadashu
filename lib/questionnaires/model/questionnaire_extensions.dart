@@ -4,7 +4,8 @@ import 'package:fhir/r4.dart';
 
 import '../../fhir_types/fhir_types_extensions.dart';
 
-extension WoFQuestionnaireAnswerOptionExtensions on QuestionnaireAnswerOption {
+extension FDashQuestionnaireAnswerOptionExtensions
+    on QuestionnaireAnswerOption {
   /// Localized access to  display value
   String localizedDisplay(Locale locale) {
     return valueString ?? valueCoding?.localizedDisplay(locale) ?? toString();
@@ -16,7 +17,7 @@ extension WoFQuestionnaireAnswerOptionExtensions on QuestionnaireAnswerOption {
   }
 }
 
-extension WoFQuestionnaireItemExtension on QuestionnaireItem {
+extension FDashQuestionnaireItemExtension on QuestionnaireItem {
   bool isItemControl(String itemControl) {
     return extension_
             ?.extensionOrNull(
@@ -25,5 +26,14 @@ extension WoFQuestionnaireItemExtension on QuestionnaireItem {
             ?.containsCoding('http://hl7.org/fhir/questionnaire-item-control',
                 itemControl) ??
         false;
+  }
+
+  /// Unit from SDC 'questionnaire-unit' extension.
+  String? get unit {
+    return extension_
+        ?.extensionOrNull(
+            'http://hl7.org/fhir/StructureDefinition/questionnaire-unit')
+        ?.valueCoding
+        ?.display;
   }
 }
