@@ -125,8 +125,8 @@ class _NumericalAnswerState
 
   @override
   Widget buildReadOnly(BuildContext context) {
-    // TODO: international number formatting
-    return Text(value.toString());
+    return Text(
+        (value != null) ? value!.format(Localizations.localeOf(context)) : '');
   }
 
   Widget _buildDropDownFromUnits(BuildContext context, List<Coding> units) {
@@ -220,9 +220,17 @@ class _NumericalAnswerState
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 onChanged: (content) {
                   if (content.trim().isEmpty) {
-                    value = null;
+                    // TODO: Will copyWith value: null leave the value untouched or kill it?
+                    if (value == null) {
+                      value = null;
+                    } else {
+                      value = value!.copyWith(value: null);
+                    }
                   } else {
-                    value = Quantity(value: Decimal(content));
+                    if (value == null) {
+                      value = Quantity(value: Decimal(content));
+                    } else {}
+                    value = value!.copyWith(value: Decimal(content));
                   }
                 },
               )),

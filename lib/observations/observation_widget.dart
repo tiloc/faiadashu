@@ -95,7 +95,7 @@ class ObservationValueWidget extends StatelessWidget {
       do {
         final ObservationComponent component = componentIterator.next();
         final unitString =
-            ' ${component.valueQuantity?.unit ?? component.valueQuantity?.code ?? unknownUnitText}';
+            ' ${component.valueQuantity?.unit ?? unknownUnitText}';
         // Avoid duplicate output of same unit:
         // emit unit only when it is different from unit of previous component
         if (currentUnit != null && unitString != currentUnit) {

@@ -68,8 +68,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
             div.write('<p>${answer.valueDecimal.toString()}</p>');
           }
         } else if (answer.valueQuantity != null) {
-          div.write(
-              '<p>${answer.valueQuantity!.value} ${answer.valueQuantity!.unit}</p>');
+          div.write('<p>${answer.valueQuantity!.format(locale)}</p>');
         } else if (answer.valueInteger != null) {
           div.write('<p>${answer.valueInteger!.value}</p>');
         } else if (answer.valueCoding != null) {

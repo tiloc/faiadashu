@@ -31,6 +31,33 @@ extension FDashDateTimeExtension on FhirDateTime {
   }
 }
 
+extension FDashDecimalExtension on Decimal {
+  String format(Locale locale) {
+    final decimalFormat = NumberFormat.decimalPattern(locale.toString());
+    return decimalFormat.format(value);
+  }
+}
+
+extension FDashQuantityExtension on Quantity {
+  String format(Locale locale,
+      {String defaultText = '', String unknownValueText = '?'}) {
+    if (value == null) {
+      if (unit == null) {
+        return defaultText;
+      } else {
+        return '$unknownValueText $unit';
+      }
+    } else {
+      final decimalFormat = NumberFormat.decimalPattern(locale.toString());
+      if (unit == null) {
+        return decimalFormat.format(value!.value);
+      } else {
+        return '${decimalFormat.format(value!.value)} $unit';
+      }
+    }
+  }
+}
+
 extension FDashCodingExtension on Coding {
   /// Localized access to display value
   String localizedDisplay(Locale locale) {
