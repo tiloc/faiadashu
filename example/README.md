@@ -1,6 +1,6 @@
-# Fire Dash Example
+# *Faiadasshu* [(ファイアダッシュ)] — Widgets for Digital Health™ - Example App
 
-An example app to show off the Fire Dash widgets.
+An example app to show off *Faiadasshu* [(ファイアダッシュ)] — Widgets for Digital Health™.
 
 Use the menu to explore the widgets.
 

@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Fire Dash [(ファイアダッシュ)] Gallery',
+      title: 'Faiadasshu [(ファイアダッシュ)] Gallery',
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -54,11 +54,11 @@ class _HomePageState extends State<HomePage> {
         title: Builder(
           builder: (BuildContext context) => RichText(
             text: TextSpan(
-              text: 'Fire Dash [(ファイアダッシュ)] —\n',
+              text: 'Faiadasshu [(ファイアダッシュ)] —\n',
               style: DefaultTextStyle.of(context).style,
               children: const <TextSpan>[
                 TextSpan(
-                    text: 'Widgets for Digital Health',
+                    text: 'Widgets for Digital Health™',
                     style: TextStyle(fontSize: 12)),
               ],
             ),
