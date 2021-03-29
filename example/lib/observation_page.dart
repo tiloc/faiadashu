@@ -1,10 +1,5 @@
-import 'package:fhir/primitive_types/code.dart';
-import 'package:fhir/primitive_types/decimal.dart';
-import 'package:fhir/primitive_types/fhir_date_time.dart';
-import 'package:fhir/primitive_types/fhir_uri.dart';
-import 'package:fhir/r4/general_types/general_types.dart';
-import 'package:fhir/r4/resource_types/clinical/diagnostics/diagnostics.dart';
-import 'package:fire_dash/observations/observation_widget.dart';
+import 'package:faiadashu/observations/observation_widget.dart';
+import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
 import 'exhibit_page.dart';

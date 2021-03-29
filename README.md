@@ -1,6 +1,6 @@
 [![style: lint](https://img.shields.io/badge/style-lint-4BC0F5.svg)](https://pub.dev/packages/lint)
 
-# *Faiadasshu* [(ファイアダッシュ)] — Widgets for Digital Health™
+# *Faiadashu™* [(ファイアダッシュ)] — Widgets for Digital Health
 
 ### Build healthcare apps fast — use the Flutter™ SDK and follow popular standards in healthcare.
 
@@ -21,7 +21,7 @@ Supports numerous features described in the FHIR® standard.
 
 **Click link below for narrated longer video**
 
-[Demo Video](https://github.com/tiloc/fire_dash/blob/f53a13cbecb707c51534b4bacdd52d72be291506/doc/movies/sdc-example.mp4)
+[Demo Video](https://github.com/tiloc/faiadashu/blob/f53a13cbecb707c51534b4bacdd52d72be291506/doc/movies/sdc-example.mp4)
 
 ### Related projects
 [![Pub Version](https://img.shields.io/pub/v/fhir?label=pub.dev&labelColor=333940&logo=dart)](https://pub.dev/packages/fhir)
@@ -64,6 +64,7 @@ Flutter and the related logo are trademarks of Google LLC. We are not endorsed b
 ### Compliance with the FHIR® standard
 This library is not endorsed by Health Level Seven International. It supports a subset of the FHIR R4 specification,
 with additional support for a subset of the SDC (Structured Data Capture) profile.
+
 HL7, FHIR and the FHIR [FLAME DESIGN] are the registered trademarks of Health Level Seven International and their use does not constitute endorsement by HL7.
 
 All statements about compliance with a particular FHIR standard are truthful and made as a matter of Fair Use.
@@ -73,5 +74,3 @@ This material contains content from LOINC (http://loinc.org). LOINC is copyright
 
 #### Third-Party Content
 This product includes all or a portion of the UCUM table, UCUM codes, and UCUM definitions or is derived from it, subject to a license from Regenstrief Institute, Inc. and The UCUM Organization. Your use of the UCUM table, UCUM codes, UCUM definitions also is subject to this license, a copy of which is available at http://unitsofmeasure.org. The current complete UCUM table, UCUM Specification are available for download at http://unitsofmeasure.org. The UCUM table and UCUM codes are copyright © 1995-2020, Regenstrief Institute, Inc. and the Unified Codes for Units of Measures (UCUM) Organization. All rights reserved. THE UCUM TABLE (IN ALL FORMATS), UCUM DEFINITIONS, AND SPECIFICATION ARE PROVIDED "AS IS". ANY EXPRESS OR IMPLIED WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-
-

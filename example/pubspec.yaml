@@ -1,4 +1,5 @@
-name: fire_dash_example
+name: faiadashu_example
+description: Example app for Faiadashu™
 
 environment:
   sdk: '>=2.12.0 <3.0.0'
@@ -7,7 +8,7 @@ environment:
 dependencies:
   fhir: ^0.4.0
 
-  fire_dash:
+  faiadashu:
     path: ..
 
   flutter:

@@ -1,6 +1,6 @@
-# *Faiadasshu* [(ファイアダッシュ)] — Widgets for Digital Health™ - Example App
+# *Faiadashu™* [(ファイアダッシュ)] — Widgets for Digital Health - Example App
 
-An example app to show off *Faiadasshu* [(ファイアダッシュ)] — Widgets for Digital Health™.
+An example app to show off *Faiadashu™* [(ファイアダッシュ)] — Widgets for Digital Health.
 
 Use the menu to explore the widgets.
 

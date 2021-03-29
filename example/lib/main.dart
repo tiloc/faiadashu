@@ -1,4 +1,4 @@
-import 'package:fire_dash/questionnaires/questionnaires.dart';
+import 'package:faiadashu/questionnaires/questionnaires.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Faiadasshu [(ファイアダッシュ)] Gallery',
+      title: 'Faiadashu™ [(ファイアダッシュ)] Gallery',
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -55,11 +55,11 @@ class _HomePageState extends State<HomePage> {
         title: Builder(
           builder: (BuildContext context) => RichText(
             text: TextSpan(
-              text: 'Faiadasshu [(ファイアダッシュ)] —\n',
+              text: 'Faiadashu™ [(ファイアダッシュ)] —\n',
               style: DefaultTextStyle.of(context).style,
               children: const <TextSpan>[
                 TextSpan(
-                    text: 'Widgets for Digital Health™',
+                    text: 'Widgets for Digital Health',
                     style: TextStyle(fontSize: 12)),
               ],
             ),

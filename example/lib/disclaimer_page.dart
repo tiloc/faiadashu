@@ -23,5 +23,5 @@ This material contains the following artwork:
   }
 
   @override
-  String get title => 'Faiadasshu Disclaimers';
+  String get title => 'Faiadashu™ Disclaimers';
 }
