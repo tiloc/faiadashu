@@ -13,7 +13,7 @@ class Logger {
   late final logging.Logger loggingLogger;
 
   factory Logger(String name) {
-    return Logger._(name);
+    return Logger._('fdash.$name');
   }
 
   Logger._(this.name) : loggingLogger = logging.Logger(name);

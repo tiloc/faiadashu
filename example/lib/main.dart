@@ -12,7 +12,7 @@ import 'observation_page.dart';
 import 'primitive_page.dart';
 
 void main() {
-  if (kDebugMode) {
+  if (kDebugMode || kIsWeb) {
     Logger.root.level = Level.ALL;
     Logger.root.onRecord.listen((LogRecord rec) {
       developer.log(rec.message,
