@@ -13,7 +13,7 @@ import 'questionnaire_location.dart';
 /// Can deal with incomplete questionnaires.
 /// Will return 0 when no score field exists on the questionnaire.
 class TotalScoreAggregator extends Aggregator<Decimal> {
-  static final logger = Logger('TotalScoreAggregator');
+  static final logger = Logger(TotalScoreAggregator);
 
   late final QuestionnaireLocation? totalScoreLocation;
   late final String logTag;

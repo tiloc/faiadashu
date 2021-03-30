@@ -6,33 +6,51 @@ import 'package:flutter/services.dart' show rootBundle;
 
 import '../../logging/logging.dart';
 import '../questionnaires.dart';
+import '../valueset/valueset_provider.dart';
 
 class QuestionnaireFiller extends StatefulWidget {
   final WidgetBuilder builder;
-  final Future<QuestionnaireTopLocation> Function(dynamic param) loaderFuture;
+  final Future<QuestionnaireTopLocation> Function(
+      dynamic param, ValueSetProvider? valueSetProvider) loaderFuture;
   final dynamic loaderParam;
-  static final logger = Logger('QuestionnaireFiller');
+  final ValueSetProvider? valueSetProvider;
+  static final logger = Logger(QuestionnaireFiller);
+
+  static Future<QuestionnaireTopLocation> _loadFromString(
+      dynamic instrumentString, ValueSetProvider? valueSetProvider) async {
+    final jsonQuestionnaire =
+        json.decode(instrumentString as String) as Map<String, dynamic>;
+    final topLocation = QuestionnaireTopLocation.fromQuestionnaire(
+        Questionnaire.fromJson(jsonQuestionnaire),
+        aggregators: [
+          TotalScoreAggregator(),
+          NarrativeAggregator(),
+          QuestionnaireResponseAggregator()
+        ],
+        valueSetProvider: valueSetProvider);
+
+    await topLocation.initState();
+
+    return topLocation;
+  }
 
   static Future<QuestionnaireTopLocation> _loadFromAsset(
-      dynamic assetPath) async {
+      dynamic assetPath, ValueSetProvider? valueSetProvider) async {
     logger.log('Enter _loadFromAsset', level: LogLevel.trace);
     final instrumentString = await rootBundle.loadString(assetPath.toString());
-    final jsonQuestionnaire =
-        json.decode(instrumentString) as Map<String, dynamic>;
-    return QuestionnaireTopLocation.fromQuestionnaire(
-      Questionnaire.fromJson(jsonQuestionnaire),
-      aggregators: [
-        TotalScoreAggregator(),
-        NarrativeAggregator(),
-        QuestionnaireResponseAggregator()
-      ],
-    );
+    return _loadFromString(instrumentString, valueSetProvider);
   }
 
   const QuestionnaireFiller.fromAsset(this.loaderParam,
-      {Key? key, required this.builder})
+      {Key? key, required this.builder, this.valueSetProvider})
       // ignore: avoid_field_initializers_in_const_classes
       : loaderFuture = _loadFromAsset,
+        super(key: key);
+
+  const QuestionnaireFiller.fromString(this.loaderParam,
+      {Key? key, required this.builder, this.valueSetProvider})
+      // ignore: avoid_field_initializers_in_const_classes
+      : loaderFuture = _loadFromString,
         super(key: key);
 
   static QuestionnaireFillerData of(BuildContext context) {
@@ -47,7 +65,7 @@ class QuestionnaireFiller extends StatefulWidget {
 }
 
 class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
-  static final logger = Logger('_QuestionnaireFillerState');
+  static final logger = Logger(_QuestionnaireFillerState);
 
   late final Future<QuestionnaireTopLocation> builderFuture;
   QuestionnaireTopLocation? _topLocation;
@@ -56,7 +74,8 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
   @override
   void initState() {
     super.initState();
-    builderFuture = widget.loaderFuture.call(widget.loaderParam);
+    builderFuture =
+        widget.loaderFuture.call(widget.loaderParam, widget.valueSetProvider);
   }
 
   @override
@@ -101,7 +120,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
                 return QuestionnaireLoadingIndicator(snapshot);
               }
               if (snapshot.hasData) {
-                logger.log('FutureBuilder hasData', level: LogLevel.info);
+                logger.log('FutureBuilder hasData');
                 _topLocation = snapshot.data;
                 // TODO: There has got to be a more elegant way! Goal is to register the lister exactly once, after the future has completed.
                 // Can I do .then for that?
@@ -122,7 +141,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
 }
 
 class QuestionnaireFillerData extends InheritedWidget {
-  static final logger = Logger('QuestionnaireFillerData');
+  static final logger = Logger(QuestionnaireFillerData);
   final QuestionnaireTopLocation topLocation;
   final Iterable<QuestionnaireLocation> surveyLocations;
   late final List<QuestionnaireItemFiller?> _itemFillers;

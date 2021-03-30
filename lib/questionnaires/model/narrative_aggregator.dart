@@ -10,7 +10,7 @@ import 'aggregator.dart';
 /// Create a narrative from the responses to a [Questionnaire].
 /// Updates immediately after responses have changed.
 class NarrativeAggregator extends Aggregator<Narrative> {
-  static final logger = Logger('NarrativeAggregator');
+  static final logger = Logger(NarrativeAggregator);
 
   // Revision of topLocation when _narrative was calculated
   int _revision = -1;

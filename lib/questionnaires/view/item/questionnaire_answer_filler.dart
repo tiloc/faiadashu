@@ -16,7 +16,7 @@ abstract class QuestionnaireAnswerFiller extends StatefulWidget {
 
 abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller>
     extends State<W> {
-  static final logger = Logger('QuestionnaireAnswerState');
+  static final logger = Logger(QuestionnaireAnswerState);
   V? _value;
 
   QuestionnaireAnswerState();

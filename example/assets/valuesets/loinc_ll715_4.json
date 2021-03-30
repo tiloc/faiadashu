@@ -1,0 +1,55 @@
+{
+  "resourceType": "ValueSet",
+  "id": "LL715-4",
+  "meta": {
+    "versionId": "3",
+    "lastUpdated": "2020-12-15T11:25:21.397+00:00"
+  },
+  "url": "http://loinc.org/vs/LL715-4",
+  "identifier": [ {
+    "system": "urn:ietf:rfc:3986",
+    "value": "urn:oid:1.3.6.1.4.1.12009.10.1.3196"
+  } ],
+  "version": "Loinc_2.69",
+  "name": "Platelet morph",
+  "status": "active",
+  "publisher": "Regenstrief Institute, Inc.",
+  "contact": [ {
+    "name": "Regenstrief Institute, Inc.",
+    "telecom": [ {
+      "system": "url",
+      "value": "https://loinc.org"
+    } ]
+  } ],
+  "copyright": "This content from LOINC® is copyright © 1995 Regenstrief Institute, Inc. and the LOINC Committee, and available at no cost under the license at https://loinc.org/license/",
+  "compose": {
+    "include": [ {
+      "system": "http://loinc.org",
+      "concept": [ {
+        "code": "LA11165-0",
+        "display": "Platelet anisocytosis"
+      }, {
+        "code": "LA11168-4",
+        "display": "Platelet clump"
+      }, {
+        "code": "LA11167-6",
+        "display": "Platelet large fragments"
+      }, {
+        "code": "LA11166-8",
+        "display": "Platelet satellitism"
+      }, {
+        "code": "LA11169-2",
+        "display": "Platelets.agranular"
+      }, {
+        "code": "LA11170-0",
+        "display": "Platelets.giant"
+      }, {
+        "code": "LA11172-6",
+        "display": "Platelets.large"
+      }, {
+        "code": "LA11171-8",
+        "display": "Platelets.small"
+      } ]
+    } ]
+  }
+}

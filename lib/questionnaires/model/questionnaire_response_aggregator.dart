@@ -8,7 +8,7 @@ import '../questionnaires.dart';
 
 class QuestionnaireResponseAggregator
     extends Aggregator<QuestionnaireResponse> {
-  static final Logger logger = Logger('QuestionnaireResponseAggregator');
+  static final Logger logger = Logger(QuestionnaireResponseAggregator);
 
   QuestionnaireResponseAggregator()
       : super(QuestionnaireResponse(), autoAggregate: false);

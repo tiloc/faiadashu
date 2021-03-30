@@ -19,7 +19,7 @@ class NumericalAnswer extends QuestionnaireAnswerFiller {
 
 class _NumericalAnswerState
     extends QuestionnaireAnswerState<Quantity, NumericalAnswer> {
-  static final logger = Logger('_NumericalAnswerState');
+  static final logger = Logger(_NumericalAnswerState);
 
   late final TextInputFormatter _numberInputFormatter;
   late final NumberFormat _numberInputFormat;

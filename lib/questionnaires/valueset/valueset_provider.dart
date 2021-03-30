@@ -37,7 +37,7 @@ class NestedValueSetProvider extends ValueSetProvider {
 }
 
 class AssetValueSetProvider extends ValueSetProvider {
-  late final Map<String, ValueSet> valueSets;
+  final Map<String, ValueSet> valueSets = {};
   final Map<String, String> assetMap;
 
   AssetValueSetProvider(this.assetMap);

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../questionnaires.dart';
+import '../valueset/valueset_provider.dart';
 import 'narrative_drawer.dart';
 import 'questionnaire_cover_page.dart';
 
@@ -15,9 +16,11 @@ class QuestionnaireScrollerPage extends StatefulWidget {
   final Widget? floatingActionButton;
   final List<Widget>? frontMatter;
   final List<Widget>? backMatter;
+  final ValueSetProvider? valueSetProvider;
 
   const QuestionnaireScrollerPage.fromAsset(this.loaderParam,
-      {this.floatingActionButton,
+      {this.valueSetProvider,
+      this.floatingActionButton,
       this.frontMatter,
       this.backMatter = const [
         SizedBox(
@@ -143,7 +146,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
                   }),
             ),
           ));
-    });
+    }, valueSetProvider: widget.valueSetProvider);
   }
 
   Future<void> _showQuestionnaireInfo(

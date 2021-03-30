@@ -10,7 +10,7 @@ import '../../../questionnaires.dart';
 import '../../xhtml.dart';
 
 class ChoiceAnswer extends QuestionnaireAnswerFiller {
-  static final logger = Logger('ChoiceAnswer');
+  static final logger = Logger(ChoiceAnswer);
   // This class abuses CodeableConcept to model multiple choice and open choice.
 
   const ChoiceAnswer(
@@ -23,7 +23,7 @@ class ChoiceAnswer extends QuestionnaireAnswerFiller {
 
 class _ChoiceAnswerState
     extends QuestionnaireAnswerState<CodeableConcept, ChoiceAnswer> {
-  static final logger = Logger('_ChoiceAnswerState');
+  static final logger = Logger(_ChoiceAnswerState);
   // ignore: prefer_collection_literals
   final _answerOptions = LinkedHashMap<String, QuestionnaireAnswerOption>();
 
@@ -77,7 +77,11 @@ class _ChoiceAnswerState
 
   @override
   Widget buildEditable(BuildContext context) {
-    return _buildChoiceAnswers(context);
+    if (_answerOptions.length < 15) {
+      return _buildChoiceAnswers(context);
+    } else {
+      return _buildLookupAnswers(context);
+    }
   }
 
   CodeableConcept? _fillValue(String? newValue) {
@@ -229,37 +233,51 @@ class _ChoiceAnswerState
           ]);
         }
       } else {
-        final ValueSetInclude? valueSetInclude =
-            valueSet.compose?.include.firstOrNull;
+        final List<ValueSetInclude>? valueSetIncludes =
+            valueSet.compose?.include;
 
-        if (valueSetInclude == null) {
+        if (valueSetIncludes == null) {
           throw QuestionnaireFormatException(
               'Include in ValueSet $key does not exist.', qi);
         }
 
-        final List<ValueSetConcept> valueSetConcepts =
-            valueSetInclude.concept ?? [];
+        for (final valueSetInclude in valueSetIncludes) {
+          List<ValueSetConcept> valueSetConcepts =
+              valueSetInclude.concept ?? [];
 
-        if (valueSetConcepts.isEmpty) {
-          logger.log('Concepts in ValueSet $key is empty.',
-              level: LogLevel.warn);
-        }
+          if (valueSetConcepts.isEmpty) {
+            logger.log('Concepts in ValueSet $key is empty.');
+            // TODO: This is hacky, but a start
+            // ValueSets may contain references to further included ValueSets.
+            final includeUri =
+                valueSetInclude.valueSet?.firstOrNull?.value?.toString();
+            if (includeUri != null) {
+              final includeConcepts = widget.location.top
+                  .getValueSet(includeUri)
+                  ?.compose
+                  ?.include
+                  .firstOrNull
+                  ?.concept;
+              valueSetConcepts.addAll(includeConcepts ?? []);
+            }
+          }
 
-        for (final concept in valueSetConcepts) {
-          _answerOptions.addEntries([
-            MapEntry<String, QuestionnaireAnswerOption>(
-                concept.code!.toString(),
-                QuestionnaireAnswerOption(
-                    extension_:
-                        _createOptionPrefixExtension(concept.extension_),
-                    valueCoding: Coding(
-                        system: valueSetInclude.system,
-                        code: concept.code,
-                        userSelected: Boolean(true),
-                        display: concept.display,
-                        extension_:
-                            _createOrdinalExtension(concept.extension_))))
-          ]);
+          for (final concept in valueSetConcepts) {
+            _answerOptions.addEntries([
+              MapEntry<String, QuestionnaireAnswerOption>(
+                  concept.code!.toString(),
+                  QuestionnaireAnswerOption(
+                      extension_:
+                          _createOptionPrefixExtension(concept.extension_),
+                      valueCoding: Coding(
+                          system: valueSetInclude.system,
+                          code: concept.code,
+                          userSelected: Boolean(true),
+                          display: concept.display,
+                          extension_:
+                              _createOrdinalExtension(concept.extension_))))
+            ]);
+          }
         }
       }
     } else {
@@ -347,5 +365,27 @@ class _ChoiceAnswerState
             children: choices,
           ));
     }
+  }
+
+  Widget _buildLookupAnswers(BuildContext context) {
+    final locale = Localizations.localeOf(context);
+    return Autocomplete<QuestionnaireAnswerOption>(
+      displayStringForOption: (answerOption) =>
+          answerOption.localizedDisplay(locale),
+      optionsBuilder: (TextEditingValue textEditingValue) {
+        if (textEditingValue.text.isEmpty) {
+          return const Iterable<QuestionnaireAnswerOption>.empty();
+        }
+        return _answerOptions.values.where((QuestionnaireAnswerOption option) {
+          return option
+              .localizedDisplay(locale)
+              .toLowerCase()
+              .contains(textEditingValue.text.toLowerCase());
+        });
+      },
+      onSelected: (QuestionnaireAnswerOption selectedOption) {
+        value = _fillValue(selectedOption.optionCode);
+      },
+    );
   }
 }

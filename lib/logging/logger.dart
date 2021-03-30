@@ -12,7 +12,7 @@ class Logger {
   final String name;
   late final logging.Logger loggingLogger;
 
-  factory Logger(String name) {
+  factory Logger(Type name) {
     return Logger._('fdash.$name');
   }
 

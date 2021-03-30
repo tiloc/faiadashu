@@ -1,12 +1,12 @@
 import 'dart:collection';
 
 import 'package:collection/collection.dart';
+import 'package:faiadashu/questionnaires/valueset/valueset_provider.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../fhir_types/fhir_types_extensions.dart';
 import '../../logging/logging.dart';
-import '../valueset/fhir_valueset_provider.dart';
 import '../view/xhtml.dart';
 import 'aggregator.dart';
 import 'questionnaire_exceptions.dart';
@@ -19,13 +19,17 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
   final Map<String, QuestionnaireLocation> _cachedItems = {};
   List<QuestionnaireLocation>? _enabledWhens;
   final List<Aggregator>? _aggregators;
-  static final logger = Logger('QuestionnaireTopLocation');
+  final ValueSetProvider? _valueSetProvider;
+  static final logger = Logger(QuestionnaireTopLocation);
 
   /// Create the first location top-down of the given [Questionnaire].
   /// Will throw [Error]s in case this [Questionnaire] has no items.
+  /// A newly constructed [QuestionnaireTopLocation] will require an invocation of
+  /// [init], or it might malfunction!
   QuestionnaireTopLocation.fromQuestionnaire(Questionnaire questionnaire,
-      {List<Aggregator>? aggregators})
+      {List<Aggregator>? aggregators, ValueSetProvider? valueSetProvider})
       : _aggregators = aggregators,
+        _valueSetProvider = valueSetProvider,
         super._(
             questionnaire,
             null,
@@ -66,6 +70,13 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
     activateEnableWhen();
   }
 
+  /// Bring the model into a fully functional state.
+  /// Unfortunately, this is necessary, as some operations are async and
+  /// you cannot have an async constructor.
+  Future<void> initState() async {
+    await _valueSetProvider?.init();
+  }
+
   T aggregator<T extends Aggregator>() {
     if (_aggregators == null) {
       throw StateError('Aggregators have not been specified in constructor.');
@@ -87,7 +98,7 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
 
   /// Get a [ValueSet] which is not contained in the [Questionnaire].
   ValueSet? getValueSet(String uri) {
-    return FhirValueSetProvider().getValueSet(uri);
+    return _valueSetProvider?.getValueSet(uri);
   }
 
   /// Find a contained element by its id.
@@ -200,7 +211,7 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
   final int level;
   int _revision = 1;
   late final String logTag;
-  static final logger = Logger('QuestionnaireLocation');
+  static final logger = Logger(QuestionnaireLocation);
 
   QuestionnaireTopLocation get top => _top!;
 

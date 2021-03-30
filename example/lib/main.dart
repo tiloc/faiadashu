@@ -2,6 +2,8 @@ import 'dart:developer' as developer;
 import 'dart:io';
 
 import 'package:faiadashu/questionnaires/questionnaires.dart';
+import 'package:faiadashu/questionnaires/valueset/fhir_valueset_provider.dart';
+import 'package:faiadashu/questionnaires/valueset/valueset.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -66,6 +68,21 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final valueSetProvider = NestedValueSetProvider([
+    FhirValueSetProvider(),
+    AssetValueSetProvider(<String, String>{
+      'http://hl7.org/fhir/ValueSet/iso3166-1-2':
+          'assets/valuesets/fhir_valueset_iso3166_1_2.json',
+      'http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetYesNoUnk':
+          'assets/valuesets/who_cr_valueset_yes_no_unknown.json',
+      'http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetSexAtBirth':
+          'assets/valuesets/who_cr_valueset_sex_at_birth.json',
+      'http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetAgeUnits':
+          'assets/valuesets/who_cr_valueset_age_units.json',
+      'http://loinc.org/vs/LL715-4': 'assets/valuesets/loinc_ll715_4.json'
+    })
+  ]);
+
   @override
   Widget build(BuildContext context) {
     final fab = FloatingActionButton.extended(
@@ -131,6 +148,7 @@ class _HomePageState extends State<HomePage> {
                   MaterialPageRoute(
                       builder: (context) => QuestionnaireScrollerPage.fromAsset(
                           'assets/instruments/sdc_demo.json',
+                          valueSetProvider: valueSetProvider,
                           floatingActionButton: fab)));
             },
           ),
@@ -142,9 +160,9 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          const QuestionnaireScrollerPage.fromAsset(
-                              'assets/instruments/sdc-example-render.json')));
+                      builder: (context) => QuestionnaireScrollerPage.fromAsset(
+                          'assets/instruments/sdc-example-render.json',
+                          valueSetProvider: valueSetProvider)));
             },
           ),
           ListTile(
@@ -155,9 +173,11 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          const QuestionnaireScrollerPage.fromAsset(
-                              'assets/instruments/argonaut_sampler.json')));
+                    builder: (context) => QuestionnaireScrollerPage.fromAsset(
+                      'assets/instruments/argonaut_sampler.json',
+                      valueSetProvider: valueSetProvider,
+                    ),
+                  ));
             },
           ),
           ListTile(
@@ -168,9 +188,9 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          const QuestionnaireScrollerPage.fromAsset(
-                              'assets/instruments/phq9_instrument.json')));
+                      builder: (context) => QuestionnaireScrollerPage.fromAsset(
+                          'assets/instruments/phq9_instrument.json',
+                          valueSetProvider: valueSetProvider)));
             },
           ),
           ListTile(
@@ -193,9 +213,9 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          const QuestionnaireScrollerPage.fromAsset(
-                              'assets/instruments/hf_instrument.json')));
+                      builder: (context) => QuestionnaireScrollerPage.fromAsset(
+                          'assets/instruments/hf_instrument.json',
+                          valueSetProvider: valueSetProvider)));
             },
           ),
           ListTile(
@@ -205,9 +225,9 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          const QuestionnaireScrollerPage.fromAsset(
-                              'assets/instruments/prapare_instrument.json')));
+                      builder: (context) => QuestionnaireScrollerPage.fromAsset(
+                          'assets/instruments/prapare_instrument.json',
+                          valueSetProvider: valueSetProvider)));
             },
           ),
           ListTile(
@@ -218,9 +238,9 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          const QuestionnaireScrollerPage.fromAsset(
-                              'assets/instruments/bluebook.json')));
+                      builder: (context) => QuestionnaireScrollerPage.fromAsset(
+                          'assets/instruments/bluebook.json',
+                          valueSetProvider: valueSetProvider)));
             },
           ),
           ListTile(
@@ -230,9 +250,9 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          const QuestionnaireScrollerPage.fromAsset(
-                              'assets/instruments/who_covid19.json')));
+                      builder: (context) => QuestionnaireScrollerPage.fromAsset(
+                          'assets/instruments/who_covid19.json',
+                          valueSetProvider: valueSetProvider)));
             },
           ),
         ],

@@ -1,0 +1,81 @@
+{
+  "resourceType": "ValueSet",
+  "id": "WhoCrValueSetYesNoUnk",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-valueset"
+    ]
+  },
+  "text": {
+    "status": "extensions",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>This value set includes codes based on the following rules:</p><ul><li>Include all codes defined in <a href=\"http://hl7.org/fhir/R4/v2/0136/index.html\"><code>http://terminology.hl7.org/CodeSystem/v2-0136</code></a></li><li>Include these codes as defined in <a href=\"http://terminology.hl7.org/2.0.0/CodeSystem-v2-0532.html\"><code>http://terminology.hl7.org/CodeSystem/v2-0532</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td><td><b>Definition</b></td></tr><tr><td><a href=\"http://terminology.hl7.org/2.0.0/CodeSystem-v2-0532.html#v2-0532-UNK\">UNK</a></td><td>unknown</td><td>unknown</td></tr></table></li></ul></div>"
+  },
+  "url": "http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetYesNoUnk",
+  "version": "0.1.0",
+  "name": "WhoCrValueSetYesNoUnk",
+  "title": "Yes/No/Unknown",
+  "status": "draft",
+  "experimental": true,
+  "date": "2021-02-11T17:12:53+00:00",
+  "publisher": "OpenHIE",
+  "contact": [
+    {
+      "name": "OpenHIE",
+      "telecom": [
+        {
+          "system": "url",
+          "value": "http://www.ohie.org"
+        }
+      ]
+    }
+  ],
+  "description": "Yes/No/Unknown Value Set",
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "system": "http://unstats.un.org/unsd/methods/m49/m49.htm",
+          "code": "001"
+        }
+      ]
+    }
+  ],
+  "immutable": false,
+  "copyright": "2021",
+  "compose": {
+    "include": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/v2-0136"
+      },
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/v2-0532",
+        "concept": [
+          {
+            "code": "UNK"
+          }
+        ]
+      }
+    ]
+  },
+  "expansion": {
+    "identifier": "urn:uuid:bf99fe50-2c2b-41ad-bd63-bee6919810b4",
+    "timestamp": "2015-07-14T10:00:00Z",
+    "contains": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/v2-0136",
+        "code": "Y",
+        "display": "Yes"
+      },
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/v2-0136",
+        "code": "N",
+        "display": "No"
+      },
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/data-absent-reason",
+        "code": "asked-unknown",
+        "display": "Don't know"
+      }
+    ]
+  }
+}

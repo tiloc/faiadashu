@@ -9,7 +9,7 @@ import '../model/questionnaire_location.dart';
 
 /// Extract Xhtml from SDC extensions and build Widgets from Xhtml.
 class Xhtml {
-  static final Logger logger = Logger('Xhtml');
+  static final Logger logger = Logger(Xhtml);
   const Xhtml._();
 
   static Widget? toWidget(

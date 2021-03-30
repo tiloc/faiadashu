@@ -25,11 +25,9 @@ dependencies:
   collection: ^1.15.0
 
   date_time_picker: ^2.0.0
-  fhir: ^0.4.0
-#    git:
-#      url: https://github.com/MayJuun/fhir.git
-#      path: fhir
-#      ref: dev
+#  fhir: ^0.4.0
+  fhir:
+    path: /Users/tilo/Projects/fhir/fhir
 
   flutter:
     sdk: flutter

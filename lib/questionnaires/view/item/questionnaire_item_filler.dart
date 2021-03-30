@@ -7,7 +7,7 @@ import '../../../logging/logging.dart';
 import '../../questionnaires.dart';
 
 class QuestionnaireItemFiller extends StatefulWidget {
-  static final logger = Logger('QuestionnaireItemFiller');
+  static final logger = Logger(QuestionnaireItemFiller);
   final Widget? _titleWidget;
   final QuestionnaireLocation location;
   final QuestionnaireResponseFiller _responseFiller;
@@ -29,7 +29,7 @@ class QuestionnaireItemFiller extends StatefulWidget {
 }
 
 class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
-  static final logger = Logger('QuestionnaireItemFillerState');
+  static final logger = Logger(QuestionnaireItemFillerState);
 
   @override
   Widget build(BuildContext context) {
