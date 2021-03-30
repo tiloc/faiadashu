@@ -1,0 +1,1453 @@
+{
+  "resourceType": "Questionnaire",
+  "id": "WhoCrQuestionnaireCovid19Surveillance",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire",
+      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-render",
+      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-behave",
+      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-extr-defn"
+    ]
+  },
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">...snipped for brevity...</div>"
+  },
+  "contained": [
+    {
+      "resourceType": "ValueSet",
+      "id": "WhoCrValueSetQuestionnaireCountry",
+      "meta": {
+        "profile": [
+          "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-valueset"
+        ]
+      },
+      "name": "WhoCrValueSetQuestionnaireCountry",
+      "status": "draft",
+      "experimental": true,
+      "publisher": "OpenHIE",
+      "contact": [
+        {
+          "name": "Elliot Silver",
+          "telecom": [
+            {
+              "system": "email",
+              "value": "elliot@argentixinfo.com",
+              "use": "work"
+            }
+          ]
+        }
+      ],
+      "jurisdiction": [
+        {
+          "coding": [
+            {
+              "system": "http://unstats.un.org/unsd/methods/m49/m49.htm",
+              "code": "001"
+            }
+          ]
+        }
+      ],
+      "immutable": false,
+      "copyright": "{{{year}}}",
+      "compose": {
+        "include": [
+          {
+            "valueSet": [
+              "http://hl7.org/fhir/ValueSet/iso3166-1-2"
+            ]
+          },
+          {
+            "system": "http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemQuestionnaireChoice"
+          }
+        ]
+      }
+    },
+    {
+      "resourceType": "ValueSet",
+      "id": "WhoCrValueSetQuestionnaireReasonForTesting",
+      "meta": {
+        "profile": [
+          "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-valueset"
+        ]
+      },
+      "name": "WhoCrValueSetQuestionnaireReasonForTesting",
+      "status": "draft",
+      "experimental": true,
+      "publisher": "OpenHIE",
+      "contact": [
+        {
+          "name": "Elliot Silver",
+          "telecom": [
+            {
+              "system": "email",
+              "value": "elliot@argentixinfo.com",
+              "use": "work"
+            }
+          ]
+        }
+      ],
+      "jurisdiction": [
+        {
+          "coding": [
+            {
+              "system": "http://unstats.un.org/unsd/methods/m49/m49.htm",
+              "code": "001"
+            }
+          ]
+        }
+      ],
+      "immutable": false,
+      "copyright": "{{{year}}}",
+      "compose": {
+        "include": [
+          {
+            "system": "http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemReasonForTesting"
+          },
+          {
+            "system": "http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemQuestionnaireChoice"
+          }
+        ]
+      }
+    },
+    {
+      "resourceType": "ValueSet",
+      "id": "WhoCrValueSetQuestionnaireComorbidity",
+      "meta": {
+        "profile": [
+          "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-valueset"
+        ]
+      },
+      "name": "WhoCrValueSetQuestionnaireComorbidity",
+      "status": "draft",
+      "experimental": true,
+      "publisher": "OpenHIE",
+      "contact": [
+        {
+          "name": "Elliot Silver",
+          "telecom": [
+            {
+              "system": "email",
+              "value": "elliot@argentixinfo.com",
+              "use": "work"
+            }
+          ]
+        }
+      ],
+      "jurisdiction": [
+        {
+          "coding": [
+            {
+              "system": "http://unstats.un.org/unsd/methods/m49/m49.htm",
+              "code": "001"
+            }
+          ]
+        }
+      ],
+      "immutable": false,
+      "copyright": "{{{year}}}",
+      "compose": {
+        "include": [
+          {
+            "system": "http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemComorbidity"
+          },
+          {
+            "system": "http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemQuestionnaireChoice"
+          }
+        ]
+      }
+    },
+    {
+      "resourceType": "ValueSet",
+      "id": "WhoCrValueSetQuestionnairePatientOutcome",
+      "meta": {
+        "profile": [
+          "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-valueset"
+        ]
+      },
+      "name": "WhoCrValueSetQuestionnairePatientOutcome",
+      "status": "draft",
+      "experimental": true,
+      "publisher": "OpenHIE",
+      "contact": [
+        {
+          "name": "Elliot Silver",
+          "telecom": [
+            {
+              "system": "email",
+              "value": "elliot@argentixinfo.com",
+              "use": "work"
+            }
+          ]
+        }
+      ],
+      "jurisdiction": [
+        {
+          "coding": [
+            {
+              "system": "http://unstats.un.org/unsd/methods/m49/m49.htm",
+              "code": "001"
+            }
+          ]
+        }
+      ],
+      "immutable": false,
+      "copyright": "{{{year}}}",
+      "compose": {
+        "include": [
+          {
+            "valueSet": [
+              "http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetPatientOutcome"
+            ]
+          },
+          {
+            "system": "http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemQuestionnaireChoice"
+          }
+        ]
+      }
+    },
+    {
+      "resourceType": "ValueSet",
+      "id": "WhoCrValueSetQuestionnaireAdmin1",
+      "meta": {
+        "profile": [
+          "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-valueset"
+        ]
+      },
+      "name": "WhoCrValueSetQuestionnaireAdmin1",
+      "status": "draft",
+      "experimental": true,
+      "publisher": "OpenHIE",
+      "contact": [
+        {
+          "name": "Elliot Silver",
+          "telecom": [
+            {
+              "system": "email",
+              "value": "elliot@argentixinfo.com",
+              "use": "work"
+            }
+          ]
+        }
+      ],
+      "jurisdiction": [
+        {
+          "coding": [
+            {
+              "system": "http://unstats.un.org/unsd/methods/m49/m49.htm",
+              "code": "001"
+            }
+          ]
+        }
+      ],
+      "immutable": false,
+      "copyright": "{{{year}}}",
+      "compose": {
+        "include": [
+          {
+            "valueSet": [
+              "http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetAdmin1"
+            ]
+          },
+          {
+            "system": "http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemQuestionnaireChoice"
+          }
+        ]
+      }
+    }
+  ],
+  "url": "http://openhie.github.io/covid-19/Questionnaire/WhoCrQuestionnaireCovid19Surveillance",
+  "version": "0.1.0",
+  "name": "WhoCrQuestionnaireCovid19Surveillance",
+  "status": "draft",
+  "experimental": true,
+  "subjectType": [
+    "Patient"
+  ],
+  "date": "2021-02-11T17:11:27+00:00",
+  "publisher": "OpenHIE",
+  "contact": [
+    {
+      "name": "OpenHIE",
+      "telecom": [
+        {
+          "system": "url",
+          "value": "http://www.ohie.org"
+        }
+      ]
+    }
+  ],
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "system": "http://unstats.un.org/unsd/methods/m49/m49.htm",
+          "code": "001"
+        }
+      ]
+    }
+  ],
+  "copyright": "2021",
+  "item": [
+    {
+      "linkId": "instruction",
+      "text": "Report to WHO within 48 hours of case identification",
+      "type": "display"
+    },
+    {
+      "linkId": "report_date",
+      "code": [
+        {
+          "system": "http://loinc.org",
+          "code": "77995-9"
+        }
+      ],
+      "text": "Date of reporting to national health authority:",
+      "type": "date"
+    },
+    {
+      "linkId": "report_country",
+      "code": [
+        {
+          "system": "http://loinc.org",
+          "code": "77983-5"
+        }
+      ],
+      "text": "Reporting country:",
+      "type": "choice",
+      "answerValueSet": "#WhoCrValueSetQuestionnaireCountry",
+      "item": [
+        {
+          "linkId": "report_country_other",
+          "code": [
+            {
+              "system": "http://loinc.org",
+              "code": "77983-5"
+            }
+          ],
+          "text": "If Other, please specify:",
+          "type": "string",
+          "enableWhen": [
+            {
+              "question": "report_country",
+              "operator": "=",
+              "answerCoding": {
+                "system": "http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemQuestionnaireChoice",
+                "code": "other"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "report_test_reason",
+      "code": [
+        {
+          "system": "http://loinc.org",
+          "code": "67098-4",
+          "display": "Reason for test or procedure"
+        }
+      ],
+      "text": "Why tested for COVID-19:",
+      "type": "choice",
+      "repeats": true,
+      "answerValueSet": "#WhoCrValueSetQuestionnaireReasonForTesting",
+      "item": [
+        {
+          "linkId": "report_test_reason_other",
+          "code": [
+            {
+              "system": "http://loinc.org",
+              "code": "67098-4",
+              "display": "Reason for test or procedure"
+            }
+          ],
+          "text": "If Other, please specify:",
+          "type": "string",
+          "enableWhen": [
+            {
+              "question": "report_test_reason",
+              "operator": "=",
+              "answerCoding": {
+                "system": "http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemQuestionnaireChoice",
+                "code": "other"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "section_patient_info",
+      "prefix": "Section 1",
+      "text": "Patient information",
+      "type": "group",
+      "item": [
+        {
+          "linkId": "patinfo_ID",
+          "code": [
+            {
+              "system": "http://loinc.org",
+              "code": "94659-0"
+            }
+          ],
+          "text": "Unique Case Identifier (used in country):",
+          "type": "string"
+        },
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unitValueSet",
+              "valueCanonical": "http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetAgeUnits"
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+              "valueInteger": 0
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+              "valueInteger": 125
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/maxDecimalPlaces",
+              "valueInteger": 0
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-maxQuantity",
+              "valueQuantity": {
+                "value": 125,
+                "system": "http://unitsofmeasure.org",
+                "code": "a"
+              }
+            }
+          ],
+          "linkId": "patinfo_ageonset",
+          "code": [
+            {
+              "system": "http://loinc.org",
+              "code": "30525-0"
+            }
+          ],
+          "text": "Age (use days if <1 month, months if <1 year):",
+          "type": "quantity"
+        },
+        {
+          "linkId": "patinfo_sex",
+          "code": [
+            {
+              "system": "http://loinc.org",
+              "code": "76689-9"
+            }
+          ],
+          "text": "Sex at birth:",
+          "type": "choice",
+          "answerValueSet": "http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetSexAtBirth"
+        },
+        {
+          "linkId": "patinfo_placediagnosed",
+          "text": "Place where the case was diagnosed:",
+          "type": "group",
+          "item": [
+            {
+              "linkId": "patinfo_idadmin0",
+              "code": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "96546-7"
+                }
+              ],
+              "text": "Country:",
+              "type": "choice",
+              "answerValueSet": "#WhoCrValueSetQuestionnaireCountry",
+              "item": [
+                {
+                  "linkId": "patinfo_idadmin0_other",
+                  "code": [
+                    {
+                      "system": "http://loinc.org",
+                      "code": "96546-7"
+                    }
+                  ],
+                  "text": "If Other, please specify:",
+                  "type": "string",
+                  "enableWhen": [
+                    {
+                      "question": "patinfo_idadmin0",
+                      "operator": "=",
+                      "answerCoding": {
+                        "system": "http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemQuestionnaireChoice",
+                        "code": "other"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "linkId": "patinfo_idadmin1",
+                  "code": [
+                    {
+                      "system": "http://loinc.org",
+                      "code": "96547-5"
+                    }
+                  ],
+                  "text": "Admin Level 1 (province):",
+                  "type": "choice",
+                  "enableWhen": [
+                    {
+                      "question": "patinfo_idadmin0",
+                      "operator": "exists",
+                      "answerBoolean": true
+                    }
+                  ],
+                  "answerValueSet": "#WhoCrValueSetQuestionnaireAdmin1",
+                  "item": [
+                    {
+                      "linkId": "patinfo_idadmin1_other",
+                      "code": [
+                        {
+                          "system": "http://loinc.org",
+                          "code": "96547-5"
+                        }
+                      ],
+                      "text": "If Other, please specify:",
+                      "type": "string",
+                      "enableWhen": [
+                        {
+                          "question": "patinfo_idadmin1",
+                          "operator": "=",
+                          "answerCoding": {
+                            "system": "http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemQuestionnaireChoice",
+                            "code": "other"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "patinfo_placereside",
+          "text": "Case usual place of residency:",
+          "type": "group",
+          "item": [
+            {
+              "linkId": "patinfo_resadmin0",
+              "code": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "77983-5"
+                }
+              ],
+              "text": "Country:",
+              "type": "choice",
+              "answerValueSet": "#WhoCrValueSetQuestionnaireCountry",
+              "item": [
+                {
+                  "linkId": "patinfo_resadmin0_other",
+                  "code": [
+                    {
+                      "system": "http://loinc.org",
+                      "code": "77983-5"
+                    }
+                  ],
+                  "text": "If Other, please specify:",
+                  "type": "string",
+                  "enableWhen": [
+                    {
+                      "question": "patinfo_resadmin0",
+                      "operator": "=",
+                      "answerCoding": {
+                        "system": "http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemQuestionnaireChoice",
+                        "code": "other"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "section_clinical_status",
+      "prefix": "Section 2",
+      "text": "Clinical Status",
+      "type": "group",
+      "item": [
+        {
+          "linkId": "Lab_date1",
+          "text": "Date of first laboratory confirmation test:",
+          "type": "date"
+        },
+        {
+          "linkId": "patcourse_asymp",
+          "text": "Any symptoms or signs at time of specimen collection that resulted in first laboratory confirmation?",
+          "type": "choice",
+          "answerValueSet": "http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetYesNoUnk",
+          "item": [
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/questionnaire-item-control",
+                        "code": "help"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "linkId": "patcourse_asymp_help",
+              "text": "No: Case was asymptomatic",
+              "type": "display"
+            },
+            {
+              "linkId": "patcourse_dateonset",
+              "code": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "65222-2"
+                }
+              ],
+              "text": "Date of onset of symptoms:",
+              "type": "date",
+              "enableWhen": [
+                {
+                  "question": "patcourse_asymp",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://terminology.hl7.org/CodeSystem/v2-0136",
+                    "code": "Y"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "section_comorbidity",
+          "text": "Underlying conditions and comorbidity:",
+          "type": "group",
+          "item": [
+            {
+              "linkId": "Comcond_any",
+              "code": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "75618-9"
+                }
+              ],
+              "text": "Any underlying conditions?",
+              "type": "choice",
+              "answerValueSet": "http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetYesNoUnk"
+            },
+            {
+              "linkId": "section_comorb_list",
+              "text": "If yes, select all that apply:",
+              "type": "group",
+              "enableWhen": [
+                {
+                  "question": "Comcond_any",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://terminology.hl7.org/CodeSystem/v2-0136",
+                    "code": "Y"
+                  }
+                }
+              ],
+              "item": [
+                {
+                  "linkId": "comorbidity",
+                  "code": [
+                    {
+                      "system": "http://loinc.org",
+                      "code": "75618-9"
+                    }
+                  ],
+                  "text": "Comorbidity or condition present",
+                  "type": "choice",
+                  "repeats": true,
+                  "answerValueSet": "#WhoCrValueSetQuestionnaireComorbidity",
+                  "item": [
+                    {
+                      "linkId": "comorbidity_other",
+                      "code": [
+                        {
+                          "system": "http://loinc.org",
+                          "code": "75618-9"
+                        }
+                      ],
+                      "text": "If Other, please specify:",
+                      "type": "string",
+                      "enableWhen": [
+                        {
+                          "question": "comorbidity",
+                          "operator": "=",
+                          "answerCoding": {
+                            "system": "http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemQuestionnaireChoice",
+                            "code": "other"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "linkId": "Comcond_preg",
+                  "code": [
+                    {
+                      "system": "http://loinc.org",
+                      "code": "82810-3"
+                    }
+                  ],
+                  "text": "Is the patient pregnant?",
+                  "type": "boolean",
+                  "item": [
+                    {
+                      "linkId": "Comcond_pregt",
+                      "code": [
+                        {
+                          "system": "http://loinc.org",
+                          "code": "32418-6"
+                        }
+                      ],
+                      "text": "Trimester of pregnancy",
+                      "type": "choice",
+                      "enableWhen": [
+                        {
+                          "question": "Comcond_preg",
+                          "operator": "=",
+                          "answerBoolean": true
+                        }
+                      ],
+                      "answerValueSet": "http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetPregnancyTrimester"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "linkId": "section_health_status",
+              "text": "Health Status at time of Reporting:",
+              "type": "group",
+              "item": [
+                {
+                  "linkId": "patcourse_admit",
+                  "code": [
+                    {
+                      "system": "http://loinc.org",
+                      "code": "77974-4"
+                    }
+                  ],
+                  "text": "Admission to hospital:",
+                  "type": "choice",
+                  "answerValueSet": "http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetYesNoUnk"
+                },
+                {
+                  "linkId": "section_hospital_admission",
+                  "text": "if yes:",
+                  "type": "group",
+                  "enableWhen": [
+                    {
+                      "question": "patcourse_admit",
+                      "operator": "=",
+                      "answerCoding": {
+                        "system": "http://terminology.hl7.org/CodeSystem/v2-0136",
+                        "code": "Y"
+                      }
+                    }
+                  ],
+                  "item": [
+                    {
+                      "linkId": "patcourse_presHCF",
+                      "code": [
+                        {
+                          "system": "http://loinc.org",
+                          "code": "8656-1"
+                        }
+                      ],
+                      "text": "First date of admission to hospital:",
+                      "type": "date"
+                    },
+                    {
+                      "linkId": "patcourse_icu",
+                      "code": [
+                        {
+                          "system": "http://loinc.org",
+                          "code": "95420-6"
+                        }
+                      ],
+                      "text": "Did the case receive care in an intensive care unit (ICU)?",
+                      "type": "choice",
+                      "answerValueSet": "http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetYesNoUnk"
+                    },
+                    {
+                      "linkId": "patcourse_vent",
+                      "code": [
+                        {
+                          "system": "http://loinc.org",
+                          "code": "96539-2"
+                        }
+                      ],
+                      "text": "Did the case receive ventilation?",
+                      "type": "choice",
+                      "answerValueSet": "http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetYesNoUnk"
+                    },
+                    {
+                      "linkId": "patcourse_ecmo",
+                      "code": [
+                        {
+                          "system": "http://loinc.org",
+                          "code": "96540-0"
+                        }
+                      ],
+                      "text": "Did the case receive extracorporeal membrane oxygenation?",
+                      "type": "choice",
+                      "answerValueSet": "http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetYesNoUnk"
+                    }
+                  ]
+                },
+                {
+                  "linkId": "patcourse_iso",
+                  "code": [
+                    {
+                      "system": "http://loinc.org",
+                      "code": "96548-3"
+                    }
+                  ],
+                  "text": "Is case in isolation with Infection Control Practice in place?",
+                  "type": "choice",
+                  "answerValueSet": "http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetYesNoUnk",
+                  "item": [
+                    {
+                      "linkId": "patcourse_dateiso",
+                      "code": [
+                        {
+                          "system": "http://loinc.org",
+                          "code": "96549-1"
+                        }
+                      ],
+                      "text": "Date of isolation:",
+                      "type": "date",
+                      "enableWhen": [
+                        {
+                          "question": "patcourse_iso",
+                          "operator": "=",
+                          "answerCoding": {
+                            "system": "http://terminology.hl7.org/CodeSystem/v2-0136",
+                            "code": "Y"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "section_exposure_risk",
+      "prefix": "Section 3",
+      "text": "Exposure risk in the 14 days prior to symptom onset (prior to testing if asymptomatic)",
+      "type": "group",
+      "item": [
+        {
+          "linkId": "patinfo_occuhcw",
+          "code": [
+            {
+              "system": "http://loinc.org",
+              "code": "95418-0"
+            }
+          ],
+          "text": "Is case a Health Care Worker (any job in a health care setting):",
+          "type": "choice",
+          "answerValueSet": "http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetYesNoUnk",
+          "item": [
+            {
+              "linkId": "patinfo_occuhcw_ifyes",
+              "text": "If yes:",
+              "type": "group",
+              "enableWhen": [
+                {
+                  "question": "patinfo_occuhcw",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://terminology.hl7.org/CodeSystem/v2-0136",
+                    "code": "Y"
+                  }
+                }
+              ],
+              "item": [
+                {
+                  "linkId": "patinfo_occuhcw_hcf_info",
+                  "type": "group",
+                  "repeats": true,
+                  "item": [
+                    {
+                      "linkId": "patinfo_occuhcw_country",
+                      "code": [
+                        {
+                          "system": "http://loinc.org",
+                          "code": "80437-7"
+                        }
+                      ],
+                      "text": "Country:",
+                      "type": "choice",
+                      "answerValueSet": "#WhoCrValueSetQuestionnaireCountry",
+                      "item": [
+                        {
+                          "linkId": "patinfo_occuhcw_country_other",
+                          "code": [
+                            {
+                              "system": "http://loinc.org",
+                              "code": "80437-7"
+                            }
+                          ],
+                          "text": "If Other, please specify:",
+                          "type": "string",
+                          "enableWhen": [
+                            {
+                              "question": "patinfo_occuhcw_country",
+                              "operator": "=",
+                              "answerCoding": {
+                                "system": "http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemQuestionnaireChoice",
+                                "code": "other"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "patinfo_occuhcw_city",
+                      "code": [
+                        {
+                          "system": "http://loinc.org",
+                          "code": "80431-0"
+                        }
+                      ],
+                      "text": "City:",
+                      "type": "string"
+                    },
+                    {
+                      "linkId": "patinfo_occuhcw_name",
+                      "code": [
+                        {
+                          "system": "http://loinc.org",
+                          "code": "76696-4"
+                        }
+                      ],
+                      "text": "Name of Facility:",
+                      "type": "string"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "expo_travel",
+          "code": [
+            {
+              "system": "http://loinc.org",
+              "code": "96542-6"
+            }
+          ],
+          "text": "Has the case travelled in the 14 days prior to symptom onset?",
+          "type": "choice",
+          "answerValueSet": "http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetYesNoUnk",
+          "item": [
+            {
+              "linkId": "expo_travel_ifyes",
+              "text": "If yes, please specify the places the patient travelled to and date of departure from the places:",
+              "type": "group",
+              "enableWhen": [
+                {
+                  "question": "expo_travel",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://terminology.hl7.org/CodeSystem/v2-0136",
+                    "code": "Y"
+                  }
+                }
+              ],
+              "repeats": true,
+              "item": [
+                {
+                  "linkId": "expo_travel_country",
+                  "code": [
+                    {
+                      "system": "http://loinc.org",
+                      "code": "94651-7"
+                    }
+                  ],
+                  "text": "Country:",
+                  "type": "choice",
+                  "answerValueSet": "#WhoCrValueSetQuestionnaireCountry",
+                  "item": [
+                    {
+                      "linkId": "expo_travel_country_other",
+                      "code": [
+                        {
+                          "system": "http://loinc.org",
+                          "code": "94651-7"
+                        }
+                      ],
+                      "text": "If Other, please specify:",
+                      "type": "string",
+                      "enableWhen": [
+                        {
+                          "question": "expo_travel_country",
+                          "operator": "=",
+                          "answerCoding": {
+                            "system": "http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemQuestionnaireChoice",
+                            "code": "other"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "linkId": "expo_travel_city",
+                  "code": [
+                    {
+                      "system": "http://loinc.org",
+                      "code": "94653-3"
+                    }
+                  ],
+                  "text": "City:",
+                  "type": "string"
+                },
+                {
+                  "linkId": "expo_travel_date",
+                  "code": [
+                    {
+                      "system": "http://loinc.org",
+                      "code": "91560-3"
+                    }
+                  ],
+                  "text": "Date of Departure from the place:",
+                  "type": "dateTime"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "expo_visit_healthcare",
+          "code": [
+            {
+              "system": "http://loinc.org",
+              "code": "96543-4"
+            }
+          ],
+          "text": "Has case visited any health care facility in the 14 days prior to symptom onset?",
+          "type": "choice",
+          "answerValueSet": "http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetYesNoUnk"
+        },
+        {
+          "linkId": "expo_contact_case",
+          "code": [
+            {
+              "system": "http://loinc.org",
+              "code": "96544-2"
+            }
+          ],
+          "text": "Has case had contact with a confirmed case in the 14 days prior to symptom onset?",
+          "type": "choice",
+          "answerValueSet": "http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetYesNoUnk",
+          "item": [
+            {
+              "linkId": "expo_contacts",
+              "text": "If yes, please list unique case identifiers of all probable or confirmed cases:",
+              "type": "group",
+              "enableWhen": [
+                {
+                  "question": "expo_contact_case",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://terminology.hl7.org/CodeSystem/v2-0136",
+                    "code": "Y"
+                  }
+                }
+              ],
+              "repeats": true,
+              "item": [
+                {
+                  "linkId": "expo_ID",
+                  "code": [
+                    {
+                      "system": "http://loinc.org",
+                      "code": "94657-4"
+                    }
+                  ],
+                  "text": "Contact ID",
+                  "type": "string"
+                },
+                {
+                  "linkId": "exposure_contact_exposure_details",
+                  "text": "Exposure details",
+                  "type": "group",
+                  "repeats": true,
+                  "item": [
+                    {
+                      "linkId": "expo_case_date_first",
+                      "code": [
+                        {
+                          "system": "http://loinc.org",
+                          "code": "96545-9"
+                        }
+                      ],
+                      "text": "First Date of Contact",
+                      "type": "dateTime"
+                    },
+                    {
+                      "linkId": "expo_case_date_last",
+                      "code": [
+                        {
+                          "system": "http://loinc.org",
+                          "code": "96545-9"
+                        }
+                      ],
+                      "text": "Last Date of Contact",
+                      "type": "dateTime"
+                    },
+                    {
+                      "linkId": "expo_case_setting_detail",
+                      "code": [
+                        {
+                          "system": "http://loinc.org",
+                          "code": "81267-7"
+                        }
+                      ],
+                      "text": "Contact setting:",
+                      "type": "text"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "expo_case_location",
+          "code": [
+            {
+              "system": "http://loinc.org",
+              "code": "77984-3"
+            }
+          ],
+          "text": "Most likely country of exposure:",
+          "type": "choice",
+          "answerValueSet": "#WhoCrValueSetQuestionnaireCountry",
+          "item": [
+            {
+              "linkId": "expo_case_location_other",
+              "code": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "77984-3"
+                }
+              ],
+              "text": "If Other, please specify:",
+              "type": "string",
+              "enableWhen": [
+                {
+                  "question": "expo_case_location",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemQuestionnaireChoice",
+                    "code": "other"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "section_outcome",
+      "prefix": "Section 4",
+      "text": "Outcome",
+      "type": "group",
+      "item": [
+        {
+          "linkId": "outcome_instruct",
+          "text": "Complete and re-send the full form as soon as outcome of disease is known or after 30 days after initial report.",
+          "type": "display"
+        },
+        {
+          "linkId": "outcome_submitted_date",
+          "code": [
+            {
+              "system": "http://loinc.org",
+              "code": "96553-3"
+            }
+          ],
+          "text": "Date of re-submission of this report:",
+          "type": "date"
+        },
+        {
+          "linkId": "outcome_asymp",
+          "text": "If case was asymptomatic at time of specimen collection resulting in first laboratory confirmation, did the case develop any symptoms or signs at any time prior to discharge or death?",
+          "type": "choice",
+          "answerValueSet": "http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetYesNoUnk",
+          "item": [
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/questionnaire-item-control",
+                        "code": "help"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "linkId": "outcome_asymp_help",
+              "text": "No: the case remains asymptomatic; Yes: the previously asymptomatic case developed symptoms and/or signs of illness.",
+              "type": "display"
+            }
+          ]
+        },
+        {
+          "linkId": "outcome_asymp_date",
+          "code": [
+            {
+              "system": "http://loinc.org",
+              "code": "65222-2"
+            }
+          ],
+          "text": "Date of onset of symptoms/signs of illness:",
+          "type": "date",
+          "enableWhen": [
+            {
+              "question": "outcome_asymp",
+              "operator": "=",
+              "answerCoding": {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0136",
+                "code": "Y"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "section_clinical_course",
+          "text": "Clinical Course:",
+          "type": "group",
+          "item": [
+            {
+              "linkId": "outcome_patcourse_admit",
+              "code": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "77974-4"
+                }
+              ],
+              "text": "Admission to hospital (may have been previously reported):",
+              "type": "choice",
+              "answerValueSet": "http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetYesNoUnk"
+            },
+            {
+              "linkId": "outcome_patcourse_presHCF",
+              "code": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "8656-1"
+                }
+              ],
+              "text": "First date of admission to hospital:",
+              "type": "date",
+              "enableWhen": [
+                {
+                  "question": "outcome_patcourse_admit",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://terminology.hl7.org/CodeSystem/v2-0136",
+                    "code": "Y"
+                  }
+                }
+              ]
+            },
+            {
+              "linkId": "section_outcome_admission",
+              "text": "If yes:",
+              "type": "group",
+              "enableWhen": [
+                {
+                  "question": "outcome_patcourse_admit",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://terminology.hl7.org/CodeSystem/v2-0136",
+                    "code": "Y"
+                  }
+                }
+              ],
+              "item": [
+                {
+                  "linkId": "outcome_patcourse_icu",
+                  "code": [
+                    {
+                      "system": "http://loinc.org",
+                      "code": "95420-6"
+                    }
+                  ],
+                  "text": "Did the case receive care in an intensive care unit (ICU)?",
+                  "type": "choice",
+                  "answerValueSet": "http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetYesNoUnk"
+                },
+                {
+                  "linkId": "outcome_patcourse_vent",
+                  "code": [
+                    {
+                      "system": "http://loinc.org",
+                      "code": "96539-2"
+                    }
+                  ],
+                  "text": "Did the case receive ventilation?",
+                  "type": "choice",
+                  "answerValueSet": "http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetYesNoUnk"
+                },
+                {
+                  "linkId": "outcome_patcourse_ecmo",
+                  "code": [
+                    {
+                      "system": "http://loinc.org",
+                      "code": "96540-0"
+                    }
+                  ],
+                  "text": "Did the case receive extracorporeal membrane oxygenation?",
+                  "type": "choice",
+                  "answerValueSet": "http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetYesNoUnk"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "outcome_patcourse_status",
+          "code": [
+            {
+              "system": "http://loinc.org",
+              "code": "91541-3"
+            }
+          ],
+          "text": "Health Outcome:",
+          "type": "choice",
+          "answerValueSet": "#WhoCrValueSetQuestionnairePatientOutcome",
+          "item": [
+            {
+              "linkId": "outcome_patcourse_status_other",
+              "text": "If other, please explain:",
+              "type": "string",
+              "enableWhen": [
+                {
+                  "question": "outcome_patcourse_status",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemQuestionnaireChoice",
+                    "code": "other"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "outcome_date_of_outcome",
+          "text": "Date of Release from isolation/hospital or Date of Death:",
+          "type": "date"
+        },
+        {
+          "linkId": "outcome_lab",
+          "text": "If released from hospital/isolation, details of last laboratory test",
+          "type": "group",
+          "enableWhen": [
+            {
+              "question": "outcome_patcourse_status",
+              "operator": "!=",
+              "answerCoding": {
+                "system": "http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemPatientOutcome",
+                "code": "DEATH"
+              }
+            },
+            {
+              "question": "outcome_date_of_outcome",
+              "operator": "exists",
+              "answerBoolean": true
+            }
+          ],
+          "enableBehavior": "all",
+          "item": [
+            {
+              "linkId": "outcome_lab_date",
+              "code": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "96550-9"
+                }
+              ],
+              "text": "Date of last test:",
+              "type": "date"
+            },
+            {
+              "linkId": "outcome_lab_result",
+              "code": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "96552-5"
+                }
+              ],
+              "text": "Results of last test:",
+              "type": "choice",
+              "answerValueSet": "http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetTestResult"
+            }
+          ]
+        },
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+              "valueInteger": 0
+            }
+          ],
+          "linkId": "outcome_contacts_followed",
+          "code": [
+            {
+              "system": "http://loinc.org",
+              "code": "96551-7"
+            }
+          ],
+          "text": "Total number of contacts followed for this case:",
+          "type": "integer"
+        },
+        {
+          "linkId": "outcome_contacts_followed_unknown",
+          "code": [
+            {
+              "system": "http://loinc.org",
+              "code": "96551-7"
+            }
+          ],
+          "text": "Unknown:",
+          "type": "boolean"
+        }
+      ]
+    }
+  ]
+}

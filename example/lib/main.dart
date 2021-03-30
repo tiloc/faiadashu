@@ -199,6 +199,18 @@ class _HomePageState extends State<HomePage> {
                               'assets/instruments/bluebook.json')));
             },
           ),
+          ListTile(
+            title: const Text('WHO COVID19 Surveillance'),
+            subtitle: const Text('BROKEN Real-world, mixed-type survey by WHO'),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          const QuestionnaireScrollerPage.fromAsset(
+                              'assets/instruments/who_covid19.json')));
+            },
+          ),
         ],
       ),
     );

@@ -60,6 +60,9 @@ class QuestionnaireResponseAggregator
     final narrativeAggregator = topLocation.aggregator<NarrativeAggregator>();
 
     final questionnaireResponse = QuestionnaireResponse(
+        // TODO: Should this come from topLocation, or simply be a param for aggregate?
+        // TODO: For status = 'complete' the items which are not enabled SHALL be excluded.
+        //  For other status they might be included  (FHIR-31077)
         status: topLocation.responseStatus,
         item: responseItems,
         authored: FhirDateTime(DateTime.now()),

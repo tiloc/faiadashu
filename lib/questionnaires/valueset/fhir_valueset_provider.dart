@@ -2,13 +2,14 @@ import 'dart:convert';
 
 import 'package:fhir/r4.dart';
 
+import 'valueset_provider.dart';
+
 // ignore: avoid_classes_with_only_static_members
-class FhirValueSet {
-  // TODO: Caching
-  static ValueSet? getValueSet(String uri) {
+class FhirValueSetProvider extends ValueSetProvider {
+  @override
+  ValueSet? getValueSet(String uri) {
     switch (uri) {
       case 'http://hl7.org/fhir/ValueSet/administrative-gender':
-        // TODO: Carve out into an extension
         return ValueSet(
             compose: ValueSetCompose(include: [
           ValueSetInclude(
@@ -163,4 +164,10 @@ class FhirValueSet {
   }
 }
 ''';
+
+  @override
+  Future<void> init() async {
+    // Do nothing
+    return;
+  }
 }

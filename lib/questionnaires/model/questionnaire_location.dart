@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../fhir_types/fhir_types_extensions.dart';
 import '../../logging/logging.dart';
+import '../valueset/fhir_valueset_provider.dart';
 import '../view/xhtml.dart';
 import 'aggregator.dart';
 import 'questionnaire_exceptions.dart';
@@ -83,6 +84,11 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
     if (notifyListeners) {
       this.notifyListeners();
     }
+  }
+
+  /// Get a [ValueSet] which is not contained in the [Questionnaire].
+  ValueSet? getValueSet(String uri) {
+    return FhirValueSetProvider().getValueSet(uri);
   }
 
   /// Find a contained element by its id.

@@ -11,13 +11,13 @@
 * Localized output of clinical codings
 * Development tree view for clinical and administrative data structures
   
-![Screenshot](./doc/png/observations.png)
+![Screenshot](https://user-images.githubusercontent.com/16414047/112978818-12977f00-9158-11eb-8e1c-6772dcc3270a.png)
 
 #### The Major Thing: Filler widget for Questionnaires
 
 Supports numerous features described in the FHIR® standard.
 
-![Screenshot](./doc/png/github-teaser.gif)
+![Screenshot](https://user-images.githubusercontent.com/16414047/112978477-b0d71500-9157-11eb-9c70-f8bddc7b6396.gif)
 
 **Click link below for narrated longer video**
 

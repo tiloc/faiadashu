@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import '../../../../fhir_types/fhir_types_extensions.dart';
 import '../../../../logging/logging.dart';
 import '../../../questionnaires.dart';
-import '../../../valueset/fhir_valueset.dart';
 import '../../xhtml.dart';
 
 class ChoiceAnswer extends QuestionnaireAnswerFiller {
@@ -194,7 +193,7 @@ class _ChoiceAnswerState
       final isValueSetContained = key.startsWith('#');
       final ValueSet? valueSet = isValueSetContained
           ? widget.location.top.findContainedByElementId(key) as ValueSet?
-          : FhirValueSet.getValueSet(key);
+          : widget.location.top.getValueSet(key);
 
       if (valueSet == null) {
         if (isValueSetContained) {

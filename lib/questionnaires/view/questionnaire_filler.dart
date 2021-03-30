@@ -89,23 +89,41 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
     return FutureBuilder<QuestionnaireTopLocation>(
         future: builderFuture,
         builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            developer.log('FutureBuilder hasData',
-                level: LogLevel.debug, name: logTag);
-            _topLocation = snapshot.data;
-            // TODO: There has got to be a more elegant way! Goal is to register the lister exactly once, after the future has completed.
-            if (_onTopChangeListenerFunction == null) {
-              _onTopChangeListenerFunction = () => _onTopChange();
-              _topLocation!.addListener(_onTopChangeListenerFunction!);
-            }
-            return QuestionnaireFillerData._(
-              _topLocation!,
-              builder: widget.builder,
-            );
-          } else {
-            developer.log('FutureBuilder still waiting for data...',
-                level: LogLevel.debug, name: logTag);
-            return const QuestionnaireLoadingIndicator();
+          switch (snapshot.connectionState) {
+            case ConnectionState.active:
+              // TODO: This should never happen in our use-case?
+              developer.log('FutureBuilder is active...',
+                  level: LogLevel.debug, name: logTag);
+              return QuestionnaireLoadingIndicator(snapshot);
+            case ConnectionState.none:
+              return QuestionnaireLoadingIndicator(snapshot);
+            case ConnectionState.waiting:
+              developer.log('FutureBuilder still waiting for data...',
+                  level: LogLevel.debug, name: logTag);
+              return QuestionnaireLoadingIndicator(snapshot);
+            case ConnectionState.done:
+              if (snapshot.hasError) {
+                developer.log('FutureBuilder hasError',
+                    level: LogLevel.warn, name: logTag);
+                return QuestionnaireLoadingIndicator(snapshot);
+              }
+              if (snapshot.hasData) {
+                developer.log('FutureBuilder hasData',
+                    level: LogLevel.info, name: logTag);
+                _topLocation = snapshot.data;
+                // TODO: There has got to be a more elegant way! Goal is to register the lister exactly once, after the future has completed.
+                // Can I do .then for that?
+                if (_onTopChangeListenerFunction == null) {
+                  _onTopChangeListenerFunction = () => _onTopChange();
+                  _topLocation!.addListener(_onTopChangeListenerFunction!);
+                }
+                return QuestionnaireFillerData._(
+                  _topLocation!,
+                  builder: widget.builder,
+                );
+              }
+              throw StateError(
+                  'FutureBuilder snapshot has unexpected state: $snapshot');
           }
         });
   }
