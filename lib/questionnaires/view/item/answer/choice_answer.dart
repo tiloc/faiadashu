@@ -242,7 +242,7 @@ class _ChoiceAnswerState
         }
 
         for (final valueSetInclude in valueSetIncludes) {
-          List<ValueSetConcept> valueSetConcepts =
+          final List<ValueSetConcept> valueSetConcepts =
               valueSetInclude.concept ?? [];
 
           if (valueSetConcepts.isEmpty) {
