@@ -1,5 +1,4 @@
 import 'dart:collection';
-import 'dart:developer' as developer;
 
 import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
@@ -11,6 +10,7 @@ import '../../../questionnaires.dart';
 import '../../xhtml.dart';
 
 class ChoiceAnswer extends QuestionnaireAnswerFiller {
+  static final logger = Logger('ChoiceAnswer');
   // This class abuses CodeableConcept to model multiple choice and open choice.
 
   const ChoiceAnswer(
@@ -23,6 +23,7 @@ class ChoiceAnswer extends QuestionnaireAnswerFiller {
 
 class _ChoiceAnswerState
     extends QuestionnaireAnswerState<CodeableConcept, ChoiceAnswer> {
+  static final logger = Logger('_ChoiceAnswerState');
   // ignore: prefer_collection_literals
   final _answerOptions = LinkedHashMap<String, QuestionnaireAnswerOption>();
 
@@ -240,7 +241,7 @@ class _ChoiceAnswerState
             valueSetInclude.concept ?? [];
 
         if (valueSetConcepts.isEmpty) {
-          developer.log('Concepts in ValueSet $key is empty.',
+          logger.log('Concepts in ValueSet $key is empty.',
               level: LogLevel.warn);
         }
 

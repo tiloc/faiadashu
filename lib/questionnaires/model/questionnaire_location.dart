@@ -1,5 +1,4 @@
 import 'dart:collection';
-import 'dart:developer' as developer;
 
 import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
@@ -20,6 +19,7 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
   final Map<String, QuestionnaireLocation> _cachedItems = {};
   List<QuestionnaireLocation>? _enabledWhens;
   final List<Aggregator>? _aggregators;
+  static final logger = Logger('QuestionnaireTopLocation');
 
   /// Create the first location top-down of the given [Questionnaire].
   /// Will throw [Error]s in case this [Questionnaire] has no items.
@@ -34,8 +34,8 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
             null,
             0,
             0) {
-    developer.log('QuestionnaireTopLocation.fromQuestionnaire',
-        level: LogLevel.debug, name: logTag);
+    logger.log('QuestionnaireTopLocation.fromQuestionnaire',
+        level: LogLevel.debug);
     _top = this;
     // This will set up the traversal order and fill up the cache.
     _ensureOrderedItems();
@@ -51,8 +51,7 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
       }
     }
 
-    developer.log('_enabledWhens: $_enabledWhens',
-        name: logTag, level: LogLevel.debug);
+    logger.log('_enabledWhens: $_enabledWhens', level: LogLevel.debug);
 
     if (aggregators != null) {
       for (final aggregator in aggregators) {
@@ -76,10 +75,10 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
 
   void bumpRevision({bool notifyListeners = true}) {
     final newRevision = _revision + 1;
-    developer.log(
-        'QuestionnaireTopLocation.bumpRevision $notifyListeners: $_revision -> $newRevision',
-        level: LogLevel.debug,
-        name: logTag);
+    logger.log(
+      'QuestionnaireTopLocation.bumpRevision $notifyListeners: $_revision -> $newRevision',
+      level: LogLevel.debug,
+    );
     _revision = newRevision;
     if (notifyListeners) {
       this.notifyListeners();
@@ -146,17 +145,16 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
   /// Update the current enablement status of all items.
   void updateEnableWhen({bool notifyListeners = true}) {
     if (_enabledWhens == null) {
-      developer.log('updateEnableWhen: no conditional items',
-          name: logTag, level: LogLevel.trace);
+      logger.log('updateEnableWhen: no conditional items',
+          level: LogLevel.trace);
       return;
     }
-    developer.log('updateEnableWhen()', name: logTag, level: LogLevel.trace);
+    logger.log('updateEnableWhen()', level: LogLevel.trace);
 
     final previouslyEnabled = List<bool>.generate(
         preOrder().length, (index) => preOrder().elementAt(index).enabled,
         growable: false);
-    developer.log('prevEnabled: $previouslyEnabled',
-        name: logTag, level: LogLevel.trace);
+    logger.log('prevEnabled: $previouslyEnabled', level: LogLevel.trace);
     for (final location in preOrder()) {
       location._enabled = true;
     }
@@ -167,14 +165,12 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
     final afterEnabled = List<bool>.generate(
         preOrder().length, (index) => preOrder().elementAt(index).enabled,
         growable: false);
-    developer.log('afterEnabled: $afterEnabled',
-        name: logTag, level: LogLevel.trace);
+    logger.log('afterEnabled: $afterEnabled', level: LogLevel.trace);
 
     if (!listEquals(previouslyEnabled, afterEnabled)) {
       bumpRevision(notifyListeners: notifyListeners);
     } else {
-      developer.log('enableWhen unchanged.',
-          level: LogLevel.debug, name: logTag);
+      logger.log('enableWhen unchanged.', level: LogLevel.debug);
     }
   }
 
@@ -204,6 +200,7 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
   final int level;
   int _revision = 1;
   late final String logTag;
+  static final logger = Logger('QuestionnaireLocation');
 
   QuestionnaireTopLocation get top => _top!;
 
@@ -222,9 +219,8 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
     if (questionnaireItem.enableBehavior != null &&
         questionnaireItem.enableBehavior !=
             QuestionnaireItemEnableBehavior.any) {
-      developer.log(
+      logger.log(
           'Unsupported enableBehavior: ${questionnaireItem.enableBehavior}',
-          name: logTag,
           level: LogLevel.warn);
     }
     forEnableWhens((qew) {
@@ -243,16 +239,15 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
               ?.valueCoding;
           // TODO: More sophistication? System, cardinality, etc.
           if (responseCoding?.code != qew.answerCoding?.code) {
-            developer.log(
+            logger.log(
                 'enableWhen: no equality $responseCoding != ${qew.answerCoding}',
-                level: LogLevel.debug,
-                name: logTag);
+                level: LogLevel.debug);
             _disableWithChildren();
           }
           break;
         default:
-          developer.log('Unsupported operator: ${qew.operator_}.',
-              name: logTag, level: LogLevel.warn);
+          logger.log('Unsupported operator: ${qew.operator_}.',
+              level: LogLevel.warn);
       }
     });
   }
@@ -314,8 +309,8 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
       (questionnaireItem.item != null) && (questionnaireItem.item!.isNotEmpty);
 
   set responseItem(QuestionnaireResponseItem? questionnaireResponseItem) {
-    developer.log('set responseItem $questionnaireResponseItem',
-        name: logTag, level: LogLevel.debug);
+    logger.log('set responseItem $questionnaireResponseItem',
+        level: LogLevel.debug);
     if (questionnaireResponseItem != _questionnaireResponseItem) {
       _questionnaireResponseItem = questionnaireResponseItem;
       top.bumpRevision();
@@ -415,7 +410,7 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
   }
 
   LinkedHashMap<String, QuestionnaireLocation> _addChildren() {
-    developer.log('_addChildren $linkId', level: LogLevel.trace, name: logTag);
+    logger.log('_addChildren $linkId', level: LogLevel.trace);
     final LinkedHashMap<String, QuestionnaireLocation> locationMap =
         LinkedHashMap<String, QuestionnaireLocation>();
     if (locationMap.containsKey(linkId)) {
@@ -477,8 +472,6 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
       this.parent,
       this.siblingIndex,
       this.level) {
-    // ignore: no_runtimetype_tostring
-    logTag = 'fdash.${runtimeType.toString()}';
     _top = top;
   }
 

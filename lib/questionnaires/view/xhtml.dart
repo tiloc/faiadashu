@@ -1,16 +1,15 @@
-import 'dart:developer' as developer;
-
+import 'package:faiadashu/fire_dash.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_html_css/simple_html_css.dart';
 
 import '../../fhir_types/fhir_types.dart';
-import '../../logging/log_level.dart';
+import '../../logging/logging.dart';
 import '../model/questionnaire_location.dart';
 
 /// Extract Xhtml from SDC extensions and build Widgets from Xhtml.
 class Xhtml {
-  static const String logTag = 'fdash.Xhtml';
+  static final Logger logger = Logger('Xhtml');
   const Xhtml._();
 
   static Widget? toWidget(
@@ -21,8 +20,7 @@ class Xhtml {
       {double? width,
       double? height,
       Key? key}) {
-    developer.log('enter toWidget $plainText',
-        level: LogLevel.trace, name: logTag);
+    logger.log('enter toWidget $plainText', level: LogLevel.trace);
     final xhtml = Xhtml.toXhtml(plainText, extension);
 
     if (xhtml == null) {
@@ -38,12 +36,18 @@ class Xhtml {
           width: width, height: height, semanticLabel: plainText);
     }
     if (xhtml.startsWith(imgHashPrefix)) {
-      final base64Binary = topLocation.findContainedByElementId(xhtml.substring(
-              imgHashPrefix.length, xhtml.length - imgSuffix.length + 1))
-          as Binary?;
+      final elementId = xhtml.substring(
+          imgHashPrefix.length, xhtml.length - imgSuffix.length + 1);
+      final base64Binary =
+          topLocation.findContainedByElementId(elementId) as Binary?;
       final base64String = base64Binary?.data?.value;
+      if (base64String == null) {
+        throw QuestionnaireFormatException(
+            'Malformed base64 string for image element ID $elementId',
+            elementId);
+      }
       return Base64BinaryWidget(
-        base64String!,
+        base64String,
         width: width,
         height: height,
         semanticLabel: plainText,

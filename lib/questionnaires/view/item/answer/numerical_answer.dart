@@ -1,5 +1,3 @@
-import 'dart:developer' as developer;
-
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -21,6 +19,8 @@ class NumericalAnswer extends QuestionnaireAnswerFiller {
 
 class _NumericalAnswerState
     extends QuestionnaireAnswerState<Quantity, NumericalAnswer> {
+  static final logger = Logger('_NumericalAnswerState');
+
   late final TextInputFormatter _numberInputFormatter;
   late final NumberFormat _numberInputFormat;
   late final bool _isSlider;
@@ -28,16 +28,12 @@ class _NumericalAnswerState
   late final double _maxValue;
   late final int _maxDecimal;
   late final int? _divisions;
-  late final String logTag;
 
   _NumericalAnswerState();
 
   @override
   void initState() {
     super.initState();
-    // ignore: no_runtimetype_tostring
-    logTag = 'fdash.${runtimeType.toString()}';
-
     _isSlider = widget.location.questionnaireItem.isItemControl('slider');
 
     final minValueExtension = widget.location.questionnaireItem.extension_
@@ -89,7 +85,7 @@ class _NumericalAnswerState
         (_maxDecimal != 0) ? '.0#####'.substring(0, _maxDecimal + 1) : '';
     _numberInputFormat = NumberFormat('$maxIntegerDigits$maxFractionDigits');
 
-    developer.log(
+    logger.log(
         'input format for ${widget.location.linkId}: "$_numberInputFormat"',
         level: LogLevel.debug);
 
@@ -241,7 +237,7 @@ class _NumericalAnswerState
 
   @override
   QuestionnaireResponseAnswer? fillAnswer() {
-    developer.log('fillAnswer: $value', level: LogLevel.debug);
+    logger.log('fillAnswer: $value', level: LogLevel.debug);
     if (value == null) {
       return null;
     }

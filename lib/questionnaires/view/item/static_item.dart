@@ -1,5 +1,3 @@
-import 'dart:developer' as developer;
-
 import 'package:fhir/primitive_types/decimal.dart';
 import 'package:fhir/r4.dart';
 import 'package:fhir/r4/resource_types/clinical/diagnostics/diagnostics.dart';
@@ -7,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:simple_html_css/simple_html_css.dart';
 
 import '../../../fhir_types/fhir_types_extensions.dart';
+import '../../../logging/logging.dart';
 import '../../questionnaires.dart';
 
 class StaticItem extends QuestionnaireAnswerFiller {
@@ -19,6 +18,8 @@ class StaticItem extends QuestionnaireAnswerFiller {
 }
 
 class _StaticItemState extends QuestionnaireAnswerState {
+  static final logger = Logger('_StaticItemState');
+
   // Bypass the regular 'value' field, as this has too many side-effects for a pure output widget.
   Decimal? calcResult;
 
@@ -34,15 +35,15 @@ class _StaticItemState extends QuestionnaireAnswerState {
     }
 
     if (widget.location.isCalculatedExpression) {
-      developer.log(
+      logger.log(
           'Adding listener to ${widget.location} for calculated expression');
       widget.location.top.addListener(() => _questionnaireChanged());
     }
   }
 
   void _questionnaireChanged() {
-    developer.log('questionnaireChanged(): ${widget.location.responseItem}',
-        level: 500);
+    logger.log('questionnaireChanged(): ${widget.location.responseItem}',
+        level: LogLevel.debug);
     if (widget.location.responseItem != null) {
       setState(() {
         calcResult =
@@ -50,7 +51,7 @@ class _StaticItemState extends QuestionnaireAnswerState {
                 widget.location.responseItem!.answer?.firstOrNull?.valueQuantity
                     ?.value;
       });
-      developer.log('calculated result: $calcResult', level: 700);
+      logger.log('calculated result: $calcResult', level: LogLevel.info);
     }
   }
 

@@ -23,7 +23,13 @@ class QuestionnaireLoadingIndicator extends StatelessWidget {
     return Card(
         color: hasError ? Colors.amber : null,
         child: Column(children: [
-          const CircularProgressIndicator(),
+          if (hasError)
+            const Icon(
+              Icons.error,
+              color: Colors.red,
+            )
+          else
+            const CircularProgressIndicator(),
           Text(state),
           Text(detail),
         ]));

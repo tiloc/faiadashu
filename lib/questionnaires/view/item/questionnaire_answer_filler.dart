@@ -1,5 +1,3 @@
-import 'dart:developer' as developer;
-
 import 'package:fhir/r4/r4.dart';
 import 'package:flutter/material.dart';
 
@@ -18,6 +16,7 @@ abstract class QuestionnaireAnswerFiller extends StatefulWidget {
 
 abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller>
     extends State<W> {
+  static final logger = Logger('QuestionnaireAnswerState');
   V? _value;
 
   QuestionnaireAnswerState();
@@ -50,7 +49,7 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller>
 
   // ignore: avoid_setters_without_getters
   set initialValue(V? initialValue) {
-    developer.log('initialValue ${widget.location.linkId} = $initialValue',
+    logger.log('initialValue ${widget.location.linkId} = $initialValue',
         level: LogLevel.debug);
     _value = initialValue;
   }

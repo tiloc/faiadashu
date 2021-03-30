@@ -1,12 +1,36 @@
+import 'dart:developer' as developer;
+import 'dart:io';
+
 import 'package:faiadashu/questionnaires/questionnaires.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:logging/logging.dart';
 
 import 'disclaimer_page.dart';
 import 'observation_page.dart';
 import 'primitive_page.dart';
 
 void main() {
+  if (kDebugMode) {
+    Logger.root.level = Level.ALL;
+    Logger.root.onRecord.listen((LogRecord rec) {
+      developer.log(rec.message,
+          time: rec.time,
+          sequenceNumber: rec.sequenceNumber,
+          level: rec.level.value,
+          name: rec.loggerName,
+          zone: rec.zone,
+          error: rec.error,
+          stackTrace: rec.stackTrace);
+    });
+  } else {
+    Logger.root.level = Level.ALL; // In real production this might be WARN.
+    Logger.root.onRecord.listen((LogRecord rec) {
+      stdout.writeln('${rec.level.name}: ${rec.message}');
+    });
+  }
+
   runApp(const MyApp());
 }
 

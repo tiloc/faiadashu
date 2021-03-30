@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer' as developer;
 
 import 'package:fhir/r4/r4.dart';
 import 'package:flutter/material.dart';
@@ -12,11 +11,11 @@ class QuestionnaireFiller extends StatefulWidget {
   final WidgetBuilder builder;
   final Future<QuestionnaireTopLocation> Function(dynamic param) loaderFuture;
   final dynamic loaderParam;
-  static const String logTag = 'fdash.QuestionnaireFiller';
+  static final logger = Logger('QuestionnaireFiller');
 
   static Future<QuestionnaireTopLocation> _loadFromAsset(
       dynamic assetPath) async {
-    developer.log('Enter _loadFromAsset', level: LogLevel.trace, name: logTag);
+    logger.log('Enter _loadFromAsset', level: LogLevel.trace);
     final instrumentString = await rootBundle.loadString(assetPath.toString());
     final jsonQuestionnaire =
         json.decode(instrumentString) as Map<String, dynamic>;
@@ -48,15 +47,11 @@ class QuestionnaireFiller extends StatefulWidget {
 }
 
 class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
+  static final logger = Logger('_QuestionnaireFillerState');
+
   late final Future<QuestionnaireTopLocation> builderFuture;
   QuestionnaireTopLocation? _topLocation;
   void Function()? _onTopChangeListenerFunction;
-  late final String logTag;
-
-  _QuestionnaireFillerState() {
-    // ignore: no_runtimetype_tostring
-    logTag = 'fdash.${runtimeType.toString()}';
-  }
 
   @override
   void initState() {
@@ -66,7 +61,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
 
   @override
   void dispose() {
-    developer.log('dispose', level: LogLevel.trace, name: logTag);
+    logger.log('dispose', level: LogLevel.trace);
 
     if (_onTopChangeListenerFunction != null && _topLocation != null) {
       _topLocation!.removeListener(_onTopChangeListenerFunction!);
@@ -77,7 +72,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
   }
 
   void _onTopChange() {
-    developer.log('_onTopChange', level: LogLevel.trace, name: logTag);
+    logger.log('_onTopChange', level: LogLevel.trace);
     if (mounted) {
       setState(() {});
     }
@@ -85,31 +80,28 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
 
   @override
   Widget build(BuildContext context) {
-    developer.log('Enter build()', level: LogLevel.trace, name: logTag);
+    logger.log('Enter build()', level: LogLevel.trace);
     return FutureBuilder<QuestionnaireTopLocation>(
         future: builderFuture,
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.active:
               // TODO: This should never happen in our use-case?
-              developer.log('FutureBuilder is active...',
-                  level: LogLevel.debug, name: logTag);
+              logger.log('FutureBuilder is active...', level: LogLevel.debug);
               return QuestionnaireLoadingIndicator(snapshot);
             case ConnectionState.none:
               return QuestionnaireLoadingIndicator(snapshot);
             case ConnectionState.waiting:
-              developer.log('FutureBuilder still waiting for data...',
-                  level: LogLevel.debug, name: logTag);
+              logger.log('FutureBuilder still waiting for data...',
+                  level: LogLevel.debug);
               return QuestionnaireLoadingIndicator(snapshot);
             case ConnectionState.done:
               if (snapshot.hasError) {
-                developer.log('FutureBuilder hasError',
-                    level: LogLevel.warn, name: logTag);
+                logger.log('FutureBuilder hasError', level: LogLevel.warn);
                 return QuestionnaireLoadingIndicator(snapshot);
               }
               if (snapshot.hasData) {
-                developer.log('FutureBuilder hasData',
-                    level: LogLevel.info, name: logTag);
+                logger.log('FutureBuilder hasData', level: LogLevel.info);
                 _topLocation = snapshot.data;
                 // TODO: There has got to be a more elegant way! Goal is to register the lister exactly once, after the future has completed.
                 // Can I do .then for that?
@@ -130,11 +122,11 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
 }
 
 class QuestionnaireFillerData extends InheritedWidget {
+  static final logger = Logger('QuestionnaireFillerData');
   final QuestionnaireTopLocation topLocation;
   final Iterable<QuestionnaireLocation> surveyLocations;
   late final List<QuestionnaireItemFiller?> _itemFillers;
   late final int _revision;
-  late final String logTag;
 
   QuestionnaireFillerData._(
     this.topLocation, {
@@ -144,10 +136,7 @@ class QuestionnaireFillerData extends InheritedWidget {
         surveyLocations = topLocation.preOrder(),
         _itemFillers = List<QuestionnaireItemFiller?>.filled(
             topLocation.preOrder().length, null),
-        super(key: key, child: Builder(builder: builder)) {
-    // ignore: no_runtimetype_tostring
-    logTag = 'fdash.${runtimeType.toString()}';
-  }
+        super(key: key, child: Builder(builder: builder));
 
   T aggregator<T extends Aggregator>() {
     return topLocation.aggregator<T>();

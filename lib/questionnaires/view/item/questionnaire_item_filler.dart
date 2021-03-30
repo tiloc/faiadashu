@@ -1,5 +1,3 @@
-import 'dart:developer' as developer;
-
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_html_css/simple_html_css.dart';
@@ -9,10 +7,10 @@ import '../../../logging/logging.dart';
 import '../../questionnaires.dart';
 
 class QuestionnaireItemFiller extends StatefulWidget {
+  static final logger = Logger('QuestionnaireItemFiller');
   final Widget? _titleWidget;
   final QuestionnaireLocation location;
   final QuestionnaireResponseFiller _responseFiller;
-  late final String logTag;
 
   factory QuestionnaireItemFiller.fromQuestionnaireItem(
       QuestionnaireLocation location) {
@@ -24,29 +22,20 @@ class QuestionnaireItemFiller extends StatefulWidget {
 
   QuestionnaireItemFiller._(this.location, this._responseFiller, {Key? key})
       : _titleWidget = QuestionnaireItemFillerTitle.forLocation(location),
-        super(key: key) {
-    // ignore: no_runtimetype_tostring
-    logTag = 'fdash.${runtimeType.toString()}';
-  }
+        super(key: key);
 
   @override
   State<StatefulWidget> createState() => QuestionnaireItemFillerState();
 }
 
 class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
-  late final String logTag;
-
-  QuestionnaireItemFillerState() {
-    // ignore: no_runtimetype_tostring
-    logTag = 'fdash.${runtimeType.toString()}';
-  }
+  static final logger = Logger('QuestionnaireItemFillerState');
 
   @override
   Widget build(BuildContext context) {
-    developer.log(
+    logger.log(
         'build ${widget.location.linkId} hidden: ${widget.location.isHidden}, enabled: ${widget.location.enabled}',
-        level: LogLevel.debug,
-        name: logTag);
+        level: LogLevel.debug);
 
     return (!widget.location.isHidden)
         ? AnimatedSwitcher(

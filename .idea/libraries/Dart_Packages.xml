@@ -128,6 +128,13 @@
             </list>
           </value>
         </entry>
+        <entry key="logging">
+          <value>
+            <list>
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/logging-1.0.1/lib" />
+            </list>
+          </value>
+        </entry>
         <entry key="matcher">
           <value>
             <list>
@@ -265,6 +272,7 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/intl-0.17.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/json_annotation-4.0.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/lint-1.5.3/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/logging-1.0.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/matcher-0.12.10/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/meta-1.3.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/path-1.8.0/lib" />

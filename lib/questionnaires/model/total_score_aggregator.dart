@@ -1,4 +1,3 @@
-import 'dart:developer' as developer;
 import 'dart:ui';
 
 import 'package:collection/collection.dart';
@@ -14,13 +13,12 @@ import 'questionnaire_location.dart';
 /// Can deal with incomplete questionnaires.
 /// Will return 0 when no score field exists on the questionnaire.
 class TotalScoreAggregator extends Aggregator<Decimal> {
+  static final logger = Logger('TotalScoreAggregator');
+
   late final QuestionnaireLocation? totalScoreLocation;
   late final String logTag;
   TotalScoreAggregator({bool autoAggregate = true})
-      : super(Decimal(0), autoAggregate: autoAggregate) {
-    // ignore: no_runtimetype_tostring
-    logTag = 'fdash.${runtimeType.toString()}';
-  }
+      : super(Decimal(0), autoAggregate: autoAggregate);
 
   @override
   void init(QuestionnaireTopLocation topLocation) {
@@ -47,21 +45,20 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
       return null;
     }
 
-    developer.log('totalScore.aggregrate', level: LogLevel.debug, name: logTag);
+    logger.log('totalScore.aggregrate', level: LogLevel.debug);
     // Special handling if this is the total score
     double sum = 0.0;
     for (final location in topLocation.preOrder()) {
       if (location != totalScoreLocation) {
         final points = location.score;
-        developer.log('Adding $location: $points',
-            level: LogLevel.trace, name: logTag);
+        logger.log('Adding $location: $points', level: LogLevel.trace);
         if (points != null) {
           sum += points.value!;
         }
       }
     }
 
-    developer.log('sum: $sum', level: LogLevel.debug, name: logTag);
+    logger.log('sum: $sum', level: LogLevel.debug);
     final result = Decimal(sum);
     if (notifyListeners) {
       value = result;

@@ -1,31 +1,28 @@
-import 'dart:developer' as developer;
 import 'dart:ui';
 
 import 'package:fhir/r4.dart';
 
 import '../../fhir_types/fhir_types_extensions.dart';
-import '../../logging/log_level.dart';
+import '../../logging/logging.dart';
 import '../questionnaires.dart';
 import 'aggregator.dart';
 
 /// Create a narrative from the responses to a [Questionnaire].
 /// Updates immediately after responses have changed.
 class NarrativeAggregator extends Aggregator<Narrative> {
+  static final logger = Logger('NarrativeAggregator');
+
   // Revision of topLocation when _narrative was calculated
   int _revision = -1;
   // Cached narrative
   Narrative? _narrative;
-  late final String logTag;
 
   static final emptyNarrative = Narrative(
       div: '<div xmlns="http://www.w3.org/1999/xhtml"></div>',
       status: NarrativeStatus.empty);
 
   NarrativeAggregator()
-      : super(NarrativeAggregator.emptyNarrative, autoAggregate: false) {
-    // ignore: no_runtimetype_tostring
-    logTag = 'fdash.${runtimeType.toString()}';
-  }
+      : super(NarrativeAggregator.emptyNarrative, autoAggregate: false);
 
   @override
   void init(QuestionnaireTopLocation topLocation) {
@@ -110,13 +107,12 @@ class NarrativeAggregator extends Aggregator<Narrative> {
   Narrative? aggregate(Locale? locale, {bool notifyListeners = false}) {
     ArgumentError.checkNotNull(locale, 'locale');
 
-    developer.log(
+    logger.log(
         '$this.aggregate (topRev: ${topLocation.revision}, rev: $_revision)',
-        level: LogLevel.debug,
-        name: logTag);
+        level: LogLevel.debug);
     if (topLocation.revision == _revision) {
-      developer.log('Regurgitating narrative revision $_revision',
-          level: LogLevel.debug, name: logTag);
+      logger.log('Regurgitating narrative revision $_revision',
+          level: LogLevel.debug);
       return _narrative;
     }
     // Manually invoke the update, because the order matters and enableWhen calcs need to come after answer value updates.

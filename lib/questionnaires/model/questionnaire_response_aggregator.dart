@@ -1,6 +1,6 @@
-import 'dart:developer' as developer;
 import 'dart:ui';
 
+import 'package:faiadashu/logging/logger.dart';
 import 'package:fhir/r4.dart';
 
 import '../../logging/log_level.dart';
@@ -8,13 +8,10 @@ import '../questionnaires.dart';
 
 class QuestionnaireResponseAggregator
     extends Aggregator<QuestionnaireResponse> {
-  late final String logTag;
+  static final Logger logger = Logger('QuestionnaireResponseAggregator');
 
   QuestionnaireResponseAggregator()
-      : super(QuestionnaireResponse(), autoAggregate: false) {
-    // ignore: no_runtimetype_tostring
-    logTag = 'fdash.${runtimeType.toString()}';
-  }
+      : super(QuestionnaireResponse(), autoAggregate: false);
 
   /// Initialize the aggregator.
   @override
@@ -42,8 +39,7 @@ class QuestionnaireResponseAggregator
   @override
   QuestionnaireResponse? aggregate(Locale? locale,
       {bool notifyListeners = false}) {
-    developer.log('QuestionnaireResponse.aggregrate',
-        level: LogLevel.trace, name: logTag);
+    logger.log('QuestionnaireResponse.aggregrate', level: LogLevel.trace);
 
     final responseItems = <QuestionnaireResponseItem>[];
 
