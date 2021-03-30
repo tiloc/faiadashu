@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/fire_dash.iml" filepath="$PROJECT_DIR$/fire_dash.iml" />
-      <module fileurl="file://$PROJECT_DIR$/android/fire_dash_android.iml" filepath="$PROJECT_DIR$/android/fire_dash_android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/faiadashu.iml" filepath="$PROJECT_DIR$/.idea/faiadashu.iml" />
     </modules>
   </component>
 </project>
