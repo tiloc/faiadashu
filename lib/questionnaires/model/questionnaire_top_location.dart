@@ -11,6 +11,7 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
   List<QuestionnaireLocation>? _enabledWhens;
   final List<Aggregator>? _aggregators;
   final ExternalResourceProvider? _extResourceProvider;
+  int _revision = 1;
   static final logger = Logger(QuestionnaireTopLocation);
 
   /// Create the first location top-down of the given [Questionnaire].

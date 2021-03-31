@@ -24,7 +24,7 @@ class ChoiceAnswer extends QuestionnaireAnswerFiller {
 
 class _ChoiceAnswerState
     extends QuestionnaireAnswerState<CodeableConcept, ChoiceAnswer> {
-  static final logger = Logger(_ChoiceAnswerState);
+//  static final logger = Logger(_ChoiceAnswerState);
   // ignore: prefer_collection_literals
   final _answerOptions = LinkedHashMap<String, QuestionnaireAnswerOption>();
 

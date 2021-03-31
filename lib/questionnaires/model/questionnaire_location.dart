@@ -26,7 +26,6 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
   late QuestionnaireTopLocation? _top;
   final int siblingIndex;
   final int level;
-  int _revision = 1;
   late final String logTag;
   static final logger = Logger(QuestionnaireLocation);
 
