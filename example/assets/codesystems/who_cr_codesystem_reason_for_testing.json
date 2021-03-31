@@ -1,0 +1,73 @@
+{
+  "resourceType": "CodeSystem",
+  "id": "WhoCrCodeSystemReasonForTesting",
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>This code system http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemReasonForTesting defines the following codes:</p><table class=\"codes\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td><td><b>Definition</b></td></tr><tr><td style=\"white-space:nowrap\">CASE_CONTACT<a name=\"WhoCrCodeSystemReasonForTesting-CASE_CONTACT\"> </a></td><td>Contact of a case</td><td>Contact of a case</td></tr><tr><td style=\"white-space:nowrap\">SEEKING_HC<a name=\"WhoCrCodeSystemReasonForTesting-SEEKING_HC\"> </a></td><td>Ill Seeking Healthcare due to suspicion of COVID-19</td><td>Ill Seeking Healthcare due to suspicion of COVID-19</td></tr><tr><td style=\"white-space:nowrap\">POE_DETECTION<a name=\"WhoCrCodeSystemReasonForTesting-POE_DETECTION\"> </a></td><td>Detected at point of entry</td><td>Detected at point of entry</td></tr><tr><td style=\"white-space:nowrap\">REPATRIATION<a name=\"WhoCrCodeSystemReasonForTesting-REPATRIATION\"> </a></td><td>Repatriation</td><td>Repatriation</td></tr><tr><td style=\"white-space:nowrap\">SURVEILLANCE<a name=\"WhoCrCodeSystemReasonForTesting-SURVEILLANCE\"> </a></td><td>Routine respiratory disease surveillance systems (e.g. influenza)</td><td>Routine respiratory disease surveillance systems (e.g. influenza)</td></tr><tr><td style=\"white-space:nowrap\">UNKNOWN<a name=\"WhoCrCodeSystemReasonForTesting-UNKNOWN\"> </a></td><td>Unknown</td><td>Unknown</td></tr></table></div>"
+  },
+  "url": "http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemReasonForTesting",
+  "version": "0.1.0",
+  "name": "WhoCrCodeSystemReasonForTesting",
+  "title": "Reason for Testing",
+  "status": "draft",
+  "experimental": true,
+  "date": "2021-02-11T17:12:53+00:00",
+  "publisher": "OpenHIE",
+  "contact": [
+    {
+      "name": "OpenHIE",
+      "telecom": [
+        {
+          "system": "url",
+          "value": "http://www.ohie.org"
+        }
+      ]
+    }
+  ],
+  "description": "A code system of reasons to perform testing",
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "system": "http://unstats.un.org/unsd/methods/m49/m49.htm",
+          "code": "001"
+        }
+      ]
+    }
+  ],
+  "copyright": "2021",
+  "content": "complete",
+  "count": 6,
+  "concept": [
+    {
+      "code": "CASE_CONTACT",
+      "display": "Contact of a case",
+      "definition": "Contact of a case"
+    },
+    {
+      "code": "SEEKING_HC",
+      "display": "Ill Seeking Healthcare due to suspicion of COVID-19",
+      "definition": "Ill Seeking Healthcare due to suspicion of COVID-19"
+    },
+    {
+      "code": "POE_DETECTION",
+      "display": "Detected at point of entry",
+      "definition": "Detected at point of entry"
+    },
+    {
+      "code": "REPATRIATION",
+      "display": "Repatriation",
+      "definition": "Repatriation"
+    },
+    {
+      "code": "SURVEILLANCE",
+      "display": "Routine respiratory disease surveillance systems (e.g. influenza)",
+      "definition": "Routine respiratory disease surveillance systems (e.g. influenza)"
+    },
+    {
+      "code": "UNKNOWN",
+      "display": "Unknown",
+      "definition": "Unknown"
+    }
+  ]
+}

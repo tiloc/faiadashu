@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../questionnaires.dart';
-import '../valueset/valueset_provider.dart';
+import '../resource_provider/resource_provider.dart';
 import 'narrative_drawer.dart';
 import 'questionnaire_cover_page.dart';
 
@@ -16,10 +16,10 @@ class QuestionnaireScrollerPage extends StatefulWidget {
   final Widget? floatingActionButton;
   final List<Widget>? frontMatter;
   final List<Widget>? backMatter;
-  final ValueSetProvider? valueSetProvider;
+  final ExternalResourceProvider? resourceProvider;
 
   const QuestionnaireScrollerPage.fromAsset(this.loaderParam,
-      {this.valueSetProvider,
+      {this.resourceProvider,
       this.floatingActionButton,
       this.frontMatter,
       this.backMatter = const [
@@ -146,7 +146,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
                   }),
             ),
           ));
-    }, valueSetProvider: widget.valueSetProvider);
+    }, externalResourceProvider: widget.resourceProvider);
   }
 
   Future<void> _showQuestionnaireInfo(

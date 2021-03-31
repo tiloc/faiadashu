@@ -1,0 +1,52 @@
+{
+  "resourceType": "ValueSet",
+  "id": "WhoCrValueSetPatientOutcome",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-valueset"
+    ]
+  },
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><ul><li>Include all codes defined in <a href=\"CodeSystem-WhoCrCodeSystemPatientOutcome.html\"><code>http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemPatientOutcome</code></a></li></ul></div>"
+  },
+  "url": "http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetPatientOutcome",
+  "version": "0.1.0",
+  "name": "WhoCrValueSetPatientOutcome",
+  "title": "Patient Outcome",
+  "status": "draft",
+  "experimental": true,
+  "date": "2021-02-11T17:12:53+00:00",
+  "publisher": "OpenHIE",
+  "contact": [
+    {
+      "name": "OpenHIE",
+      "telecom": [
+        {
+          "system": "url",
+          "value": "http://www.ohie.org"
+        }
+      ]
+    }
+  ],
+  "description": "Patient Outcome",
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "system": "http://unstats.un.org/unsd/methods/m49/m49.htm",
+          "code": "001"
+        }
+      ]
+    }
+  ],
+  "immutable": false,
+  "copyright": "2021",
+  "compose": {
+    "include": [
+      {
+        "system": "http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemPatientOutcome"
+      }
+    ]
+  }
+}

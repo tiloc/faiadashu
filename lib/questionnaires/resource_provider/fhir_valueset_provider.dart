@@ -2,12 +2,12 @@ import 'dart:convert';
 
 import 'package:fhir/r4.dart';
 
-import 'valueset_provider.dart';
+import 'external_resource_provider.dart';
 
 // ignore: avoid_classes_with_only_static_members
-class FhirValueSetProvider extends ValueSetProvider {
+class FhirValueSetProvider extends ExternalResourceProvider {
   @override
-  ValueSet? getValueSet(String uri) {
+  ValueSet? getResource(String uri) {
     switch (uri) {
       case 'http://hl7.org/fhir/ValueSet/administrative-gender':
         return ValueSet(

@@ -15,6 +15,18 @@ extension FDashQuestionnaireAnswerOptionExtensions
   String get optionCode {
     return valueString ?? valueCoding!.code.toString();
   }
+
+  static QuestionnaireAnswerOption fromCoding(Coding coding,
+      {List<FhirExtension>? Function(Coding)? extensionBuilder,
+      List<FhirExtension>? Function(Coding)? codingExtensionBuilder,
+      bool userSelected = true}) {
+    return QuestionnaireAnswerOption(
+        extension_: extensionBuilder?.call(coding),
+        valueCoding: coding.copyWith(
+            // TODO: swap out display for a localized display?
+            userSelected: Boolean(userSelected),
+            extension_: codingExtensionBuilder?.call(coding)));
+  }
 }
 
 extension FDashQuestionnaireItemExtension on QuestionnaireItem {

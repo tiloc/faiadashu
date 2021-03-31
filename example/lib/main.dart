@@ -2,8 +2,6 @@ import 'dart:developer' as developer;
 import 'dart:io';
 
 import 'package:faiadashu/questionnaires/questionnaires.dart';
-import 'package:faiadashu/questionnaires/valueset/fhir_valueset_provider.dart';
-import 'package:faiadashu/questionnaires/valueset/valueset.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -68,9 +66,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final valueSetProvider = NestedValueSetProvider([
+  final resourceProvider = NestedExternalResourceProvider([
     FhirValueSetProvider(),
-    AssetValueSetProvider(<String, String>{
+    AssetResourceProvider(<String, String>{
+      'http://hl7.org/fhir/ValueSet/ucum-bodyweight':
+          'assets/valuesets/ucum_bodyweight.json',
       'http://hl7.org/fhir/ValueSet/iso3166-1-2':
           'assets/valuesets/fhir_valueset_iso3166_1_2.json',
       'http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetYesNoUnk':
@@ -79,7 +79,21 @@ class _HomePageState extends State<HomePage> {
           'assets/valuesets/who_cr_valueset_sex_at_birth.json',
       'http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetAgeUnits':
           'assets/valuesets/who_cr_valueset_age_units.json',
-      'http://loinc.org/vs/LL715-4': 'assets/valuesets/loinc_ll715_4.json'
+      'http://loinc.org/vs/LL715-4': 'assets/valuesets/loinc_ll715_4.json',
+      'http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetPregnancyTrimester':
+          'assets/valuesets/who_cr_valueset_pregnancy_trimester.json',
+      'http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetAdmin1':
+          'assets/valuesets/who_cr_valueset_admin_1.json',
+      'http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetPatientOutcome':
+          'assets/valuesets/who_cr_valueset_patient_outcome.json',
+      'http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemPatientOutcome':
+          'assets/codesystems/who_cr_codesystem_patient_outcome.json',
+      'http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemPregnancyTrimester':
+          'assets/codesystems/who_cr_codesystem_pregnancy_trimester.json',
+      'http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemQuestionnaireChoice':
+          'assets/codesystems/who_cr_codesystem_questionnaire_choice.json',
+      'http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemReasonForTesting':
+          'assets/codesystems/who_cr_codesystem_reason_for_testing.json'
     })
   ]);
 
@@ -148,7 +162,7 @@ class _HomePageState extends State<HomePage> {
                   MaterialPageRoute(
                       builder: (context) => QuestionnaireScrollerPage.fromAsset(
                           'assets/instruments/sdc_demo.json',
-                          valueSetProvider: valueSetProvider,
+                          resourceProvider: resourceProvider,
                           floatingActionButton: fab)));
             },
           ),
@@ -162,7 +176,7 @@ class _HomePageState extends State<HomePage> {
                   MaterialPageRoute(
                       builder: (context) => QuestionnaireScrollerPage.fromAsset(
                           'assets/instruments/sdc-example-render.json',
-                          valueSetProvider: valueSetProvider)));
+                          resourceProvider: resourceProvider)));
             },
           ),
           ListTile(
@@ -175,7 +189,7 @@ class _HomePageState extends State<HomePage> {
                   MaterialPageRoute(
                     builder: (context) => QuestionnaireScrollerPage.fromAsset(
                       'assets/instruments/argonaut_sampler.json',
-                      valueSetProvider: valueSetProvider,
+                      resourceProvider: resourceProvider,
                     ),
                   ));
             },
@@ -190,7 +204,7 @@ class _HomePageState extends State<HomePage> {
                   MaterialPageRoute(
                       builder: (context) => QuestionnaireScrollerPage.fromAsset(
                           'assets/instruments/phq9_instrument.json',
-                          valueSetProvider: valueSetProvider)));
+                          resourceProvider: resourceProvider)));
             },
           ),
           ListTile(
@@ -215,7 +229,7 @@ class _HomePageState extends State<HomePage> {
                   MaterialPageRoute(
                       builder: (context) => QuestionnaireScrollerPage.fromAsset(
                           'assets/instruments/hf_instrument.json',
-                          valueSetProvider: valueSetProvider)));
+                          resourceProvider: resourceProvider)));
             },
           ),
           ListTile(
@@ -227,7 +241,7 @@ class _HomePageState extends State<HomePage> {
                   MaterialPageRoute(
                       builder: (context) => QuestionnaireScrollerPage.fromAsset(
                           'assets/instruments/prapare_instrument.json',
-                          valueSetProvider: valueSetProvider)));
+                          resourceProvider: resourceProvider)));
             },
           ),
           ListTile(
@@ -240,19 +254,20 @@ class _HomePageState extends State<HomePage> {
                   MaterialPageRoute(
                       builder: (context) => QuestionnaireScrollerPage.fromAsset(
                           'assets/instruments/bluebook.json',
-                          valueSetProvider: valueSetProvider)));
+                          resourceProvider: resourceProvider)));
             },
           ),
           ListTile(
             title: const Text('WHO COVID19 Surveillance'),
-            subtitle: const Text('BROKEN Real-world, mixed-type survey by WHO'),
+            subtitle: const Text(
+                'Real-world example with very long ValueSets and enableWhen'),
             onTap: () {
               Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => QuestionnaireScrollerPage.fromAsset(
                           'assets/instruments/who_covid19.json',
-                          valueSetProvider: valueSetProvider)));
+                          resourceProvider: resourceProvider)));
             },
           ),
         ],

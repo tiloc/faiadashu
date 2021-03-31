@@ -1,0 +1,52 @@
+{
+  "resourceType": "ValueSet",
+  "id": "WhoCrValueSetAdmin1",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-valueset"
+    ]
+  },
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><ul><li>Include all codes defined in <a href=\"http://terminology.hl7.org/2.0.0/CodeSystem-v3-iso3166-2.html\"><code>urn:iso:std:iso:3166:-2</code></a></li></ul></div>"
+  },
+  "url": "http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetAdmin1",
+  "version": "0.1.0",
+  "name": "WhoCrValueSetAdmin1",
+  "title": "List of Administrative Level 1 Names (Province/State/Canton)",
+  "status": "draft",
+  "experimental": true,
+  "date": "2021-02-11T17:12:53+00:00",
+  "publisher": "OpenHIE",
+  "contact": [
+    {
+      "name": "OpenHIE",
+      "telecom": [
+        {
+          "system": "url",
+          "value": "http://www.ohie.org"
+        }
+      ]
+    }
+  ],
+  "description": "List of Administrative Level 1 Names (Province/State/Canton)",
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "system": "http://unstats.un.org/unsd/methods/m49/m49.htm",
+          "code": "001"
+        }
+      ]
+    }
+  ],
+  "immutable": false,
+  "copyright": "2021",
+  "compose": {
+    "include": [
+      {
+        "system": "urn:iso:std:iso:3166:-2"
+      }
+    ]
+  }
+}

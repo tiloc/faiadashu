@@ -31,4 +31,7 @@ flutter:
   assets:
     - assets/instruments/
     - assets/valuesets/
+    - assets/codesystems/
+
+
 

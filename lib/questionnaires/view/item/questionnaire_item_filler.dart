@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_html_css/simple_html_css.dart';
@@ -107,7 +109,8 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
           TextSpan(children: <InlineSpan>[
             if (leading != null) WidgetSpan(child: leading),
             if (titleText != null)
-              HTML.toTextSpan(context, '$openStyleTag$titleText$closeStyleTag'),
+              HTML.toTextSpan(context,
+                  '$openStyleTag${htmlEscape.convert(titleText)}$closeStyleTag'),
           ]),
           semanticsLabel: titleText,
         ));

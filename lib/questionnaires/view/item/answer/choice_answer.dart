@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../fhir_types/fhir_types_extensions.dart';
 import '../../../../logging/logging.dart';
+import '../../../../questionnaires/model/questionnaire_extensions.dart';
 import '../../../questionnaires.dart';
 import '../../xhtml.dart';
 
@@ -184,10 +185,23 @@ class _ChoiceAnswerState
         ArgumentError.checkNotNull(codeableConcept.coding));
   }
 
+  void _addAnswerOption(Coding coding) {
+    _answerOptions.addEntries([
+      MapEntry<String, QuestionnaireAnswerOption>(
+          coding.code!.toString(),
+          FDashQuestionnaireAnswerOptionExtensions.fromCoding(
+            coding,
+            extensionBuilder: (inCoding) =>
+                _createOptionPrefixExtension(inCoding.extension_),
+            codingExtensionBuilder: (inCoding) =>
+                _createOrdinalExtension(inCoding.extension_),
+          ))
+    ]);
+  }
+
   /// Convert [ValueSet]s or [QuestionnaireAnswerOption]s to normalized [QuestionnaireAnswerOption]s
   void _createAnswerOptions() {
     final qi = widget.location.questionnaireItem;
-    final questionnaire = widget.location.questionnaire;
 
     if (qi.answerValueSet != null) {
       final key = qi.answerValueSet?.value?.toString();
@@ -195,91 +209,8 @@ class _ChoiceAnswerState
         throw QuestionnaireFormatException(
             'Questionnaire choice item does not specify a key', qi);
       }
-      final isValueSetContained = key.startsWith('#');
-      final ValueSet? valueSet = isValueSetContained
-          ? widget.location.top.findContainedByElementId(key) as ValueSet?
-          : widget.location.top.getValueSet(key);
 
-      if (valueSet == null) {
-        if (isValueSetContained) {
-          throw QuestionnaireFormatException(
-              'Questionnaire does not contain referenced ValueSet $key',
-              questionnaire.contained);
-        } else {
-          throw QuestionnaireFormatException(
-              'External ValueSet $key cannot be located.', qi);
-        }
-      }
-
-      final List<ValueSetContains>? valueSetContains =
-          valueSet.expansion?.contains;
-
-      if (valueSetContains != null) {
-        // Expansion has preference over includes. They are not additive.
-        for (final contains in valueSetContains) {
-          _answerOptions.addEntries([
-            MapEntry<String, QuestionnaireAnswerOption>(
-                contains.code!.toString(),
-                QuestionnaireAnswerOption(
-                    extension_:
-                        _createOptionPrefixExtension(contains.extension_),
-                    valueCoding: Coding(
-                        system: contains.system,
-                        code: contains.code,
-                        userSelected: Boolean(true),
-                        display: contains.display,
-                        extension_:
-                            _createOrdinalExtension(contains.extension_))))
-          ]);
-        }
-      } else {
-        final List<ValueSetInclude>? valueSetIncludes =
-            valueSet.compose?.include;
-
-        if (valueSetIncludes == null) {
-          throw QuestionnaireFormatException(
-              'Include in ValueSet $key does not exist.', qi);
-        }
-
-        for (final valueSetInclude in valueSetIncludes) {
-          final List<ValueSetConcept> valueSetConcepts =
-              valueSetInclude.concept ?? [];
-
-          if (valueSetConcepts.isEmpty) {
-            logger.log('Concepts in ValueSet $key is empty.');
-            // TODO: This is hacky, but a start
-            // ValueSets may contain references to further included ValueSets.
-            final includeUri =
-                valueSetInclude.valueSet?.firstOrNull?.value?.toString();
-            if (includeUri != null) {
-              final includeConcepts = widget.location.top
-                  .getValueSet(includeUri)
-                  ?.compose
-                  ?.include
-                  .firstOrNull
-                  ?.concept;
-              valueSetConcepts.addAll(includeConcepts ?? []);
-            }
-          }
-
-          for (final concept in valueSetConcepts) {
-            _answerOptions.addEntries([
-              MapEntry<String, QuestionnaireAnswerOption>(
-                  concept.code!.toString(),
-                  QuestionnaireAnswerOption(
-                      extension_:
-                          _createOptionPrefixExtension(concept.extension_),
-                      valueCoding: Coding(
-                          system: valueSetInclude.system,
-                          code: concept.code,
-                          userSelected: Boolean(true),
-                          display: concept.display,
-                          extension_:
-                              _createOrdinalExtension(concept.extension_))))
-            ]);
-          }
-        }
-      }
+      widget.location.top.visitValueSet(key, _addAnswerOption, context: qi);
     } else {
       if (qi.answerOption != null) {
         _answerOptions.addEntries(qi.answerOption!.map<
@@ -362,6 +293,7 @@ class _ChoiceAnswerState
       return Card(
           margin: const EdgeInsets.only(top: 8, bottom: 8),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: choices,
           ));
     }

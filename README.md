@@ -1,6 +1,6 @@
 [![style: lint](https://img.shields.io/badge/style-lint-4BC0F5.svg)](https://pub.dev/packages/lint)
 
-# *Faiadashu™* [(ファイアダッシュ)] — Widgets for Digital Health
+# *Faiadashu™ [(ファイアダッシュ)]* — Widgets for Digital Health
 
 ### Build healthcare apps fast — use the Flutter™ SDK and follow popular standards in healthcare.
 
@@ -31,8 +31,9 @@ Apart from this major dependency this library aims to be as unopinionated as pos
 state management and persistence frameworks.
 
 ### Contributing
-Contributions and discussions are welcome! This is currently not well-defined yet. I think right now you can simply open
-an Issue to get in touch.
+Contributions and discussions are welcome! This is currently not well-defined yet. I will soon post an invite link to the awesome FHIR-FLI
+Slack channel which is run by some like-minded folks and where I can be frequently found.
+
 
 ### License
 MIT License

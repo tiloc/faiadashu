@@ -6,18 +6,19 @@ import 'package:flutter/services.dart' show rootBundle;
 
 import '../../logging/logging.dart';
 import '../questionnaires.dart';
-import '../valueset/valueset_provider.dart';
+import '../resource_provider/resource_provider.dart';
 
 class QuestionnaireFiller extends StatefulWidget {
   final WidgetBuilder builder;
   final Future<QuestionnaireTopLocation> Function(
-      dynamic param, ValueSetProvider? valueSetProvider) loaderFuture;
+      dynamic param, ExternalResourceProvider? valueSetProvider) loaderFuture;
   final dynamic loaderParam;
-  final ValueSetProvider? valueSetProvider;
+  final ExternalResourceProvider? externalResourceProvider;
   static final logger = Logger(QuestionnaireFiller);
 
   static Future<QuestionnaireTopLocation> _loadFromString(
-      dynamic instrumentString, ValueSetProvider? valueSetProvider) async {
+      dynamic instrumentString,
+      ExternalResourceProvider? valueSetProvider) async {
     final jsonQuestionnaire =
         json.decode(instrumentString as String) as Map<String, dynamic>;
     final topLocation = QuestionnaireTopLocation.fromQuestionnaire(
@@ -35,20 +36,20 @@ class QuestionnaireFiller extends StatefulWidget {
   }
 
   static Future<QuestionnaireTopLocation> _loadFromAsset(
-      dynamic assetPath, ValueSetProvider? valueSetProvider) async {
+      dynamic assetPath, ExternalResourceProvider? valueSetProvider) async {
     logger.log('Enter _loadFromAsset', level: LogLevel.trace);
     final instrumentString = await rootBundle.loadString(assetPath.toString());
     return _loadFromString(instrumentString, valueSetProvider);
   }
 
   const QuestionnaireFiller.fromAsset(this.loaderParam,
-      {Key? key, required this.builder, this.valueSetProvider})
+      {Key? key, required this.builder, this.externalResourceProvider})
       // ignore: avoid_field_initializers_in_const_classes
       : loaderFuture = _loadFromAsset,
         super(key: key);
 
   const QuestionnaireFiller.fromString(this.loaderParam,
-      {Key? key, required this.builder, this.valueSetProvider})
+      {Key? key, required this.builder, this.externalResourceProvider})
       // ignore: avoid_field_initializers_in_const_classes
       : loaderFuture = _loadFromString,
         super(key: key);
@@ -74,8 +75,8 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
   @override
   void initState() {
     super.initState();
-    builderFuture =
-        widget.loaderFuture.call(widget.loaderParam, widget.valueSetProvider);
+    builderFuture = widget.loaderFuture
+        .call(widget.loaderParam, widget.externalResourceProvider);
   }
 
   @override

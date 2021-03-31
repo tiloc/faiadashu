@@ -159,23 +159,21 @@ class _NumericalAnswerState
 
   @override
   Widget buildEditable(BuildContext context) {
-    // TODO: WIP - support for units - Build Codings from ValueSet
-    final unit = widget.location.questionnaireItem.unit;
-    final units = (widget.location.questionnaireItem.type ==
-            QuestionnaireItemType.quantity)
-        ? <Coding>[
-            Coding(
-                system: FhirUri('http://unitsofmeasure.org'), code: Code('kg')),
-            Coding(
-                system: FhirUri('http://unitsofmeasure.org'),
-                code: Code('[lb_av]'),
-                display: 'lb'),
-            Coding(
-                system: FhirUri('http://unitsofmeasure.org'), code: Code('g'))
-          ]
-        : (unit != null)
-            ? [Coding(code: Code(unit))]
-            : null;
+    final qi = widget.location.questionnaireItem;
+    final unit = qi.unit;
+    final units = <Coding>[];
+    final unitsUri = qi.extension_
+        ?.extensionOrNull(
+            'http://hl7.org/fhir/StructureDefinition/questionnaire-unitValueSet')
+        ?.valueCanonical
+        .toString();
+    if (unitsUri != null) {
+      widget.location.top.visitValueSet(unitsUri, (coding) {
+        units.add(coding);
+      }, context: qi.linkId);
+    } else if (unit != null) {
+      units.add(Coding(code: Code(unit)));
+    }
 
     return _isSlider
         ? Slider(
@@ -207,10 +205,10 @@ class _NumericalAnswerState
                     return '$inputValue is not a valid number.';
                   }
                   if (number > _maxValue) {
-                    return 'Enter a number up to $_maxValue.';
+                    return 'Enter a number up to ${Decimal(_maxValue).format(Localizations.localeOf(context))}.';
                   }
                   if (number < _minValue) {
-                    return 'Enter a number $_minValue, or higher.';
+                    return 'Enter a number ${Decimal(_minValue).format(Localizations.localeOf(context))}, or higher.';
                   }
                 },
                 autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -230,8 +228,7 @@ class _NumericalAnswerState
                   }
                 },
               )),
-              if (units != null && units.isNotEmpty)
-                _buildDropDownFromUnits(context, units)
+              if (units.isNotEmpty) _buildDropDownFromUnits(context, units)
             ]));
   }
 
