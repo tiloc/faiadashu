@@ -11,9 +11,9 @@ dependencies:
   faiadashu:
     path: ..
 
-  #  fhir: ^0.4.0
-  fhir:
-    path: /Users/tilo/Projects/fhir/fhir
+  fhir: ^0.4.2
+#  fhir:
+#    path: /Users/tilo/Projects/fhir/fhir
 
   flutter:
     sdk: flutter

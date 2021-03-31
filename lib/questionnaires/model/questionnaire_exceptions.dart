@@ -4,10 +4,10 @@ class QuestionnaireFormatException implements Exception {
   final String message;
 
   /// The offending data element
-  final dynamic element;
+  final Object? element;
 
   /// A throwable
-  final dynamic? cause;
+  final Object? cause;
   QuestionnaireFormatException(this.message, this.element, [this.cause]);
 
   @override
