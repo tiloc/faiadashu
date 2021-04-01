@@ -45,6 +45,7 @@ The library does not communicate to servers. It is up to your app to obtain remo
 of the library as you see fit. See the sections on the individual use-cases for integration points.
 
 The FHIRFLI `fhir_at_rest` package is compatible with the `fhir` library which is underlying this library: https://pub.dev/packages/fhir_at_rest
+
 Communication might require authentication. The FHIRFLI `fhir_auth` package is compatible with the `fhir` library which is underlying this library: https://pub.dev/packages/fhir_auth
 
 ### Use-Case: Display an Observation
@@ -62,12 +63,14 @@ ObservationWidget(
 ### Use-Case: Fill a Questionnaire
 #### Capabilities
 The Questionnaire Filler widget is based on a specification called Structured Data Capture (SDC).
+
+[The capabilities of this widget are documented here](sdc-capabilities.md).
+
 Information on Structured Data Capture can be found here: 
 * [SDC Home Page](http://hl7.org/fhir/uv/sdc/2019May/)
 * [YT Video from FHIR DevDays](https://www.youtube.com/watch?v=WPudaF4S7Bk)
 * There is a chat channel at https://chat.fhir.org stream `#questionnaire`.
 
-The capabilities of this widget are documented [here](sdc-capabilities.md).
 
 #### Code example
 The display and filling of a Questionnaire is entirely self-contained. You create the widget to fill a Questionnaire,
