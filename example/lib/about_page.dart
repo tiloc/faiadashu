@@ -8,13 +8,13 @@ class AboutPage extends ExhibitPage {
 
   @override
   Widget buildExhibit(BuildContext context) {
-    return HTML.toRichText(context, '''
-    <h2>Faiadashu™ FHIRDash</h2>
-    <h3><i>[(ファイアダッシュ)]</i></h3>
-    <p>
-    
-    </p> 
-    ''');
+    return Builder(builder: (context) => HTML.toRichText(context, '''
+    <i><h2>Faiadashu™ FHIRDash</h2></i>
+    <p>Faia Dasshu <i>[(ファイアダッシュ)]</i> — or Fire Dash — is a play with words.</p>
+    <p>It sounds like FHIR. It pays hommage to Dash - the mascot of the Flutter framework.</p>
+    <p>It expresses forward speed.</p>
+    <p>I love the sound of it.</p> 
+    '''));
   }
 
   @override

@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:logging/logging.dart';
 
+import 'about_page.dart';
 import 'disclaimer_page.dart';
 import 'observation_page.dart';
 import 'primitive_page.dart';
@@ -43,7 +44,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Faiadashu™ [(ファイアダッシュ)] Gallery',
+      title: 'Faiadashu™ FHIRDash Gallery',
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -116,7 +117,7 @@ class _HomePageState extends State<HomePage> {
         title: Builder(
           builder: (BuildContext context) => RichText(
             text: TextSpan(
-              text: 'Faiadashu™ [(ファイアダッシュ)] —\n',
+              text: 'Faiadashu™  FHIRDash —\n',
               style: DefaultTextStyle.of(context).style,
               children: const <TextSpan>[
                 TextSpan(
@@ -129,6 +130,17 @@ class _HomePageState extends State<HomePage> {
       ),
       body: ListView(
         children: [
+          ListTile(
+            title: const Text('About Faiadashu™ FHIRDash'),
+            subtitle: const Text(
+              '[(ファイアダッシュ)]',
+              style: TextStyle(fontStyle: FontStyle.italic),
+            ),
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const AboutPage()));
+            },
+          ),
           ListTile(
             title: const Text('Disclaimers'),
             subtitle: const Text('Legalese'),
