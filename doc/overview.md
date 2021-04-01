@@ -60,7 +60,18 @@ ObservationWidget(
 ```
 
 ### Use-Case: Fill a Questionnaire
-The display and filling of a Questionnaire is entirely self-contained.
+#### Capabilities
+The Questionnaire Filler widget is based on a specification called Structured Data Capture (SDC).
+Information on Structured Data Capture can be found here: 
+* [SDC Home Page](http://hl7.org/fhir/uv/sdc/2019May/)
+* [YT Video from FHIR DevDays](https://www.youtube.com/watch?v=WPudaF4S7Bk)
+* There is a chat channel at https://chat.fhir.org stream `#questionnaire`.
+
+The capabilities of this widget are documented [here](sdc-capabilities.md).
+
+#### Code example
+The display and filling of a Questionnaire is entirely self-contained. You create the widget to fill a Questionnaire,
+return it as part of your `build()` method and lean back.
 
 ```dart
 final widget = QuestionnaireScrollerPage(
