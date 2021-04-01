@@ -1,5 +1,5 @@
 # *Faiadashu™ FHIRDash* — Widgets for Digital Health - Example App
-##*[(ファイアダッシュ)]*
+## *[(ファイアダッシュ)]*
 
 An example app to show off *Faiadashu™ FHIRDash* — Widgets for Digital Health.
 
