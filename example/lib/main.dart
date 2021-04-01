@@ -66,9 +66,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  // It is typically NOT possible to resolve value sets through their URL.
+  // This mechanism allows to add them from other sources.
   final resourceProvider = NestedExternalResourceProvider([
     FhirValueSetProvider(),
-    AssetResourceProvider(<String, String>{
+    AssetResourceProvider.fromMap(<String, String>{
       'http://hl7.org/fhir/ValueSet/ucum-bodyweight':
           'assets/valuesets/ucum_bodyweight.json',
       'http://hl7.org/fhir/ValueSet/iso3166-1-2':
@@ -160,8 +162,9 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => QuestionnaireScrollerPage.fromAsset(
-                          'assets/instruments/sdc_demo.json',
+                      builder: (context) => QuestionnaireScrollerPage(
+                          AssetResourceProvider('questionnaire',
+                              'assets/instruments/sdc_demo.json'),
                           resourceProvider: resourceProvider,
                           floatingActionButton: fab)));
             },
@@ -174,8 +177,9 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => QuestionnaireScrollerPage.fromAsset(
-                          'assets/instruments/sdc-example-render.json',
+                      builder: (context) => QuestionnaireScrollerPage(
+                          AssetResourceProvider('questionnaire',
+                              'assets/instruments/sdc-example-render.json'),
                           resourceProvider: resourceProvider)));
             },
           ),
@@ -187,8 +191,9 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => QuestionnaireScrollerPage.fromAsset(
-                      'assets/instruments/argonaut_sampler.json',
+                    builder: (context) => QuestionnaireScrollerPage(
+                      AssetResourceProvider('questionnaire',
+                          'assets/instruments/argonaut_sampler.json'),
                       resourceProvider: resourceProvider,
                     ),
                   ));
@@ -202,8 +207,9 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => QuestionnaireScrollerPage.fromAsset(
-                          'assets/instruments/phq9_instrument.json',
+                      builder: (context) => QuestionnaireScrollerPage(
+                          AssetResourceProvider('questionnaire',
+                              'assets/instruments/phq9_instrument.json'),
                           resourceProvider: resourceProvider)));
             },
           ),
@@ -215,9 +221,9 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          const QuestionnaireStepperPage.fromAsset(
-                              'assets/instruments/phq9_instrument.json')));
+                      builder: (context) => QuestionnaireStepperPage(
+                          AssetResourceProvider('questionnaire',
+                              'assets/instruments/phq9_instrument.json'))));
             },
           ),
           ListTile(
@@ -227,8 +233,9 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => QuestionnaireScrollerPage.fromAsset(
-                          'assets/instruments/hf_instrument.json',
+                      builder: (context) => QuestionnaireScrollerPage(
+                          AssetResourceProvider('questionnaire',
+                              'assets/instruments/hf_instrument.json'),
                           resourceProvider: resourceProvider)));
             },
           ),
@@ -239,8 +246,9 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => QuestionnaireScrollerPage.fromAsset(
-                          'assets/instruments/prapare_instrument.json',
+                      builder: (context) => QuestionnaireScrollerPage(
+                          AssetResourceProvider('questionnaire',
+                              'assets/instruments/prapare_instrument.json'),
                           resourceProvider: resourceProvider)));
             },
           ),
@@ -252,8 +260,9 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => QuestionnaireScrollerPage.fromAsset(
-                          'assets/instruments/bluebook.json',
+                      builder: (context) => QuestionnaireScrollerPage(
+                          AssetResourceProvider('questionnaire',
+                              'assets/instruments/bluebook.json'),
                           resourceProvider: resourceProvider)));
             },
           ),
@@ -265,8 +274,9 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => QuestionnaireScrollerPage.fromAsset(
-                          'assets/instruments/who_covid19.json',
+                      builder: (context) => QuestionnaireScrollerPage(
+                          AssetResourceProvider('questionnaire',
+                              'assets/instruments/who_covid19.json'),
                           resourceProvider: resourceProvider)));
             },
           ),

@@ -12,13 +12,13 @@ import 'questionnaire_cover_page.dart';
 
 /// Fill a questionnaire through a vertically scrolling input form.
 class QuestionnaireScrollerPage extends StatefulWidget {
-  final String loaderParam;
+  final ExternalResourceProvider questionnaireProvider;
   final Widget? floatingActionButton;
   final List<Widget>? frontMatter;
   final List<Widget>? backMatter;
   final ExternalResourceProvider? resourceProvider;
 
-  const QuestionnaireScrollerPage.fromAsset(this.loaderParam,
+  const QuestionnaireScrollerPage(this.questionnaireProvider,
       {this.resourceProvider,
       this.floatingActionButton,
       this.frontMatter,
@@ -68,7 +68,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
 
   @override
   Widget build(BuildContext context) {
-    return QuestionnaireFiller.fromAsset(widget.loaderParam,
+    return QuestionnaireFiller(widget.questionnaireProvider,
         builder: (BuildContext context) {
       final mainMatterLength =
           QuestionnaireFiller.of(context).surveyLocations.length;

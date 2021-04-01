@@ -6,9 +6,9 @@ import 'narrative_drawer.dart';
 
 /// Fill a questionnaire through a wizard-style series of individual questions.
 class QuestionnaireStepperPage extends StatefulWidget {
-  final String loaderParam;
+  final ExternalResourceProvider questionnaireProvider;
 
-  const QuestionnaireStepperPage.fromAsset(this.loaderParam, {Key? key})
+  const QuestionnaireStepperPage(this.questionnaireProvider, {Key? key})
       : super(key: key);
 
   @override
@@ -21,7 +21,7 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
   @override
   Widget build(BuildContext context) {
     final controller = PageController();
-    return QuestionnaireFiller.fromAsset(widget.loaderParam,
+    return QuestionnaireFiller(widget.questionnaireProvider,
         builder: (BuildContext context) => Scaffold(
             appBar: AppBar(
               leading: Builder(

@@ -1,8 +1,5 @@
-import 'dart:convert';
-
 import 'package:fhir/r4/r4.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
 
 import '../../logging/logging.dart';
 import '../questionnaires.dart';
@@ -10,49 +7,37 @@ import '../resource_provider/resource_provider.dart';
 
 class QuestionnaireFiller extends StatefulWidget {
   final WidgetBuilder builder;
-  final Future<QuestionnaireTopLocation> Function(
-      dynamic param, ExternalResourceProvider? valueSetProvider) loaderFuture;
-  final dynamic loaderParam;
+  final ExternalResourceProvider questionnaireProvider;
+  final ExternalResourceProvider? questionnaireResponseProvider;
+
   final ExternalResourceProvider? externalResourceProvider;
   static final logger = Logger(QuestionnaireFiller);
 
-  static Future<QuestionnaireTopLocation> _loadFromString(
-      dynamic instrumentString,
-      ExternalResourceProvider? valueSetProvider) async {
-    final jsonQuestionnaire =
-        json.decode(instrumentString as String) as Map<String, dynamic>;
+  Future<QuestionnaireTopLocation> _createTopLocation() async {
+    await questionnaireProvider.init();
+    final questionnaire = ArgumentError.checkNotNull(
+        questionnaireProvider.getResource('questionnaire')) as Questionnaire;
     final topLocation = QuestionnaireTopLocation.fromQuestionnaire(
-        Questionnaire.fromJson(jsonQuestionnaire),
+        questionnaire,
+        // TODO: Make this a parameter with a default
         aggregators: [
           TotalScoreAggregator(),
           NarrativeAggregator(),
           QuestionnaireResponseAggregator()
         ],
-        valueSetProvider: valueSetProvider);
+        externalResourceProvider: externalResourceProvider);
 
     await topLocation.initState();
 
     return topLocation;
   }
 
-  static Future<QuestionnaireTopLocation> _loadFromAsset(
-      dynamic assetPath, ExternalResourceProvider? valueSetProvider) async {
-    logger.log('Enter _loadFromAsset', level: LogLevel.trace);
-    final instrumentString = await rootBundle.loadString(assetPath.toString());
-    return _loadFromString(instrumentString, valueSetProvider);
-  }
-
-  const QuestionnaireFiller.fromAsset(this.loaderParam,
-      {Key? key, required this.builder, this.externalResourceProvider})
-      // ignore: avoid_field_initializers_in_const_classes
-      : loaderFuture = _loadFromAsset,
-        super(key: key);
-
-  const QuestionnaireFiller.fromString(this.loaderParam,
-      {Key? key, required this.builder, this.externalResourceProvider})
-      // ignore: avoid_field_initializers_in_const_classes
-      : loaderFuture = _loadFromString,
-        super(key: key);
+  const QuestionnaireFiller(this.questionnaireProvider,
+      {Key? key,
+      required this.builder,
+      this.externalResourceProvider,
+      this.questionnaireResponseProvider})
+      : super(key: key);
 
   static QuestionnaireFillerData of(BuildContext context) {
     final result =
@@ -75,8 +60,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
   @override
   void initState() {
     super.initState();
-    builderFuture = widget.loaderFuture
-        .call(widget.loaderParam, widget.externalResourceProvider);
+    builderFuture = widget._createTopLocation();
   }
 
   @override

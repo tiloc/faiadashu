@@ -40,7 +40,9 @@ class AssetResourceProvider extends ExternalResourceProvider {
   final Map<String, Resource> resources = {};
   final Map<String, String> assetMap;
 
-  AssetResourceProvider(this.assetMap);
+  AssetResourceProvider(String key, String assetPath)
+      : assetMap = {key: assetPath};
+  AssetResourceProvider.fromMap(this.assetMap);
 
   @override
   Future<void> init() async {

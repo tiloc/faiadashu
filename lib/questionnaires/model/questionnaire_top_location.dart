@@ -20,9 +20,9 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
   /// [init], or it might malfunction!
   QuestionnaireTopLocation.fromQuestionnaire(Questionnaire questionnaire,
       {List<Aggregator>? aggregators,
-      ExternalResourceProvider? valueSetProvider})
+      ExternalResourceProvider? externalResourceProvider})
       : _aggregators = aggregators,
-        _extResourceProvider = valueSetProvider,
+        _extResourceProvider = externalResourceProvider,
         super._(
             questionnaire,
             null,

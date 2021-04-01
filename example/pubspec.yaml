@@ -32,6 +32,8 @@ flutter:
     - assets/instruments/
     - assets/valuesets/
     - assets/codesystems/
+    - assets/responses/
+
 
 
 
