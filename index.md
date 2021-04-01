@@ -1,6 +1,8 @@
 ## Welcome to the Faiadashu™ FHIRDash Gallery
 *[(ファイアダッシュ)]*
 
+Build beautiful healthcare apps fast — use the Flutter™ SDK and follow the HL7® FHIR® standard.
+
 ### Observations nicely formatted
 <img width="443" alt="observations" src="https://user-images.githubusercontent.com/16414047/112978818-12977f00-9158-11eb-8e1c-6772dcc3270a.png">
 
