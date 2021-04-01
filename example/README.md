@@ -4,6 +4,7 @@
 An example app to show off *Faiadashu™ FHIRDash* — Widgets for Digital Health.
 
 **Use the in-app menu to explore the widgets**
+
 ![In-App Menu](../doc/example-menu.png)
 
 ## Disclaimer
