@@ -41,8 +41,7 @@ class QuestionnaireAnswerFillerFactory {
         case QuestionnaireItemType.reference:
         case QuestionnaireItemType.url:
           throw QuestionnaireFormatException(
-              'Unsupported item type: ${location.questionnaireItem.type!}',
-              null);
+              'Unsupported item type: ${location.questionnaireItem.type!}');
       }
     } catch (exception) {
       logger.log('Cannot create answer filler:',
