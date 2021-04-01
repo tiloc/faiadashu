@@ -35,7 +35,7 @@ Supported.
 #### enableWhen
 Limited support for operators: =, exists
 
-Limited support for behaviors: ´any´
+Limited support for behaviors: `any`
 
 #### boolean
 Comprehensive support, incl. tri-state for "not answered"
@@ -97,6 +97,9 @@ Comprehensive support
 #### choice
 Comprehensive support, incl. optionChoice and choices from ValueSets.
 Support for multiple choice (item.repeats = true) and lookup from ValueSets (triggered automatically by large # of choices).
+
+Support for leaving a question unanswered.
+
 ##### Extensions
 - ordinalValue
 - choiceOrientation: supported, but `horizontal` may be ignored due to display constraints (mobile phone).
@@ -119,3 +122,9 @@ Total score will be entered into any field which meets one of the following:
 - has extension `cqf-expression`
 - is readOnly and has unit `{score}`
 
+### Response creation
+All detail from the questions in the questionnaire carries over into the Response.
+
+A narrative will be auto-generated.
+
+Choice answers will be marked as "user selected".
