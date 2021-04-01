@@ -44,4 +44,6 @@ The library is licensed under the MIT license. The full license text is here [LI
 Due to its nature, this library requires a multitude of third-party content and licenses. It is up to you to examine the
 provided information and decide whether you meet the obligations to use this library and/or the contained content.
 
+[Legal Information](doc/disclaimers.md)
+
 **This information is not a substitute for professional legal advice.**
