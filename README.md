@@ -5,6 +5,8 @@
 ## Mission
 Build beautiful healthcare apps fast — use the Flutter™ SDK and follow the HL7® FHIR® standard.
 
+> FHIR® is the registered trademark of HL7 and is used with the permission of HL7. Use of the FHIR trademark does not constitute endorsement of this product by HL7.
+
 ## Features
 * **A ready-made Widget to fill FHIR® Questionnaires.**
 * Formatted and localized output of clinical observations
@@ -37,9 +39,6 @@ Slack channel which is run by some like-minded folks and where I can be frequent
 
 ### License
 The library is licensed under the MIT license. The full license text is here [LICENSE](LICENSE).
-
-### The FHIR® trademark
-FHIR® is the registered trademark of HL7 and is used with the permission of HL7. Use of the FHIR trademark does not constitute endorsement of this product by HL7.
 
 ### Full list of legal attributions
 Due to its nature, this library requires a multitude of third-party content and licenses. It is up to you to examine the
