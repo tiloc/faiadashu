@@ -97,7 +97,9 @@ class _HomePageState extends State<HomePage> {
       'http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemQuestionnaireChoice':
           'assets/codesystems/who_cr_codesystem_questionnaire_choice.json',
       'http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemReasonForTesting':
-          'assets/codesystems/who_cr_codesystem_reason_for_testing.json'
+          'assets/codesystems/who_cr_codesystem_reason_for_testing.json',
+      'http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemComorbidity':
+          'assets/codesystems/who_cr_codesystem_comorbidity.json',
     })
   ]);
 
@@ -167,6 +169,20 @@ class _HomePageState extends State<HomePage> {
                       builder: (context) => QuestionnaireScrollerPage(
                           AssetResourceProvider.singleton(Questionnaire,
                               'assets/instruments/sdc_demo.json'),
+                          resourceProvider: resourceProvider,
+                          floatingActionButton: fab)));
+            },
+          ),
+          ListTile(
+            title: const Text('FHIR Hot Beverage IG'),
+            subtitle: const Text('WIP Beverage Questionnaire'),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => QuestionnaireScrollerPage(
+                          AssetResourceProvider.singleton(Questionnaire,
+                              'assets/instruments/beverage_ig.json'),
                           resourceProvider: resourceProvider,
                           floatingActionButton: fab)));
             },

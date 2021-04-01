@@ -26,12 +26,23 @@ class Xhtml {
     if (xhtml == null) {
       return null;
     }
-    const imgBase64Prefix = "<img src='data:image/png;base64,";
+    const imgPngBase64Prefix = "<img src='data:image/png;base64,";
+    const imgJpgBase64Prefix = "<img src='data:image/jpeg;base64,";
     const imgHashPrefix = "<img src='#";
     const imgSuffix = "'/>";
-    if (xhtml.startsWith(imgBase64Prefix)) {
+    if (xhtml.startsWith(imgPngBase64Prefix)) {
       final base64String = xhtml.substring(
-          imgBase64Prefix.length, xhtml.length - imgSuffix.length);
+          imgPngBase64Prefix.length, xhtml.length - imgSuffix.length);
+      logger.log('Length of base64: ${base64String.length}',
+          level: LogLevel.debug);
+      return Base64BinaryWidget(base64String,
+          width: width, height: height, semanticLabel: plainText);
+    }
+    if (xhtml.startsWith(imgJpgBase64Prefix)) {
+      final base64String = xhtml.substring(
+          imgJpgBase64Prefix.length, xhtml.length - imgSuffix.length);
+      logger.log('Length of base64: ${base64String.length}',
+          level: LogLevel.debug);
       return Base64BinaryWidget(base64String,
           width: width, height: height, semanticLabel: plainText);
     }
