@@ -2,8 +2,8 @@ import 'package:fhir/r4/r4.dart';
 import 'package:flutter/material.dart';
 
 import '../../logging/logging.dart';
+import '../../resource_provider/resource_provider.dart';
 import '../questionnaires.dart';
-import '../resource_provider/resource_provider.dart';
 
 class QuestionnaireFiller extends StatefulWidget {
   final WidgetBuilder builder;
@@ -16,7 +16,9 @@ class QuestionnaireFiller extends StatefulWidget {
   Future<QuestionnaireTopLocation> _createTopLocation() async {
     await questionnaireProvider.init();
     final questionnaire = ArgumentError.checkNotNull(
-        questionnaireProvider.getResource('questionnaire')) as Questionnaire;
+        questionnaireProvider.getResource((Questionnaire).toString())
+            as Questionnaire?,
+        "'Questionnaire' asset");
     final topLocation = QuestionnaireTopLocation.fromQuestionnaire(
         questionnaire,
         // TODO: Make this a parameter with a default

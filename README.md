@@ -1,27 +1,30 @@
 [![style: lint](https://img.shields.io/badge/style-lint-4BC0F5.svg)](https://pub.dev/packages/lint)
 
-# *Faiadashu™ [(ファイアダッシュ)]* — Widgets for Digital Health
+# *Faiadashu™ FHIRDash* — Widgets for Digital Health
 
-### Build healthcare apps fast — use the Flutter™ SDK and follow popular standards in healthcare.
+## Mission
+Build beautiful healthcare apps fast — use the Flutter™ SDK and follow the HL7® FHIR® standard.
 
-### Features
-#### Minor things
-* Formatted and localized output of dates / times
+## Features
+* **A ready-made Widget to fill FHIR® Questionnaires.**
 * Formatted and localized output of clinical observations
+* Formatted and localized output of dates / times
 * Localized output of clinical codings
-* Development tree view for clinical and administrative data structures
+* Development tree view to introspect clinical and administrative data structures
   
+## Gallery
+### Filler for FHIR Questionnaires
+![Swift walk-through](https://user-images.githubusercontent.com/16414047/113286611-bdd93d00-92ec-11eb-9c7d-fd72dd0b99fe.gif)
+
+**Click link below for extended, narrated video**
+
+[Demo Video on YT](https://youtu.be/k9vEy9Z_L18)
+
+### Display formatted, localized observations
 ![Screenshot](https://user-images.githubusercontent.com/16414047/112978818-12977f00-9158-11eb-8e1c-6772dcc3270a.png)
 
-#### The Major Thing: Filler widget for Questionnaires
-
-Supports numerous features described in the FHIR® standard.
-
-![Screenshot](https://user-images.githubusercontent.com/16414047/112978477-b0d71500-9157-11eb-9c70-f8bddc7b6396.gif)
-
-**Click link below for narrated longer video**
-
-[Demo Video](https://github.com/tiloc/faiadashu/blob/f53a13cbecb707c51534b4bacdd52d72be291506/doc/movies/sdc-example.mp4)
+### Supported versions of Flutter™ SDK
+This library depends on Flutter™ SDK 2.0, or later. It is null-safe. It cannot be used with earlier versions of the SDK.
 
 ### Related projects
 [![Pub Version](https://img.shields.io/pub/v/fhir?label=pub.dev&labelColor=333940&logo=dart)](https://pub.dev/packages/fhir)
@@ -58,17 +61,17 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-### Supported versions of Flutter™ SDK
-This library depends on Flutter™ SDK 2.0, or later.
+### The FHIR® trademark
+FHIR® is the registered trademark of HL7 and is used with the permission of HL7. Use of the FHIR trademark does not constitute endorsement of this product by HL7.
+
+### The Flutter™ trademark
 Flutter and the related logo are trademarks of Google LLC. We are not endorsed by or affiliated with Google LLC.
 
 ### Compliance with the HL7® FHIR® standard
-**This library is not endorsed by Health Level Seven International.** It supports a subset of the FHIR R4 specification,
+This SDK supports a subset of the FHIR R4 specification,
 with additional support for a subset of the SDC (Structured Data Capture) profile.
 
-HL7, FHIR and the FHIR [FLAME DESIGN] are the registered trademarks of Health Level Seven International and their use does not constitute endorsement by HL7.
-
-All statements about compliance with a particular FHIR standard are truthful and made as a matter of Fair Use.
+All statements about compliance with a particular FHIR standard are deemed truthful and made as a matter of Fair Use.
 
 ### Contained content from HL7® and FHIR®
 This material contains content from the FHIR specification. Further information about the license terms can be found here: https://www.hl7.org/fhir/license.html

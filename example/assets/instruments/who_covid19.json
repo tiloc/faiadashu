@@ -429,7 +429,7 @@
               "code": "30525-0"
             }
           ],
-          "text": "Age (use days if <1 month, months if <1 year):",
+          "text": "Age (use days if under 1 month, months if under 1 year):",
           "type": "quantity"
         },
         {

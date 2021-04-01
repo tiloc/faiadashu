@@ -42,6 +42,10 @@ class AssetResourceProvider extends ExternalResourceProvider {
 
   AssetResourceProvider(String key, String assetPath)
       : assetMap = {key: assetPath};
+
+  AssetResourceProvider.singleton(Type resourceType, String assetPath)
+      : assetMap = {resourceType.toString(): assetPath};
+
   AssetResourceProvider.fromMap(this.assetMap);
 
   @override

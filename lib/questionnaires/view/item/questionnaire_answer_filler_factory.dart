@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../../faiadashu.dart';
 import '../../model/questionnaire_location.dart';
+import '../broken_questionnaire_item.dart';
 import 'answer/answer.dart';
 import 'item.dart';
 
@@ -70,20 +71,9 @@ class _BrokenItemState extends State<_BrokenItem> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-        color: Colors.red,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              widget.exception.toString(),
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600),
-            ),
-            Text(widget.location.questionnaireItem.toJson().toString())
-          ],
-        ));
+    return BrokenQuestionnaireItem(
+        'Could not initialize QuestionnaireAnswerFiller',
+        widget.location.questionnaireItem,
+        widget.exception);
   }
 }

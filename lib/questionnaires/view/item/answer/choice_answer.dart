@@ -8,6 +8,7 @@ import '../../../../fhir_types/fhir_types_extensions.dart';
 import '../../../../logging/logging.dart';
 import '../../../../questionnaires/model/questionnaire_extensions.dart';
 import '../../../questionnaires.dart';
+import '../../broken_questionnaire_item.dart';
 import '../../xhtml.dart';
 
 class ChoiceAnswer extends QuestionnaireAnswerFiller {
@@ -24,9 +25,10 @@ class ChoiceAnswer extends QuestionnaireAnswerFiller {
 
 class _ChoiceAnswerState
     extends QuestionnaireAnswerState<CodeableConcept, ChoiceAnswer> {
-//  static final logger = Logger(_ChoiceAnswerState);
+  static final logger = Logger(_ChoiceAnswerState);
   // ignore: prefer_collection_literals
   final _answerOptions = LinkedHashMap<String, QuestionnaireAnswerOption>();
+  Object? _initFailure;
 
   _ChoiceAnswerState();
 
@@ -34,11 +36,18 @@ class _ChoiceAnswerState
   void initState() {
     super.initState();
 
-    _createAnswerOptions();
+    try {
+      _createAnswerOptions();
 
-    if (widget.location.responseItem != null) {
-      initialValue = _fillValue(
-          _choiceStringFromCoding(widget.answerLocation.answer?.valueCoding));
+      if (widget.location.responseItem != null) {
+        initialValue = _fillValue(
+            _choiceStringFromCoding(widget.answerLocation.answer?.valueCoding));
+      }
+    } catch (exception) {
+      logger.log(
+          'Could not initialize ChoiceAnswer for ${widget.location.linkId}',
+          error: exception);
+      _initFailure = exception;
     }
   }
 
@@ -72,16 +81,25 @@ class _ChoiceAnswerState
 
   @override
   Widget buildReadOnly(BuildContext context) {
-    return Text(
-        value?.localizedDisplay(Localizations.localeOf(context)) ?? '-');
+    return (_initFailure == null)
+        ? Text(value?.localizedDisplay(Localizations.localeOf(context)) ?? '-')
+        : BrokenQuestionnaireItem.fromException(_initFailure!);
   }
 
   @override
   Widget buildEditable(BuildContext context) {
-    if (_answerOptions.length < 15) {
-      return _buildChoiceAnswers(context);
-    } else {
-      return _buildLookupAnswers(context);
+    if (_initFailure != null) {
+      return BrokenQuestionnaireItem.fromException(_initFailure!);
+    }
+
+    try {
+      if (_answerOptions.length < 15) {
+        return _buildChoiceAnswers(context);
+      } else {
+        return _buildLookupAnswers(context);
+      }
+    } catch (exception) {
+      return BrokenQuestionnaireItem.fromException(exception);
     }
   }
 

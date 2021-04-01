@@ -1,5 +1,5 @@
 name: faiadashu
-description: Build healthcare apps fastBuild healthcare apps fast — use the Flutter™ SDK and follow popular standards in healthcare.
+description: Faiadashu FHIRDash - Build beautiful healthcare apps fast — use the Flutter™ SDK and follow the HL7® FHIR® standard.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
@@ -14,8 +14,10 @@ description: Build healthcare apps fastBuild healthcare apps fast — use the Fl
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 0.1.2
+version: 0.1.3
+homepage: https://tiloc.github.io/faiadashu/
 repository: https://github.com/tiloc/faiadashu
+issue_tracker: https://github.com/tiloc/faiadashu/issues
 
 environment:
   sdk: '>=2.12.0 <3.0.0'

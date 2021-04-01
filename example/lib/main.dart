@@ -2,6 +2,8 @@ import 'dart:developer' as developer;
 import 'dart:io';
 
 import 'package:faiadashu/questionnaires/questionnaires.dart';
+import 'package:faiadashu/resource_provider/resource_provider.dart';
+import 'package:fhir/r4.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -163,7 +165,7 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => QuestionnaireScrollerPage(
-                          AssetResourceProvider('questionnaire',
+                          AssetResourceProvider.singleton(Questionnaire,
                               'assets/instruments/sdc_demo.json'),
                           resourceProvider: resourceProvider,
                           floatingActionButton: fab)));
@@ -178,7 +180,7 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => QuestionnaireScrollerPage(
-                          AssetResourceProvider('questionnaire',
+                          AssetResourceProvider.singleton(Questionnaire,
                               'assets/instruments/sdc-example-render.json'),
                           resourceProvider: resourceProvider)));
             },
@@ -192,7 +194,7 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => QuestionnaireScrollerPage(
-                      AssetResourceProvider('questionnaire',
+                      AssetResourceProvider.singleton(Questionnaire,
                           'assets/instruments/argonaut_sampler.json'),
                       resourceProvider: resourceProvider,
                     ),
@@ -208,7 +210,7 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => QuestionnaireScrollerPage(
-                          AssetResourceProvider('questionnaire',
+                          AssetResourceProvider.singleton(Questionnaire,
                               'assets/instruments/phq9_instrument.json'),
                           resourceProvider: resourceProvider)));
             },
@@ -222,7 +224,7 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => QuestionnaireStepperPage(
-                          AssetResourceProvider('questionnaire',
+                          AssetResourceProvider.singleton(Questionnaire,
                               'assets/instruments/phq9_instrument.json'))));
             },
           ),
@@ -234,7 +236,7 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => QuestionnaireScrollerPage(
-                          AssetResourceProvider('questionnaire',
+                          AssetResourceProvider.singleton(Questionnaire,
                               'assets/instruments/hf_instrument.json'),
                           resourceProvider: resourceProvider)));
             },
@@ -247,7 +249,7 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => QuestionnaireScrollerPage(
-                          AssetResourceProvider('questionnaire',
+                          AssetResourceProvider.singleton(Questionnaire,
                               'assets/instruments/prapare_instrument.json'),
                           resourceProvider: resourceProvider)));
             },
@@ -261,7 +263,7 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => QuestionnaireScrollerPage(
-                          AssetResourceProvider('questionnaire',
+                          AssetResourceProvider.singleton(Questionnaire,
                               'assets/instruments/bluebook.json'),
                           resourceProvider: resourceProvider)));
             },
@@ -275,7 +277,7 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => QuestionnaireScrollerPage(
-                          AssetResourceProvider('questionnaire',
+                          AssetResourceProvider.singleton(Questionnaire,
                               'assets/instruments/who_covid19.json'),
                           resourceProvider: resourceProvider)));
             },

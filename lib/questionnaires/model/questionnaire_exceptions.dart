@@ -8,10 +8,10 @@ class QuestionnaireFormatException implements Exception {
 
   /// A throwable
   final Object? cause;
-  QuestionnaireFormatException(this.message, this.element, [this.cause]);
+  QuestionnaireFormatException(this.message, [this.element, this.cause]);
 
   @override
   String toString() {
-    return '$message: $element';
+    return (element != null) ? '$message: $element' : message;
   }
 }

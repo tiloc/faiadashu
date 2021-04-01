@@ -1,6 +1,7 @@
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
+import '../../resource_provider/external_resource_provider.dart';
 import '../questionnaires.dart';
 import 'narrative_drawer.dart';
 

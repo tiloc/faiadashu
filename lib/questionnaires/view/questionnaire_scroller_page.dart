@@ -5,8 +5,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../resource_provider/resource_provider.dart';
 import '../questionnaires.dart';
-import '../resource_provider/resource_provider.dart';
 import 'narrative_drawer.dart';
 import 'questionnaire_cover_page.dart';
 
