@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:fhir/r4.dart';
 import 'package:fhir/r4/resource/resource.dart';
 import 'package:flutter/material.dart';
 
@@ -31,19 +34,21 @@ class BrokenQuestionnaireItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-        color: Colors.red,
+      color: Colors.red,
+      child: Container(
+        padding: const EdgeInsets.all(8),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (cause != null)
-              Text(
+              SelectableText(
                 cause.toString(),
                 style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.w600),
               ),
-            Text(
+            SelectableText(
               message,
               style: const TextStyle(
                   color: Colors.yellow,
@@ -51,10 +56,14 @@ class BrokenQuestionnaireItem extends StatelessWidget {
                   fontWeight: FontWeight.w600),
             ),
             if (element != null)
-              Text((element is Resource)
-                  ? (element! as Resource).toJson().toString()
-                  : element.toString())
+              SelectableText((element is Resource)
+                  ? jsonEncode((element! as Resource).toJson())
+                  : (element is QuestionnaireItem)
+                      ? jsonEncode((element! as QuestionnaireItem).toJson())
+                      : element.toString())
           ],
-        ));
+        ),
+      ),
+    );
   }
 }

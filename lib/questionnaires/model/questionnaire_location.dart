@@ -43,40 +43,71 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
   /// Calculate the current enablement status of this item.
   /// Sets the [enabled] property
   void _calculateEnabled() {
-    if (questionnaireItem.enableBehavior != null &&
-        questionnaireItem.enableBehavior !=
-            QuestionnaireItemEnableBehavior.any) {
-      logger.log(
-          'Unsupported enableBehavior: ${questionnaireItem.enableBehavior}',
-          level: LogLevel.warn);
-    }
+    bool anyTrigger = false;
+    int allTriggered = 0;
+    int allCount = 0;
+
     forEnableWhens((qew) {
+      allCount++;
       switch (qew.operator_) {
         case QuestionnaireEnableWhenOperator.exists:
           if (top.findByLinkId(qew.question!).responseItem == null) {
-            _disableWithChildren();
+            anyTrigger = true;
+            allTriggered++;
           }
           break;
         case QuestionnaireEnableWhenOperator.eq:
+        case QuestionnaireEnableWhenOperator.ne:
           final responseCoding = top
               .findByLinkId(qew.question!)
               .responseItem
               ?.answer
               ?.firstOrNull
               ?.valueCoding;
-          // TODO: More sophistication? System, cardinality, etc.
-          if (responseCoding?.code != qew.answerCoding?.code) {
-            logger.log(
-                'enableWhen: no equality $responseCoding != ${qew.answerCoding}',
+          // TODO: More sophistication- System, cardinality, etc.
+          if (responseCoding?.code == qew.answerCoding?.code) {
+            logger.log('enableWhen: $responseCoding == ${qew.answerCoding}',
                 level: LogLevel.debug);
-            _disableWithChildren();
+            if (qew.operator_ == QuestionnaireEnableWhenOperator.eq) {
+              anyTrigger = true;
+              allTriggered++;
+            }
+          } else {
+            logger.log('enableWhen: $responseCoding != ${qew.answerCoding}',
+                level: LogLevel.debug);
+            if (qew.operator_ == QuestionnaireEnableWhenOperator.ne) {
+              anyTrigger = true;
+              allTriggered++;
+            }
           }
           break;
         default:
           logger.log('Unsupported operator: ${qew.operator_}.',
               level: LogLevel.warn);
+          // Err on the side of caution: Enable fields when enableWhen cannot be evaluated.
+          anyTrigger = true;
+          allTriggered++;
       }
     });
+
+    // TODO: Optimization: 'any' could stop evaluation after first trigger.
+    switch (questionnaireItem.enableBehavior) {
+      case QuestionnaireItemEnableBehavior.any:
+      case null:
+        if (!anyTrigger) {
+          _disableWithChildren();
+        }
+        break;
+      case QuestionnaireItemEnableBehavior.all:
+        if (allCount != allTriggered) {
+          _disableWithChildren();
+        }
+        break;
+      case QuestionnaireItemEnableBehavior.unknown:
+        throw QuestionnaireFormatException(
+            'enableWhen with unclear enableBehavior: ${questionnaireItem.enableBehavior}',
+            questionnaireItem);
+    }
   }
 
   bool _enabled = true;

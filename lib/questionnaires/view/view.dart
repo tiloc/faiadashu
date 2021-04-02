@@ -1,3 +1,4 @@
+export 'fdash_autocomplete.dart';
 export 'item/item.dart';
 export 'narrative_drawer.dart';
 export 'questionnaire_cover_page.dart';

@@ -13,7 +13,7 @@ import '../../xhtml.dart';
 
 class ChoiceAnswer extends QuestionnaireAnswerFiller {
   static final logger = Logger(ChoiceAnswer);
-  // This class abuses CodeableConcept to model multiple choice and open choice.
+  // This class uses CodeableConcept to model multiple choice and open choice.
 
   const ChoiceAnswer(
       QuestionnaireLocation location, AnswerLocation answerLocation,
@@ -319,7 +319,8 @@ class _ChoiceAnswerState
 
   Widget _buildLookupAnswers(BuildContext context) {
     final locale = Localizations.localeOf(context);
-    return Autocomplete<QuestionnaireAnswerOption>(
+    return FDashAutocomplete<QuestionnaireAnswerOption>(
+      initialValue: _choiceString(value),
       displayStringForOption: (answerOption) =>
           answerOption.localizedDisplay(locale),
       optionsBuilder: (TextEditingValue textEditingValue) {

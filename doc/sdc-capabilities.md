@@ -37,9 +37,12 @@ Only supported for `choice`
 Supported.
 
 #### enableWhen
-Limited support for operators: =, exists
+Support for all behaviors: `any`, `all`
 
-Limited support for behaviors: `any`
+Limited support for operators:
+* `=` only on coding 
+* `exists` on all types
+* All other operators: always return true, as to not prevent filling of the questionnaire.
 
 #### boolean
 Comprehensive support, incl. tri-state for "not answered"
@@ -106,11 +109,13 @@ Support for leaving a question unanswered.
 
 ##### Extensions
 - ordinalValue
+- iso21090-CO-value
 - choiceOrientation: supported, but `horizontal` may be ignored due to display constraints (mobile phone).
 - questionnaire-optionPrefix: supported
 - valueset-label: supported
 - rendering-xhtml: in addition to regular capabilities may also contain a base64 encoded image of type PNG or JPEG. 
 - questionnaire-itemControl: check-box, radio-button
+- translation: option choices can be translated
 #### open-choice 
 Same as `choice`, no support for open text input yet.
 
@@ -122,9 +127,12 @@ Not supported
 Ability to add up the ordinalValue of all choice questions into a total score.
 
 Total score will be entered into any field which meets one of the following:
-- has extension `sdc-questionnaire-calculatedExpression`
-- has extension `cqf-expression`
+- has extension `sdc-questionnaire-calculatedExpression` (**regardless of content of the expression!**)
+- has extension `cqf-expression` (**regardless of content of the expression!**)
 - is readOnly and has unit `{score}`
+
+**No true support for FHIRPath or CQL expressions is provided!** Any field which has one of the trigger extensions will
+have a total score calculcated, regardless of content of the expression!
 
 ### Response creation
 All detail from the questions in the questionnaire carries over into the Response.
