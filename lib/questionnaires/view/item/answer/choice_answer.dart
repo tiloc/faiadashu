@@ -109,9 +109,20 @@ class _ChoiceAnswerState
         : null;
   }
 
+  bool _isExclusive(Coding coding) {
+    return _answerOptions[_choiceStringFromCoding(coding)]!
+            .extension_
+            ?.extensionOrNull(
+                'http://hl7.org/fhir/StructureDefinition/questionnaire-optionExclusive')
+            ?.valueBoolean
+            ?.value ==
+        true;
+  }
+
   /// Turn on/off the checkbox with the provided [toggleValue].
   /// Used in repeating items.
   CodeableConcept? _fillToggledValue(String? toggleValue) {
+    logger.log('Enter fillToggledValue $toggleValue', level: LogLevel.trace);
     if (toggleValue == null) {
       return null;
     }
@@ -122,9 +133,23 @@ class _ChoiceAnswerState
     final entryIndex = value!.coding!
         .indexWhere((coding) => coding.code?.value == toggleValue);
     if (entryIndex == -1) {
-      return value!.copyWith(
-          coding: [...value!.coding!, ..._fillValue(toggleValue)!.coding!]);
+      logger.log('$toggleValue currently not selected.', level: LogLevel.debug);
+      final enabledCodeableConcept = _fillValue(toggleValue)!;
+      final enabledCoding = enabledCodeableConcept.coding!.first;
+      if (_isExclusive(enabledCoding)) {
+        logger.log('$toggleValue isExclusive', level: LogLevel.debug);
+        // The newly enabled checkbox is exclusive, kill all others.
+        return enabledCodeableConcept;
+      } else {
+        logger.log('$toggleValue is not exclusive', level: LogLevel.debug);
+        // Kill all exclusive ones.
+        return value!.copyWith(coding: [
+          ...value!.coding!.whereNot((coding) => _isExclusive(coding)),
+          enabledCoding
+        ]);
+      }
     } else {
+      logger.log('$toggleValue currently selected.', level: LogLevel.debug);
       return CodeableConcept(coding: value!.coding!..removeAt(entryIndex));
     }
   }

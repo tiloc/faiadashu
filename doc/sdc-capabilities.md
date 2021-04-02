@@ -17,6 +17,9 @@ Supported
 #### displayCategory
 `security` and `instructions` are supported.
 
+#### optionalDisplay
+The filler never chooses to omit a field from display.
+
 ### Item types: Grouping
 #### group
 Supported, but no support for item-control.
@@ -108,6 +111,7 @@ Support for multiple choice (item.repeats = true) and lookup from ValueSets (tri
 Support for leaving a question unanswered.
 
 ##### Extensions
+- optionExclusive
 - ordinalValue
 - iso21090-CO-value
 - choiceOrientation: supported, but `horizontal` may be ignored due to display constraints (mobile phone).

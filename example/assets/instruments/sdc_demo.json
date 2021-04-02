@@ -545,6 +545,70 @@
       "required": false,
       "linkId": "/38214-3",
       "text": "Pain severity Score VAS"
+    },
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "check-box",
+                "display": "Check-box"
+              }
+            ]
+          }
+        }
+      ],
+      "linkId": "1.0-option-exclusive",
+      "text": "What treatments do you now have for heart disease? (select all that applies)",
+      "type": "choice",
+      "repeats": true,
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "noTreatment",
+            "display": "No Treatment"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "aspirin",
+            "display": "Aspirin"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "otherMeds",
+            "display": "Other medicines, tablets, or pills"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "diet",
+            "display": "Diet"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "exercise",
+            "display": "Exercise"
+          }
+        },
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionExclusive",
+              "valueBoolean": true
+            }
+          ],
+          "valueCoding": {
+            "code": "none",
+            "display": "None of the above"
+          }
+        }
+      ]
     }
   ]
 }
