@@ -13,6 +13,8 @@ class QuestionnaireAnswerFillerFactory {
 
   static QuestionnaireAnswerFiller fromQuestionnaireItem(
       QuestionnaireLocation location, AnswerLocation answerLocation) {
+    logger.log('Creating AnswerFiller for $location', level: LogLevel.debug);
+
     try {
       switch (location.questionnaireItem.type!) {
         case QuestionnaireItemType.choice:

@@ -50,7 +50,7 @@ class MyApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
       ],
       supportedLocales: [
-        Locale('en'),
+        Locale('en', 'US'),
         Locale('de'),
 //        Locale('jp'),  // TODO: Support for Japanese is semi-broken in Flutter
         Locale('es'),
@@ -300,6 +300,10 @@ class _HomePageState extends State<HomePage> {
                         builder: (context) => QuestionnaireScrollerPage(
                             AssetResourceProvider.singleton(Questionnaire,
                                 'assets/instruments/bluebook.json'),
+                            questionnaireResponseProvider:
+                                AssetResourceProvider.singleton(
+                                    QuestionnaireResponse,
+                                    'assets/responses/bluebook_response.json'),
                             resourceProvider: resourceProvider)));
               },
             ),

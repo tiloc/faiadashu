@@ -190,6 +190,9 @@ class _NumericalAnswerState
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Expanded(
                   child: TextFormField(
+                initialValue: (value?.value != null)
+                    ? _numberInputFormat.format(value!.value!.value)
+                    : null,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                 ),

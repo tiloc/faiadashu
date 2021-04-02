@@ -6,22 +6,22 @@ import 'package:intl/intl.dart';
 
 extension FDashDateTimeExtension on FhirDateTime {
   String format(Locale locale, {String defaultText = ''}) {
-    final languageCode = locale.languageCode;
+    final localeCode = locale.toString();
     if (precision != DateTimePrecision.INVALID) {
       final DateFormat dateFormat;
       switch (precision) {
         case DateTimePrecision.FULL:
         case DateTimePrecision.INVALID:
-          dateFormat = DateFormat.yMd(languageCode).add_jms();
+          dateFormat = DateFormat.yMd(localeCode).add_jms();
           break;
         case DateTimePrecision.YYYY:
-          dateFormat = DateFormat.y(languageCode);
+          dateFormat = DateFormat.y(localeCode);
           break;
         case DateTimePrecision.YYYYMM:
-          dateFormat = DateFormat.yM(languageCode);
+          dateFormat = DateFormat.yM(localeCode);
           break;
         case DateTimePrecision.YYYYMMDD:
-          dateFormat = DateFormat.yMd(languageCode);
+          dateFormat = DateFormat.yMd(localeCode);
           break;
       }
       return dateFormat.format(value!);

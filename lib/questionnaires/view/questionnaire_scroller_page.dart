@@ -16,10 +16,12 @@ class QuestionnaireScrollerPage extends StatefulWidget {
   final Widget? floatingActionButton;
   final List<Widget>? frontMatter;
   final List<Widget>? backMatter;
+  final ExternalResourceProvider? questionnaireResponseProvider;
   final ExternalResourceProvider? resourceProvider;
 
   const QuestionnaireScrollerPage(this.questionnaireProvider,
-      {this.resourceProvider,
+      {this.questionnaireResponseProvider,
+      this.resourceProvider,
       this.floatingActionButton,
       this.frontMatter,
       this.backMatter = const [
@@ -69,6 +71,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
   @override
   Widget build(BuildContext context) {
     return QuestionnaireFiller(widget.questionnaireProvider,
+        questionnaireResponseProvider: widget.questionnaireResponseProvider,
         builder: (BuildContext context) {
       final mainMatterLength =
           QuestionnaireFiller.of(context).surveyLocations.length;

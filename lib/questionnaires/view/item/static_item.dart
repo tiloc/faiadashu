@@ -29,10 +29,9 @@ class _StaticItemState extends QuestionnaireAnswerState {
   void initState() {
     super.initState();
 
-    if (widget.location.responseItem != null) {
-      calcResult = widget.location.responseItem!.answer!.first.valueDecimal ??
-          widget.location.responseItem!.answer!.first.valueQuantity?.value;
-    }
+    calcResult =
+        widget.location.responseItem?.answer?.firstOrNull?.valueDecimal ??
+            widget.location.responseItem?.answer?.first.valueQuantity?.value;
 
     if (widget.location.isCalculatedExpression) {
       logger.log(

@@ -1,6 +1,7 @@
 import 'package:fhir/r4/r4.dart';
 import 'package:flutter/material.dart';
 
+import '../../../logging/logger.dart';
 import '../../questionnaires.dart';
 import 'questionnaire_answer_filler_factory.dart';
 
@@ -16,8 +17,9 @@ class QuestionnaireResponseFiller extends StatefulWidget {
 }
 
 class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
-  List<QuestionnaireAnswerFiller> _answerFillers = [];
+  late final List<QuestionnaireAnswerFiller> _answerFillers;
   List<QuestionnaireResponseAnswer?> _answers = [];
+  static final logger = Logger(QuestionnaireResponseState);
 
   QuestionnaireResponseState();
 

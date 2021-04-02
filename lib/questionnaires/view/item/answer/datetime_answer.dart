@@ -25,6 +25,10 @@ class _DateTimeAnswerState
   void initState() {
     super.initState();
     initialValue = widget.answerLocation.answer?.valueDateTime ??
+        ((widget.answerLocation.answer?.valueDate != null)
+            ? FhirDateTime(widget.answerLocation.answer?.valueDate
+                .toString()) // TODO: File a PR to allow construction of FhirDateTime directly from Date.
+            : null) ??
         ((widget.location.questionnaireItem.extension_
                     ?.extensionOrNull(
                         'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression')
@@ -46,19 +50,38 @@ class _DateTimeAnswerState
 
   @override
   Widget buildEditable(BuildContext context) {
+    final itemType = widget.location.questionnaireItem.type;
+
+    final initialDate =
+        (itemType != QuestionnaireItemType.time) ? value?.value : null;
+
+    final initialTime =
+        (itemType != QuestionnaireItemType.date && value?.value != null)
+            ? (value!.precision == DateTimePrecision.FULL)
+                ? TimeOfDay.fromDateTime(value!.value!)
+                : null
+            : null;
+
+    final locale = Localizations.localeOf(context);
+    final _initialValue = value?.format(locale);
+
+    final pickerType = ArgumentError.checkNotNull(const {
+      QuestionnaireItemType.date: DateTimePickerType.date,
+      QuestionnaireItemType.datetime: DateTimePickerType.dateTime,
+      QuestionnaireItemType.time: DateTimePickerType.time,
+    }[itemType]);
+
     return Container(
         padding: const EdgeInsets.only(top: 8, bottom: 8),
         child: DateTimePicker(
+          initialDate: initialDate,
+          initialTime: initialTime,
+          initialValue: _initialValue,
           decoration: const InputDecoration(border: OutlineInputBorder()),
-          type: ArgumentError.checkNotNull(const {
-            QuestionnaireItemType.date: DateTimePickerType.date,
-            QuestionnaireItemType.datetime: DateTimePickerType.dateTime,
-            QuestionnaireItemType.time: DateTimePickerType.time,
-          }[widget.location.questionnaireItem.type]),
-          locale: Localizations.localeOf(context),
+          type: pickerType,
+          locale: locale,
           firstDate: DateTime(1860),
           lastDate: DateTime(2050),
-          initialValue: value?.toString(),
           onChanged: (content) {
             value = FhirDateTime(content);
           },

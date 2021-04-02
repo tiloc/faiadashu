@@ -240,11 +240,48 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
   /// Find the [QuestionnaireLocation] that corresponds to the linkId.
   /// Throws an [Exception] when no such [QuestionnaireLocation] exists.
   QuestionnaireLocation findByLinkId(String linkId) {
-    return _orderedItems![linkId]!;
+    final result = _orderedItems![linkId];
+    if (result == null) {
+      throw QuestionnaireFormatException("Location '$linkId' not found.");
+    } else {
+      return result;
+    }
   }
 
   QuestionnaireResponseStatus responseStatus =
       QuestionnaireResponseStatus.unknown;
+
+  void _populateItems(List<QuestionnaireResponseItem>? qris) {
+    if (qris == null) {
+      return;
+    }
+    for (final item in qris) {
+      findByLinkId(item.linkId!).responseItem = item;
+      _populateItems(item.item);
+      if (item.answer != null) {
+        for (final answer in item.answer!) {
+          _populateItems(answer.item);
+        }
+      }
+    }
+  }
+
+  /// Populate the answers in the questionnaire with the answers from a response.
+  void populate(QuestionnaireResponse? questionnaireResponse) {
+    logger.log('Populating with $questionnaireResponse', level: LogLevel.debug);
+    if (questionnaireResponse == null) {
+      return;
+    }
+
+    if (questionnaireResponse.item == null ||
+        questionnaireResponse.item!.isEmpty) {
+      return;
+    }
+
+    // TODO: What is the best notification strategy?
+    // Assumption: It would be better to first set all responses in bulk and then recalc.
+    _populateItems(questionnaireResponse.item);
+  }
 
   /// Update the current enablement status of all items.
   void updateEnableWhen({bool notifyListeners = true}) {

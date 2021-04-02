@@ -29,7 +29,15 @@ class QuestionnaireFiller extends StatefulWidget {
         ],
         externalResourceProvider: externalResourceProvider);
 
-    await topLocation.initState();
+    await Future.wait([
+      topLocation.initState(),
+      if (questionnaireResponseProvider != null)
+        questionnaireResponseProvider!.init()
+    ]);
+
+    final response = questionnaireResponseProvider?.getResource(
+        (QuestionnaireResponse).toString()) as QuestionnaireResponse?;
+    topLocation.populate(response);
 
     return topLocation;
   }
@@ -92,8 +100,8 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.active:
-              // TODO: This should never happen in our use-case?
-              logger.log('FutureBuilder is active...', level: LogLevel.debug);
+              // This should never happen in our use-case (is for streaming)
+              logger.log('FutureBuilder is active...', level: LogLevel.warn);
               return QuestionnaireLoadingIndicator(snapshot);
             case ConnectionState.none:
               return QuestionnaireLoadingIndicator(snapshot);

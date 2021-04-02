@@ -34,6 +34,7 @@ class _StringAnswerState
     return Container(
         padding: const EdgeInsets.only(top: 8, bottom: 8),
         child: TextFormField(
+          initialValue: value,
           maxLines: (widget.location.questionnaireItem.type ==
                   QuestionnaireItemType.text)
               ? 4

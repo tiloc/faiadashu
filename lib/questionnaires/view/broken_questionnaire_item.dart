@@ -43,6 +43,13 @@ class BrokenQuestionnaireItem extends StatelessWidget {
                     fontSize: 16,
                     fontWeight: FontWeight.w600),
               ),
+            Text(
+              message,
+              style: const TextStyle(
+                  color: Colors.yellow,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600),
+            ),
             if (element != null)
               Text((element is Resource)
                   ? (element! as Resource).toJson().toString()

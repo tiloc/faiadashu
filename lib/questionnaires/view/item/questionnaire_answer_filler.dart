@@ -8,6 +8,7 @@ import '../../questionnaires.dart';
 abstract class QuestionnaireAnswerFiller extends StatefulWidget {
   final QuestionnaireLocation location;
   final AnswerLocation answerLocation;
+  static final logger = Logger(QuestionnaireAnswerFiller);
 
   const QuestionnaireAnswerFiller(this.location, this.answerLocation,
       {Key? key})
