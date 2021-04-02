@@ -1,6 +1,7 @@
 ## SDC Capabilities
 
 **Click this video to watch the capabilities in action**
+
 [![Walkthrough of the capabilities](https://img.youtube.com/vi/k9vEy9Z_L18/hqdefault.jpg)](https://www.youtube.com/watch?v=k9vEy9Z_L18 "Walkthrough of the Capabilities")
 
 ### Advanced Rendering
