@@ -1,5 +1,5 @@
 [![style: lint](https://img.shields.io/badge/style-lint-4BC0F5.svg)](https://pub.dev/packages/lint)
-
+[![pub package](https://img.shields.io/pub/v/faiadashu.svg?logo=flutter)](https://pub.dartlang.org/packages/faiadashu)
 # *Faiadashu™ FHIRDash* — Widgets for Digital Health
 
 ## Mission
