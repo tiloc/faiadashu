@@ -1,3 +1,8 @@
+## 0.1.4
+* Pre-populate a questionnaire from an existing response
+* Better support for enableWhen
+* Much improved documentation
+
 ## 0.1.3
 * Better error handling, especially for choice items
 * Mention permission to use the FHIR® trademark (Thank you Graham!)
