@@ -191,7 +191,7 @@ class _NumericalAnswerState
               Expanded(
                   child: TextFormField(
                 initialValue: (value?.value != null)
-                    ? _numberInputFormat.format(value!.value!.value)
+                    ? value!.value!.format(Localizations.localeOf(context))
                     : null,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
@@ -244,12 +244,16 @@ class _NumericalAnswerState
 
     switch (widget.location.questionnaireItem.type) {
       case QuestionnaireItemType.decimal:
-        return QuestionnaireResponseAnswer(valueDecimal: value!.value);
+        return (value!.value != null)
+            ? QuestionnaireResponseAnswer(valueDecimal: value!.value)
+            : null;
       case QuestionnaireItemType.quantity:
         return QuestionnaireResponseAnswer(valueQuantity: value);
       case QuestionnaireItemType.integer:
-        return QuestionnaireResponseAnswer(
-            valueInteger: Integer(value!.value!.value!.round()));
+        return (value!.value != null)
+            ? QuestionnaireResponseAnswer(
+                valueInteger: Integer(value!.value!.value!.round()))
+            : null;
       default:
         throw StateError(
             'item.type cannot be ${widget.location.questionnaireItem.type}');

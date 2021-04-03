@@ -4,6 +4,8 @@ import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
 import 'package:intl/intl.dart';
 
+import '../logging/logging.dart';
+
 extension FDashDateTimeExtension on FhirDateTime {
   String format(Locale locale, {String defaultText = ''}) {
     final localeCode = locale.toString();
@@ -32,9 +34,20 @@ extension FDashDateTimeExtension on FhirDateTime {
 }
 
 extension FDashDecimalExtension on Decimal {
+  static final logger = Logger(Decimal);
+
   String format(Locale locale) {
-    final decimalFormat = NumberFormat.decimalPattern(locale.toString());
-    return decimalFormat.format(value);
+    if (!isValid) {
+      return toString();
+    }
+
+    try {
+      final decimalFormat = NumberFormat.decimalPattern(locale.toString());
+      return decimalFormat.format(value);
+    } catch (exception) {
+      logger.log('Cannot format $this', level: LogLevel.warn, error: exception);
+      rethrow;
+    }
   }
 }
 
@@ -48,11 +61,10 @@ extension FDashQuantityExtension on Quantity {
         return '$unknownValueText $unit';
       }
     } else {
-      final decimalFormat = NumberFormat.decimalPattern(locale.toString());
       if (unit == null) {
-        return decimalFormat.format(value!.value);
+        return value!.format(locale);
       } else {
-        return '${decimalFormat.format(value!.value)} $unit';
+        return '${value!.format(locale)} $unit';
       }
     }
   }

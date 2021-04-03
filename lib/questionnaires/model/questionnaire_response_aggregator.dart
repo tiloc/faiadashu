@@ -55,11 +55,19 @@ class QuestionnaireResponseAggregator
 
     final narrativeAggregator = topLocation.aggregator<NarrativeAggregator>();
 
+    final questionnaireUrl = topLocation.questionnaire.url?.toString();
+    final questionnaireVersion = topLocation.questionnaire.version;
+    final questionnaireCanonical = (questionnaireUrl != null)
+        ? Canonical(
+            "$questionnaireUrl${(questionnaireVersion != null) ? '|$questionnaireVersion' : ''}")
+        : null;
+
     final questionnaireResponse = QuestionnaireResponse(
         // TODO: Should this come from topLocation, or simply be a param for aggregate?
         // TODO: For status = 'complete' the items which are not enabled SHALL be excluded.
         //  For other status they might be included  (FHIR-31077)
         status: topLocation.responseStatus,
+        questionnaire: questionnaireCanonical,
         item: responseItems,
         authored: FhirDateTime(DateTime.now()),
         text: narrativeAggregator.aggregate(locale));

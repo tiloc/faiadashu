@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart' as logging;
 
 import 'logging.dart';
@@ -28,8 +29,30 @@ class Logger {
     Object? error,
     StackTrace? stackTrace,
   }) {
-    {
-      loggingLogger.log(level, message, error, stackTrace, zone);
+    loggingLogger.log(level, message, error, stackTrace, zone);
+  }
+
+  void warn(
+    String message, {
+    DateTime? time,
+    int? sequenceNumber,
+    Zone? zone,
+    Object? error,
+    StackTrace? stackTrace,
+  }) {
+    loggingLogger.log(LogLevel.warn, message, error, stackTrace, zone);
+  }
+
+  /// Log. See dart:developer log for meaning of params.
+  void trace(
+    String message, {
+    DateTime? time,
+    int? sequenceNumber,
+    Zone? zone,
+  }) {
+    if (kDebugMode) {
+      // Can the compiler kill this code on prod builds?
+      loggingLogger.log(LogLevel.trace, message, null, null, zone);
     }
   }
 }
