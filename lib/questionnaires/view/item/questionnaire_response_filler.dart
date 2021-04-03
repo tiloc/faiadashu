@@ -1,6 +1,8 @@
+import 'package:fhir/r4.dart';
 import 'package:fhir/r4/r4.dart';
 import 'package:flutter/material.dart';
 
+import '../../../coding/coding.dart';
 import '../../../logging/logger.dart';
 import '../../questionnaires.dart';
 import 'questionnaire_answer_filler_factory.dart';
@@ -20,6 +22,8 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
   late final List<QuestionnaireAnswerFiller> _answerFillers;
   List<QuestionnaireResponseAnswer?> _answers = [];
   static final logger = Logger(QuestionnaireResponseState);
+
+  Coding? _nullFlavor;
 
   QuestionnaireResponseState();
 
@@ -59,12 +63,15 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
         .map<QuestionnaireResponseAnswer>((answer) => answer!)
         .toList(growable: false);
 
-    if (filledAnswers.isEmpty) {
+    if (filledAnswers.isEmpty && _nullFlavor == null) {
       return null;
     }
     return QuestionnaireResponseItem(
         linkId: widget.location.linkId,
         text: widget.location.questionnaireItem.text,
+        extension_: (_nullFlavor != null)
+            ? [FhirExtension(url: NullFlavor.system, valueCoding: _nullFlavor)]
+            : null,
         answer: filledAnswers);
   }
 
@@ -80,10 +87,31 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
 
   List<QuestionnaireResponseAnswer?> get value => _answers;
 
+  /// Is the response 'masked', not answered due to privacy reasons.
+  bool get isMasked => _nullFlavor == NullFlavor.masked;
+
   @override
   Widget build(BuildContext context) {
     // TODO(tiloc) show a list of answers, and buttons to add/remove if repeat
-    return _answerFillers[0];
+    return Column(mainAxisSize: MainAxisSize.min, children: [
+      if (!isMasked) ..._answerFillers,
+      if (!widget.location.isReadOnly &&
+          widget.location.questionnaireItem.required_ != Boolean(true))
+        Row(children: [
+          const Text('I choose not to answer'),
+          Switch(
+            value: isMasked,
+            onChanged: (bool value) {
+              setState(() {
+                _nullFlavor = value ? NullFlavor.masked : null;
+              });
+              // Bubble up the response
+              // TODO: This currently seems to destroy choice answers with .repeat = true
+              widget.location.responseItem = fillResponse();
+            },
+          )
+        ])
+    ]);
   }
 }
 
