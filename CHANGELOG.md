@@ -1,3 +1,9 @@
+## 0.1.5
+* Support for optionExclusive
+* Support for Help items
+* Enable Copy&Paste of narrative
+* Better documentation
+
 ## 0.1.4
 * Pre-populate a questionnaire from an existing response
 * Better support for enableWhen

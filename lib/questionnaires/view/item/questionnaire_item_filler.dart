@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:simple_html_css/simple_html_css.dart';
 
 import '../../../fhir_types/fhir_types_extensions.dart';
@@ -88,6 +89,7 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final leading = QuestionnaireItemFillerTitleLeading.forLocation(location);
+    final help = QuestionnaireItemFillerHelp.forLocation(location);
 
     final requiredTag =
         (location.questionnaireItem.required_?.value == true) ? '*' : '';
@@ -106,14 +108,72 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
     return Container(
         padding: const EdgeInsets.only(top: 8.0),
         child: Text.rich(
-          TextSpan(children: <InlineSpan>[
-            if (leading != null) WidgetSpan(child: leading),
-            if (titleText != null)
-              HTML.toTextSpan(context,
-                  '$openStyleTag${htmlEscape.convert(titleText)}$closeStyleTag'),
-          ]),
+          TextSpan(
+            children: <InlineSpan>[
+              if (leading != null) WidgetSpan(child: leading),
+              if (titleText != null)
+                HTML.toTextSpan(context,
+                    '$openStyleTag${htmlEscape.convert(titleText)}$closeStyleTag'),
+              if (help != null) WidgetSpan(child: help),
+            ],
+          ),
           semanticsLabel: titleText,
         ));
+  }
+}
+
+class QuestionnaireItemFillerHelp extends StatefulWidget {
+  final QuestionnaireLocation ql;
+
+  const QuestionnaireItemFillerHelp._(this.ql, {Key? key}) : super(key: key);
+
+  static Widget? forLocation(QuestionnaireLocation location, {Key? key}) {
+    final helpLocation = location.helpLocation;
+
+    return (helpLocation != null)
+        ? QuestionnaireItemFillerHelp._(helpLocation, key: key)
+        : null;
+  }
+
+  @override
+  State<StatefulWidget> createState() => QuestionnaireItemFillerHelpState();
+}
+
+class QuestionnaireItemFillerHelpState
+    extends State<QuestionnaireItemFillerHelp> {
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      mouseCursor: SystemMouseCursors.help,
+      color: Theme.of(context).accentColor,
+      icon: const Icon(Icons.info_outline),
+      onPressed: () {
+        _showHelp(context, widget.ql);
+      },
+    );
+  }
+
+  Future<void> _showHelp(
+      BuildContext context, QuestionnaireLocation questionnaireLocation) async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Help'),
+            content:
+                HTML.toRichText(context, questionnaireLocation.titleText ?? ''),
+            actions: <Widget>[
+              OutlinedButton(
+                onPressed: () {
+                  setState(() {
+                    Navigator.pop(context);
+                  });
+                },
+                child: const Text('Dismiss'),
+              ),
+            ],
+          );
+        });
   }
 }
 

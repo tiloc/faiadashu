@@ -244,6 +244,11 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
         isHelp;
   }
 
+  /// Get the [QuestionnaireLocation] which contains help text about the current item.
+  /// Returns null, if this doesn't exist.
+  QuestionnaireLocation? get helpLocation =>
+      children.firstWhereOrNull((location) => location.isHelp);
+
   bool get isHelp {
     return questionnaireItem.isItemControl('help') ||
         (questionnaireItem.extension_

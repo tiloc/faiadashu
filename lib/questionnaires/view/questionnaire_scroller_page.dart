@@ -115,7 +115,8 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
           ),
           endDrawer: const NarrativeDrawer(),
           floatingActionButton: widget.floatingActionButton,
-          body: RawKeyboardListener(
+          body: SafeArea(
+              child: RawKeyboardListener(
             autofocus: true,
             focusNode: _focusNode,
             onKey: _handleKeyEvent,
@@ -148,7 +149,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
                     }
                   }),
             ),
-          ));
+          )));
     }, externalResourceProvider: widget.resourceProvider);
   }
 

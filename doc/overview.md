@@ -89,6 +89,9 @@ The filler widget comes in two flavors:
 * `QuestionnaireScrollerPage`: A vertically scrolling filler
 * `QuestionnaireStepperPage`: A side-ways, wizard-style filler
 
+Both of these flavors will take over the entire screen and bring their own Scaffold. An embeddable filler is contained in
+`QuestionnaireFiller`. This will return a list of Widgets than can be used for arbitrary UI designs. 
+
 #### Integration points
 The main integration point is the `ResourceProvider` which is being used by the library to obtain
 content, such as the actual questionnaire, or the referenced ValueSets.
@@ -102,3 +105,11 @@ The library is looking for the Questionnaire under the URI 'Questionnaire'.
 
 ##### ValueSets and CodeSystems
 The library is looking for the ValueSets and CodeSystems under the URI through which they are referenced.
+
+##### QuestionnaireResponse
+The current state of the questionnaire can be compiled into a QuestionnaireResponse at any time through the following code:
+```dart
+final response = QuestionnaireFiller.of(context)
+  .aggregator<QuestionnaireResponseAggregator>()
+    .aggregate(locale);
+```

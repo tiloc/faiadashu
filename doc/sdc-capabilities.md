@@ -11,14 +11,21 @@ Support for colors. Usable in many places (title, text, option) as permitted by 
 Comprehensive support for fonts, style, and colors. No support for tables or lists.
 Usable in many places (title, text, option) as permitted by the specification.
 
-#### hidden
-Supported
 
+#### help
+Display items with itemControl `help` are associated with the proper question and display a help dialog.
+
+![item_help](images/item_help.png)
 #### displayCategory
 `security` and `instructions` are supported.
+![displaycategory](images/displaycategory.png)
 
 #### optionalDisplay
 The filler never chooses to omit a field from display.
+
+#### hidden
+Supported
+
 
 ### Item types: Grouping
 #### group
@@ -130,6 +137,8 @@ Not supported
 ### Scoring
 Ability to add up the ordinalValue of all choice questions into a total score.
 
+![total_score](images/total_score.png)
+
 Total score will be entered into any field which meets one of the following:
 - has extension `sdc-questionnaire-calculatedExpression` (**regardless of content of the expression!**)
 - has extension `cqf-expression` (**regardless of content of the expression!**)
@@ -144,3 +153,54 @@ All detail from the questions in the questionnaire carries over into the Respons
 A narrative will be auto-generated.
 
 Choice answers will be marked as "user selected".
+
+```json
+{
+  "resourceType": "QuestionnaireResponse",
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><h3>Over the past 2 weeks, how much has your heart failure limited your enjoyment of life?</h3><p>It has moderately limited my enjoyment of life</p><h3>Overall summary score</h3><p>3 {score}</p></div>"
+  },
+  "status": "unknown",
+  "authored": "2021-04-03T17:49:47.261704",
+  "item": [
+    {
+      "linkId": "/hfcode-923-0",
+      "text": "Please indicate how much you are limited by <b>heart failure</b> (<i>shortness of breath or fatigue</i>) in your ability to do the following activities over the past 2 weeks.",
+      "item": [
+        {
+          "linkId": "/hfcode-IV88-IV",
+          "text": "Over the past 2 weeks, how much has your heart failure limited your enjoyment of life?",
+          "answer": [
+            {
+              "valueCoding": {
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/StructureDefinition/iso21090-CO-value",
+                    "valueDecimal": 3
+                  }
+                ],
+                "code": "CODE-II-7747-7",
+                "display": "It has moderately limited my enjoyment of life",
+                "userSelected": true
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "/hfcode-924-8",
+          "text": "Overall summary score",
+          "answer": [
+            {
+              "valueQuantity": {
+                "value": 3,
+                "unit": "{score}"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```

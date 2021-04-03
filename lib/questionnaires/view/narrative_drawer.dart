@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:simple_html_css/simple_html_css.dart';
 
 import '../../fhir_types/fhir_types.dart';
@@ -60,10 +63,29 @@ class _NarrativeDrawerState extends State<NarrativeDrawer> {
                               .aggregate(locale)
                               ?.toJson(),
                         ),
-/*                      : Text(jsonEncode(QuestionnaireFiller.of(context)
-                          .aggregator<QuestionnaireResponseAggregator>()
-                          .aggregate(locale)
-                          ?.toJson())), */
+                  secondary: IconButton(
+                    icon: const Icon(Icons.copy),
+                    onPressed: () {
+                      Clipboard.setData(ClipboardData(
+                              text: _drawerMode
+                                  ? jsonEncode(QuestionnaireFiller.of(context)
+                                      .aggregator<
+                                          QuestionnaireResponseAggregator>()
+                                      .aggregate(locale)
+                                      ?.toJson())
+                                  : QuestionnaireFiller.of(context)
+                                      .aggregator<NarrativeAggregator>()
+                                      .aggregate(locale)
+                                      ?.div))
+                          .then((_) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: _drawerMode
+                                ? const Text(
+                                    'QuestionnaireResponse copied to clipboard')
+                                : const Text('Narrative copied to clipboard')));
+                      });
+                    },
+                  ),
                   value: _drawerMode,
                   onChanged: (newState) {
                     setState(() {
