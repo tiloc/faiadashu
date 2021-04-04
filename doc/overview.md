@@ -52,12 +52,12 @@ Communication might require authentication. The FHIRFLI `fhir_auth` package is c
 ```dart
 final bpObservation = Observation(...); // Construct your FHIR Observation here.
 
-ObservationWidget(
+return ObservationWidget(
         bpObservation,
         valueStyle: Theme.of(context).textTheme.headline4,
         codeStyle: Theme.of(context).textTheme.subtitle2,
         dateTimeStyle: Theme.of(context).textTheme.caption,
-      ),
+      );
 ```
 
 ### Use-Case: Fill a Questionnaire
@@ -90,7 +90,7 @@ The filler widget comes in two flavors:
 * `QuestionnaireStepperPage`: A side-ways, wizard-style filler
 
 Both of these flavors will take over the entire screen and bring their own Scaffold. An embeddable filler is contained in
-`QuestionnaireFiller`. This will return a list of Widgets than can be used for arbitrary UI designs. 
+`QuestionnaireFiller`. This will return a list of Widgets - one for each question - that can be used for arbitrary UI designs.
 
 #### Integration points
 The main integration point is the `ResourceProvider` which is being used by the library to obtain

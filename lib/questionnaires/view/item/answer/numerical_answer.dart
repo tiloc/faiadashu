@@ -1,3 +1,4 @@
+import 'package:faiadashu/coding/coding.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -21,8 +22,7 @@ class _NumericalAnswerState
     extends QuestionnaireAnswerState<Quantity, NumericalAnswer> {
   static final logger = Logger(_NumericalAnswerState);
 
-  late final TextInputFormatter _numberInputFormatter;
-  late final NumberFormat _numberInputFormat;
+  late final String _numberFormat;
   late final bool _isSlider;
   late final double _minValue;
   late final double _maxValue;
@@ -83,25 +83,11 @@ class _NumericalAnswerState
         : '############';
     final maxFractionDigits =
         (_maxDecimal != 0) ? '.0#####'.substring(0, _maxDecimal + 1) : '';
-    _numberInputFormat = NumberFormat('$maxIntegerDigits$maxFractionDigits');
 
-    logger.log(
-        'input format for ${widget.location.linkId}: "$_numberInputFormat"',
+    _numberFormat = '$maxIntegerDigits$maxFractionDigits';
+
+    logger.log('input format for ${widget.location.linkId}: "$_numberFormat"',
         level: LogLevel.debug);
-
-    // TODO: The format doesn't really restrict what can be entered.
-    _numberInputFormatter =
-        TextInputFormatter.withFunction((oldValue, newValue) {
-      if (newValue.text.isEmpty) {
-        return newValue;
-      }
-      try {
-        _numberInputFormat.parse(newValue.text);
-        return newValue;
-      } catch (_) {
-        return oldValue;
-      }
-    });
 
     // TODO: look at initialValue extension
     Quantity? existingValue;
@@ -157,9 +143,40 @@ class _NumericalAnswerState
         ));
   }
 
+  String? _validate(
+      String? inputValue, NumberFormat numberInputFormat, Locale locale) {
+    if (inputValue == null || inputValue.isEmpty) {
+      return null;
+    }
+    num number = double.nan;
+    try {
+      number = numberInputFormat.parse(inputValue);
+    } catch (_) {
+      // Ignore FormatException, number remains nan.
+    }
+    if (number == double.nan) {
+      return '$inputValue is not a valid number.';
+    }
+    if (number > _maxValue) {
+      return 'Enter a number up to ${Decimal(_maxValue).format(locale)}.';
+    }
+    if (number < _minValue) {
+      return 'Enter a number ${Decimal(_minValue).format(locale)}, or higher.';
+    }
+  }
+
   @override
   Widget buildEditable(BuildContext context) {
+    final numberInputFormat = NumberFormat(
+        _numberFormat,
+        Localizations.localeOf(context)
+            .toLanguageTag()); // TODO: toString or toLanguageTag?
+
+    final numberInputFormatter =
+        _NumericalTextInputFormatter(numberInputFormat);
+
     final qi = widget.location.questionnaireItem;
+    final locale = Localizations.localeOf(context);
     final unit = qi.unit;
     final units = <Coding>[];
     final unitsUri = qi.extension_
@@ -196,26 +213,23 @@ class _NumericalAnswerState
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                 ),
-                inputFormatters: [_numberInputFormatter],
+                inputFormatters: [numberInputFormatter],
                 keyboardType: TextInputType.number,
                 validator: (inputValue) {
-                  if (inputValue == null || inputValue.isEmpty) {
-                    return null;
-                  }
-                  // TODO: Internationalize
-                  final number = double.tryParse(inputValue);
-                  if (number == null) {
-                    return '$inputValue is not a valid number.';
-                  }
-                  if (number > _maxValue) {
-                    return 'Enter a number up to ${Decimal(_maxValue).format(Localizations.localeOf(context))}.';
-                  }
-                  if (number < _minValue) {
-                    return 'Enter a number ${Decimal(_minValue).format(Localizations.localeOf(context))}, or higher.';
-                  }
+                  return _validate(inputValue, numberInputFormat, locale);
                 },
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 onChanged: (content) {
+                  final valid =
+                      _validate(content, numberInputFormat, locale) == null;
+                  final nullFlavorExtension = !valid
+                      ? [
+                          FhirExtension(
+                              url: NullFlavor.extensionUrl,
+                              valueCoding: NullFlavor.invalid)
+                        ]
+                      : null;
+
                   if (content.trim().isEmpty) {
                     // TODO: Will copyWith value: null leave the value untouched or kill it?
                     if (value == null) {
@@ -225,9 +239,14 @@ class _NumericalAnswerState
                     }
                   } else {
                     if (value == null) {
-                      value = Quantity(value: Decimal(content));
-                    } else {}
-                    value = value!.copyWith(value: Decimal(content));
+                      value = Quantity(
+                          value: Decimal(numberInputFormat.parse(content)),
+                          extension_: nullFlavorExtension);
+                    } else {
+                      value = value!.copyWith(
+                          value: Decimal(numberInputFormat.parse(content)),
+                          extension_: nullFlavorExtension);
+                    }
                   }
                 },
               )),
@@ -245,18 +264,46 @@ class _NumericalAnswerState
     switch (widget.location.questionnaireItem.type) {
       case QuestionnaireItemType.decimal:
         return (value!.value != null)
-            ? QuestionnaireResponseAnswer(valueDecimal: value!.value)
+            ? QuestionnaireResponseAnswer(
+                valueDecimal: value!.value, extension_: value!.extension_)
             : null;
       case QuestionnaireItemType.quantity:
-        return QuestionnaireResponseAnswer(valueQuantity: value);
+        return QuestionnaireResponseAnswer(
+            valueQuantity: value, extension_: value!.extension_);
       case QuestionnaireItemType.integer:
         return (value!.value != null)
             ? QuestionnaireResponseAnswer(
-                valueInteger: Integer(value!.value!.value!.round()))
+                valueInteger: Integer(value!.value!.value!.round()),
+                extension_: value!.extension_)
             : null;
       default:
         throw StateError(
             'item.type cannot be ${widget.location.questionnaireItem.type}');
+    }
+  }
+}
+
+class _NumericalTextInputFormatter extends TextInputFormatter {
+  static final logger = Logger(_NumericalTextInputFormatter);
+  final NumberFormat numberFormat;
+  _NumericalTextInputFormatter(this.numberFormat);
+
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.text.isEmpty) {
+      return newValue;
+    }
+    // Group separator is causing lots of trouble.
+    if (newValue.text.contains(numberFormat.symbols.GROUP_SEP)) {
+      return oldValue;
+    }
+    try {
+      final parsed = numberFormat.parse(newValue.text);
+      logger.trace('parsed: ${newValue.text} -> $parsed');
+      return newValue;
+    } catch (_) {
+      return oldValue;
     }
   }
 }

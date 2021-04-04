@@ -83,12 +83,33 @@ class _DateTimeAnswerState
           firstDate: DateTime(1860),
           lastDate: DateTime(2050),
           onChanged: (content) {
-            value = FhirDateTime(content);
+            if (itemType == QuestionnaireItemType.time) {
+              value = FhirDateTime('19700101T$content');
+            } else {
+              value = FhirDateTime(content);
+            }
           },
         ));
   }
 
   @override
-  QuestionnaireResponseAnswer? fillAnswer() =>
-      QuestionnaireResponseAnswer(valueDateTime: value);
+  QuestionnaireResponseAnswer? fillAnswer() {
+    final itemType = widget.location.questionnaireItem.type;
+
+    if (value?.value == null) {
+      return null;
+    }
+
+    if (itemType == QuestionnaireItemType.date) {
+      return QuestionnaireResponseAnswer(valueDate: Date(value!.value));
+    } else if (itemType == QuestionnaireItemType.datetime) {
+      return QuestionnaireResponseAnswer(valueDateTime: value);
+    } else if (itemType == QuestionnaireItemType.time) {
+      return QuestionnaireResponseAnswer(
+          valueTime: Time(
+              value!.value!.toIso8601String().substring('yyyy-MM-ddT'.length)));
+    } else {
+      throw StateError('Unexpected itemType: $itemType');
+    }
+  }
 }

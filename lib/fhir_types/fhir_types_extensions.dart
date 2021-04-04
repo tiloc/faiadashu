@@ -6,30 +6,60 @@ import 'package:intl/intl.dart';
 
 import '../logging/logging.dart';
 
+extension FDashTimeExtension on Time {
+  String format(Locale locale, {String defaultText = ''}) {
+    final localeCode = locale.toString();
+    if (!isValid) {
+      return defaultText;
+    }
+
+    return DateFormat.Hm(localeCode)
+        .format(DateTime.parse('19700101T${toString()}'));
+  }
+}
+
+extension FDashDateExtension on Date {
+  String format(Locale locale, {String defaultText = ''}) {
+    final localeCode = locale.toString();
+    final DateFormat dateFormat;
+    switch (precision) {
+      case DatePrecision.YYYY:
+        dateFormat = DateFormat.y(localeCode);
+        break;
+      case DatePrecision.YYYYMM:
+        dateFormat = DateFormat.yM(localeCode);
+        break;
+      case DatePrecision.YYYYMMDD:
+        dateFormat = DateFormat.yMd(localeCode);
+        break;
+      default:
+        return defaultText;
+    }
+    return dateFormat.format(value!);
+  }
+}
+
 extension FDashDateTimeExtension on FhirDateTime {
   String format(Locale locale, {String defaultText = ''}) {
     final localeCode = locale.toString();
-    if (precision != DateTimePrecision.INVALID) {
-      final DateFormat dateFormat;
-      switch (precision) {
-        case DateTimePrecision.FULL:
-        case DateTimePrecision.INVALID:
-          dateFormat = DateFormat.yMd(localeCode).add_jms();
-          break;
-        case DateTimePrecision.YYYY:
-          dateFormat = DateFormat.y(localeCode);
-          break;
-        case DateTimePrecision.YYYYMM:
-          dateFormat = DateFormat.yM(localeCode);
-          break;
-        case DateTimePrecision.YYYYMMDD:
-          dateFormat = DateFormat.yMd(localeCode);
-          break;
-      }
-      return dateFormat.format(value!);
-    } else {
-      return defaultText;
+    final DateFormat dateFormat;
+    switch (precision) {
+      case DateTimePrecision.INVALID:
+        return defaultText;
+      case DateTimePrecision.FULL:
+        dateFormat = DateFormat.yMd(localeCode).add_jm();
+        break;
+      case DateTimePrecision.YYYY:
+        dateFormat = DateFormat.y(localeCode);
+        break;
+      case DateTimePrecision.YYYYMM:
+        dateFormat = DateFormat.yM(localeCode);
+        break;
+      case DateTimePrecision.YYYYMMDD:
+        dateFormat = DateFormat.yMd(localeCode);
+        break;
     }
+    return dateFormat.format(value!);
   }
 }
 

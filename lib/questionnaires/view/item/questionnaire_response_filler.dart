@@ -3,6 +3,8 @@ import 'package:fhir/r4/r4.dart';
 import 'package:flutter/material.dart';
 
 import '../../../coding/coding.dart';
+import '../../../coding/null_flavor.dart';
+import '../../../fhir_types/fhir_types_extensions.dart';
 import '../../../logging/logger.dart';
 import '../../questionnaires.dart';
 import 'questionnaire_answer_filler_factory.dart';
@@ -70,7 +72,10 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
         linkId: widget.location.linkId,
         text: widget.location.questionnaireItem.text,
         extension_: (_nullFlavor != null)
-            ? [FhirExtension(url: NullFlavor.system, valueCoding: _nullFlavor)]
+            ? [
+                FhirExtension(
+                    url: NullFlavor.systemUri, valueCoding: _nullFlavor)
+              ]
             : null,
         answer: filledAnswers);
   }
@@ -79,6 +84,9 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
     if (mounted) {
       setState(() {
         _answers = newValue;
+        // TODO: This assumes a single answer, or at least all answers having the same nullFlavor.
+        final newNullFlavor = newValue.firstOrNull?.extension_?.nullFlavor;
+        _nullFlavor = newNullFlavor;
       });
     }
     // Bubble up the response
