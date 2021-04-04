@@ -81,10 +81,10 @@ class Xhtml {
 
     return (xhtml != null)
         ? ((renderingStyle != null)
-            ? '<div style="$renderingStyle">$xhtml</div>'
+            ? '<span style="$renderingStyle">$xhtml</span>'
             : xhtml)
         : (renderingStyle != null)
-            ? '<div style="$renderingStyle">$plainText</div>'
+            ? '<span style="$renderingStyle">$plainText</span>'
             : plainText;
   }
 }

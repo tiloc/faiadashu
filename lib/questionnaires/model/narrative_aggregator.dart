@@ -68,7 +68,8 @@ class NarrativeAggregator extends Aggregator<Narrative> {
         returnValue = true;
         break;
       case DataAbsentReason.askedButDeclinedCode:
-        div.write('<p><i>Declined to answer</i></p>');
+        div.write(
+            '<p><i><span style="color:red">X </span>Declined to answer</i></p>');
         returnValue = true;
         break;
       default:
