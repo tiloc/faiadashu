@@ -314,14 +314,28 @@ class _ChoiceAnswerState
           width: 100, height: 100);
 
       choices.add(isMultipleChoice
-          ? CheckboxListTile(
-              title: styledOptionTitle,
-              value: value?.coding?.firstWhereOrNull(
-                      (coding) => coding.code?.value == choice.optionCode) !=
-                  null,
-              onChanged: (bool? newValue) {
-                value = _fillToggledValue(choice.optionCode);
-              })
+          ? _isExclusive(choice.valueCoding!)
+              ? RadioListTile<String>(
+                  title: styledOptionTitle,
+                  groupValue: choice.optionCode,
+                  value: value?.coding
+                          ?.firstWhereOrNull((coding) =>
+                              coding.code?.value == choice.optionCode)
+                          ?.code
+                          ?.value ??
+                      '',
+                  onChanged: (_) {
+                    value = _fillToggledValue(choice.optionCode);
+                  },
+                )
+              : CheckboxListTile(
+                  title: styledOptionTitle,
+                  value: value?.coding?.firstWhereOrNull((coding) =>
+                          coding.code?.value == choice.optionCode) !=
+                      null,
+                  onChanged: (bool? newValue) {
+                    value = _fillToggledValue(choice.optionCode);
+                  })
           : RadioListTile<String>(
               title: styledOptionTitle,
               value: choice.optionCode,
