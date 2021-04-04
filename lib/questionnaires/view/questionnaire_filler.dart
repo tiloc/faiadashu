@@ -75,7 +75,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
 
   @override
   void dispose() {
-    logger.log('dispose', level: LogLevel.trace);
+    logger.trace('dispose');
 
     if (_onTopChangeListenerFunction != null && _topLocation != null) {
       _topLocation!.removeListener(_onTopChangeListenerFunction!);
@@ -101,7 +101,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
           switch (snapshot.connectionState) {
             case ConnectionState.active:
               // This should never happen in our use-case (is for streaming)
-              logger.log('FutureBuilder is active...', level: LogLevel.warn);
+              logger.warn('FutureBuilder is active...');
               return QuestionnaireLoadingIndicator(snapshot);
             case ConnectionState.none:
               return QuestionnaireLoadingIndicator(snapshot);
@@ -111,14 +111,14 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
               return QuestionnaireLoadingIndicator(snapshot);
             case ConnectionState.done:
               if (snapshot.hasError) {
-                logger.log('FutureBuilder hasError', level: LogLevel.warn);
+                logger.warn('FutureBuilder hasError');
                 return QuestionnaireLoadingIndicator(snapshot);
               }
               if (snapshot.hasData) {
                 logger.log('FutureBuilder hasData');
                 _topLocation = snapshot.data;
                 // TODO: There has got to be a more elegant way! Goal is to register the lister exactly once, after the future has completed.
-                // Can I do .then for that?
+                // Dart has abilities to chain Futures.
                 if (_onTopChangeListenerFunction == null) {
                   _onTopChangeListenerFunction = () => _onTopChange();
                   _topLocation!.addListener(_onTopChangeListenerFunction!);

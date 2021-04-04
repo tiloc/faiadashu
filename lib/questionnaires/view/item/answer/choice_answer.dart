@@ -40,8 +40,12 @@ class _ChoiceAnswerState
       _createAnswerOptions();
 
       if (widget.location.responseItem != null) {
-        initialValue = _fillValue(
-            _choiceStringFromCoding(widget.answerLocation.answer?.valueCoding));
+        initialValue = CodeableConcept(
+            coding: widget.location.responseItem!.answer
+                ?.map((answer) =>
+                    _answerOptions[_choiceStringFromCoding(answer.valueCoding)]!
+                        .valueCoding!)
+                .toList());
       }
     } catch (exception) {
       logger.log(
@@ -64,7 +68,7 @@ class _ChoiceAnswerState
 
     // TODO(tiloc): Return the order of the codings in the order of the choices
     // TODO(tiloc): Support open free text (should always come last?)
-    return value!.coding?.map<QuestionnaireResponseAnswer>((coding) {
+    final result = value!.coding?.map<QuestionnaireResponseAnswer>((coding) {
       // Some answers may only be a display, not have a code
       return coding.code != null
           ? QuestionnaireResponseAnswer(
@@ -72,6 +76,8 @@ class _ChoiceAnswerState
                   _answerOptions[_choiceStringFromCoding(coding)]!.valueCoding)
           : QuestionnaireResponseAnswer(valueCoding: coding);
     }).toList();
+
+    return result;
   }
 
   @override
@@ -93,10 +99,13 @@ class _ChoiceAnswerState
     }
 
     try {
-      if (_answerOptions.length < 15) {
-        return _buildChoiceAnswers(context);
-      } else {
+      if (!(widget.location.questionnaireItem.repeats == Boolean(true)) &&
+          (_answerOptions.length > 10 ||
+              widget.location.questionnaireItem
+                  .isItemControl('autocomplete'))) {
         return _buildLookupAnswers(context);
+      } else {
+        return _buildChoiceAnswers(context);
       }
     } catch (exception) {
       return BrokenQuestionnaireItem.fromException(exception);
@@ -345,7 +354,7 @@ class _ChoiceAnswerState
   Widget _buildLookupAnswers(BuildContext context) {
     final locale = Localizations.localeOf(context);
     return FDashAutocomplete<QuestionnaireAnswerOption>(
-      initialValue: _choiceString(value),
+      initialValue: value?.localizedDisplay(locale),
       displayStringForOption: (answerOption) =>
           answerOption.localizedDisplay(locale),
       optionsBuilder: (TextEditingValue textEditingValue) {

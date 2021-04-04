@@ -32,7 +32,9 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
   @override
   void initState() {
     super.initState();
-    // TODO(tiloc): This is currently limited to a single answer
+    // TODO: Enhancement: Allow repeats = true for other kinds of items
+    // This assumes that all answers are of the same kind
+    // and repeats = true is only supported for choice items
     _answerFillers = [
       QuestionnaireAnswerFillerFactory.fromQuestionnaireItem(
           widget.location, AnswerLocation._(this, 0))
@@ -40,21 +42,39 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
 
     final int? answerCount = widget.location.responseItem?.answer?.length;
     if (answerCount != null && answerCount > 0) {
-      _answers = [widget.location.responseItem!.answer![0]];
+      _answers = widget.location.responseItem!.answer!;
     } else {
       _answers = [null];
     }
+
+    _dataAbsentReason =
+        widget.location.responseItem?.extension_?.dataAbsentReason;
   }
 
   void stashAnswer(int answerIndex, QuestionnaireResponseAnswer? answer) {
     // TODO(tiloc): Handle a list of answers.
-    value = [answer];
+    if (mounted) {
+      setState(() {
+        _answers = [answer];
+        _dataAbsentReason = answer?.extension_?.dataAbsentReason;
+      });
+    }
+    // Bubble up the response
+    widget.location.responseItem = fillResponse();
   }
 
   /// Special functionality to allow choice and open-choice items with "repeats".
   void stashChoiceAnswers(
       int answerIndex, List<QuestionnaireResponseAnswer?>? answers) {
-    value = answers ?? [];
+    if (mounted) {
+      setState(() {
+        _answers = answers ?? [];
+        // This assumes all answers having the same dataAbsentReason.
+        final newdataAbsentReason =
+            answers?.firstOrNull?.extension_?.dataAbsentReason;
+        _dataAbsentReason = newdataAbsentReason;
+      });
+    }
   }
 
   /// Fill the response with all the answers which are not null.
@@ -65,30 +85,40 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
         .map<QuestionnaireResponseAnswer>((answer) => answer!)
         .toList(growable: false);
 
-    if (filledAnswers.isEmpty && _dataAbsentReason == null) {
+    if (filledAnswers.isEmpty && dataAbsentReason == null) {
       return null;
     }
-    return QuestionnaireResponseItem(
+    final result = QuestionnaireResponseItem(
         linkId: widget.location.linkId,
         text: widget.location.questionnaireItem.text,
         extension_: (_dataAbsentReason != null)
             ? [
                 FhirExtension(
                     url: DataAbsentReason.extensionUrl,
-                    valueCoding: _dataAbsentReason)
+                    valueCoding: dataAbsentReason)
               ]
             : null,
         answer: filledAnswers);
+
+    return result;
+  }
+
+  Coding? get dataAbsentReason => _dataAbsentReason;
+
+  set dataAbsentReason(Coding? dataAbsentReason) {
+    if (mounted) {
+      setState(() {
+        _dataAbsentReason = dataAbsentReason;
+      });
+    }
+    // Bubble up the response
+    widget.location.responseItem = fillResponse();
   }
 
   set value(List<QuestionnaireResponseAnswer?> newValue) {
     if (mounted) {
       setState(() {
         _answers = newValue;
-        // TODO: This assumes a single answer, or at least all answers having the same dataAbsentReason.
-        final newdataAbsentReason =
-            newValue.firstOrNull?.extension_?.dataAbsentReason;
-        _dataAbsentReason = newdataAbsentReason;
       });
     }
     // Bubble up the response
@@ -113,13 +143,8 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
           Switch(
             value: isAskedButDeclined,
             onChanged: (bool value) {
-              setState(() {
-                _dataAbsentReason =
-                    value ? DataAbsentReason.askedButDeclined : null;
-              });
-              // Bubble up the response
-              // TODO: This currently seems to destroy choice answers with .repeat = true
-              widget.location.responseItem = fillResponse();
+              dataAbsentReason =
+                  value ? DataAbsentReason.askedButDeclined : null;
             },
           )
         ])

@@ -1,3 +1,11 @@
+## 0.1.6
+* Bugfixes for enableWhen, autocomplete, choice
+* experimental support for data-absent-reason on responses
+  - Skip question UI element
+  - Visualization in narrative
+* Support autocomplete item control
+* Better rendering for renderingStyle
+
 ## 0.1.5
 * Support for optionExclusive
 * Support for Help items

@@ -137,8 +137,8 @@ Support for leaving a question unanswered.
 - questionnaire-optionPrefix: supported
 - valueset-label: supported
 - rendering-xhtml: in addition to regular capabilities may also contain a base64 encoded image of type PNG or JPEG. 
-- questionnaire-itemControl: check-box, radio-button
-- translation: option choices can be translated
+- questionnaire-itemControl: check-box, radio-button, autocomplete
+- translation: option choices can be translated using the FHIR translation mechanism
 #### open-choice 
 Same as `choice`, no support for open text input yet.
 
