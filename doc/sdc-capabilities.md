@@ -7,10 +7,14 @@
 ### Advanced Rendering
 #### rendering-style
 Support for colors. Usable in many places (title, text, option) as permitted by the specification.
+
+![rendering_style](images/rendering_style.png)
+
 #### rendering-xhtml
 Comprehensive support for fonts, style, and colors. No support for tables or lists.
 Usable in many places (title, text, option) as permitted by the specification.
 
+![rendering_xhtml](images/rendering_xhtml.png)
 
 #### help
 Display items with itemControl `help` are associated with the proper question and display a help dialog.
@@ -61,12 +65,18 @@ Comprehensive support, incl. tri-state for "not answered"
 Comprehensive support.
 
 Special support for read-only display of total score.
+
+Quantity requires the declaration of units. It does not support free-text entry for units.
+
 ##### Extensions
 - minValue
 - maxValue
 - maxDecimalPlaces
 - questionnaire-itemControl: slider
 - sliderStepValue
+- unitValueSet
+- unit
+
 #### decimal
 Comprehensive support.
 
@@ -77,19 +87,21 @@ Special support for read-only display of total score.
 - maxDecimalPlaces
 - questionnaire-itemControl: slider
 - sliderStepValue
+- unit
 
 #### integer
 Comprehensive support
 
 Special support for read-only display of total score.
 
-Special support for Danish specification on patient feedback.
+Special support for 🇩🇰 Danish specification on patient feedback.
 
 ##### Extensions
 - minValue
 - maxValue
 - questionnaire-itemControl: slider
 - sliderStepValue
+- unit
 - http://ehealth.sundhed.dk/fhir/StructureDefinition/ehealth-questionnaire-feedback
 
 #### date

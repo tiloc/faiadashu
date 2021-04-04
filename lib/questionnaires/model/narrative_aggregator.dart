@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:fhir/r4.dart';
 
-import '../../coding/null_flavor.dart';
+import '../../coding/data_absent_reasons.dart';
 import '../../fhir_types/fhir_types_extensions.dart';
 import '../../logging/logging.dart';
 import '../questionnaires.dart';
@@ -49,53 +49,61 @@ class NarrativeAggregator extends Aggregator<Narrative> {
 
     bool returnValue = false;
 
-    final invalid = location.responseItem!.extension_?.nullFlavorCode ==
-        NullFlavor.invalidCode;
+    final invalid =
+        item.extension_?.dataAbsentReasonCode == DataAbsentReason.invalidCode;
 
     if (invalid) {
       div.write('<div style="color:red">');
     }
 
     if (item.text != null) {
-      div.write('<h${level + 2}>${item.text}</h${level + 2}>');
+      div.write(
+          '<h${level + 2}>${invalid ? '[INVALID]' : ''}${item.text}</h${level + 2}>');
       returnValue = true;
     }
 
-    if (item.extension_?.nullFlavorCode != NullFlavor.maskedCode) {
-      // TODO(tiloc): Create further extensions for formatting
-      if (item.answer != null) {
-        for (final answer in item.answer!) {
-          if (answer.valueString != null) {
-            div.write('<p>${answer.valueString}</p>');
-          } else if (answer.valueDecimal != null) {
-            if (location.isCalculatedExpression) {
-              div.write('<h3>${answer.valueDecimal!.format(locale)}</h3>');
+    switch (item.extension_?.dataAbsentReasonCode) {
+      case DataAbsentReason.maskedCode:
+        div.write('<p>***</p>');
+        returnValue = true;
+        break;
+      case DataAbsentReason.askedButDeclinedCode:
+        div.write('<p><i>Declined to answer</i></p>');
+        returnValue = true;
+        break;
+      default:
+        if (item.answer != null) {
+          for (final answer in item.answer!) {
+            if (answer.valueString != null) {
+              div.write('<p>${answer.valueString}</p>');
+            } else if (answer.valueDecimal != null) {
+              if (location.isCalculatedExpression) {
+                div.write('<h3>${answer.valueDecimal!.format(locale)}</h3>');
+              } else {
+                div.write('<p>${answer.valueDecimal!.format(locale)}</p>');
+              }
+            } else if (answer.valueQuantity != null) {
+              div.write('<p>${answer.valueQuantity!.format(locale)}</p>');
+            } else if (answer.valueInteger != null) {
+              div.write('<p>${answer.valueInteger!.value}</p>');
+            } else if (answer.valueCoding != null) {
+              div.write(
+                  '<p>${answer.valueCoding!.localizedDisplay(locale)}</p>');
+            } else if (answer.valueDateTime != null) {
+              div.write('<p>${answer.valueDateTime!.format(locale)}</p>');
+            } else if (answer.valueDate != null) {
+              div.write('<p>${answer.valueDate!.format(locale)}</p>');
+            } else if (answer.valueTime != null) {
+              div.write('<p>${answer.valueTime!.format(locale)}</p>');
+            } else if (answer.valueBoolean != null) {
+              div.write(
+                  '<p>${(answer.valueBoolean!.value!) ? '[X]' : '[ ]'}</p>');
             } else {
-              div.write('<p>${answer.valueDecimal!.format(locale)}</p>');
+              div.write('<p>${answer.toString()}</p>');
             }
-          } else if (answer.valueQuantity != null) {
-            div.write('<p>${answer.valueQuantity!.format(locale)}</p>');
-          } else if (answer.valueInteger != null) {
-            div.write('<p>${answer.valueInteger!.value}</p>');
-          } else if (answer.valueCoding != null) {
-            div.write('<p>${answer.valueCoding!.localizedDisplay(locale)}</p>');
-          } else if (answer.valueDateTime != null) {
-            div.write('<p>${answer.valueDateTime!.format(locale)}</p>');
-          } else if (answer.valueDate != null) {
-            div.write('<p>${answer.valueDate!.format(locale)}</p>');
-          } else if (answer.valueTime != null) {
-            div.write('<p>${answer.valueTime!.format(locale)}</p>');
-          } else if (answer.valueBoolean != null) {
-            div.write(
-                '<p>${(answer.valueBoolean!.value!) ? '[X]' : '[ ]'}</p>');
-          } else {
-            div.write('<p>${answer.toString()}</p>');
+            returnValue = true;
           }
-          returnValue = true;
         }
-      }
-    } else {
-      div.write('<p>***</p>');
     }
     if (invalid) {
       div.write('</div>');

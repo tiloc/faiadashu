@@ -36,6 +36,7 @@ class _NumericalAnswerState
     super.initState();
     _isSlider = widget.location.questionnaireItem.isItemControl('slider');
 
+    // TODO: Enhancement: This could all be moved into a model.
     final minValueExtension = widget.location.questionnaireItem.extension_
         ?.extensionOrNull('http://hl7.org/fhir/StructureDefinition/minValue');
     final maxValueExtension = widget.location.questionnaireItem.extension_
@@ -222,11 +223,11 @@ class _NumericalAnswerState
                 onChanged: (content) {
                   final valid =
                       _validate(content, numberInputFormat, locale) == null;
-                  final nullFlavorExtension = !valid
+                  final dataAbsentReasonExtension = !valid
                       ? [
                           FhirExtension(
-                              url: NullFlavor.extensionUrl,
-                              valueCoding: NullFlavor.invalid)
+                              url: DataAbsentReason.extensionUrl,
+                              valueCoding: DataAbsentReason.invalid)
                         ]
                       : null;
 
@@ -241,11 +242,11 @@ class _NumericalAnswerState
                     if (value == null) {
                       value = Quantity(
                           value: Decimal(numberInputFormat.parse(content)),
-                          extension_: nullFlavorExtension);
+                          extension_: dataAbsentReasonExtension);
                     } else {
                       value = value!.copyWith(
                           value: Decimal(numberInputFormat.parse(content)),
-                          extension_: nullFlavorExtension);
+                          extension_: dataAbsentReasonExtension);
                     }
                   }
                 },
@@ -283,6 +284,7 @@ class _NumericalAnswerState
   }
 }
 
+/// An input formatter for internationalized input of numbers.
 class _NumericalTextInputFormatter extends TextInputFormatter {
   static final logger = Logger(_NumericalTextInputFormatter);
   final NumberFormat numberFormat;
@@ -294,10 +296,17 @@ class _NumericalTextInputFormatter extends TextInputFormatter {
     if (newValue.text.isEmpty) {
       return newValue;
     }
-    // Group separator is causing lots of trouble.
+    // Group separator is causing lots of trouble. Suppress.
     if (newValue.text.contains(numberFormat.symbols.GROUP_SEP)) {
       return oldValue;
     }
+
+    // NumberFormat.parse is not preventing decimal points on integers.
+    if (newValue.text.contains(numberFormat.symbols.DECIMAL_SEP) &&
+        numberFormat.maximumFractionDigits == 0) {
+      return oldValue;
+    }
+
     try {
       final parsed = numberFormat.parse(newValue.text);
       logger.trace('parsed: ${newValue.text} -> $parsed');

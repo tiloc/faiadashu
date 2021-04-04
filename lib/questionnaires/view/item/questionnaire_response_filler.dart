@@ -3,7 +3,7 @@ import 'package:fhir/r4/r4.dart';
 import 'package:flutter/material.dart';
 
 import '../../../coding/coding.dart';
-import '../../../coding/null_flavor.dart';
+import '../../../coding/data_absent_reasons.dart';
 import '../../../fhir_types/fhir_types_extensions.dart';
 import '../../../logging/logger.dart';
 import '../../questionnaires.dart';
@@ -25,7 +25,7 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
   List<QuestionnaireResponseAnswer?> _answers = [];
   static final logger = Logger(QuestionnaireResponseState);
 
-  Coding? _nullFlavor;
+  Coding? _dataAbsentReason;
 
   QuestionnaireResponseState();
 
@@ -65,16 +65,17 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
         .map<QuestionnaireResponseAnswer>((answer) => answer!)
         .toList(growable: false);
 
-    if (filledAnswers.isEmpty && _nullFlavor == null) {
+    if (filledAnswers.isEmpty && _dataAbsentReason == null) {
       return null;
     }
     return QuestionnaireResponseItem(
         linkId: widget.location.linkId,
         text: widget.location.questionnaireItem.text,
-        extension_: (_nullFlavor != null)
+        extension_: (_dataAbsentReason != null)
             ? [
                 FhirExtension(
-                    url: NullFlavor.systemUri, valueCoding: _nullFlavor)
+                    url: DataAbsentReason.extensionUrl,
+                    valueCoding: _dataAbsentReason)
               ]
             : null,
         answer: filledAnswers);
@@ -84,9 +85,10 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
     if (mounted) {
       setState(() {
         _answers = newValue;
-        // TODO: This assumes a single answer, or at least all answers having the same nullFlavor.
-        final newNullFlavor = newValue.firstOrNull?.extension_?.nullFlavor;
-        _nullFlavor = newNullFlavor;
+        // TODO: This assumes a single answer, or at least all answers having the same dataAbsentReason.
+        final newdataAbsentReason =
+            newValue.firstOrNull?.extension_?.dataAbsentReason;
+        _dataAbsentReason = newdataAbsentReason;
       });
     }
     // Bubble up the response
@@ -95,23 +97,25 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
 
   List<QuestionnaireResponseAnswer?> get value => _answers;
 
-  /// Is the response 'masked', not answered due to privacy reasons.
-  bool get isMasked => _nullFlavor == NullFlavor.masked;
+  /// Is the response 'asked but declined'
+  bool get isAskedButDeclined =>
+      _dataAbsentReason == DataAbsentReason.askedButDeclined;
 
   @override
   Widget build(BuildContext context) {
     // TODO(tiloc) show a list of answers, and buttons to add/remove if repeat
     return Column(mainAxisSize: MainAxisSize.min, children: [
-      if (!isMasked) ..._answerFillers,
+      if (!isAskedButDeclined) ..._answerFillers,
       if (!widget.location.isReadOnly &&
           widget.location.questionnaireItem.required_ != Boolean(true))
         Row(children: [
           const Text('I choose not to answer'),
           Switch(
-            value: isMasked,
+            value: isAskedButDeclined,
             onChanged: (bool value) {
               setState(() {
-                _nullFlavor = value ? NullFlavor.masked : null;
+                _dataAbsentReason =
+                    value ? DataAbsentReason.askedButDeclined : null;
               });
               // Bubble up the response
               // TODO: This currently seems to destroy choice answers with .repeat = true
