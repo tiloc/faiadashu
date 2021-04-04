@@ -43,6 +43,8 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
   /// Calculate the current enablement status of this item.
   /// Sets the [enabled] property
   void _calculateEnabled() {
+    logger.trace('Enter _calculateEnabled()');
+
     bool anyTrigger = false;
     int allTriggered = 0;
     int allCount = 0;
@@ -51,7 +53,7 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
       allCount++;
       switch (qew.operator_) {
         case QuestionnaireEnableWhenOperator.exists:
-          if (top.findByLinkId(qew.question!).responseItem == null) {
+          if (top.findByLinkId(qew.question!).responseItem != null) {
             anyTrigger = true;
             allTriggered++;
           }
