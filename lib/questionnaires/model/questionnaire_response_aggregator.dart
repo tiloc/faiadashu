@@ -19,12 +19,15 @@ class QuestionnaireResponseAggregator
     super.init(topLocation);
   }
 
-  QuestionnaireResponseItem _fromGroupItem(QuestionnaireLocation location) {
+  QuestionnaireResponseItem? _fromGroupItem(QuestionnaireLocation location) {
     final nestedItems = <QuestionnaireResponseItem>[];
 
     for (final nestedItem in location.children) {
       if (nestedItem.questionnaireItem.type == QuestionnaireItemType.group) {
-        nestedItems.add(_fromGroupItem(nestedItem));
+        final groupItem = _fromGroupItem(nestedItem);
+        if (groupItem != null) {
+          nestedItems.add(groupItem);
+        }
       } else {
         if (nestedItem.responseItem != null) {
           nestedItems.add(nestedItem.responseItem!);
@@ -32,8 +35,12 @@ class QuestionnaireResponseAggregator
       }
     }
 
-    return QuestionnaireResponseItem(
-        linkId: location.linkId, text: location.titleText, item: nestedItems);
+    if (nestedItems.isNotEmpty) {
+      return QuestionnaireResponseItem(
+          linkId: location.linkId, text: location.titleText, item: nestedItems);
+    } else {
+      return null;
+    }
   }
 
   @override
@@ -45,7 +52,10 @@ class QuestionnaireResponseAggregator
 
     for (final location in topLocation.siblings) {
       if (location.questionnaireItem.type == QuestionnaireItemType.group) {
-        responseItems.add(_fromGroupItem(location));
+        final groupItem = _fromGroupItem(location);
+        if (groupItem != null) {
+          responseItems.add(groupItem);
+        }
       } else {
         if (location.responseItem != null) {
           responseItems.add(location.responseItem!);
@@ -68,7 +78,7 @@ class QuestionnaireResponseAggregator
         //  For other status they might be included  (FHIR-31077)
         status: topLocation.responseStatus,
         questionnaire: questionnaireCanonical,
-        item: responseItems,
+        item: (responseItems.isNotEmpty) ? responseItems : null,
         authored: FhirDateTime(DateTime.now()),
         text: narrativeAggregator.aggregate(locale));
 

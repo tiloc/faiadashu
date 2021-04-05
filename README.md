@@ -34,8 +34,10 @@ Build beautiful healthcare apps fast — use the Flutter™ SDK and follow the H
 This is mainly a user interface add-on to the awesome FHIRFLI "fhir" library: https://pub.dev/packages/fhir
 
 ### Contributing
-Contributions and discussions are welcome! This is currently not well-defined yet. I will soon post an invite link to the awesome FHIR-FLI
-Slack channel which is run by some like-minded folks and where I can be frequently found.
+Contributions and discussions are welcome! This is currently not well-defined yet. I am posting an invite link to the awesome FHIR-FLI
+Slack channel which is run by some like-minded folks and where I can be frequently found:
+
+[FHIR-FLI Slack Channel](https://join.slack.com/t/fhir-fli/shared_invite/zt-ofv2cycm-9yjdMj8a~zXp7nDBeB_sNQ)
 
 ### License
 The library is licensed under the MIT license. The full license text is here [LICENSE](LICENSE).

@@ -53,12 +53,16 @@ class DataAbsentReason {
   static const invalidCode = 'invalid';
 
   /// The value as represented in the instance is not a member of the set of permitted data values in the constrained value domain of a variable.
+  ///
+  /// [invalid] is not officially a part of the data-absent-reason ValueSet!
   static final invalid = Coding(
       code: const Code.asConst(invalidCode),
       display: 'Invalid',
       system: systemUri);
 
   /// The actual value is not a member of the set of permitted data values in the constrained value domain of a variable. (e.g., concept not provided by required code system).
+  ///
+  /// [other] is not officially a part of the data-absent-reason ValueSet!
   static final other = Coding(
       code: const Code.asConst(otherCode), display: 'Other', system: systemUri);
 
@@ -67,12 +71,11 @@ class DataAbsentReason {
 
 extension DataAbsentReasonExtension on List<FhirExtension> {
   Coding? get dataAbsentReason {
-    return extensionOrNull(DataAbsentReason.extensionUrl.toString())
-        ?.valueCoding;
+    return extensionOrNull(DataAbsentReason.extensionUrl)?.valueCoding;
   }
 
   String? get dataAbsentReasonCode {
-    return extensionOrNull(DataAbsentReason.extensionUrl.toString())
+    return extensionOrNull(DataAbsentReason.extensionUrl)
         ?.valueCoding
         ?.code
         ?.value;

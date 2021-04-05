@@ -75,6 +75,8 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
         _dataAbsentReason = newdataAbsentReason;
       });
     }
+    // Bubble up the response
+    widget.location.responseItem = fillResponse();
   }
 
   /// Fill the response with all the answers which are not null.
@@ -98,7 +100,8 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
                     valueCoding: dataAbsentReason)
               ]
             : null,
-        answer: filledAnswers);
+        // FHIR cannot have empty arrays.
+        answer: filledAnswers.isEmpty ? null : filledAnswers);
 
     return result;
   }

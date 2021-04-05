@@ -101,7 +101,32 @@ extension FDashQuantityExtension on Quantity {
 }
 
 extension FDashCodingExtension on Coding {
-  /// Localized access to display value
+  /// Returns whether [Coding] and another [Coding] are a match.
+  ///
+  /// Returns false if [otherCoding] is null.
+  ///
+  /// Follows Postel's law regarding case-sensitivity.
+  /// > CodeSystem.caseSensitive: If this value is missing, then it is not specified whether a code system is case sensitive or not. When the rule is not known, Postel's law should be followed: produce codes with the correct case, and accept codes in any case.
+  bool match(Coding? otherCoding) {
+    if (otherCoding == null) {
+      return false;
+    }
+
+    if (system != otherCoding.system) {
+      return false;
+    }
+
+    if (code?.value == otherCoding.code?.value) {
+      return true;
+    }
+
+    return code?.value != null &&
+        otherCoding.code?.value != null &&
+        code!.value!.toUpperCase() == otherCoding.code!.value!.toUpperCase();
+  }
+
+  /// Localized access to display value.
+  /// TODO: Currently only matches by language.
   String localizedDisplay(Locale locale) {
     // TODO: Carve this out to be used in other places (titles).
     final translationExtension = displayElement?.extension_?.firstWhereOrNull(
@@ -128,8 +153,8 @@ extension FDashCodingExtension on Coding {
 
 extension FDashListCodingExtension on List<Coding> {
   /// Localized access to display value or empty string
-  String localizedDisplay(Locale locale) {
-    if (isEmpty) return '';
+  String localizedDisplay(Locale locale, {String defaultText = ''}) {
+    if (isEmpty) return defaultText;
     return first.localizedDisplay(locale);
   }
 }
@@ -151,12 +176,74 @@ extension FDashCodeableConceptExtension on CodeableConcept {
   }
 }
 
+/// Access to [FhirExtension]s from a List.
+///
+/// Mimics a [Map] with String?/FhirUri as the key and FhirExtension as value.
+/// Extensions are treated similar to a [Set]: Only one of each type can exist
+/// and their order is not retained.
+///
+/// Unfortunately, since the [List] is already claiming the operators they
+/// cannot be overridden here.
 extension FDashListFhirExtensionExtension on List<FhirExtension> {
-  /// The extension with the given URI, or null
-  FhirExtension? extensionOrNull(String uri) {
-    return firstWhereOrNull((ext) {
-      return ext.url == FhirUri(uri);
-    });
+  FhirExtension? removeExtension(Object? key) {
+    if (key == null) {
+      return null;
+    }
+
+    if (key is FhirExtension) {
+      final index = indexWhere((ext) {
+        return ext == key;
+      });
+      return (index != -1) ? removeAt(index) : null;
+    } else if (key is String) {
+      final index = indexWhere((ext) {
+        return ext.url == FhirUri(key);
+      });
+      return (index != -1) ? removeAt(index) : null;
+    } else if (key is FhirUri) {
+      final index = indexWhere((ext) {
+        return ext.url == key;
+      });
+      return (index != -1) ? removeAt(index) : null;
+    } else {
+      throw ArgumentError.value(key, 'key',
+          'Only FhirExtension, String and FhirUri are supported as key.');
+    }
+  }
+
+  /// Sets the extension.
+  ///
+  /// Overwrites the existing one, if it exists.
+  /// Adds it as a new one, if it did not exist.
+  ///
+  /// Does nothing if [extension] is null.
+  void setExtension(FhirExtension? extension) {
+    if (extension == null) {
+      return;
+    }
+
+    removeExtension(extension);
+    add(extension);
+  }
+
+  /// Returns the extension with the given URI, or null
+  FhirExtension? extensionOrNull(Object? key) {
+    if (key == null) {
+      return null;
+    }
+
+    if (key is String) {
+      return firstWhereOrNull((ext) {
+        return ext.url == FhirUri(key);
+      });
+    } else if (key is FhirUri) {
+      return firstWhereOrNull((ext) {
+        return ext.url == key;
+      });
+    } else {
+      throw ArgumentError.value(
+          key, 'key', 'Only String and FhirUri are supported as key.');
+    }
   }
 }
 
