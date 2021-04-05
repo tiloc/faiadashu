@@ -5,6 +5,8 @@
   - Visualization in narrative
 * Support autocomplete item control
 * Better rendering for renderingStyle
+* Better documentation
+* Slack invite for community building
 
 ## 0.1.5
 * Support for optionExclusive
