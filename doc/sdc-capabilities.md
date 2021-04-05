@@ -160,12 +160,27 @@ Total score will be entered into any field which meets one of the following:
 have a total score calculcated, regardless of content of the expression!
 
 ### Response creation
-All detail from the questions in the questionnaire carries over into the Response.
 
-A narrative will be auto-generated.
+#### Reference to Questionnaire
+A canonical reference to the questionnaire will be generated, including a version number.
+
+The `http://hl7.org/fhir/StructureDefinition/display` extension will not be set.
+
+#### Status
+Status can be set to any of the supported values. Setting the status to complete does currently not have impact on items affected by enableWhen (they should be discarded).
+
+#### Authored
+Will be set to the current time.
+
+#### Narrative
+A narrative will be auto-generated. Its status will be `generated`, unless it is `empty`.
+
+#### Answers
+All detail from the questions in the questionnaire carries over into the Response.
 
 Choice answers will be marked as "user selected".
 
+#### Example QuestionnaireResponse
 ```json
 {
   "resourceType": "QuestionnaireResponse",

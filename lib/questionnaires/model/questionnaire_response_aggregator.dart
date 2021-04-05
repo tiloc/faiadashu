@@ -82,6 +82,9 @@ class QuestionnaireResponseAggregator
         authored: FhirDateTime(DateTime.now()),
         text: narrativeAggregator.aggregate(locale));
 
+    // TODO: SDC mandates a an extension on "questionnaire", but the FHIR library doesn't have questionnaireElement
+    // see http://hl7.org/fhir/2018Sep/extension-display.html
+
     if (notifyListeners) {
       value = questionnaireResponse;
     }

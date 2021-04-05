@@ -48,4 +48,9 @@ provided information and decide whether you meet the obligations to use this lib
 
 [Legal Information](doc/disclaimers.md)
 
+---------------------------------------
+
 **This information is not a substitute for professional legal advice.**
+
+---------------------------------------
+
