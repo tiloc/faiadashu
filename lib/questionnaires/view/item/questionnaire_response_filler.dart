@@ -70,9 +70,9 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
       setState(() {
         _answers = answers ?? [];
         // This assumes all answers having the same dataAbsentReason.
-        final newdataAbsentReason =
+        final newDataAbsentReason =
             answers?.firstOrNull?.extension_?.dataAbsentReason;
-        _dataAbsentReason = newdataAbsentReason;
+        _dataAbsentReason = newDataAbsentReason;
       });
     }
     // Bubble up the response

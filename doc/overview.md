@@ -113,3 +113,12 @@ final response = QuestionnaireFiller.of(context)
   .aggregator<QuestionnaireResponseAggregator>()
     .aggregate(locale);
 ```
+
+##### Error handling
+###### During initialization
+A `QuestionnaireFormatException` is thrown.
+
+###### During filling
+The filler will display informative error boxes.
+
+![error_widget](images/error_widget.png)

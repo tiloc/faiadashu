@@ -29,6 +29,9 @@ class _ChoiceAnswerState
   // ignore: prefer_collection_literals
   final _answerOptions = LinkedHashMap<String, QuestionnaireAnswerOption>();
   Object? _initFailure;
+  late final TextEditingController? _otherChoiceController;
+
+  static const openChoiceOther = 'open-choice-other';
 
   _ChoiceAnswerState();
 
@@ -53,6 +56,12 @@ class _ChoiceAnswerState
           error: exception);
       _initFailure = exception;
     }
+
+    if (widget.location.questionnaireItem.type ==
+        QuestionnaireItemType.open_choice) {
+      // TODO: Set initialValue
+      _otherChoiceController = TextEditingController();
+    }
   }
 
   @override
@@ -66,16 +75,23 @@ class _ChoiceAnswerState
       return null;
     }
 
-    // TODO(tiloc): Return the order of the codings in the order of the choices
-    // TODO(tiloc): Support open free text (should always come last?)
-    final result = value!.coding?.map<QuestionnaireResponseAnswer>((coding) {
-      // Some answers may only be a display, not have a code
-      return coding.code != null
-          ? QuestionnaireResponseAnswer(
-              valueCoding:
-                  _answerOptions[_choiceStringFromCoding(coding)]!.valueCoding)
-          : QuestionnaireResponseAnswer(valueCoding: coding);
-    }).toList();
+    // TODO(tiloc): Return the order of the codings in the order of the choices?
+
+    // TODO: This is only supporting a single other text.
+    final result = (value!.coding?.firstOrNull?.code?.value == openChoiceOther)
+        ? [
+            QuestionnaireResponseAnswer(
+                valueCoding: Coding(display: _otherChoiceController!.text))
+          ]
+        : value!.coding?.map<QuestionnaireResponseAnswer>((coding) {
+            // Some answers may only be a display, not have a code
+            return coding.code != null
+                ? QuestionnaireResponseAnswer(
+                    valueCoding:
+                        _answerOptions[_choiceStringFromCoding(coding)]!
+                            .valueCoding)
+                : QuestionnaireResponseAnswer(valueCoding: coding);
+          }).toList();
 
     return result;
   }
@@ -343,6 +359,29 @@ class _ChoiceAnswerState
               onChanged: (String? newValue) {
                 value = _fillValue(newValue);
               }));
+    }
+
+    if (qi.type == QuestionnaireItemType.open_choice) {
+      choices.add(RadioListTile<String>(
+        value: openChoiceOther,
+        groupValue: _choiceString(value),
+        onChanged: (String? newValue) {
+          value = CodeableConcept(
+              coding: [Coding(code: Code(openChoiceOther))],
+              text: _otherChoiceController!.text);
+        },
+        title: TextFormField(
+          controller: _otherChoiceController,
+          onChanged: (newText) {
+            value = (newText.isEmpty)
+                ? null
+                : CodeableConcept(
+                    coding: [Coding(code: Code(openChoiceOther))],
+                    text: _otherChoiceController!.text);
+          },
+        ),
+        secondary: const Text('Other'),
+      ));
     }
 
     if (qi.extension_

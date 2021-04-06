@@ -140,7 +140,9 @@ Support for leaving a question unanswered.
 - questionnaire-itemControl: check-box, radio-button, autocomplete
 - translation: option choices can be translated using the FHIR translation mechanism
 #### open-choice 
-Same as `choice`, no support for open text input yet.
+Same as `choice` with the following differences:
+- repeats is not supported
+- a single text input field labeled 'Other' is added to the selections
 
 #### url, attachment, reference
 Not supported

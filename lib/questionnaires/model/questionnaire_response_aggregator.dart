@@ -1,9 +1,8 @@
 import 'dart:ui';
 
-import 'package:faiadashu/logging/logger.dart';
 import 'package:fhir/r4.dart';
 
-import '../../logging/log_level.dart';
+import '../../logging/logger.dart';
 import '../questionnaires.dart';
 
 class QuestionnaireResponseAggregator
@@ -46,7 +45,7 @@ class QuestionnaireResponseAggregator
   @override
   QuestionnaireResponse? aggregate(Locale? locale,
       {bool notifyListeners = false}) {
-    logger.log('QuestionnaireResponse.aggregrate', level: LogLevel.trace);
+    logger.trace('QuestionnaireResponse.aggregrate');
 
     final responseItems = <QuestionnaireResponseItem>[];
 
