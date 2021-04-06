@@ -2,6 +2,7 @@
   "resourceType": "Questionnaire",
   "id": "beverage",
   "url": "https://build.fhir.org/ig/DavidPyke/HotBeverage/",
+  "name": "hot_beverage_q",
   "title": "Hot Beverage IG",
   "status": "draft",
   "subjectType": [
@@ -47,7 +48,7 @@
     {
       "linkId": "2.5.b-repeats",
       "text": "How do you like your coffee best?",
-      "type": "open-choice",
+      "type": "choice",
       "repeats": true,
       "answerOption": [
         {
@@ -69,6 +70,12 @@
           }
         },
         {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionExclusive",
+              "valueBoolean": true
+            }
+          ],
           "valueCoding": {
             "code": "BLACK",
             "display": "Pure and black"

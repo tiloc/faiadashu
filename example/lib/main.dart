@@ -42,21 +42,23 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
       title: 'Faiadashu™ FHIRDash Gallery',
-      localizationsDelegates: [
+      localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
-      supportedLocales: [
+      supportedLocales: const [
         Locale('en', 'US'),
         Locale('de'),
 //        Locale('jp'),  // TODO: Support for Japanese is semi-broken in Flutter
         Locale('es'),
         Locale('ar'),
       ],
-      home: HomePage(),
+      home: const HomePage(),
     );
   }
 }
