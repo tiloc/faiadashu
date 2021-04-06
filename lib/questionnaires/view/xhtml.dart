@@ -64,7 +64,8 @@ class Xhtml {
         semanticLabel: plainText,
       );
     } else {
-      return HTML.toRichText(context, xhtml);
+      return HTML.toRichText(context, xhtml,
+          defaultTextStyle: Theme.of(context).textTheme.bodyText1);
     }
   }
 

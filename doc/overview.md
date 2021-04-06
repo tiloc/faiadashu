@@ -20,7 +20,7 @@ https://pub.dev/packages/fhir
 Support for the FHIR Standard is focussed on the R4 release which is located here: [![FHIR R4](fhir-logo-www.png)](https://hl7.org/fhir/R4/)  https://hl7.org/fhir/R4/
 
 ### Theme
-Theme - including text and colors - is obtained through the Material theme of the app.
+Theme - including text and colors - is obtained through the Material theme of the app. Both dark and light schemes work.
 
 ### Locale
 Locale is obtained through `Localizations.localeOf(context)`

@@ -113,7 +113,8 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
               if (leading != null) WidgetSpan(child: leading),
               if (titleText != null)
                 HTML.toTextSpan(context,
-                    '$openStyleTag${htmlEscape.convert(titleText)}$closeStyleTag'),
+                    '$openStyleTag${htmlEscape.convert(titleText)}$closeStyleTag',
+                    defaultTextStyle: Theme.of(context).textTheme.bodyText1),
               if (help != null) WidgetSpan(child: help),
             ],
           ),
@@ -160,8 +161,9 @@ class QuestionnaireItemFillerHelpState
         builder: (context) {
           return AlertDialog(
             title: const Text('Help'),
-            content:
-                HTML.toRichText(context, questionnaireLocation.titleText ?? ''),
+            content: HTML.toRichText(
+                context, questionnaireLocation.titleText ?? '',
+                defaultTextStyle: Theme.of(context).textTheme.bodyText1),
             actions: <Widget>[
               OutlinedButton(
                 onPressed: () {

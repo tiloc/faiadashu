@@ -8,7 +8,10 @@ class AboutPage extends ExhibitPage {
 
   @override
   Widget buildExhibit(BuildContext context) {
-    return Builder(builder: (context) => HTML.toRichText(context, '''
+    return Builder(
+        builder: (context) => HTML.toRichText(
+            context,
+            '''
     <i><h2>Faiadashu™ FHIRDash</h2></i>
     <p>Faia Dasshu <i>[(ファイアダッシュ)]</i> — or <i>Fire Dash</i> — is a play with words.</p>
     <p></p>
@@ -17,7 +20,8 @@ class AboutPage extends ExhibitPage {
     <div style="font-size: 10px; color:#888888; font-style:italic">それは猛烈なペースで前進します—飛んでいる火花で！</div></p>
     <p><b>I love the sound of it.</b><br>
     <div style="font-size: 10px; color:#888888">私はその音が大好きです。</div></p> 
-    '''));
+    ''',
+            defaultTextStyle: Theme.of(context).textTheme.bodyText1));
   }
 
   @override
