@@ -5,11 +5,11 @@ import 'fhir_types_extensions.dart';
 
 /// A [Text] widget built from a FhirDateTime.
 /// Takes the precision and locale into account.
-class FhirDateTimeWidget extends StatelessWidget {
+class FhirDateTimeText extends StatelessWidget {
   final FhirDateTime? dateTime;
   final TextStyle? style;
   final String defaultText;
-  const FhirDateTimeWidget(this.dateTime,
+  const FhirDateTimeText(this.dateTime,
       {this.style, this.defaultText = '', Key? key})
       : super(key: key);
 

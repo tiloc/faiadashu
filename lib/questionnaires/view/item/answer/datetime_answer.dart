@@ -1,4 +1,4 @@
-import 'package:date_time_picker/date_time_picker.dart';
+import 'package:faiadashu/fhir_types/date_time_picker.dart';
 import 'package:fhir/r4.dart';
 import 'package:fhir/r4/resource_types/clinical/diagnostics/diagnostics.dart';
 import 'package:flutter/material.dart';
@@ -42,7 +42,7 @@ class _DateTimeAnswerState
 
   @override
   Widget buildReadOnly(BuildContext context) {
-    return FhirDateTimeWidget(
+    return FhirDateTimeText(
       value,
       defaultText: '-',
     );
@@ -52,42 +52,24 @@ class _DateTimeAnswerState
   Widget buildEditable(BuildContext context) {
     final itemType = widget.location.questionnaireItem.type;
 
-    final initialDate =
-        (itemType != QuestionnaireItemType.time) ? value?.value : null;
-
-    final initialTime =
-        (itemType != QuestionnaireItemType.date && value?.value != null)
-            ? (value!.precision == DateTimePrecision.FULL)
-                ? TimeOfDay.fromDateTime(value!.value!)
-                : null
-            : null;
-
-    final locale = Localizations.localeOf(context);
-    final _initialValue = value?.format(locale);
+    final initialDate = (itemType != QuestionnaireItemType.time) ? value : null;
 
     final pickerType = ArgumentError.checkNotNull(const {
-      QuestionnaireItemType.date: DateTimePickerType.date,
-      QuestionnaireItemType.datetime: DateTimePickerType.dateTime,
-      QuestionnaireItemType.time: DateTimePickerType.time,
+      QuestionnaireItemType.date: Date,
+      QuestionnaireItemType.datetime: FhirDateTime,
+      QuestionnaireItemType.time: Time,
     }[itemType]);
 
     return Container(
         padding: const EdgeInsets.only(top: 8, bottom: 8),
-        child: DateTimePicker(
-          initialDate: initialDate,
-          initialTime: initialTime,
-          initialValue: _initialValue,
-          decoration: const InputDecoration(border: OutlineInputBorder()),
-          type: pickerType,
-          locale: locale,
+        child: FhirDateTimePicker(
+          initialDateTime: initialDate,
           firstDate: DateTime(1860),
           lastDate: DateTime(2050),
-          onChanged: (content) {
-            if (itemType == QuestionnaireItemType.time) {
-              value = FhirDateTime('19700101T$content');
-            } else {
-              value = FhirDateTime(content);
-            }
+          pickerType: pickerType,
+          decoration: const InputDecoration(border: OutlineInputBorder()),
+          onChanged: (fhirDateTime) {
+            value = fhirDateTime;
           },
         ));
   }

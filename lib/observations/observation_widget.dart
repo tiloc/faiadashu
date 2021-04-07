@@ -31,7 +31,7 @@ class ObservationWidget extends StatelessWidget {
             unknownValueText: unknownValueText),
         _codeWidget =
             CodeableConceptWidget(observation.code, style: codeStyle, key: key),
-        _dateTimeWidget = FhirDateTimeWidget(
+        _dateTimeWidget = FhirDateTimeText(
           observation.effectiveDateTime,
           style: dateTimeStyle,
         ),

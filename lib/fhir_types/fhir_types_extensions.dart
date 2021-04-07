@@ -13,7 +13,7 @@ extension FDashTimeExtension on Time {
       return defaultText;
     }
 
-    return DateFormat.Hm(localeCode)
+    return DateFormat.jm(localeCode)
         .format(DateTime.parse('19700101T${toString()}'));
   }
 }
