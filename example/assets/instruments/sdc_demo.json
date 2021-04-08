@@ -609,6 +609,17 @@
           }
         }
       ]
+    },
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/regex",
+          "valueString": "ANA NAN"
+        }
+      ],
+      "linkId": "1-ananan",
+      "type": "string",
+      "text": "Postal Code (A1A 1A1)"
     }
   ]
 }

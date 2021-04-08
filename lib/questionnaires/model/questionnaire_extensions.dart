@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:faiadashu/faiadashu.dart';
 import 'package:fhir/r4.dart';
 
 import '../../fhir_types/fhir_types_extensions.dart';
@@ -13,6 +14,11 @@ extension FDashQuestionnaireAnswerOptionExtensions
 
   /// The coded value for the option, taken from either valueString or valueCoding
   String get optionCode {
+    if (valueString == null && valueCoding == null) {
+      throw QuestionnaireFormatException(
+          'QuestionnaireAnswerOption requires either a valueString or a valueCoding.',
+          this);
+    }
     return valueString ?? valueCoding!.code.toString();
   }
 
