@@ -618,7 +618,7 @@
         },
         {
           "url": "http://hl7.org/fhir/StructureDefinition/entryFormat",
-          "valueString": "A1A 1A1"
+          "valueString": "1A1 A1A"
         }
       ],
       "linkId": "1-ananan",
