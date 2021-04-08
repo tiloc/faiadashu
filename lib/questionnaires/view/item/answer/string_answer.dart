@@ -16,27 +16,29 @@ class StringAnswer extends QuestionnaireAnswerFiller {
 
 class _StringAnswerState
     extends QuestionnaireAnswerState<String, StringAnswer> {
-  late final String? _humanPattern;
   late final RegExp? _regExp;
+  final _controller = TextEditingController();
 
   _StringAnswerState();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
     super.initState();
     initialValue = widget.answerLocation.answer?.valueString;
+    _controller.text = value ?? '';
 
-    _humanPattern = widget.location.questionnaireItem.extension_
+    final _regexPattern = widget.location.questionnaireItem.extension_
         ?.extensionOrNull('http://hl7.org/fhir/StructureDefinition/regex')
         ?.valueString;
 
-    if (_humanPattern != null) {
-      _regExp = RegExp(
-          '^$_humanPattern\$'
-              .replaceAll(RegExp('N'), r'\d')
-              .replaceAll(RegExp('A'), r"[\p{L}]"),
-          caseSensitive: false,
-          unicode: true);
+    if (_regexPattern != null) {
+      _regExp = RegExp(_regexPattern, unicode: true);
     } else {
       _regExp = null;
     }
@@ -54,7 +56,11 @@ class _StringAnswerState
 
     if (_regExp != null) {
       if (!_regExp!.hasMatch(inputValue)) {
-        return "Enter as '$_humanPattern'";
+        if (entryFormat != null) {
+          return "Provide as '$entryFormat'";
+        } else {
+          return 'Provide a valid answer.';
+        }
       }
     }
 
@@ -66,14 +72,15 @@ class _StringAnswerState
     return Container(
         padding: const EdgeInsets.only(top: 8, bottom: 8),
         child: TextFormField(
-          initialValue: value,
+          keyboardType: TextInputType.text,
+          controller: _controller,
           maxLines: (widget.location.questionnaireItem.type ==
                   QuestionnaireItemType.text)
               ? 4
               : 1,
           decoration: InputDecoration(
             border: const OutlineInputBorder(),
-            hintText: entryFormat ?? _humanPattern,
+            hintText: entryFormat,
           ),
           validator: (inputValue) => _validate(inputValue),
           autovalidateMode: AutovalidateMode.onUserInteraction,

@@ -614,12 +614,16 @@
       "extension": [
         {
           "url": "http://hl7.org/fhir/StructureDefinition/regex",
-          "valueString": "ANA NAN"
+          "valueString": "(\\d[A-Z]\\d [A-Z]\\d[A-Z])"
+        },
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/entryFormat",
+          "valueString": "A1A 1A1"
         }
       ],
       "linkId": "1-ananan",
       "type": "string",
-      "text": "Postal Code (A1A 1A1)"
+      "text": "Postal Code"
     }
   ]
 }
