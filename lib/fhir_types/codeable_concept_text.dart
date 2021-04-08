@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 
 import 'fhir_types_extensions.dart';
 
-class CodeableConceptWidget extends StatelessWidget {
+class CodeableConceptText extends StatelessWidget {
   final CodeableConcept codeableConcept;
   final TextStyle? style;
 
-  const CodeableConceptWidget(this.codeableConcept, {this.style, Key? key})
+  const CodeableConceptText(this.codeableConcept, {this.style, Key? key})
       : super(key: key);
 
   @override

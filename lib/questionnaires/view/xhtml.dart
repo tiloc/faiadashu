@@ -35,7 +35,7 @@ class Xhtml {
           imgPngBase64Prefix.length, xhtml.length - imgSuffix.length);
       logger.log('Length of base64: ${base64String.length}',
           level: LogLevel.debug);
-      return Base64BinaryWidget(base64String,
+      return Base64Image(base64String,
           width: width, height: height, semanticLabel: plainText);
     }
     if (xhtml.startsWith(imgJpgBase64Prefix)) {
@@ -43,7 +43,7 @@ class Xhtml {
           imgJpgBase64Prefix.length, xhtml.length - imgSuffix.length);
       logger.log('Length of base64: ${base64String.length}',
           level: LogLevel.debug);
-      return Base64BinaryWidget(base64String,
+      return Base64Image(base64String,
           width: width, height: height, semanticLabel: plainText);
     }
     if (xhtml.startsWith(imgHashPrefix)) {
@@ -57,7 +57,7 @@ class Xhtml {
             'Malformed base64 string for image element ID $elementId',
             elementId);
       }
-      return Base64BinaryWidget(
+      return Base64Image(
         base64String,
         width: width,
         height: height,
