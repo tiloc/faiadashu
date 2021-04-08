@@ -69,6 +69,7 @@ Special support for read-only display of total score.
 Quantity requires the declaration of units. It does not support free-text entry for units.
 
 ##### Extensions
+- entryFormat
 - minValue
 - maxValue
 - maxDecimalPlaces
@@ -82,6 +83,7 @@ Comprehensive support.
 
 Special support for read-only display of total score.
 ##### Extensions
+- entryFormat
 - minValue
 - maxValue
 - maxDecimalPlaces
@@ -97,6 +99,7 @@ Special support for read-only display of total score.
 Special support for 🇩🇰 Danish specification on patient feedback.
 
 ##### Extensions
+- entryFormat
 - minValue
 - maxValue
 - questionnaire-itemControl: slider
@@ -120,6 +123,7 @@ Comprehensive support. Time picker with localized format.
 #### string, text 
 Comprehensive support
 ##### Extensions
+- entryFormat
 - maxLength
 - questionnaire-itemControl: text-box 
 

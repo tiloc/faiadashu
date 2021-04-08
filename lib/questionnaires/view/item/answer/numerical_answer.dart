@@ -211,8 +211,9 @@ class _NumericalAnswerState
                 initialValue: (value?.value != null)
                     ? value!.value!.format(Localizations.localeOf(context))
                     : null,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  hintText: entryFormat,
                 ),
                 inputFormatters: [numberInputFormatter],
                 keyboardType: TextInputType.number,

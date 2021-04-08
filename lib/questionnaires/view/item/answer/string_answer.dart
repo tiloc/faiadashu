@@ -39,8 +39,9 @@ class _StringAnswerState
                   QuestionnaireItemType.text)
               ? 4
               : 1,
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            border: const OutlineInputBorder(),
+            hintText: entryFormat,
           ),
           onChanged: (content) {
             value = content;

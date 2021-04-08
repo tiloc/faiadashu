@@ -55,4 +55,17 @@ class Logger {
       loggingLogger.log(LogLevel.trace, message, null, null, zone);
     }
   }
+
+  /// Log. See dart:developer log for meaning of params.
+  void debug(
+    String message, {
+    DateTime? time,
+    int? sequenceNumber,
+    Zone? zone,
+  }) {
+    if (kDebugMode) {
+      // Can the compiler kill this code on prod builds?
+      loggingLogger.log(LogLevel.debug, message, null, null, zone);
+    }
+  }
 }

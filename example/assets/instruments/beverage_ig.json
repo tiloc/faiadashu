@@ -42,8 +42,14 @@
     {
       "linkId": "123523.35235",
       "type": "string",
-      "text": "Enter your First Name",
-      "maxLength": 50
+      "text": "Enter your Name",
+      "maxLength": 50,
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/entryFormat",
+          "valueString": "First name only"
+        }
+      ]
     },
     {
       "linkId": "2.5.b-repeats",
