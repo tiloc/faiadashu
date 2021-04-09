@@ -123,7 +123,8 @@ Comprehensive support. Time picker with localized format.
 #### string, text 
 Comprehensive support
 ##### Extensions
-- entryFormat
+- entryFormat (use regular expressions, *not the "ANA NAN" format as seen in some examples.*)
+- minLength  
 - maxLength
 - questionnaire-itemControl: text-box 
 

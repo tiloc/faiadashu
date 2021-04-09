@@ -613,6 +613,17 @@
     {
       "extension": [
         {
+          "url": "http://hl7.org/fhir/StructureDefinition/minLength",
+          "valueInteger": 2
+        }
+      ],
+      "linkId": "1-minlength",
+      "type": "string",
+      "text": "Enter your Last Name"
+    },
+    {
+      "extension": [
+        {
           "url": "http://hl7.org/fhir/StructureDefinition/regex",
           "valueString": "(\\d[A-Z]\\d [A-Z]\\d[A-Z])"
         },

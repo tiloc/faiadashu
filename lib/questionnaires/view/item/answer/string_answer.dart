@@ -17,6 +17,7 @@ class StringAnswer extends QuestionnaireAnswerFiller {
 class _StringAnswerState
     extends QuestionnaireAnswerState<String, StringAnswer> {
   late final RegExp? _regExp;
+  late final int _minLength;
   final _controller = TextEditingController();
 
   _StringAnswerState();
@@ -42,6 +43,13 @@ class _StringAnswerState
     } else {
       _regExp = null;
     }
+
+    _minLength = widget.location.questionnaireItem.extension_
+            ?.extensionOrNull(
+                'http://hl7.org/fhir/StructureDefinition/minLength')
+            ?.valueInteger
+            ?.value ??
+        0;
   }
 
   @override
@@ -52,6 +60,10 @@ class _StringAnswerState
   String? _validate(String? inputValue) {
     if (inputValue == null || inputValue.isEmpty) {
       return null;
+    }
+
+    if (inputValue.length < _minLength) {
+      return 'Enter $_minLength or more characters.';
     }
 
     if (_regExp != null) {
