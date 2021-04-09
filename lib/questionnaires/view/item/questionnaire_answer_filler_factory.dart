@@ -28,6 +28,7 @@ class QuestionnaireAnswerFillerFactory {
               : NumericalAnswer(location, answerLocation);
         case QuestionnaireItemType.string:
         case QuestionnaireItemType.text:
+        case QuestionnaireItemType.url:
           return StringAnswer(location, answerLocation);
         case QuestionnaireItemType.display:
         case QuestionnaireItemType.group:
@@ -41,7 +42,6 @@ class QuestionnaireAnswerFillerFactory {
         case QuestionnaireItemType.attachment:
         case QuestionnaireItemType.unknown:
         case QuestionnaireItemType.reference:
-        case QuestionnaireItemType.url:
           throw QuestionnaireFormatException(
               'Unsupported item type: ${location.questionnaireItem.type!}');
       }

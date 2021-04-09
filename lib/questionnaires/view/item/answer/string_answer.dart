@@ -66,6 +66,14 @@ class _StringAnswerState
       return 'Enter $_minLength or more characters.';
     }
 
+    if (widget.location.questionnaireItem.type == QuestionnaireItemType.url) {
+      if (!RegExp(
+              r'^(http|https|ftp|sftp)://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
+          .hasMatch(inputValue)) {
+        return 'Enter a valid URL.';
+      }
+    }
+
     if (_regExp != null) {
       if (!_regExp!.hasMatch(inputValue)) {
         if (entryFormat != null) {
@@ -106,7 +114,9 @@ class _StringAnswerState
   @override
   QuestionnaireResponseAnswer? fillAnswer() {
     return (value != null && value!.isNotEmpty)
-        ? QuestionnaireResponseAnswer(valueString: value)
+        ? (widget.location.questionnaireItem.type != QuestionnaireItemType.url)
+            ? QuestionnaireResponseAnswer(valueString: value)
+            : QuestionnaireResponseAnswer(valueUri: FhirUri(value))
         : null;
   }
 }

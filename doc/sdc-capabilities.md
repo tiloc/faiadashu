@@ -149,7 +149,10 @@ Same as `choice` with the following differences:
 - repeats is not supported
 - a single text input field labeled 'Other' is added to the selections
 
-#### url, attachment, reference
+#### url
+Supported (accepts http, https, ftp, and sftp)
+
+#### attachment, reference
 Not supported
 
 
