@@ -1,3 +1,12 @@
+## 0.1.7
+* Support for open-choice
+* Support for regex
+* Support for entryFormat
+* Support for minLength
+* Support for URL  
+* Support for dark mode
+* Internationalized Date Picker (for FhirDateTime, Date, Time)
+
 ## 0.1.6
 * Bugfixes for enableWhen, autocomplete, choice
 * experimental support for data-absent-reason on responses
