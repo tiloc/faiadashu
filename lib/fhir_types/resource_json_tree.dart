@@ -178,6 +178,7 @@ class _JsonViewerListNodeState extends _JsonNodeState<_JsonViewerListNode> {
   @override
   Widget build(BuildContext context) {
     final count = widget.nodeValue.length;
+    final themeData = Theme.of(context);
 
     Widget result = GestureDetector(
         onTap: () => toggleOpen(),
@@ -195,8 +196,10 @@ class _JsonViewerListNodeState extends _JsonNodeState<_JsonViewerListNode> {
             Text(
               " ($count)",
               style: (count > 0)
-                  ? const TextStyle(color: Colors.indigoAccent)
-                  : const TextStyle(color: Colors.orangeAccent),
+                  ? TextStyle(
+                      color: themeData.textTheme.bodyText1!.color!
+                          .withOpacity(0.54))
+                  : TextStyle(color: themeData.errorColor),
             ),
           ],
         ));
@@ -227,16 +230,20 @@ class _JsonViewerGenericNode extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var color = Theme.of(context).textTheme.bodyText1!.color;
+    final themeData = Theme.of(context);
+
+    var color = themeData.textTheme.bodyText1!.color;
     if (nodeValue == null) {
-      color = Theme.of(context).errorColor;
+      color = themeData.errorColor;
     } else {
       switch (nodeValue.runtimeType) {
         case bool:
-          color = (nodeValue as bool) == true ? Colors.green : Colors.red;
+          color = (nodeValue as bool) == true
+              ? themeData.accentColor
+              : themeData.errorColor;
           break;
         case int:
-          color = Colors.green;
+          color = themeData.accentColor;
           break;
       }
     }
@@ -247,7 +254,8 @@ class _JsonViewerGenericNode extends StatelessWidget {
         children: <Widget>[
           Text(
             nodeName,
-            style: const TextStyle(color: Colors.black54),
+            style: TextStyle(
+                color: themeData.textTheme.bodyText1!.color!.withOpacity(0.54)),
           ),
           const Text(' : '),
           if (nodeValue != null)
@@ -259,7 +267,7 @@ class _JsonViewerGenericNode extends StatelessWidget {
               style: TextStyle(color: color),
             )),
           if (nodeValue == null)
-            const Text('null', style: TextStyle(color: Colors.orangeAccent)),
+            Text('null', style: TextStyle(color: themeData.accentColor)),
         ],
       ),
     );

@@ -41,59 +41,60 @@ class _NarrativeDrawerState extends State<NarrativeDrawer> {
             child: Container(
               padding: const EdgeInsets.all(16.0),
               child: Builder(
-                builder: (context) => SwitchListTile(
-                  title: Text(
-                    !_drawerMode
-                        ? 'Narrative'
-                        : 'FHIR R4 QuestionnaireResponse JSON',
-                    style: Theme.of(context).textTheme.headline5,
-                  ),
-                  subtitle: !_drawerMode
-                      ? HTML.toRichText(
-                          context,
-                          QuestionnaireFiller.of(context)
-                                  .aggregator<NarrativeAggregator>()
-                                  .aggregate(locale)
-                                  ?.div ??
-                              NarrativeAggregator.emptyNarrative.div,
-                          defaultTextStyle:
-                              Theme.of(context).textTheme.bodyText1)
-                      : ResourceJsonTree(
-                          QuestionnaireFiller.of(context)
-                              .aggregator<QuestionnaireResponseAggregator>()
-                              .aggregate(locale)
-                              ?.toJson(),
-                        ),
-                  secondary: IconButton(
-                    icon: const Icon(Icons.copy),
-                    onPressed: () {
-                      Clipboard.setData(ClipboardData(
-                              text: _drawerMode
-                                  ? jsonEncode(QuestionnaireFiller.of(context)
-                                      .aggregator<
-                                          QuestionnaireResponseAggregator>()
-                                      .aggregate(locale)
-                                      ?.toJson())
-                                  : QuestionnaireFiller.of(context)
-                                      .aggregator<NarrativeAggregator>()
-                                      .aggregate(locale)
-                                      ?.div))
-                          .then((_) {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: _drawerMode
-                                ? const Text(
-                                    'QuestionnaireResponse copied to clipboard')
-                                : const Text('Narrative copied to clipboard')));
+                builder: (context) => Column(children: [
+                  SwitchListTile(
+                    title: Text(
+                      !_drawerMode ? 'Narrative' : 'FHIR R4 JSON',
+                      style: Theme.of(context).textTheme.headline5,
+                    ),
+                    secondary: IconButton(
+                      icon: const Icon(Icons.copy),
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(
+                                text: _drawerMode
+                                    ? jsonEncode(QuestionnaireFiller.of(context)
+                                        .aggregator<
+                                            QuestionnaireResponseAggregator>()
+                                        .aggregate(locale)
+                                        ?.toJson())
+                                    : QuestionnaireFiller.of(context)
+                                        .aggregator<NarrativeAggregator>()
+                                        .aggregate(locale)
+                                        ?.div))
+                            .then((_) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: _drawerMode
+                                  ? const Text(
+                                      'QuestionnaireResponse copied to clipboard')
+                                  : const Text(
+                                      'Narrative copied to clipboard')));
+                        });
+                      },
+                    ),
+                    value: _drawerMode,
+                    onChanged: (newState) {
+                      setState(() {
+                        _drawerMode = newState;
                       });
                     },
                   ),
-                  value: _drawerMode,
-                  onChanged: (newState) {
-                    setState(() {
-                      _drawerMode = newState;
-                    });
-                  },
-                ),
+                  if (!_drawerMode)
+                    HTML.toRichText(
+                        context,
+                        QuestionnaireFiller.of(context)
+                                .aggregator<NarrativeAggregator>()
+                                .aggregate(locale)
+                                ?.div ??
+                            NarrativeAggregator.emptyNarrative.div,
+                        defaultTextStyle: Theme.of(context).textTheme.bodyText1)
+                  else
+                    ResourceJsonTree(
+                      QuestionnaireFiller.of(context)
+                          .aggregator<QuestionnaireResponseAggregator>()
+                          .aggregate(locale)
+                          ?.toJson(),
+                    ),
+                ]),
               ),
             ),
           ),
