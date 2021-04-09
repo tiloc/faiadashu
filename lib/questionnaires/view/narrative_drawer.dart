@@ -30,7 +30,6 @@ class _NarrativeDrawerState extends State<NarrativeDrawer> {
 
     return Card(
       margin: const EdgeInsets.all(8.0),
-      color: Colors.white,
       child: ConstrainedBox(
         constraints:
             BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.7),
@@ -56,7 +55,9 @@ class _NarrativeDrawerState extends State<NarrativeDrawer> {
                                   .aggregator<NarrativeAggregator>()
                                   .aggregate(locale)
                                   ?.div ??
-                              NarrativeAggregator.emptyNarrative.div)
+                              NarrativeAggregator.emptyNarrative.div,
+                          defaultTextStyle:
+                              Theme.of(context).textTheme.bodyText1)
                       : ResourceJsonTree(
                           QuestionnaireFiller.of(context)
                               .aggregator<QuestionnaireResponseAggregator>()

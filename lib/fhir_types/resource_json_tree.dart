@@ -118,7 +118,10 @@ class _MapNodeState extends _JsonNodeState<_JsonViewerMapNode> {
         onTap: () => toggleOpen(),
         child: Row(
           children: <Widget>[
-            Icon(isOpen ? Icons.arrow_drop_down : Icons.arrow_right),
+            Icon(
+              isOpen ? Icons.arrow_drop_down : Icons.arrow_right,
+              color: Theme.of(context).accentColor,
+            ),
             Text(
               widget.nodeName,
               style: Theme.of(context).textTheme.bodyText1,
@@ -181,7 +184,10 @@ class _JsonViewerListNodeState extends _JsonNodeState<_JsonViewerListNode> {
         child: Row(
           children: <Widget>[
             if (count > 0)
-              Icon(isOpen ? Icons.arrow_drop_down : Icons.arrow_right),
+              Icon(
+                isOpen ? Icons.arrow_drop_down : Icons.arrow_right,
+                color: Theme.of(context).accentColor,
+              ),
             Text(
               widget.nodeName,
               style: Theme.of(context).textTheme.bodyText1,
@@ -221,9 +227,9 @@ class _JsonViewerGenericNode extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var color = Colors.black;
+    var color = Theme.of(context).textTheme.bodyText1!.color;
     if (nodeValue == null) {
-      color = Colors.redAccent;
+      color = Theme.of(context).errorColor;
     } else {
       switch (nodeValue.runtimeType) {
         case bool:
