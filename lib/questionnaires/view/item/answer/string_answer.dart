@@ -1,7 +1,7 @@
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../fhir_types/fhir_types_extensions.dart';
+import '../../../model/validation/string_validator.dart';
 import '../../../questionnaires.dart';
 import '../questionnaire_answer_filler.dart';
 
@@ -16,8 +16,8 @@ class StringAnswer extends QuestionnaireAnswerFiller {
 
 class _StringAnswerState
     extends QuestionnaireAnswerState<String, StringAnswer> {
-  late final RegExp? _regExp;
-  late final int _minLength;
+  late final StringValidator _validator;
+
   final _controller = TextEditingController();
 
   _StringAnswerState();
@@ -31,60 +31,16 @@ class _StringAnswerState
   @override
   void initState() {
     super.initState();
+
+    _validator = StringValidator(location, entryFormat);
+
     initialValue = widget.answerLocation.answer?.valueString;
     _controller.text = value ?? '';
-
-    final _regexPattern = qi.extension_
-        ?.extensionOrNull('http://hl7.org/fhir/StructureDefinition/regex')
-        ?.valueString;
-
-    if (_regexPattern != null) {
-      _regExp = RegExp(_regexPattern, unicode: true);
-    } else {
-      _regExp = null;
-    }
-
-    _minLength = qi.extension_
-            ?.extensionOrNull(
-                'http://hl7.org/fhir/StructureDefinition/minLength')
-            ?.valueInteger
-            ?.value ??
-        0;
   }
 
   @override
   Widget buildReadOnly(BuildContext context) {
     return Text(value ?? '');
-  }
-
-  String? _validate(String? inputValue) {
-    if (inputValue == null || inputValue.isEmpty) {
-      return null;
-    }
-
-    if (inputValue.length < _minLength) {
-      return 'Enter $_minLength or more characters.';
-    }
-
-    if (qi.type == QuestionnaireItemType.url) {
-      if (!RegExp(
-              r'^(http|https|ftp|sftp)://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
-          .hasMatch(inputValue)) {
-        return 'Enter a valid URL.';
-      }
-    }
-
-    if (_regExp != null) {
-      if (!_regExp!.hasMatch(inputValue)) {
-        if (entryFormat != null) {
-          return "Provide as '$entryFormat'";
-        } else {
-          return 'Provide a valid answer.';
-        }
-      }
-    }
-
-    return null;
   }
 
   @override
@@ -99,12 +55,12 @@ class _StringAnswerState
             border: const OutlineInputBorder(),
             hintText: entryFormat,
           ),
-          validator: (inputValue) => _validate(inputValue),
+          validator: (inputValue) => _validator.validate(inputValue),
           autovalidateMode: AutovalidateMode.onUserInteraction,
           onChanged: (content) {
             value = content;
           },
-          maxLength: qi.maxLength?.value,
+          maxLength: _validator.maxLength,
         ));
   }
 

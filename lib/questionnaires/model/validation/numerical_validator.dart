@@ -10,7 +10,7 @@ import 'validator.dart';
 
 /// Validates numerical answers.
 class NumericalValidator extends Validator<String> {
-  static final logger = Logger(NumericalValidator);
+  static final _logger = Logger(NumericalValidator);
 
   late final String _numberPattern;
   late final bool _isSliding;
@@ -29,7 +29,7 @@ class NumericalValidator extends Validator<String> {
   NumericalValidator(QuestionnaireLocation location) : super(location) {
     _isSliding = location.questionnaireItem.isItemControl('slider');
 
-    final minValueExtension = location.questionnaireItem.extension_
+    final minValueExtension = qi.extension_
         ?.extensionOrNull('http://hl7.org/fhir/StructureDefinition/minValue');
     final maxValueExtension = location.questionnaireItem.extension_
         ?.extensionOrNull('http://hl7.org/fhir/StructureDefinition/maxValue');
@@ -41,14 +41,14 @@ class NumericalValidator extends Validator<String> {
         (_isSliding ? 100.0 : double.maxFinite);
 
     // TODO: Evaluate max length
-    switch (location.questionnaireItem.type) {
+    switch (qi.type) {
       case QuestionnaireItemType.integer:
         _maxDecimal = 0;
         break;
       case QuestionnaireItemType.decimal:
       case QuestionnaireItemType.quantity:
         // TODO: Evaluate special extensions for quantities
-        _maxDecimal = location.questionnaireItem.extension_
+        _maxDecimal = qi.extension_
                 ?.extensionOrNull(
                     'http://hl7.org/fhir/StructureDefinition/maxDecimalPlaces')
                 ?.valueInteger
@@ -57,7 +57,7 @@ class NumericalValidator extends Validator<String> {
         break;
       default:
         throw StateError(
-            'item.type cannot be ${location.questionnaireItem.type}');
+            'item.type cannot be ${qi.type}');
     }
 
     // Build a number format based on item and SDC properties.
@@ -69,7 +69,7 @@ class NumericalValidator extends Validator<String> {
 
     _numberPattern = '$maxIntegerDigits$maxFractionDigits';
 
-    logger.debug(
+    _logger.debug(
       'input format for ${location.linkId}: "$_numberPattern"',
     );
 
