@@ -2,19 +2,17 @@ import 'package:fhir/r4/resource_types/specialized/definitional_artifacts/defini
 
 import '../../../fhir_types/fhir_types_extensions.dart';
 import '../questionnaire_location.dart';
-import 'validator.dart';
+import 'item_model.dart';
 
-class StringValidator extends Validator<String> {
+class StringItemModel extends ItemModel<String> {
   static final _urlRegExp = RegExp(
       r'^(http|https|ftp|sftp)://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+');
 
   late final RegExp? regExp;
   late final int minLength;
   late final int? maxLength;
-  final String? entryFormat;
 
-  StringValidator(QuestionnaireLocation location, this.entryFormat)
-      : super(location) {
+  StringItemModel(QuestionnaireLocation location) : super(location) {
     final regexPattern = qi.extension_
         ?.extensionOrNull('http://hl7.org/fhir/StructureDefinition/regex')
         ?.valueString;

@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 import '../../../../coding/coding.dart';
 import '../../../../fhir_types/fhir_types_extensions.dart';
 import '../../../../logging/logging.dart';
-import '../../../model/validation/numerical_validator.dart';
+import '../../../model/item/numerical_item_model.dart';
 import '../../../questionnaires.dart';
 
 class NumericalAnswer extends QuestionnaireAnswerFiller {
@@ -21,9 +21,9 @@ class NumericalAnswer extends QuestionnaireAnswerFiller {
 
 class _NumericalAnswerState
     extends QuestionnaireAnswerState<Quantity, NumericalAnswer> {
-  static final logger = Logger(_NumericalAnswerState);
+  static final _logger = Logger(_NumericalAnswerState);
 
-  late final NumericalValidator _validator;
+  late final NumericalItemModel _itemModel;
   late final int? _divisions;
   late final TextInputFormatter _numberInputFormatter;
 
@@ -32,21 +32,21 @@ class _NumericalAnswerState
   @override
   void initState() {
     super.initState();
-    _validator = NumericalValidator(location);
+    _itemModel = NumericalItemModel(location);
 
-    if (_validator.isSliding) {
+    if (_itemModel.isSliding) {
       final sliderStepValueExtension = qi.extension_?.extensionOrNull(
           'http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue');
       final sliderStepValue = sliderStepValueExtension?.valueDecimal?.value ??
           sliderStepValueExtension?.valueInteger?.value?.toDouble();
       _divisions = (sliderStepValue != null)
-          ? ((_validator.maxValue - _validator.minValue) / sliderStepValue)
+          ? ((_itemModel.maxValue - _itemModel.minValue) / sliderStepValue)
               .round()
           : null;
     }
 
     _numberInputFormatter =
-        _NumericalTextInputFormatter(_validator.numberFormat);
+        _NumericalTextInputFormatter(_itemModel.numberFormat);
 
     // TODO: look at initialValue extension
     Quantity? existingValue;
@@ -57,9 +57,9 @@ class _NumericalAnswerState
               ? Quantity(value: firstAnswer.valueDecimal)
               : null);
     }
-    initialValue = (existingValue == null && _validator.isSliding)
+    initialValue = (existingValue == null && _itemModel.isSliding)
         ? Quantity(
-            value: Decimal((_validator.maxValue - _validator.minValue) /
+            value: Decimal((_itemModel.maxValue - _itemModel.minValue) /
                 2.0)) // Slider needs a guaranteed value
         : existingValue;
   }
@@ -117,10 +117,10 @@ class _NumericalAnswerState
       units.add(Coding(code: Code(unit)));
     }
 
-    return _validator.isSliding
+    return _itemModel.isSliding
         ? Slider(
-            min: _validator.minValue,
-            max: _validator.maxValue,
+            min: _itemModel.minValue,
+            max: _itemModel.maxValue,
             divisions: _divisions,
             value: value!.value!.value!, // Yay, triple value!
             onChanged: (sliderValue) {
@@ -137,16 +137,16 @@ class _NumericalAnswerState
                     : null,
                 decoration: InputDecoration(
                   border: const OutlineInputBorder(),
-                  hintText: entryFormat,
+                  hintText: _itemModel.entryFormat,
                 ),
                 inputFormatters: [_numberInputFormatter],
                 keyboardType: TextInputType.number,
                 validator: (inputValue) {
-                  return _validator.validate(inputValue);
+                  return _itemModel.validate(inputValue);
                 },
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 onChanged: (content) {
-                  final valid = _validator.validate(content) == null;
+                  final valid = _itemModel.validate(content) == null;
                   final dataAbsentReasonExtension = !valid
                       ? [
                           FhirExtension(
@@ -166,12 +166,12 @@ class _NumericalAnswerState
                     if (value == null) {
                       value = Quantity(
                           value:
-                              Decimal(_validator.numberFormat.parse(content)),
+                              Decimal(_itemModel.numberFormat.parse(content)),
                           extension_: dataAbsentReasonExtension);
                     } else {
                       value = value!.copyWith(
                           value:
-                              Decimal(_validator.numberFormat.parse(content)),
+                              Decimal(_itemModel.numberFormat.parse(content)),
                           extension_: dataAbsentReasonExtension);
                     }
                   }
@@ -183,7 +183,7 @@ class _NumericalAnswerState
 
   @override
   QuestionnaireResponseAnswer? fillAnswer() {
-    logger.debug('fillAnswer: $value');
+    _logger.debug('fillAnswer: $value');
     if (value == null) {
       return null;
     }

@@ -1,7 +1,7 @@
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
-import '../../../model/validation/string_validator.dart';
+import '../../../model/item/string_item_model.dart';
 import '../../../questionnaires.dart';
 import '../questionnaire_answer_filler.dart';
 
@@ -16,7 +16,7 @@ class StringAnswer extends QuestionnaireAnswerFiller {
 
 class _StringAnswerState
     extends QuestionnaireAnswerState<String, StringAnswer> {
-  late final StringValidator _validator;
+  late final StringItemModel _itemModel;
 
   final _controller = TextEditingController();
 
@@ -32,7 +32,7 @@ class _StringAnswerState
   void initState() {
     super.initState();
 
-    _validator = StringValidator(location, entryFormat);
+    _itemModel = StringItemModel(location);
 
     initialValue = widget.answerLocation.answer?.valueString;
     _controller.text = value ?? '';
@@ -53,14 +53,14 @@ class _StringAnswerState
           maxLines: (qi.type == QuestionnaireItemType.text) ? 4 : 1,
           decoration: InputDecoration(
             border: const OutlineInputBorder(),
-            hintText: entryFormat,
+            hintText: _itemModel.entryFormat,
           ),
-          validator: (inputValue) => _validator.validate(inputValue),
+          validator: (inputValue) => _itemModel.validate(inputValue),
           autovalidateMode: AutovalidateMode.onUserInteraction,
           onChanged: (content) {
             value = content;
           },
-          maxLength: _validator.maxLength,
+          maxLength: _itemModel.maxLength,
         ));
   }
 

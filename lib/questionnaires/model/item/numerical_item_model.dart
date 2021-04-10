@@ -6,11 +6,11 @@ import '../../../fhir_types/fhir_types_extensions.dart';
 import '../../../logging/logger.dart';
 import '../questionnaire_extensions.dart';
 import '../questionnaire_location.dart';
-import 'validator.dart';
+import 'item_model.dart';
 
 /// Validates numerical answers.
-class NumericalValidator extends Validator<String> {
-  static final _logger = Logger(NumericalValidator);
+class NumericalItemModel extends ItemModel<String> {
+  static final _logger = Logger(NumericalItemModel);
 
   late final String _numberPattern;
   late final bool _isSliding;
@@ -26,7 +26,7 @@ class NumericalValidator extends Validator<String> {
   int get maxDecimal => _maxDecimal;
   NumberFormat get numberFormat => _numberFormat;
 
-  NumericalValidator(QuestionnaireLocation location) : super(location) {
+  NumericalItemModel(QuestionnaireLocation location) : super(location) {
     _isSliding = location.questionnaireItem.isItemControl('slider');
 
     final minValueExtension = qi.extension_
@@ -56,8 +56,7 @@ class NumericalValidator extends Validator<String> {
             3; // this is just an assumption what makes sense to your average human...
         break;
       default:
-        throw StateError(
-            'item.type cannot be ${qi.type}');
+        throw StateError('item.type cannot be ${qi.type}');
     }
 
     // Build a number format based on item and SDC properties.

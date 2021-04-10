@@ -1,7 +1,6 @@
 import 'package:fhir/r4/r4.dart';
 import 'package:flutter/material.dart';
 
-import '../../../fhir_types/fhir_types_extensions.dart';
 import '../../../logging/logging.dart';
 import '../../questionnaires.dart';
 
@@ -61,15 +60,6 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller>
   }
 
   V? get value => _value;
-
-  /// Returns the human-readable entry format.
-  ///
-  /// See: http://hl7.org/fhir/R4/extension-entryformat.html
-  String? get entryFormat {
-    return widget.location.questionnaireItem.extension_
-        ?.extensionOrNull('http://hl7.org/fhir/StructureDefinition/entryFormat')
-        ?.valueString;
-  }
 
   @override
   Widget build(BuildContext context) {
