@@ -254,6 +254,39 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             ListTile(
+              title: const Text('Der Argonaut-Fragebogen'),
+              subtitle:
+                  const Text('Ein deutsches Beispiel für einen Fragebogen.'),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => QuestionnaireScrollerPage(
+                        AssetResourceProvider.singleton(Questionnaire,
+                            'assets/instruments/argonaut_sampler.json'),
+                        resourceProvider: resourceProvider,
+                        locale: const Locale('de', 'DE'),
+                      ),
+                    ));
+              },
+            ),
+            ListTile(
+              title: const Text('استبيان "أرجونوت"'),
+              subtitle: const Text('مثال على استبيان عربي.'),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => QuestionnaireScrollerPage(
+                        AssetResourceProvider.singleton(Questionnaire,
+                            'assets/instruments/argonaut_sampler.json'),
+                        resourceProvider: resourceProvider,
+                        locale: const Locale('ar', 'BH'),
+                      ),
+                    ));
+              },
+            ),
+            ListTile(
               title: const Text('PHQ9 Questionnaire Scroller'),
               subtitle:
                   const Text('Simple choice-based survey with a total score.'),

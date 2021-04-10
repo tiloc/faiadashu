@@ -84,7 +84,11 @@ class _FhirDateTimePickerState extends State<FhirDateTimePicker> {
           final time = await showTimePicker(
               initialTime: TimeOfDay.fromDateTime(
                   _dateTimeValue?.value ?? DateTime.now()),
-              context: context);
+              context: context,
+              builder: (context, child) {
+                return Localizations.override(
+                    context: context, locale: locale, child: child);
+              });
 
           if (time == null) {
             return; // Cancelled, don't touch anything

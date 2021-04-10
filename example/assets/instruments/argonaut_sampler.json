@@ -103,6 +103,23 @@
       } ],
       "linkId": "g2.q1",
       "text": "Check the box if the following statement is true.  The average air speed velocity of a laden European swallow is greater than a laden African swallow.",
+      "_text" : {
+        "extension" : [
+          {
+            "extension" : [
+              {
+                "url" : "lang",
+                "valueCode" : "de"
+              },
+              {
+                "url" : "content",
+                "valueString" : "Bitte hier ankreuzen, wenn die folgende Aussage wahr ist: Die Höchstgeschwindigkeit der unbeladenen europäischen Schwalbe ist höher als die der unbeladenen afrikanischen Schwalbe."
+              }
+            ],
+            "url" : "http://hl7.org/fhir/StructureDefinition/translation"
+          }
+        ]
+      },
       "type": "boolean",
       "required": true,
       "repeats": false
