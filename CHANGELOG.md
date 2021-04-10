@@ -1,3 +1,6 @@
+## 0.1.8
+* Support for supportLink
+
 ## 0.1.7
 * Support for open-choice
 * Support for regex
