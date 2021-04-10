@@ -43,20 +43,29 @@ extension FDashDateTimeExtension on FhirDateTime {
   String format(Locale locale, {String defaultText = ''}) {
     final localeCode = locale.toString();
     final DateFormat dateFormat;
+    final japanese = locale.languageCode == 'ja';
     switch (precision) {
       case DateTimePrecision.INVALID:
         return defaultText;
       case DateTimePrecision.FULL:
-        dateFormat = DateFormat.yMd(localeCode).add_jm();
+        dateFormat = (!japanese)
+            ? DateFormat.yMd(localeCode).add_jm()
+            : DateFormat('y年M月d日', localeCode).add_jm();
         break;
       case DateTimePrecision.YYYY:
-        dateFormat = DateFormat.y(localeCode);
+        dateFormat = (!japanese)
+            ? DateFormat.y(localeCode)
+            : DateFormat('y年', localeCode);
         break;
       case DateTimePrecision.YYYYMM:
-        dateFormat = DateFormat.yM(localeCode);
+        dateFormat = (!japanese)
+            ? DateFormat.yM(localeCode)
+            : DateFormat('y年M月', localeCode);
         break;
       case DateTimePrecision.YYYYMMDD:
-        dateFormat = DateFormat.yMd(localeCode);
+        dateFormat = (!japanese)
+            ? DateFormat.yMd(localeCode)
+            : DateFormat('y年M月d日', localeCode);
         break;
     }
     return dateFormat.format(value!);

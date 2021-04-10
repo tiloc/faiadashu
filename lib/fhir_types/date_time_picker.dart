@@ -71,6 +71,7 @@ class _FhirDateTimePickerState extends State<FhirDateTimePicker> {
               initialDate: _dateTimeValue?.value ?? DateTime.now(),
               firstDate: widget.firstDate,
               lastDate: widget.lastDate,
+              locale: locale,
               context: context);
 
           if (date == null) {

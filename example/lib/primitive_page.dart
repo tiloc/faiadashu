@@ -20,6 +20,8 @@ class PrimitivePage extends ExhibitPage {
           locale: const Locale('de', 'DE')),
       const Spacer(),
       Text('Japan', style: Theme.of(context).textTheme.headline6),
+      FhirDateTimeText(FhirDateTime('2010-02'),
+          locale: const Locale('ja', 'JP')),
       FhirDateTimeText(FhirDateTime('2010-02-05 14:02'),
           locale: const Locale('ja', 'JP')),
       const Spacer(),
