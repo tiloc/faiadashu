@@ -19,6 +19,10 @@ Usable in many places (title, text, option) as permitted by the specification.
 #### help
 Display items with itemControl `help` are associated with the proper question and display a help dialog.
 
+#### supportLink
+Support links are recognized and visualized. The particular action behind them is determined through an
+integration point of the SDK.
+
 ![item_help](images/item_help.png)
 #### displayCategory
 `security` and `instructions` are supported.

@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:logging/logging.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'about_page.dart';
 import 'disclaimer_page.dart';
@@ -187,10 +188,25 @@ class _HomePageState extends State<HomePage> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => QuestionnaireScrollerPage(
-                            AssetResourceProvider.singleton(Questionnaire,
-                                'assets/instruments/sdc_demo.json'),
-                            resourceProvider: resourceProvider,
-                            floatingActionButton: fab)));
+                                AssetResourceProvider.singleton(Questionnaire,
+                                    'assets/instruments/sdc_demo.json'),
+                                resourceProvider: resourceProvider,
+                                // Callback for supportLink
+                                onLinkTap: (context, url) async {
+                              if (await canLaunch(url.toString())) {
+                                if (url.scheme == 'https') {
+                                  await launch(url.toString(),
+                                      forceWebView: true,
+                                      enableJavaScript: true);
+                                } else {
+                                  await launch(
+                                    url.toString(),
+                                  );
+                                }
+                              } else {
+                                throw 'Could not launch $url';
+                              }
+                            }, floatingActionButton: fab)));
               },
             ),
             ListTile(

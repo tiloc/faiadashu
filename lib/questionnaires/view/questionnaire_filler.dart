@@ -5,10 +5,20 @@ import '../../logging/logging.dart';
 import '../../resource_provider/resource_provider.dart';
 import '../questionnaires.dart';
 
+/// Fill a [Questionnaire].
+///
+/// Provides visual components to view and fill a [Questionnaire].
+/// The components are provided as a [List] of [Widget]s of type [QuestionnaireItemFiller].
+/// It is up to a higher-level component to present these to the user.
+///
+/// see: [QuestionnaireScrollerPage]
+/// see: [QuestionnaireStepperPage]
 class QuestionnaireFiller extends StatefulWidget {
   final WidgetBuilder builder;
   final ExternalResourceProvider questionnaireProvider;
   final ExternalResourceProvider? questionnaireResponseProvider;
+  final List<Aggregator<dynamic>>? aggregators;
+  final void Function(BuildContext context, Uri url)? onLinkTap;
 
   final ExternalResourceProvider? externalResourceProvider;
   static final logger = Logger(QuestionnaireFiller);
@@ -21,12 +31,12 @@ class QuestionnaireFiller extends StatefulWidget {
         "'Questionnaire' asset");
     final topLocation = QuestionnaireTopLocation.fromQuestionnaire(
         questionnaire,
-        // TODO: Make this a parameter with a default
-        aggregators: [
-          TotalScoreAggregator(),
-          NarrativeAggregator(),
-          QuestionnaireResponseAggregator()
-        ],
+        aggregators: aggregators ??
+            [
+              TotalScoreAggregator(),
+              NarrativeAggregator(),
+              QuestionnaireResponseAggregator()
+            ],
         externalResourceProvider: externalResourceProvider);
 
     await Future.wait([
@@ -46,7 +56,9 @@ class QuestionnaireFiller extends StatefulWidget {
       {Key? key,
       required this.builder,
       this.externalResourceProvider,
-      this.questionnaireResponseProvider})
+      this.questionnaireResponseProvider,
+      this.aggregators,
+      this.onLinkTap})
       : super(key: key);
 
   static QuestionnaireFillerData of(BuildContext context) {
@@ -86,7 +98,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
   }
 
   void _onTopChange() {
-    logger.log('_onTopChange', level: LogLevel.trace);
+    logger.trace('_onTopChange');
     if (mounted) {
       setState(() {});
     }
@@ -94,7 +106,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
 
   @override
   Widget build(BuildContext context) {
-    logger.log('Enter build()', level: LogLevel.trace);
+    logger.trace('Enter build()');
     return FutureBuilder<QuestionnaireTopLocation>(
         future: builderFuture,
         builder: (context, snapshot) {
@@ -126,6 +138,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
                 return QuestionnaireFillerData._(
                   _topLocation!,
                   builder: widget.builder,
+                  onLinkTap: widget.onLinkTap,
                 );
               }
               throw StateError(
@@ -139,12 +152,14 @@ class QuestionnaireFillerData extends InheritedWidget {
   static final logger = Logger(QuestionnaireFillerData);
   final QuestionnaireTopLocation topLocation;
   final Iterable<QuestionnaireLocation> surveyLocations;
+  final void Function(BuildContext context, Uri url)? onLinkTap;
   late final List<QuestionnaireItemFiller?> _itemFillers;
   late final int _revision;
 
   QuestionnaireFillerData._(
     this.topLocation, {
     Key? key,
+    this.onLinkTap,
     required WidgetBuilder builder,
   })   : _revision = topLocation.revision,
         surveyLocations = topLocation.preOrder(),

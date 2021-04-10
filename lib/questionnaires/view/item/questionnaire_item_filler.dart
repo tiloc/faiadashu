@@ -89,7 +89,7 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final leading = QuestionnaireItemFillerTitleLeading.forLocation(location);
-    final help = QuestionnaireItemFillerHelp.forLocation(location);
+    final help = _QuestionnaireItemFillerHelpFactory.forLocation(location);
 
     final requiredTag =
         (location.questionnaireItem.required_?.value == true) ? '*' : '';
@@ -123,25 +123,39 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
   }
 }
 
-class QuestionnaireItemFillerHelp extends StatefulWidget {
-  final QuestionnaireLocation ql;
-
-  const QuestionnaireItemFillerHelp._(this.ql, {Key? key}) : super(key: key);
-
+class _QuestionnaireItemFillerHelpFactory {
   static Widget? forLocation(QuestionnaireLocation location, {Key? key}) {
     final helpLocation = location.helpLocation;
 
-    return (helpLocation != null)
-        ? QuestionnaireItemFillerHelp._(helpLocation, key: key)
-        : null;
-  }
+    if (helpLocation != null) {
+      return _QuestionnaireItemFillerHelp(helpLocation, key: key);
+    }
 
-  @override
-  State<StatefulWidget> createState() => QuestionnaireItemFillerHelpState();
+    final supportLink = location.questionnaireItem.extension_
+        ?.extensionOrNull(
+            'http://hl7.org/fhir/StructureDefinition/questionnaire-supportLink')
+        ?.valueUri
+        ?.value;
+
+    if (supportLink != null) {
+      return _QuestionnaireItemFillerSupportLink(supportLink, key: key);
+    }
+
+    return null;
+  }
 }
 
-class QuestionnaireItemFillerHelpState
-    extends State<QuestionnaireItemFillerHelp> {
+class _QuestionnaireItemFillerHelp extends StatefulWidget {
+  final QuestionnaireLocation ql;
+
+  const _QuestionnaireItemFillerHelp(this.ql, {Key? key}) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() => _QuestionnaireItemFillerHelpState();
+}
+
+class _QuestionnaireItemFillerHelpState
+    extends State<_QuestionnaireItemFillerHelp> {
   @override
   Widget build(BuildContext context) {
     return IconButton(
@@ -176,6 +190,27 @@ class QuestionnaireItemFillerHelpState
             ],
           );
         });
+  }
+}
+
+class _QuestionnaireItemFillerSupportLink extends StatelessWidget {
+  static final logger = Logger(_QuestionnaireItemFillerSupportLink);
+  final Uri supportLink;
+
+  const _QuestionnaireItemFillerSupportLink(this.supportLink, {Key? key})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      mouseCursor: SystemMouseCursors.help,
+      color: Theme.of(context).accentColor,
+      icon: const Icon(Icons.info_outline),
+      onPressed: () {
+        logger.debug("supportLink '${supportLink.toString()}'");
+        QuestionnaireFiller.of(context).onLinkTap?.call(context, supportLink);
+      },
+    );
   }
 }
 

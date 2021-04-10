@@ -11,7 +11,7 @@ dependencies:
   faiadashu:
     path: ..
 
-  fhir: ^0.4.2
+  fhir: ^0.4.3
 #  fhir:
 #    path: /Users/tilo/Projects/fhir/fhir
 
@@ -21,6 +21,8 @@ dependencies:
     sdk: flutter
 
   logging: ^1.0.1
+
+  url_launcher: ^6.0.3
 
 dev_dependencies:
   lint: ^1.0.0

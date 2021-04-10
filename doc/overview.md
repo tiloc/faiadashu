@@ -114,6 +114,42 @@ final response = QuestionnaireFiller.of(context)
     .aggregate(locale);
 ```
 
+##### URL launching
+It is up to the finished application if and how it wants to launch external URLs. The SDK offers an integration point
+through the `onLinkTap` function which is called every time a user taps a link - a `supportLink` for instance.
+
+The example app illustrates how to use the popular [url_launcher](https://pub.dev/packages/url_launcher) package to implement this.
+
+--------------------
+
+When using `url_launcher` it is important to follow the native setup instructions for iOS and Android 11.
+
+--------------------
+
+```dart
+final widget = QuestionnaireScrollerPage(
+    AssetResourceProvider.singleton(Questionnaire,
+        'assets/instruments/sdc_demo.json'),
+    resourceProvider: resourceProvider,
+    floatingActionButton: fab,
+    onLinkTap: (context, url) async {
+      if (await canLaunch(url.toString())) {
+        if (url.scheme == 'https') {
+          await launch(url.toString(),
+              forceWebView: true,
+              enableJavaScript: true);
+        } else {
+          await launch(
+            url.toString(),
+          );
+        }
+      } else {
+        throw 'Could not launch $url';
+      }
+    }
+);
+```
+
 ##### Error handling
 ###### During initialization
 A `QuestionnaireFormatException` is thrown.
