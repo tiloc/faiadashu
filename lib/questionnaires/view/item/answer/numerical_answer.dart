@@ -1,13 +1,13 @@
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../coding/coding.dart';
 import '../../../../fhir_types/fhir_types_extensions.dart';
 import '../../../../logging/logging.dart';
 import '../../../model/item/numerical_item_model.dart';
 import '../../../questionnaires.dart';
+import 'numerical_input.dart';
 
 class NumericalAnswer extends QuestionnaireAnswerFiller {
   const NumericalAnswer(
@@ -46,7 +46,7 @@ class _NumericalAnswerState
     }
 
     _numberInputFormatter =
-        _NumericalTextInputFormatter(_itemModel.numberFormat);
+        NumericalTextInputFormatter(_itemModel.numberFormat);
 
     // TODO: look at initialValue extension
     Quantity? existingValue;
@@ -205,39 +205,6 @@ class _NumericalAnswerState
             : null;
       default:
         throw StateError('item.type cannot be ${qi.type}');
-    }
-  }
-}
-
-/// An input formatter for internationalized input of numbers.
-class _NumericalTextInputFormatter extends TextInputFormatter {
-  static final _logger = Logger(_NumericalTextInputFormatter);
-  final NumberFormat numberFormat;
-  _NumericalTextInputFormatter(this.numberFormat);
-
-  @override
-  TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
-    if (newValue.text.isEmpty) {
-      return newValue;
-    }
-    // Group separator is causing lots of trouble. Suppress.
-    if (newValue.text.contains(numberFormat.symbols.GROUP_SEP)) {
-      return oldValue;
-    }
-
-    // NumberFormat.parse is not preventing decimal points on integers.
-    if (newValue.text.contains(numberFormat.symbols.DECIMAL_SEP) &&
-        numberFormat.maximumFractionDigits == 0) {
-      return oldValue;
-    }
-
-    try {
-      final parsed = numberFormat.parse(newValue.text);
-      _logger.trace('parsed: ${newValue.text} -> $parsed');
-      return newValue;
-    } catch (_) {
-      return oldValue;
     }
   }
 }
