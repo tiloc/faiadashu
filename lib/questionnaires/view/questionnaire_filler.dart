@@ -14,6 +14,7 @@ import '../questionnaires.dart';
 /// see: [QuestionnaireScrollerPage]
 /// see: [QuestionnaireStepperPage]
 class QuestionnaireFiller extends StatefulWidget {
+  final Locale locale;
   final WidgetBuilder builder;
   final ExternalResourceProvider questionnaireProvider;
   final ExternalResourceProvider? questionnaireResponseProvider;
@@ -31,6 +32,7 @@ class QuestionnaireFiller extends StatefulWidget {
         "'Questionnaire' asset");
     final topLocation = QuestionnaireTopLocation.fromQuestionnaire(
         questionnaire,
+        locale: locale,
         aggregators: aggregators ??
             [
               TotalScoreAggregator(),
@@ -54,6 +56,7 @@ class QuestionnaireFiller extends StatefulWidget {
 
   const QuestionnaireFiller(this.questionnaireProvider,
       {Key? key,
+      required this.locale,
       required this.builder,
       this.externalResourceProvider,
       this.questionnaireResponseProvider,
@@ -137,6 +140,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
                 }
                 return QuestionnaireFillerData._(
                   _topLocation!,
+                  locale: widget.locale,
                   builder: widget.builder,
                   onLinkTap: widget.onLinkTap,
                 );
@@ -150,6 +154,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
 
 class QuestionnaireFillerData extends InheritedWidget {
   static final logger = Logger(QuestionnaireFillerData);
+  final Locale locale;
   final QuestionnaireTopLocation topLocation;
   final Iterable<QuestionnaireLocation> surveyLocations;
   final void Function(BuildContext context, Uri url)? onLinkTap;
@@ -159,6 +164,7 @@ class QuestionnaireFillerData extends InheritedWidget {
   QuestionnaireFillerData._(
     this.topLocation, {
     Key? key,
+    required this.locale,
     this.onLinkTap,
     required WidgetBuilder builder,
   })   : _revision = topLocation.revision,

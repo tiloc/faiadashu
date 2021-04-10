@@ -23,7 +23,9 @@ Support for the FHIR Standard is focussed on the R4 release which is located her
 Theme - including text and colors - is obtained through the Material theme of the app. Both dark and light schemes work.
 
 ### Locale
-Locale is obtained through `Localizations.localeOf(context)`
+Locale is explicitly passed to the library during the initialization of the `QuestionnaireFiller`.
+
+Each filling of a questionnaire can use a different locale, but it cannot be changed while a questionnaire is being filled.
 
 ### Logging
 The library is logging through the 'logging' package: https://pub.dev/packages/logging

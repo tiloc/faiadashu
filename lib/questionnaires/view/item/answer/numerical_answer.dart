@@ -1,11 +1,12 @@
-import 'package:faiadashu/coding/coding.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../coding/coding.dart';
 import '../../../../fhir_types/fhir_types_extensions.dart';
 import '../../../../logging/logging.dart';
+import '../../../model/validation/numerical_validator.dart';
 import '../../../questionnaires.dart';
 
 class NumericalAnswer extends QuestionnaireAnswerFiller {
@@ -22,73 +23,31 @@ class _NumericalAnswerState
     extends QuestionnaireAnswerState<Quantity, NumericalAnswer> {
   static final logger = Logger(_NumericalAnswerState);
 
-  late final String _numberFormat;
-  late final bool _isSlider;
-  late final double _minValue;
-  late final double _maxValue;
-  late final int _maxDecimal;
+  late final NumericalValidator _validator;
   late final int? _divisions;
+  late final TextInputFormatter _numberInputFormatter;
 
   _NumericalAnswerState();
 
   @override
   void initState() {
     super.initState();
-    _isSlider = widget.location.questionnaireItem.isItemControl('slider');
+    _validator = NumericalValidator(widget.location);
 
-    // TODO: Enhancement: This could all be moved into a model.
-    final minValueExtension = widget.location.questionnaireItem.extension_
-        ?.extensionOrNull('http://hl7.org/fhir/StructureDefinition/minValue');
-    final maxValueExtension = widget.location.questionnaireItem.extension_
-        ?.extensionOrNull('http://hl7.org/fhir/StructureDefinition/maxValue');
-    _minValue = minValueExtension?.valueDecimal?.value ??
-        minValueExtension?.valueInteger?.value?.toDouble() ??
-        0.0;
-    _maxValue = maxValueExtension?.valueDecimal?.value ??
-        maxValueExtension?.valueInteger?.value?.toDouble() ??
-        (_isSlider ? 100.0 : double.maxFinite);
-
-    if (_isSlider) {
+    if (_validator.isSliding) {
       final sliderStepValueExtension =
           widget.location.questionnaireItem.extension_?.extensionOrNull(
               'http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue');
       final sliderStepValue = sliderStepValueExtension?.valueDecimal?.value ??
           sliderStepValueExtension?.valueInteger?.value?.toDouble();
       _divisions = (sliderStepValue != null)
-          ? ((_maxValue - _minValue) / sliderStepValue).round()
+          ? ((_validator.maxValue - _validator.minValue) / sliderStepValue)
+              .round()
           : null;
     }
-    // TODO: Evaluate max length
-    switch (widget.location.questionnaireItem.type) {
-      case QuestionnaireItemType.integer:
-        _maxDecimal = 0;
-        break;
-      case QuestionnaireItemType.decimal:
-      case QuestionnaireItemType.quantity:
-        // TODO: Evaluate special extensions for quantities
-        _maxDecimal = widget.location.questionnaireItem.extension_
-                ?.extensionOrNull(
-                    'http://hl7.org/fhir/StructureDefinition/maxDecimalPlaces')
-                ?.valueInteger
-                ?.value ??
-            3; // this is just an assumption what makes sense to your average human...
-        break;
-      default:
-        throw StateError(
-            'item.type cannot be ${widget.location.questionnaireItem.type}');
-    }
 
-    // Build a number format based on item and SDC properties.
-    final maxIntegerDigits = (_maxValue != double.maxFinite)
-        ? '############'.substring(0, _maxValue.toInt().toString().length)
-        : '############';
-    final maxFractionDigits =
-        (_maxDecimal != 0) ? '.0#####'.substring(0, _maxDecimal + 1) : '';
-
-    _numberFormat = '$maxIntegerDigits$maxFractionDigits';
-
-    logger.log('input format for ${widget.location.linkId}: "$_numberFormat"',
-        level: LogLevel.debug);
+    _numberInputFormatter =
+        _NumericalTextInputFormatter(_validator.numberFormat);
 
     // TODO: look at initialValue extension
     Quantity? existingValue;
@@ -99,17 +58,16 @@ class _NumericalAnswerState
               ? Quantity(value: firstAnswer.valueDecimal)
               : null);
     }
-    initialValue = (existingValue == null && _isSlider)
+    initialValue = (existingValue == null && _validator.isSliding)
         ? Quantity(
-            value: Decimal((_maxValue - _minValue) /
+            value: Decimal((_validator.maxValue - _validator.minValue) /
                 2.0)) // Slider needs a guaranteed value
         : existingValue;
   }
 
   @override
   Widget buildReadOnly(BuildContext context) {
-    return Text(
-        (value != null) ? value!.format(Localizations.localeOf(context)) : '');
+    return Text(value?.format(Localizations.localeOf(context)) ?? '');
   }
 
   Widget _buildDropDownFromUnits(BuildContext context, List<Coding> units) {
@@ -144,40 +102,9 @@ class _NumericalAnswerState
         ));
   }
 
-  String? _validate(
-      String? inputValue, NumberFormat numberInputFormat, Locale locale) {
-    if (inputValue == null || inputValue.isEmpty) {
-      return null;
-    }
-    num number = double.nan;
-    try {
-      number = numberInputFormat.parse(inputValue);
-    } catch (_) {
-      // Ignore FormatException, number remains nan.
-    }
-    if (number == double.nan) {
-      return '$inputValue is not a valid number.';
-    }
-    if (number > _maxValue) {
-      return 'Enter a number up to ${Decimal(_maxValue).format(locale)}.';
-    }
-    if (number < _minValue) {
-      return 'Enter a number ${Decimal(_minValue).format(locale)}, or higher.';
-    }
-  }
-
   @override
   Widget buildEditable(BuildContext context) {
-    final numberInputFormat = NumberFormat(
-        _numberFormat,
-        Localizations.localeOf(context)
-            .toLanguageTag()); // TODO: toString or toLanguageTag?
-
-    final numberInputFormatter =
-        _NumericalTextInputFormatter(numberInputFormat);
-
     final qi = widget.location.questionnaireItem;
-    final locale = Localizations.localeOf(context);
     final unit = qi.unit;
     final units = <Coding>[];
     final unitsUri = qi.extension_
@@ -193,10 +120,10 @@ class _NumericalAnswerState
       units.add(Coding(code: Code(unit)));
     }
 
-    return _isSlider
+    return _validator.isSliding
         ? Slider(
-            min: _minValue,
-            max: _maxValue,
+            min: _validator.minValue,
+            max: _validator.maxValue,
             divisions: _divisions,
             value: value!.value!.value!, // Yay, triple value!
             onChanged: (sliderValue) {
@@ -215,15 +142,14 @@ class _NumericalAnswerState
                   border: const OutlineInputBorder(),
                   hintText: entryFormat,
                 ),
-                inputFormatters: [numberInputFormatter],
+                inputFormatters: [_numberInputFormatter],
                 keyboardType: TextInputType.number,
                 validator: (inputValue) {
-                  return _validate(inputValue, numberInputFormat, locale);
+                  return _validator.validate(inputValue);
                 },
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 onChanged: (content) {
-                  final valid =
-                      _validate(content, numberInputFormat, locale) == null;
+                  final valid = _validator.validate(content) == null;
                   final dataAbsentReasonExtension = !valid
                       ? [
                           FhirExtension(
@@ -242,11 +168,13 @@ class _NumericalAnswerState
                   } else {
                     if (value == null) {
                       value = Quantity(
-                          value: Decimal(numberInputFormat.parse(content)),
+                          value:
+                              Decimal(_validator.numberFormat.parse(content)),
                           extension_: dataAbsentReasonExtension);
                     } else {
                       value = value!.copyWith(
-                          value: Decimal(numberInputFormat.parse(content)),
+                          value:
+                              Decimal(_validator.numberFormat.parse(content)),
                           extension_: dataAbsentReasonExtension);
                     }
                   }
@@ -258,7 +186,7 @@ class _NumericalAnswerState
 
   @override
   QuestionnaireResponseAnswer? fillAnswer() {
-    logger.log('fillAnswer: $value', level: LogLevel.debug);
+    logger.debug('fillAnswer: $value');
     if (value == null) {
       return null;
     }

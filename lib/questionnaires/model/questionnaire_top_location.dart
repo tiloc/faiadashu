@@ -12,6 +12,7 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
   final List<Aggregator>? _aggregators;
   final ExternalResourceProvider? _extResourceProvider;
   int _revision = 1;
+  final Locale locale;
   static final logger = Logger(QuestionnaireTopLocation);
 
   /// Create the first location top-down of the given [Questionnaire].
@@ -19,7 +20,8 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
   /// A newly constructed [QuestionnaireTopLocation] will require an invocation of
   /// [init], or it might malfunction!
   QuestionnaireTopLocation.fromQuestionnaire(Questionnaire questionnaire,
-      {List<Aggregator>? aggregators,
+      {required this.locale,
+      List<Aggregator>? aggregators,
       ExternalResourceProvider? externalResourceProvider})
       : _aggregators = aggregators,
         _extResourceProvider = externalResourceProvider,

@@ -23,6 +23,7 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
   Widget build(BuildContext context) {
     final controller = PageController();
     return QuestionnaireFiller(widget.questionnaireProvider,
+        locale: Localizations.localeOf(context),
         builder: (BuildContext context) => Scaffold(
             appBar: AppBar(
               leading: Builder(
