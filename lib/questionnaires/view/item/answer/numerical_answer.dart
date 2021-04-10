@@ -32,12 +32,11 @@ class _NumericalAnswerState
   @override
   void initState() {
     super.initState();
-    _validator = NumericalValidator(widget.location);
+    _validator = NumericalValidator(location);
 
     if (_validator.isSliding) {
-      final sliderStepValueExtension =
-          widget.location.questionnaireItem.extension_?.extensionOrNull(
-              'http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue');
+      final sliderStepValueExtension = qi.extension_?.extensionOrNull(
+          'http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue');
       final sliderStepValue = sliderStepValueExtension?.valueDecimal?.value ??
           sliderStepValueExtension?.valueInteger?.value?.toDouble();
       _divisions = (sliderStepValue != null)
@@ -51,7 +50,7 @@ class _NumericalAnswerState
 
     // TODO: look at initialValue extension
     Quantity? existingValue;
-    final firstAnswer = widget.location.responseItem?.answer?.firstOrNull;
+    final firstAnswer = location.responseItem?.answer?.firstOrNull;
     if (firstAnswer != null) {
       existingValue = firstAnswer.valueQuantity ??
           ((firstAnswer.valueDecimal != null)
@@ -77,7 +76,7 @@ class _NumericalAnswerState
           padding: const EdgeInsets.only(left: 8, top: 16),
           width: 96,
           child: Text(
-            units.first.localizedDisplay(Localizations.localeOf(context)),
+            units.first.localizedDisplay(locale),
             style: Theme.of(context).textTheme.subtitle1,
           ));
     }
@@ -95,8 +94,7 @@ class _NumericalAnswerState
           items: units.map<DropdownMenuItem<String>>((Coding value) {
             return DropdownMenuItem<String>(
               value: value.code!.value,
-              child:
-                  Text(value.localizedDisplay(Localizations.localeOf(context))),
+              child: Text(value.localizedDisplay(locale)),
             );
           }).toList(),
         ));
@@ -104,7 +102,6 @@ class _NumericalAnswerState
 
   @override
   Widget buildEditable(BuildContext context) {
-    final qi = widget.location.questionnaireItem;
     final unit = qi.unit;
     final units = <Coding>[];
     final unitsUri = qi.extension_
@@ -113,7 +110,7 @@ class _NumericalAnswerState
         ?.valueCanonical
         .toString();
     if (unitsUri != null) {
-      widget.location.top.visitValueSet(unitsUri, (coding) {
+      top.visitValueSet(unitsUri, (coding) {
         units.add(coding);
       }, context: qi.linkId);
     } else if (unit != null) {
@@ -191,7 +188,7 @@ class _NumericalAnswerState
       return null;
     }
 
-    switch (widget.location.questionnaireItem.type) {
+    switch (qi.type) {
       case QuestionnaireItemType.decimal:
         return (value!.value != null)
             ? QuestionnaireResponseAnswer(
@@ -207,15 +204,14 @@ class _NumericalAnswerState
                 extension_: value!.extension_)
             : null;
       default:
-        throw StateError(
-            'item.type cannot be ${widget.location.questionnaireItem.type}');
+        throw StateError('item.type cannot be ${qi.type}');
     }
   }
 }
 
 /// An input formatter for internationalized input of numbers.
 class _NumericalTextInputFormatter extends TextInputFormatter {
-  static final logger = Logger(_NumericalTextInputFormatter);
+  static final _logger = Logger(_NumericalTextInputFormatter);
   final NumberFormat numberFormat;
   _NumericalTextInputFormatter(this.numberFormat);
 
@@ -238,7 +234,7 @@ class _NumericalTextInputFormatter extends TextInputFormatter {
 
     try {
       final parsed = numberFormat.parse(newValue.text);
-      logger.trace('parsed: ${newValue.text} -> $parsed');
+      _logger.trace('parsed: ${newValue.text} -> $parsed');
       return newValue;
     } catch (_) {
       return oldValue;

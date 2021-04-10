@@ -12,7 +12,6 @@ import '../../broken_questionnaire_item.dart';
 import '../../xhtml.dart';
 
 class ChoiceAnswer extends QuestionnaireAnswerFiller {
-  static final logger = Logger(ChoiceAnswer);
   // This class uses CodeableConcept to model multiple choice and open choice.
 
   const ChoiceAnswer(
@@ -25,7 +24,7 @@ class ChoiceAnswer extends QuestionnaireAnswerFiller {
 
 class _ChoiceAnswerState
     extends QuestionnaireAnswerState<CodeableConcept, ChoiceAnswer> {
-  static final logger = Logger(_ChoiceAnswerState);
+  static final _logger = Logger(_ChoiceAnswerState);
   // ignore: prefer_collection_literals
   final _answerOptions = LinkedHashMap<String, QuestionnaireAnswerOption>();
   Object? _initFailure;
@@ -51,14 +50,13 @@ class _ChoiceAnswerState
                 .toList());
       }
     } catch (exception) {
-      logger.log(
+      _logger.log(
           'Could not initialize ChoiceAnswer for ${widget.location.linkId}',
           error: exception);
       _initFailure = exception;
     }
 
-    if (widget.location.questionnaireItem.type ==
-        QuestionnaireItemType.open_choice) {
+    if (qi.type == QuestionnaireItemType.open_choice) {
       // TODO: Set initialValue
       _otherChoiceController = TextEditingController();
     }
@@ -104,7 +102,7 @@ class _ChoiceAnswerState
   @override
   Widget buildReadOnly(BuildContext context) {
     return (_initFailure == null)
-        ? Text(value?.localizedDisplay(Localizations.localeOf(context)) ?? '-')
+        ? Text(value?.localizedDisplay(locale) ?? '-')
         : BrokenQuestionnaireItem.fromException(_initFailure!);
   }
 
@@ -115,10 +113,8 @@ class _ChoiceAnswerState
     }
 
     try {
-      if (!(widget.location.questionnaireItem.repeats == Boolean(true)) &&
-          (_answerOptions.length > 10 ||
-              widget.location.questionnaireItem
-                  .isItemControl('autocomplete'))) {
+      if (!(qi.repeats == Boolean(true)) &&
+          (_answerOptions.length > 10 || qi.isItemControl('autocomplete'))) {
         return _buildLookupAnswers(context);
       } else {
         return _buildChoiceAnswers(context);
@@ -147,7 +143,7 @@ class _ChoiceAnswerState
   /// Turn on/off the checkbox with the provided [toggleValue].
   /// Used in repeating items.
   CodeableConcept? _fillToggledValue(String? toggleValue) {
-    logger.log('Enter fillToggledValue $toggleValue', level: LogLevel.trace);
+    _logger.log('Enter fillToggledValue $toggleValue', level: LogLevel.trace);
     if (toggleValue == null) {
       return null;
     }
@@ -158,15 +154,16 @@ class _ChoiceAnswerState
     final entryIndex = value!.coding!
         .indexWhere((coding) => coding.code?.value == toggleValue);
     if (entryIndex == -1) {
-      logger.log('$toggleValue currently not selected.', level: LogLevel.debug);
+      _logger.log('$toggleValue currently not selected.',
+          level: LogLevel.debug);
       final enabledCodeableConcept = _fillValue(toggleValue)!;
       final enabledCoding = enabledCodeableConcept.coding!.first;
       if (_isExclusive(enabledCoding)) {
-        logger.log('$toggleValue isExclusive', level: LogLevel.debug);
+        _logger.log('$toggleValue isExclusive', level: LogLevel.debug);
         // The newly enabled checkbox is exclusive, kill all others.
         return enabledCodeableConcept;
       } else {
-        logger.log('$toggleValue is not exclusive', level: LogLevel.debug);
+        _logger.log('$toggleValue is not exclusive', level: LogLevel.debug);
         // Kill all exclusive ones.
         return value!.copyWith(coding: [
           ...value!.coding!.whereNot((coding) => _isExclusive(coding)),
@@ -174,7 +171,7 @@ class _ChoiceAnswerState
         ]);
       }
     } else {
-      logger.log('$toggleValue currently selected.', level: LogLevel.debug);
+      _logger.log('$toggleValue currently selected.', level: LogLevel.debug);
       return CodeableConcept(coding: value!.coding!..removeAt(entryIndex));
     }
   }
@@ -269,8 +266,6 @@ class _ChoiceAnswerState
 
   /// Convert [ValueSet]s or [QuestionnaireAnswerOption]s to normalized [QuestionnaireAnswerOption]s
   void _createAnswerOptions() {
-    final qi = widget.location.questionnaireItem;
-
     if (qi.answerValueSet != null) {
       final key = qi.answerValueSet?.value?.toString();
       if (key == null) {
@@ -278,7 +273,7 @@ class _ChoiceAnswerState
             'Questionnaire choice item does not specify a key', qi);
       }
 
-      widget.location.top.visitValueSet(key, _addAnswerOption, context: qi);
+      top.visitValueSet(key, _addAnswerOption, context: qi);
     } else {
       if (qi.answerOption != null) {
         _answerOptions.addEntries(qi.answerOption!.map<
@@ -299,7 +294,6 @@ class _ChoiceAnswerState
   }
 
   Widget _buildChoiceAnswers(BuildContext context) {
-    final qi = widget.location.questionnaireItem;
     final isCheckBox = qi.isItemControl('check-box');
     final isMultipleChoice = (qi.repeats?.value ?? isCheckBox) == true;
 
@@ -324,9 +318,9 @@ class _ChoiceAnswerState
       final optionPrefixDisplay =
           (optionPrefix != null) ? '$optionPrefix ' : '';
       final optionTitle =
-          '$optionPrefixDisplay${choice.localizedDisplay(Localizations.localeOf(context))}';
-      final styledOptionTitle = Xhtml.toWidget(context, widget.location.top,
-          optionTitle, choice.valueStringElement?.extension_,
+          '$optionPrefixDisplay${choice.localizedDisplay(locale)}';
+      final styledOptionTitle = Xhtml.toWidget(
+          context, top, optionTitle, choice.valueStringElement?.extension_,
           width: 100, height: 100);
 
       choices.add(isMultipleChoice
@@ -405,7 +399,6 @@ class _ChoiceAnswerState
   }
 
   Widget _buildLookupAnswers(BuildContext context) {
-    final locale = Localizations.localeOf(context);
     return FDashAutocomplete<QuestionnaireAnswerOption>(
       initialValue: value?.localizedDisplay(locale),
       displayStringForOption: (answerOption) =>

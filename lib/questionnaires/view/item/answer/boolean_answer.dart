@@ -25,6 +25,7 @@ class _BooleanItemState
 
   @override
   Widget buildReadOnly(BuildContext context) {
+    // TODO: Localized, human-readable output.
     return Text(value?.toString() ?? '');
   }
 

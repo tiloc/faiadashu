@@ -9,7 +9,6 @@ import '../../questionnaires.dart';
 abstract class QuestionnaireAnswerFiller extends StatefulWidget {
   final QuestionnaireLocation location;
   final AnswerLocation answerLocation;
-  static final logger = Logger(QuestionnaireAnswerFiller);
 
   const QuestionnaireAnswerFiller(this.location, this.answerLocation,
       {Key? key})
@@ -18,8 +17,13 @@ abstract class QuestionnaireAnswerFiller extends StatefulWidget {
 
 abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller>
     extends State<W> {
-  static final logger = Logger(QuestionnaireAnswerState);
+  static final _abstractLogger = Logger(QuestionnaireAnswerState);
   V? _value;
+
+  QuestionnaireItem get qi => widget.location.questionnaireItem;
+  Locale get locale => widget.location.top.locale;
+  QuestionnaireTopLocation get top => widget.location.top;
+  QuestionnaireLocation get location => widget.location;
 
   QuestionnaireAnswerState();
 
@@ -51,7 +55,8 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller>
 
   // ignore: avoid_setters_without_getters
   set initialValue(V? initialValue) {
-    logger.debug('initialValue ${widget.location.linkId} = $initialValue');
+    _abstractLogger
+        .debug('initialValue ${widget.location.linkId} = $initialValue');
     _value = initialValue;
   }
 

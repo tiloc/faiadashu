@@ -29,7 +29,7 @@ class _DateTimeAnswerState
             ? FhirDateTime(widget.answerLocation.answer?.valueDate
                 .toString()) // TODO: File a PR to allow construction of FhirDateTime directly from Date.
             : null) ??
-        ((widget.location.questionnaireItem.extension_
+        ((qi.extension_
                     ?.extensionOrNull(
                         'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression')
                     ?.valueExpression
@@ -50,7 +50,7 @@ class _DateTimeAnswerState
 
   @override
   Widget buildEditable(BuildContext context) {
-    final itemType = widget.location.questionnaireItem.type;
+    final itemType = qi.type;
 
     final initialDate = (itemType != QuestionnaireItemType.time) ? value : null;
 
@@ -76,7 +76,7 @@ class _DateTimeAnswerState
 
   @override
   QuestionnaireResponseAnswer? fillAnswer() {
-    final itemType = widget.location.questionnaireItem.type;
+    final itemType = qi.type;
 
     if (value?.value == null) {
       return null;

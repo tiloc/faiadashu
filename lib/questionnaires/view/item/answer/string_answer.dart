@@ -34,7 +34,7 @@ class _StringAnswerState
     initialValue = widget.answerLocation.answer?.valueString;
     _controller.text = value ?? '';
 
-    final _regexPattern = widget.location.questionnaireItem.extension_
+    final _regexPattern = qi.extension_
         ?.extensionOrNull('http://hl7.org/fhir/StructureDefinition/regex')
         ?.valueString;
 
@@ -44,7 +44,7 @@ class _StringAnswerState
       _regExp = null;
     }
 
-    _minLength = widget.location.questionnaireItem.extension_
+    _minLength = qi.extension_
             ?.extensionOrNull(
                 'http://hl7.org/fhir/StructureDefinition/minLength')
             ?.valueInteger
@@ -66,7 +66,7 @@ class _StringAnswerState
       return 'Enter $_minLength or more characters.';
     }
 
-    if (widget.location.questionnaireItem.type == QuestionnaireItemType.url) {
+    if (qi.type == QuestionnaireItemType.url) {
       if (!RegExp(
               r'^(http|https|ftp|sftp)://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
           .hasMatch(inputValue)) {
@@ -94,10 +94,7 @@ class _StringAnswerState
         child: TextFormField(
           keyboardType: TextInputType.text,
           controller: _controller,
-          maxLines: (widget.location.questionnaireItem.type ==
-                  QuestionnaireItemType.text)
-              ? 4
-              : 1,
+          maxLines: (qi.type == QuestionnaireItemType.text) ? 4 : 1,
           decoration: InputDecoration(
             border: const OutlineInputBorder(),
             hintText: entryFormat,
@@ -107,14 +104,14 @@ class _StringAnswerState
           onChanged: (content) {
             value = content;
           },
-          maxLength: widget.location.questionnaireItem.maxLength?.value,
+          maxLength: qi.maxLength?.value,
         ));
   }
 
   @override
   QuestionnaireResponseAnswer? fillAnswer() {
     return (value != null && value!.isNotEmpty)
-        ? (widget.location.questionnaireItem.type != QuestionnaireItemType.url)
+        ? (qi.type != QuestionnaireItemType.url)
             ? QuestionnaireResponseAnswer(valueString: value)
             : QuestionnaireResponseAnswer(valueUri: FhirUri(value))
         : null;
