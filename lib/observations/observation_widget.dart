@@ -13,9 +13,11 @@ class ObservationWidget extends StatelessWidget {
   final Widget _valueWidget;
   final Widget _codeWidget;
   final Widget _dateTimeWidget;
+  final Locale? locale;
 
   ObservationWidget(Observation observation,
       {Key? key,
+      this.locale,
       TextStyle? valueStyle,
       TextStyle? unitStyle,
       TextStyle? codeStyle,
@@ -26,6 +28,7 @@ class ObservationWidget extends StatelessWidget {
       : _valueWidget = ObservationValueWidget(observation,
             valueStyle: valueStyle,
             unitStyle: unitStyle,
+            locale: locale,
             componentSeparator: componentSeparator,
             unknownUnitText: unknownUnitText,
             unknownValueText: unknownValueText),
@@ -33,6 +36,7 @@ class ObservationWidget extends StatelessWidget {
             CodeableConceptText(observation.code, style: codeStyle, key: key),
         _dateTimeWidget = FhirDateTimeText(
           observation.effectiveDateTime,
+          locale: locale,
           style: dateTimeStyle,
         ),
         super(key: key);
@@ -55,6 +59,7 @@ class ObservationWidget extends StatelessWidget {
 /// or components of valueQuantity.
 class ObservationValueWidget extends StatelessWidget {
   final Observation _observation;
+  final Locale? locale;
   final TextStyle? valueStyle;
   final TextStyle? unitStyle;
   final String componentSeparator;
@@ -63,6 +68,7 @@ class ObservationValueWidget extends StatelessWidget {
 
   const ObservationValueWidget(this._observation,
       {Key? key,
+      this.locale,
       this.valueStyle,
       this.unitStyle,
       this.componentSeparator = ' | ',
@@ -74,11 +80,12 @@ class ObservationValueWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final Widget valueWidget;
 
-    final decimalFormat =
-        NumberFormat.decimalPattern(Localizations.localeOf(context).toString());
+    final decimalFormat = NumberFormat.decimalPattern(
+        (locale ?? Localizations.localeOf(context)).toString());
 
     if (_observation.valueQuantity != null) {
-      final valueString = _observation.valueQuantity!.value.toString();
+      final valueString =
+          decimalFormat.format(_observation.valueQuantity!.value);
       final unitString = _observation.valueQuantity?.unit ??
           _observation.valueQuantity?.code ??
           unknownUnitText;
@@ -120,7 +127,8 @@ class ObservationValueWidget extends StatelessWidget {
     } else {
       valueWidget = Text(unknownValueText,
           style: valueStyle?.copyWith(
-              fontWeight: FontWeight.bold, color: Colors.red));
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).errorColor));
     }
 
     return valueWidget;

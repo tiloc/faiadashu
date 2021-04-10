@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:fhir/r4.dart';
 
 import '../../../logging/logger.dart';
@@ -7,7 +5,7 @@ import '../../questionnaires.dart';
 
 class QuestionnaireResponseAggregator
     extends Aggregator<QuestionnaireResponse> {
-  static final Logger logger = Logger(QuestionnaireResponseAggregator);
+  static final Logger _logger = Logger(QuestionnaireResponseAggregator);
 
   QuestionnaireResponseAggregator()
       : super(QuestionnaireResponse(), autoAggregate: false);
@@ -43,9 +41,8 @@ class QuestionnaireResponseAggregator
   }
 
   @override
-  QuestionnaireResponse? aggregate(Locale? locale,
-      {bool notifyListeners = false}) {
-    logger.trace('QuestionnaireResponse.aggregrate');
+  QuestionnaireResponse? aggregate({bool notifyListeners = false}) {
+    _logger.trace('QuestionnaireResponse.aggregrate');
 
     final responseItems = <QuestionnaireResponseItem>[];
 
@@ -79,7 +76,7 @@ class QuestionnaireResponseAggregator
         questionnaire: questionnaireCanonical,
         item: (responseItems.isNotEmpty) ? responseItems : null,
         authored: FhirDateTime(DateTime.now()),
-        text: narrativeAggregator.aggregate(locale));
+        text: narrativeAggregator.aggregate());
 
     // TODO: SDC mandates a an extension on "questionnaire", but the FHIR library doesn't have questionnaireElement
     // see http://hl7.org/fhir/2018Sep/extension-display.html

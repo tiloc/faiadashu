@@ -9,6 +9,7 @@ import 'fhir_types_extensions.dart';
 /// The control is displayed as a text field that can be tapped to open
 /// a picker.
 class FhirDateTimePicker extends StatefulWidget {
+  final Locale? locale;
   final DateTime firstDate;
   final DateTime lastDate;
   final FhirDateTime? initialDateTime;
@@ -23,6 +24,7 @@ class FhirDateTimePicker extends StatefulWidget {
       required this.pickerType,
       this.decoration,
       this.onChanged,
+      this.locale,
       Key? key})
       : super(key: key);
 
@@ -50,7 +52,7 @@ class _FhirDateTimePickerState extends State<FhirDateTimePicker> {
 
   @override
   Widget build(BuildContext context) {
-    final locale = Localizations.localeOf(context);
+    final locale = widget.locale ?? Localizations.localeOf(context);
 
     // There is no Locale in initState.
     if (_fieldInitialized == false) {

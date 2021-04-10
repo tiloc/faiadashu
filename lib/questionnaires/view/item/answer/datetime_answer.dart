@@ -44,6 +44,7 @@ class _DateTimeAnswerState
   Widget buildReadOnly(BuildContext context) {
     return FhirDateTimeText(
       value,
+      locale: locale,
       defaultText: '-',
     );
   }
@@ -63,6 +64,7 @@ class _DateTimeAnswerState
     return Container(
         padding: const EdgeInsets.only(top: 8, bottom: 8),
         child: FhirDateTimePicker(
+          locale: locale,
           initialDateTime: initialDate,
           firstDate: DateTime(1860),
           lastDate: DateTime(2050),

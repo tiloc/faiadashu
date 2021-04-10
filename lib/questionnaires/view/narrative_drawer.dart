@@ -26,8 +26,6 @@ class _NarrativeDrawerState extends State<NarrativeDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    final locale = Localizations.localeOf(context);
-
     return Card(
       margin: const EdgeInsets.all(8.0),
       child: ConstrainedBox(
@@ -41,60 +39,65 @@ class _NarrativeDrawerState extends State<NarrativeDrawer> {
             child: Container(
               padding: const EdgeInsets.all(16.0),
               child: Builder(
-                builder: (context) => Column(children: [
-                  SwitchListTile(
-                    title: Text(
-                      !_drawerMode ? 'Narrative' : 'FHIR R4 JSON',
-                      style: Theme.of(context).textTheme.headline5,
-                    ),
-                    secondary: IconButton(
-                      icon: const Icon(Icons.copy),
-                      onPressed: () {
-                        Clipboard.setData(ClipboardData(
-                                text: _drawerMode
-                                    ? jsonEncode(QuestionnaireFiller.of(context)
-                                        .aggregator<
-                                            QuestionnaireResponseAggregator>()
-                                        .aggregate(locale)
-                                        ?.toJson())
-                                    : QuestionnaireFiller.of(context)
-                                        .aggregator<NarrativeAggregator>()
-                                        .aggregate(locale)
-                                        ?.div))
-                            .then((_) {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: _drawerMode
-                                  ? const Text(
-                                      'QuestionnaireResponse copied to clipboard')
-                                  : const Text(
-                                      'Narrative copied to clipboard')));
-                        });
-                      },
-                    ),
-                    value: _drawerMode,
-                    onChanged: (newState) {
-                      setState(() {
-                        _drawerMode = newState;
-                      });
-                    },
-                  ),
-                  if (!_drawerMode)
-                    HTML.toRichText(
-                        context,
-                        QuestionnaireFiller.of(context)
-                                .aggregator<NarrativeAggregator>()
-                                .aggregate(locale)
-                                ?.div ??
-                            NarrativeAggregator.emptyNarrative.div,
-                        defaultTextStyle: Theme.of(context).textTheme.bodyText1)
-                  else
-                    ResourceJsonTree(
-                      QuestionnaireFiller.of(context)
-                          .aggregator<QuestionnaireResponseAggregator>()
-                          .aggregate(locale)
-                          ?.toJson(),
-                    ),
-                ]),
+                builder: (context) => Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SwitchListTile(
+                        title: Text(
+                          !_drawerMode ? 'Narrative' : 'FHIR R4 JSON',
+                          style: Theme.of(context).textTheme.headline5,
+                        ),
+                        secondary: IconButton(
+                          icon: const Icon(Icons.copy),
+                          onPressed: () {
+                            Clipboard.setData(ClipboardData(
+                                    text: _drawerMode
+                                        ? jsonEncode(QuestionnaireFiller.of(
+                                                context)
+                                            .aggregator<
+                                                QuestionnaireResponseAggregator>()
+                                            .aggregate()
+                                            ?.toJson())
+                                        : QuestionnaireFiller.of(context)
+                                            .aggregator<NarrativeAggregator>()
+                                            .aggregate()
+                                            ?.div))
+                                .then((_) {
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                  content: _drawerMode
+                                      ? const Text(
+                                          'QuestionnaireResponse copied to clipboard')
+                                      : const Text(
+                                          'Narrative copied to clipboard')));
+                            });
+                          },
+                        ),
+                        value: _drawerMode,
+                        onChanged: (newState) {
+                          setState(() {
+                            _drawerMode = newState;
+                          });
+                        },
+                      ),
+                      const Divider(),
+                      if (!_drawerMode)
+                        HTML.toRichText(
+                            context,
+                            QuestionnaireFiller.of(context)
+                                    .aggregator<NarrativeAggregator>()
+                                    .aggregate()
+                                    ?.div ??
+                                NarrativeAggregator.emptyNarrative.div,
+                            defaultTextStyle:
+                                Theme.of(context).textTheme.bodyText1)
+                      else
+                        ResourceJsonTree(
+                          QuestionnaireFiller.of(context)
+                              .aggregator<QuestionnaireResponseAggregator>()
+                              .aggregate()
+                              ?.toJson(),
+                        ),
+                    ]),
               ),
             ),
           ),

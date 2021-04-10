@@ -5,9 +5,10 @@ import '../questionnaire_location.dart';
 /// Aggregators can combine numerous items from a questionnaire into a combined result.
 /// Examples: Total score; Narrative; QuestionnaireResponse; Percentage of answered questions
 /// Some aggregators can 'autoAggregate': They update automatically when the underlying questionnaire changes.
-/// More expensive or localized aggregators require manual invocations of their aggregate method.
+/// More expensive aggregators require manual invocations of their aggregate method.
 abstract class Aggregator<T> extends ValueNotifier<T> {
   late final QuestionnaireTopLocation topLocation;
+  late final Locale locale;
   final bool autoAggregate;
 
   /// [autoAggregate] specifies whether it should attach listeners to the
@@ -19,8 +20,9 @@ abstract class Aggregator<T> extends ValueNotifier<T> {
   @mustCallSuper
   void init(QuestionnaireTopLocation topLocation) {
     this.topLocation = topLocation;
+    locale = topLocation.locale;
   }
 
   /// Aggregate the questionnaire. Return [null] if currently not possible.
-  T? aggregate(Locale? locale, {bool notifyListeners = false});
+  T? aggregate({bool notifyListeners = false});
 }

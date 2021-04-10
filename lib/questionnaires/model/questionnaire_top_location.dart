@@ -13,7 +13,7 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
   final ExternalResourceProvider? _extResourceProvider;
   int _revision = 1;
   final Locale locale;
-  static final logger = Logger(QuestionnaireTopLocation);
+  static final _logger = Logger(QuestionnaireTopLocation);
 
   /// Create the first location top-down of the given [Questionnaire].
   /// Will throw [Error]s in case this [Questionnaire] has no items.
@@ -33,7 +33,7 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
             null,
             0,
             0) {
-    logger.log('QuestionnaireTopLocation.fromQuestionnaire',
+    _logger.log('QuestionnaireTopLocation.fromQuestionnaire',
         level: LogLevel.debug);
     _top = this;
     // This will set up the traversal order and fill up the cache.
@@ -50,14 +50,14 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
       }
     }
 
-    logger.log('_enabledWhens: $_enabledWhens', level: LogLevel.debug);
+    _logger.log('_enabledWhens: $_enabledWhens', level: LogLevel.debug);
 
     if (aggregators != null) {
       for (final aggregator in aggregators) {
         aggregator.init(this);
         // Assumption: aggregators that don't autoAggregate will have their aggregate method invoked manually when it matters.
         if (aggregator.autoAggregate) {
-          aggregator.aggregate(null, notifyListeners: true);
+          aggregator.aggregate(notifyListeners: true);
         }
       }
     }
@@ -81,10 +81,8 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
 
   void bumpRevision({bool notifyListeners = true}) {
     final newRevision = _revision + 1;
-    logger.log(
-      'QuestionnaireTopLocation.bumpRevision $notifyListeners: $_revision -> $newRevision',
-      level: LogLevel.debug,
-    );
+    _logger.debug(
+        'QuestionnaireTopLocation.bumpRevision $notifyListeners: $_revision -> $newRevision');
     _revision = newRevision;
     if (notifyListeners) {
       this.notifyListeners();
@@ -148,7 +146,7 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
             valueSetInclude.concept ?? [];
 
         if (valueSetConcepts.isEmpty) {
-          logger.log('Concepts in ValueSet $uri is empty.');
+          _logger.log('Concepts in ValueSet $uri is empty.');
           // TODO: Do I need something recursive here? Can there be nested inclusion?
           // ValueSets may contain references to further included ValueSets.
           final includeUri =
@@ -167,9 +165,8 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
           if (valueSetInclude.system != null) {
             final codeSystem =
                 getResource(valueSetInclude.system.toString()) as CodeSystem;
-            logger.log(
-                'Processing included CodeSystem ${codeSystem.url.toString()}',
-                level: LogLevel.debug);
+            _logger.debug(
+                'Processing included CodeSystem ${codeSystem.url.toString()}');
             if (codeSystem.concept != null) {
               for (final concept in codeSystem.concept!) {
                 final coding = Coding(
@@ -270,7 +267,8 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
 
   /// Populate the answers in the questionnaire with the answers from a response.
   void populate(QuestionnaireResponse? questionnaireResponse) {
-    logger.log('Populating with $questionnaireResponse', level: LogLevel.debug);
+    _logger.log('Populating with $questionnaireResponse',
+        level: LogLevel.debug);
     if (questionnaireResponse == null) {
       return;
     }
@@ -288,16 +286,16 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
   /// Update the current enablement status of all items.
   void updateEnableWhen({bool notifyListeners = true}) {
     if (_enabledWhens == null) {
-      logger.log('updateEnableWhen: no conditional items',
+      _logger.log('updateEnableWhen: no conditional items',
           level: LogLevel.trace);
       return;
     }
-    logger.log('updateEnableWhen()', level: LogLevel.trace);
+    _logger.log('updateEnableWhen()', level: LogLevel.trace);
 
     final previouslyEnabled = List<bool>.generate(
         preOrder().length, (index) => preOrder().elementAt(index).enabled,
         growable: false);
-    logger.log('prevEnabled: $previouslyEnabled', level: LogLevel.trace);
+    _logger.log('prevEnabled: $previouslyEnabled', level: LogLevel.trace);
     for (final location in preOrder()) {
       location._enabled = true;
     }
@@ -308,12 +306,12 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
     final afterEnabled = List<bool>.generate(
         preOrder().length, (index) => preOrder().elementAt(index).enabled,
         growable: false);
-    logger.log('afterEnabled: $afterEnabled', level: LogLevel.trace);
+    _logger.log('afterEnabled: $afterEnabled', level: LogLevel.trace);
 
     if (!listEquals(previouslyEnabled, afterEnabled)) {
       bumpRevision(notifyListeners: notifyListeners);
     } else {
-      logger.log('enableWhen unchanged.', level: LogLevel.debug);
+      _logger.log('enableWhen unchanged.', level: LogLevel.debug);
     }
   }
 

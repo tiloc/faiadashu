@@ -66,7 +66,7 @@ class _NumericalAnswerState
 
   @override
   Widget buildReadOnly(BuildContext context) {
-    return Text(value?.format(Localizations.localeOf(context)) ?? '');
+    return Text(value?.format(locale) ?? '');
   }
 
   Widget _buildDropDownFromUnits(BuildContext context, List<Coding> units) {
@@ -133,7 +133,7 @@ class _NumericalAnswerState
               Expanded(
                   child: TextFormField(
                 initialValue: (value?.value != null)
-                    ? value!.value!.format(Localizations.localeOf(context))
+                    ? value!.value!.format(locale)
                     : null,
                 decoration: InputDecoration(
                   border: const OutlineInputBorder(),

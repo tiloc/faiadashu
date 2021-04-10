@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:fhir/r4.dart';
 
 import '../../../coding/data_absent_reasons.dart';
@@ -11,7 +9,7 @@ import 'aggregator.dart';
 /// Create a narrative from the responses to a [Questionnaire].
 /// Updates immediately after responses have changed.
 class NarrativeAggregator extends Aggregator<Narrative> {
-  static final logger = Logger(NarrativeAggregator);
+  static final _logger = Logger(NarrativeAggregator);
 
   // Revision of topLocation when _narrative was calculated
   int _revision = -1;
@@ -33,8 +31,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
     _narrative = value;
   }
 
-  static bool _addResponseItemToDiv(
-      StringBuffer div, QuestionnaireLocation location, Locale locale) {
+  bool _addResponseItemToDiv(StringBuffer div, QuestionnaireLocation location) {
     final item = location.responseItem;
 
     if (item == null) {
@@ -112,14 +109,13 @@ class NarrativeAggregator extends Aggregator<Narrative> {
     return returnValue;
   }
 
-  static Narrative _generateNarrative(
-      QuestionnaireLocation topLocation, Locale locale) {
+  Narrative _generateNarrative(QuestionnaireLocation topLocation) {
     final div = StringBuffer('<div xmlns="http://www.w3.org/1999/xhtml">');
 
     bool generated = false;
 
     for (final location in topLocation.preOrder()) {
-      generated = generated | _addResponseItemToDiv(div, location, locale);
+      generated = generated | _addResponseItemToDiv(div, location);
     }
     div.write('</div>');
     return Narrative(
@@ -128,14 +124,12 @@ class NarrativeAggregator extends Aggregator<Narrative> {
   }
 
   @override
-  Narrative? aggregate(Locale? locale, {bool notifyListeners = false}) {
-    ArgumentError.checkNotNull(locale, 'locale');
-
-    logger.log(
+  Narrative? aggregate({bool notifyListeners = false}) {
+    _logger.log(
         '$this.aggregate (topRev: ${topLocation.revision}, rev: $_revision)',
         level: LogLevel.debug);
     if (topLocation.revision == _revision) {
-      logger.log('Regurgitating narrative revision $_revision',
+      _logger.log('Regurgitating narrative revision $_revision',
           level: LogLevel.debug);
       return _narrative;
     }
@@ -143,7 +137,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
     topLocation.updateEnableWhen(
         notifyListeners:
             false); // Setting this to true might result in endless refresh and stack overflow
-    _narrative = _generateNarrative(topLocation, locale!);
+    _narrative = _generateNarrative(topLocation);
     _revision = topLocation.revision;
     if (notifyListeners) {
       value = _narrative!;

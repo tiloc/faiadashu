@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
 
@@ -32,7 +30,7 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
       if (totalScoreLocation != null) {
         for (final location in topLocation.preOrder()) {
           if (!location.isStatic && location != totalScoreLocation) {
-            location.addListener(() => aggregate(null, notifyListeners: true));
+            location.addListener(() => aggregate(notifyListeners: true));
           }
         }
       }
@@ -40,12 +38,12 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
   }
 
   @override
-  Decimal? aggregate(Locale? locale, {bool notifyListeners = false}) {
+  Decimal? aggregate({bool notifyListeners = false}) {
     if (totalScoreLocation == null) {
       return null;
     }
 
-    logger.log('totalScore.aggregrate', level: LogLevel.debug);
+    logger.debug('totalScore.aggregrate');
     // Special handling if this is the total score
     double sum = 0.0;
     for (final location in topLocation.preOrder()) {
@@ -58,7 +56,7 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
       }
     }
 
-    logger.log('sum: $sum', level: LogLevel.debug);
+    logger.debug('sum: $sum');
     final result = Decimal(sum);
     if (notifyListeners) {
       value = result;

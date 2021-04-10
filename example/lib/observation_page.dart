@@ -99,6 +99,16 @@ class ObservationPage extends ExhibitPage {
         codeStyle: Theme.of(context).textTheme.subtitle2,
         dateTimeStyle: Theme.of(context).textTheme.caption,
       ),
+      const SizedBox(
+        height: 16,
+      ),
+      ObservationWidget(
+        bpObservationWHR,
+        valueStyle: Theme.of(context).textTheme.headline4,
+        codeStyle: Theme.of(context).textTheme.subtitle2,
+        dateTimeStyle: Theme.of(context).textTheme.caption,
+        locale: const Locale('ar', 'BH'),
+      ),
     ]);
   }
 
