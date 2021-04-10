@@ -60,56 +60,73 @@ class _FhirDateTimePickerState extends State<FhirDateTimePicker> {
       _fieldInitialized = true;
     }
 
-    return TextFormField(
-      decoration: widget.decoration,
-      controller: _dateTimeFieldController,
-      onTap: () async {
-        DateTime dateTime = DateTime(1970);
+    return Stack(
+      alignment: AlignmentDirectional.centerEnd,
+      children: [
+        TextFormField(
+          decoration: widget.decoration,
+          controller: _dateTimeFieldController,
+          onTap: () async {
+            DateTime dateTime = DateTime(1970);
 
-        if (widget.pickerType != Time) {
-          final date = await showDatePicker(
-              initialDate: _dateTimeValue?.value ?? DateTime.now(),
-              firstDate: widget.firstDate,
-              lastDate: widget.lastDate,
-              locale: locale,
-              context: context);
+            if (widget.pickerType != Time) {
+              final date = await showDatePicker(
+                  initialDate: _dateTimeValue?.value ?? DateTime.now(),
+                  firstDate: widget.firstDate,
+                  lastDate: widget.lastDate,
+                  locale: locale,
+                  context: context);
 
-          if (date == null) {
-            return; // Cancelled, don't touch anything
-          }
-          dateTime = date.toLocal();
-        }
+              if (date == null) {
+                return; // Cancelled, don't touch anything
+              }
+              dateTime = date.toLocal();
+            }
 
-        if (widget.pickerType == FhirDateTime || widget.pickerType == Time) {
-          final time = await showTimePicker(
-              initialTime: TimeOfDay.fromDateTime(
-                  _dateTimeValue?.value ?? DateTime.now()),
-              context: context,
-              builder: (context, child) {
-                return Localizations.override(
-                    context: context, locale: locale, child: child);
-              });
+            if (widget.pickerType == FhirDateTime ||
+                widget.pickerType == Time) {
+              final time = await showTimePicker(
+                  initialTime: TimeOfDay.fromDateTime(
+                      _dateTimeValue?.value ?? DateTime.now()),
+                  context: context,
+                  builder: (context, child) {
+                    return Localizations.override(
+                        context: context, locale: locale, child: child);
+                  });
 
-          if (time == null) {
-            return; // Cancelled, don't touch anything
-          }
+              if (time == null) {
+                return; // Cancelled, don't touch anything
+              }
 
-          dateTime = DateTime(dateTime.year, dateTime.month, dateTime.day,
-              time.hour, time.minute);
-        }
+              dateTime = DateTime(dateTime.year, dateTime.month, dateTime.day,
+                  time.hour, time.minute);
+            }
 
-        final fhirDateTime = FhirDateTime.fromDateTime(
-            dateTime,
-            (widget.pickerType == Date)
-                ? DateTimePrecision.YYYYMMDD
-                : DateTimePrecision.FULL);
-        _dateTimeFieldController.text = (widget.pickerType == Time)
-            ? DateFormat.jm(locale.toString()).format(dateTime)
-            : fhirDateTime.format(locale);
-        _dateTimeValue = fhirDateTime;
-        widget.onChanged?.call(fhirDateTime);
-      },
-      readOnly: true,
+            final fhirDateTime = FhirDateTime.fromDateTime(
+                dateTime,
+                (widget.pickerType == Date)
+                    ? DateTimePrecision.YYYYMMDD
+                    : DateTimePrecision.FULL);
+            setState(() {
+              _dateTimeFieldController.text = (widget.pickerType == Time)
+                  ? DateFormat.jm(locale.toString()).format(dateTime)
+                  : fhirDateTime.format(locale);
+            });
+            _dateTimeValue = fhirDateTime;
+            widget.onChanged?.call(fhirDateTime);
+          },
+          readOnly: true,
+        ),
+        if (_dateTimeFieldController.text.isNotEmpty)
+          IconButton(
+              onPressed: () {
+                setState(() {
+                  _dateTimeFieldController.text = '';
+                });
+                widget.onChanged?.call(null);
+              },
+              icon: const Icon(Icons.clear))
+      ],
     );
   }
 }

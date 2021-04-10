@@ -62,18 +62,19 @@ class _DateTimeAnswerState
     }[itemType]);
 
     return Container(
-        padding: const EdgeInsets.only(top: 8, bottom: 8),
-        child: FhirDateTimePicker(
-          locale: locale,
-          initialDateTime: initialDate,
-          firstDate: DateTime(1860),
-          lastDate: DateTime(2050),
-          pickerType: pickerType,
-          decoration: const InputDecoration(border: OutlineInputBorder()),
-          onChanged: (fhirDateTime) {
-            value = fhirDateTime;
-          },
-        ));
+      padding: const EdgeInsets.only(top: 8, bottom: 8),
+      child: FhirDateTimePicker(
+        locale: locale,
+        initialDateTime: initialDate,
+        firstDate: DateTime(1860),
+        lastDate: DateTime(2050),
+        pickerType: pickerType,
+        decoration: const InputDecoration(
+          border: OutlineInputBorder(),
+        ),
+        onChanged: (fhirDatetime) => value = fhirDatetime,
+      ),
+    );
   }
 
   @override
