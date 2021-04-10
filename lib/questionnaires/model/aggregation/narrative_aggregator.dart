@@ -2,10 +2,10 @@ import 'dart:ui';
 
 import 'package:fhir/r4.dart';
 
-import '../../coding/data_absent_reasons.dart';
-import '../../fhir_types/fhir_types_extensions.dart';
-import '../../logging/logging.dart';
-import '../questionnaires.dart';
+import '../../../coding/data_absent_reasons.dart';
+import '../../../fhir_types/fhir_types_extensions.dart';
+import '../../../logging/logging.dart';
+import '../../questionnaires.dart';
 import 'aggregator.dart';
 
 /// Create a narrative from the responses to a [Questionnaire].

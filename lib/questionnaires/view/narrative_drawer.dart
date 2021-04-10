@@ -5,8 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:simple_html_css/simple_html_css.dart';
 
 import '../../fhir_types/fhir_types.dart';
-import '../model/narrative_aggregator.dart';
-import '../model/questionnaire_response_aggregator.dart';
+import '../model/aggregation/narrative_aggregator.dart';
+import '../model/aggregation/questionnaire_response_aggregator.dart';
 import 'questionnaire_filler.dart';
 
 /// "Drawer" which contains the narrative for a questionnaire.

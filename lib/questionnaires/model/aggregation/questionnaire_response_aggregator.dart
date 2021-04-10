@@ -2,8 +2,8 @@ import 'dart:ui';
 
 import 'package:fhir/r4.dart';
 
-import '../../logging/logger.dart';
-import '../questionnaires.dart';
+import '../../../logging/logger.dart';
+import '../../questionnaires.dart';
 
 class QuestionnaireResponseAggregator
     extends Aggregator<QuestionnaireResponse> {

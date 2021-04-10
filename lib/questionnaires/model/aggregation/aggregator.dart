@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'questionnaire_location.dart';
+import '../questionnaire_location.dart';
 
 /// Aggregators can combine numerous items from a questionnaire into a combined result.
 /// Examples: Total score; Narrative; QuestionnaireResponse; Percentage of answered questions
