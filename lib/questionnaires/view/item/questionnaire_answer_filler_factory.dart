@@ -19,7 +19,7 @@ class QuestionnaireAnswerFillerFactory {
       switch (location.questionnaireItem.type!) {
         case QuestionnaireItemType.choice:
         case QuestionnaireItemType.open_choice:
-          return ChoiceAnswer(location, answerLocation);
+          return CodingAnswer(location, answerLocation);
         case QuestionnaireItemType.quantity:
         case QuestionnaireItemType.decimal:
         case QuestionnaireItemType.integer:

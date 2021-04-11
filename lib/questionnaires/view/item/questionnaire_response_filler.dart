@@ -9,7 +9,7 @@ import '../../../logging/logger.dart';
 import '../../questionnaires.dart';
 import 'questionnaire_answer_filler_factory.dart';
 
-/// A Widget to fill a [QuestionnaireResponseItem].
+/// Filler for a [QuestionnaireResponseItem].
 class QuestionnaireResponseFiller extends StatefulWidget {
   final QuestionnaireLocation location;
 
@@ -27,6 +27,10 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
 
   Coding? _dataAbsentReason;
 
+  QuestionnaireResponseItem? get responseItem => widget.location.responseItem;
+  set responseItem(QuestionnaireResponseItem? ri) =>
+      widget.location.responseItem = ri;
+
   QuestionnaireResponseState();
 
   @override
@@ -40,15 +44,14 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
           widget.location, AnswerLocation._(this, 0))
     ];
 
-    final int? answerCount = widget.location.responseItem?.answer?.length;
+    final int? answerCount = responseItem?.answer?.length;
     if (answerCount != null && answerCount > 0) {
-      _answers = widget.location.responseItem!.answer!;
+      _answers = responseItem!.answer!;
     } else {
       _answers = [null];
     }
 
-    _dataAbsentReason =
-        widget.location.responseItem?.extension_?.dataAbsentReason;
+    _dataAbsentReason = responseItem?.extension_?.dataAbsentReason;
   }
 
   void stashAnswer(int answerIndex, QuestionnaireResponseAnswer? answer) {
@@ -60,11 +63,11 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
       });
     }
     // Bubble up the response
-    widget.location.responseItem = fillResponse();
+    responseItem = fillResponse();
   }
 
   /// Special functionality to allow choice and open-choice items with "repeats".
-  void stashChoiceAnswers(
+  void stashCodingAnswers(
       int answerIndex, List<QuestionnaireResponseAnswer?>? answers) {
     if (mounted) {
       setState(() {
@@ -76,7 +79,7 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
       });
     }
     // Bubble up the response
-    widget.location.responseItem = fillResponse();
+    responseItem = fillResponse();
   }
 
   /// Fill the response with all the answers which are not null.
@@ -115,7 +118,7 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
       });
     }
     // Bubble up the response
-    widget.location.responseItem = fillResponse();
+    responseItem = fillResponse();
   }
 
   set value(List<QuestionnaireResponseAnswer?> newValue) {
@@ -125,7 +128,7 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
       });
     }
     // Bubble up the response
-    widget.location.responseItem = fillResponse();
+    responseItem = fillResponse();
   }
 
   List<QuestionnaireResponseAnswer?> get value => _answers;
@@ -170,8 +173,8 @@ class AnswerLocation {
   }
 
   /// Special functionality to allow choice and open-choice items with "repeats".
-  void stashChoiceAnswers(List<QuestionnaireResponseAnswer?>? answers) {
-    _responseState.stashChoiceAnswers(_answerIndex, answers);
+  void stashCodingAnswers(List<QuestionnaireResponseAnswer?>? answers) {
+    _responseState.stashCodingAnswers(_answerIndex, answers);
   }
 
   QuestionnaireResponseAnswer? get answer =>

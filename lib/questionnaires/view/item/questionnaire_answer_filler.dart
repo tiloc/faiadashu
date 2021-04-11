@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../logging/logging.dart';
 import '../../questionnaires.dart';
 
-/// A Widget to fill an individual [QuestionnaireResponseAnswer].
+/// Filler for an individual [QuestionnaireResponseAnswer].
 abstract class QuestionnaireAnswerFiller extends StatefulWidget {
   final QuestionnaireLocation location;
   final AnswerLocation answerLocation;
@@ -32,11 +32,11 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller>
 
   QuestionnaireResponseAnswer? fillAnswer();
 
-  List<QuestionnaireResponseAnswer>? fillChoiceAnswers() {
-    throw UnimplementedError('fillChoiceAnswers not implemented.');
+  List<QuestionnaireResponseAnswer>? fillCodingAnswers() {
+    throw UnimplementedError('fillCodingAnswers() not implemented.');
   }
 
-  bool hasChoiceAnswers() => false;
+  bool hasCodingAnswers() => false;
 
   set value(V? newValue) {
     if (mounted) {
@@ -44,8 +44,8 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller>
         _value = newValue;
       });
 
-      if (hasChoiceAnswers()) {
-        widget.answerLocation.stashChoiceAnswers(fillChoiceAnswers());
+      if (hasCodingAnswers()) {
+        widget.answerLocation.stashCodingAnswers(fillCodingAnswers());
       } else {
         widget.answerLocation.stashAnswer(fillAnswer());
       }

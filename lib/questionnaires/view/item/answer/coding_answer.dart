@@ -11,20 +11,22 @@ import '../../../questionnaires.dart';
 import '../../broken_questionnaire_item.dart';
 import '../../xhtml.dart';
 
-class ChoiceAnswer extends QuestionnaireAnswerFiller {
-  // This class uses CodeableConcept to model multiple choice and open choice.
-
-  const ChoiceAnswer(
+/// Answer questions which require code(s) as a response.
+///
+/// This class uses [CodeableConcept] to model multiple choice and open choice.
+/// Future R5 releases of the FHIR standard will likely have a `coding` item type.
+class CodingAnswer extends QuestionnaireAnswerFiller {
+  const CodingAnswer(
       QuestionnaireLocation location, AnswerLocation answerLocation,
       {Key? key})
       : super(location, answerLocation, key: key);
   @override
-  State<StatefulWidget> createState() => _ChoiceAnswerState();
+  State<StatefulWidget> createState() => _CodingAnswerState();
 }
 
-class _ChoiceAnswerState
-    extends QuestionnaireAnswerState<CodeableConcept, ChoiceAnswer> {
-  static final _logger = Logger(_ChoiceAnswerState);
+class _CodingAnswerState
+    extends QuestionnaireAnswerState<CodeableConcept, CodingAnswer> {
+  static final _logger = Logger(_CodingAnswerState);
   // ignore: prefer_collection_literals
   final _answerOptions = LinkedHashMap<String, QuestionnaireAnswerOption>();
   Object? _initFailure;
@@ -32,7 +34,7 @@ class _ChoiceAnswerState
 
   static const openChoiceOther = 'open-choice-other';
 
-  _ChoiceAnswerState();
+  _CodingAnswerState();
 
   @override
   void initState() {
@@ -51,7 +53,7 @@ class _ChoiceAnswerState
       }
     } catch (exception) {
       _logger.log(
-          'Could not initialize ChoiceAnswer for ${widget.location.linkId}',
+          'Could not initialize ${(CodingAnswer).toString()} for ${widget.location.linkId}',
           error: exception);
       _initFailure = exception;
     }
@@ -64,11 +66,12 @@ class _ChoiceAnswerState
 
   @override
   QuestionnaireResponseAnswer? fillAnswer() {
-    throw UnsupportedError('Choice Answer will always return choice answers.');
+    throw UnsupportedError(
+        '${(CodingAnswer).toString()} will always return coding answers.');
   }
 
   @override
-  List<QuestionnaireResponseAnswer>? fillChoiceAnswers() {
+  List<QuestionnaireResponseAnswer>? fillCodingAnswers() {
     if (value == null) {
       return null;
     }
@@ -95,7 +98,7 @@ class _ChoiceAnswerState
   }
 
   @override
-  bool hasChoiceAnswers() {
+  bool hasCodingAnswers() {
     return true;
   }
 
@@ -301,8 +304,14 @@ class _ChoiceAnswerState
     if (!isMultipleChoice) {
       choices.add(RadioListTile<String?>(
           title: Text(
-            '---',
-            style: Theme.of(context).textTheme.bodyText2,
+            '   ',
+            style: Theme.of(context).textTheme.bodyText2?.copyWith(
+                decoration: TextDecoration.lineThrough,
+                color: Theme.of(context)
+                    .textTheme
+                    .bodyText1!
+                    .color!
+                    .withOpacity(0.54)),
           ),
           value: null,
           groupValue: _choiceString(value),
