@@ -8,7 +8,7 @@ import '../questionnaire_extensions.dart';
 import '../questionnaire_location.dart';
 import 'item_model.dart';
 
-/// Validates numerical answers.
+/// Models numerical answers.
 class NumericalItemModel extends ItemModel<String> {
   static final _logger = Logger(NumericalItemModel);
 

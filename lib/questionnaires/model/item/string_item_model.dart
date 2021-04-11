@@ -4,6 +4,7 @@ import '../../../fhir_types/fhir_types_extensions.dart';
 import '../questionnaire_location.dart';
 import 'item_model.dart';
 
+/// Models string answers, incl. URLs.
 class StringItemModel extends ItemModel<String> {
   static final _urlRegExp = RegExp(
       r'^(http|https|ftp|sftp)://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+');

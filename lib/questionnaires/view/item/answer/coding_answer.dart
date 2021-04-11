@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../fhir_types/fhir_types_extensions.dart';
 import '../../../../logging/logging.dart';
 import '../../../../questionnaires/model/questionnaire_extensions.dart';
+import '../../../model/item/coding_item_model.dart';
 import '../../../questionnaires.dart';
 import '../../broken_questionnaire_item.dart';
 import '../../xhtml.dart';
@@ -27,8 +26,8 @@ class CodingAnswer extends QuestionnaireAnswerFiller {
 class _CodingAnswerState
     extends QuestionnaireAnswerState<CodeableConcept, CodingAnswer> {
   static final _logger = Logger(_CodingAnswerState);
-  // ignore: prefer_collection_literals
-  final _answerOptions = LinkedHashMap<String, QuestionnaireAnswerOption>();
+  late final CodingItemModel _itemModel;
+
   Object? _initFailure;
   late final TextEditingController? _otherChoiceController;
 
@@ -41,14 +40,15 @@ class _CodingAnswerState
     super.initState();
 
     try {
-      _createAnswerOptions();
+      _itemModel = CodingItemModel(location);
 
       if (widget.location.responseItem != null) {
         initialValue = CodeableConcept(
             coding: widget.location.responseItem!.answer
-                ?.map((answer) =>
-                    _answerOptions[_choiceStringFromCoding(answer.valueCoding)]!
-                        .valueCoding!)
+                ?.map((answer) => _itemModel
+                    .answerOptions[
+                        _itemModel.choiceStringFromCoding(answer.valueCoding)]!
+                    .valueCoding!)
                 .toList());
       }
     } catch (exception) {
@@ -88,9 +88,10 @@ class _CodingAnswerState
             // Some answers may only be a display, not have a code
             return coding.code != null
                 ? QuestionnaireResponseAnswer(
-                    valueCoding:
-                        _answerOptions[_choiceStringFromCoding(coding)]!
-                            .valueCoding)
+                    valueCoding: _itemModel
+                        .answerOptions[
+                            _itemModel.choiceStringFromCoding(coding)]!
+                        .valueCoding)
                 : QuestionnaireResponseAnswer(valueCoding: coding);
           }).toList();
 
@@ -117,182 +118,14 @@ class _CodingAnswerState
 
     try {
       if (!(qi.repeats == Boolean(true)) &&
-          (_answerOptions.length > 10 || qi.isItemControl('autocomplete'))) {
+          (_itemModel.answerOptions.length > 10 ||
+              qi.isItemControl('autocomplete'))) {
         return _buildLookupAnswers(context);
       } else {
         return _buildChoiceAnswers(context);
       }
     } catch (exception) {
       return BrokenQuestionnaireItem.fromException(exception);
-    }
-  }
-
-  CodeableConcept? _fillValue(String? newValue) {
-    return (newValue != null)
-        ? CodeableConcept(coding: [_answerOptions[newValue]!.valueCoding!])
-        : null;
-  }
-
-  bool _isExclusive(Coding coding) {
-    return _answerOptions[_choiceStringFromCoding(coding)]!
-            .extension_
-            ?.extensionOrNull(
-                'http://hl7.org/fhir/StructureDefinition/questionnaire-optionExclusive')
-            ?.valueBoolean
-            ?.value ==
-        true;
-  }
-
-  /// Turn on/off the checkbox with the provided [toggleValue].
-  /// Used in repeating items.
-  CodeableConcept? _fillToggledValue(String? toggleValue) {
-    _logger.log('Enter fillToggledValue $toggleValue', level: LogLevel.trace);
-    if (toggleValue == null) {
-      return null;
-    }
-    if ((value == null) || (value!.coding == null)) {
-      return _fillValue(toggleValue);
-    }
-
-    final entryIndex = value!.coding!
-        .indexWhere((coding) => coding.code?.value == toggleValue);
-    if (entryIndex == -1) {
-      _logger.log('$toggleValue currently not selected.',
-          level: LogLevel.debug);
-      final enabledCodeableConcept = _fillValue(toggleValue)!;
-      final enabledCoding = enabledCodeableConcept.coding!.first;
-      if (_isExclusive(enabledCoding)) {
-        _logger.log('$toggleValue isExclusive', level: LogLevel.debug);
-        // The newly enabled checkbox is exclusive, kill all others.
-        return enabledCodeableConcept;
-      } else {
-        _logger.log('$toggleValue is not exclusive', level: LogLevel.debug);
-        // Kill all exclusive ones.
-        return value!.copyWith(coding: [
-          ...value!.coding!.whereNot((coding) => _isExclusive(coding)),
-          enabledCoding
-        ]);
-      }
-    } else {
-      _logger.log('$toggleValue currently selected.', level: LogLevel.debug);
-      return CodeableConcept(coding: value!.coding!..removeAt(entryIndex));
-    }
-  }
-
-  // Take the existing extensions that might contain information about
-  // ordinal values and convert them from ordinalValue to iso21090-CO-value
-  List<FhirExtension>? _createOrdinalExtension(
-      List<FhirExtension>? inExtension) {
-    List<FhirExtension>? responseOrdinalExtension;
-
-    final FhirExtension? ordinalExtension = inExtension?.extensionOrNull(
-        'http://hl7.org/fhir/StructureDefinition/ordinalValue');
-    if (ordinalExtension != null) {
-      responseOrdinalExtension = <FhirExtension>[
-        FhirExtension(
-            url: FhirUri(
-                'http://hl7.org/fhir/StructureDefinition/iso21090-CO-value'),
-            valueDecimal: ordinalExtension.valueDecimal),
-      ];
-    }
-
-    return responseOrdinalExtension;
-  }
-
-  List<FhirExtension>? _createOptionPrefixExtension(
-      List<FhirExtension>? inExtension) {
-    List<FhirExtension>? responseOptionPrefixExtension;
-
-    final FhirExtension? labelExtension = inExtension?.extensionOrNull(
-        'http://hl7.org/fhir/StructureDefinition/valueset-label');
-    if (labelExtension != null) {
-      responseOptionPrefixExtension = <FhirExtension>[
-        FhirExtension(
-            url: FhirUri(
-                'http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix'),
-            valueString: labelExtension.valueString),
-      ];
-    }
-
-    return responseOptionPrefixExtension;
-  }
-
-  String? _choiceStringFromCoding(Coding? coding) {
-    if (coding == null) {
-      return null;
-    }
-    final choiceString =
-        (coding.code != null) ? coding.code?.value : coding.display;
-
-    if (choiceString == null) {
-      throw QuestionnaireFormatException(
-          'Insufficient info for choice string in $coding', coding);
-    } else {
-      return choiceString;
-    }
-  }
-
-  String? _choiceStringFromCodings(List<Coding>? codings) {
-    if (codings == null) {
-      return null;
-    }
-
-    final coding = codings.firstOrNull;
-    return _choiceStringFromCoding(coding);
-  }
-
-  /// Extract a string from a [CodeableConcept].
-  /// Can be used as groupValue in checkboxes/radiobuttons, or as a key in maps
-  /// Throws when Questionnaire is malformed.
-  /// Returns null if [codeableConcept] is null
-  String? _choiceString(CodeableConcept? codeableConcept) {
-    if (codeableConcept == null) {
-      return null;
-    }
-    return _choiceStringFromCodings(
-        ArgumentError.checkNotNull(codeableConcept.coding));
-  }
-
-  void _addAnswerOption(Coding coding) {
-    _answerOptions.addEntries([
-      MapEntry<String, QuestionnaireAnswerOption>(
-          coding.code!.toString(),
-          FDashQuestionnaireAnswerOptionExtensions.fromCoding(
-            coding,
-            extensionBuilder: (inCoding) =>
-                _createOptionPrefixExtension(inCoding.extension_),
-            codingExtensionBuilder: (inCoding) =>
-                _createOrdinalExtension(inCoding.extension_),
-          ))
-    ]);
-  }
-
-  /// Convert [ValueSet]s or [QuestionnaireAnswerOption]s to normalized [QuestionnaireAnswerOption]s
-  void _createAnswerOptions() {
-    if (qi.answerValueSet != null) {
-      final key = qi.answerValueSet?.value?.toString();
-      if (key == null) {
-        throw QuestionnaireFormatException(
-            'Questionnaire choice item does not specify a key', qi);
-      }
-
-      top.visitValueSet(key, _addAnswerOption, context: qi);
-    } else {
-      if (qi.answerOption != null) {
-        _answerOptions.addEntries(qi.answerOption!.map<
-            MapEntry<String, QuestionnaireAnswerOption>>((qao) => MapEntry<
-                String, QuestionnaireAnswerOption>(
-            qao.optionCode,
-            qao.copyWith(
-                valueCoding: (qao.valueCoding != null)
-                    ? qao.valueCoding!.copyWith(
-                        userSelected: Boolean(true),
-                        extension_: _createOrdinalExtension(qao.extension_))
-                    : Coding(
-                        // The spec only allows valueCoding, but real-world incl. valueString
-                        display: qao.valueString,
-                        userSelected: Boolean(true))))));
-      }
     }
   }
 
@@ -314,12 +147,12 @@ class _CodingAnswerState
                     .withOpacity(0.54)),
           ),
           value: null,
-          groupValue: _choiceString(value),
+          groupValue: _itemModel.toChoiceString(value),
           onChanged: (String? newValue) {
-            value = _fillValue(newValue);
+            value = _itemModel.fromChoiceString(newValue);
           }));
     }
-    for (final choice in _answerOptions.values) {
+    for (final choice in _itemModel.answerOptions.values) {
       final optionPrefix = choice.extension_
           ?.extensionOrNull(
               'http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix')
@@ -333,7 +166,7 @@ class _CodingAnswerState
           width: 100, height: 100);
 
       choices.add(isMultipleChoice
-          ? _isExclusive(choice.valueCoding!)
+          ? _itemModel.isExclusive(choice.valueCoding!)
               ? RadioListTile<String>(
                   title: styledOptionTitle,
                   groupValue: choice.optionCode,
@@ -344,7 +177,7 @@ class _CodingAnswerState
                           ?.value ??
                       '',
                   onChanged: (_) {
-                    value = _fillToggledValue(choice.optionCode);
+                    value = _itemModel.toggleValue(value, choice.optionCode);
                   },
                 )
               : CheckboxListTile(
@@ -353,21 +186,21 @@ class _CodingAnswerState
                           coding.code?.value == choice.optionCode) !=
                       null,
                   onChanged: (bool? newValue) {
-                    value = _fillToggledValue(choice.optionCode);
+                    value = _itemModel.toggleValue(value, choice.optionCode);
                   })
           : RadioListTile<String>(
               title: styledOptionTitle,
               value: choice.optionCode,
-              groupValue: _choiceString(value),
+              groupValue: _itemModel.toChoiceString(value),
               onChanged: (String? newValue) {
-                value = _fillValue(newValue);
+                value = _itemModel.fromChoiceString(newValue);
               }));
     }
 
     if (qi.type == QuestionnaireItemType.open_choice) {
       choices.add(RadioListTile<String>(
         value: openChoiceOther,
-        groupValue: _choiceString(value),
+        groupValue: _itemModel.toChoiceString(value),
         onChanged: (String? newValue) {
           value = CodeableConcept(
               coding: [Coding(code: Code(openChoiceOther))],
@@ -416,7 +249,8 @@ class _CodingAnswerState
         if (textEditingValue.text.isEmpty) {
           return const Iterable<QuestionnaireAnswerOption>.empty();
         }
-        return _answerOptions.values.where((QuestionnaireAnswerOption option) {
+        return _itemModel.answerOptions.values
+            .where((QuestionnaireAnswerOption option) {
           return option
               .localizedDisplay(locale)
               .toLowerCase()
@@ -424,7 +258,7 @@ class _CodingAnswerState
         });
       },
       onSelected: (QuestionnaireAnswerOption selectedOption) {
-        value = _fillValue(selectedOption.optionCode);
+        value = _itemModel.fromChoiceString(selectedOption.optionCode);
       },
     );
   }
