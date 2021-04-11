@@ -1,6 +1,7 @@
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../coding/data_absent_reasons.dart';
 import '../../../model/item/string_item_model.dart';
 import '../../../questionnaires.dart';
 import '../questionnaire_answer_filler.dart';
@@ -66,10 +67,21 @@ class _StringAnswerState
 
   @override
   QuestionnaireResponseAnswer? fillAnswer() {
+    final valid = _itemModel.validate(value) == null;
+    final dataAbsentReasonExtension = !valid
+        ? [
+            FhirExtension(
+                url: DataAbsentReason.extensionUrl,
+                valueCoding: DataAbsentReason.invalid)
+          ]
+        : null;
+
     return (value != null && value!.isNotEmpty)
         ? (qi.type != QuestionnaireItemType.url)
-            ? QuestionnaireResponseAnswer(valueString: value)
-            : QuestionnaireResponseAnswer(valueUri: FhirUri(value))
+            ? QuestionnaireResponseAnswer(
+                valueString: value, extension_: dataAbsentReasonExtension)
+            : QuestionnaireResponseAnswer(
+                valueUri: FhirUri(value), extension_: dataAbsentReasonExtension)
         : null;
   }
 }

@@ -40,6 +40,10 @@ class StringItemModel extends ItemModel<String> {
       return 'Enter $minLength or more characters.';
     }
 
+    if (maxLength != null && inValue.length > maxLength!) {
+      return 'Enter up to $maxLength characters.';
+    }
+
     if (qi.type == QuestionnaireItemType.url) {
       if (!_urlRegExp.hasMatch(inValue)) {
         return 'Enter a valid URL.';

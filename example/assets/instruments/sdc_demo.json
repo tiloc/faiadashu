@@ -247,7 +247,7 @@
       "linkId": "123523.35235",
       "type": "string",
       "text": "Enter your First Name",
-      "maxLength": 50
+      "maxLength": 25
     },
     {
       "linkId": "2.5.b-repeats",

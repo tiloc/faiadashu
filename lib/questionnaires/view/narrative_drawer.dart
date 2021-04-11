@@ -32,84 +32,87 @@ class _NarrativeDrawerState extends State<NarrativeDrawer> {
       child: ConstrainedBox(
         constraints: BoxConstraints(
             maxHeight: preferredHeight, minHeight: preferredHeight),
-        child: Scrollbar(
-          isAlwaysShown: true,
+        child: SingleChildScrollView(
           controller: _narrativeScrollController,
-          child: SingleChildScrollView(
-            controller: _narrativeScrollController,
-            child: Container(
-              padding: const EdgeInsets.all(16.0),
-              child: Builder(
-                builder: (context) => AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
-                    child: Column(
-                        key: UniqueKey(),
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SwitchListTile(
-                            key: UniqueKey(),
-                            title: Text(
-                              !_drawerMode ? 'Narrative' : 'FHIR R4 JSON',
-                              style: Theme.of(context).textTheme.headline5,
-                            ),
-                            secondary: IconButton(
-                              icon: const Icon(Icons.copy),
-                              onPressed: () {
-                                Clipboard.setData(ClipboardData(
-                                        text: _drawerMode
-                                            ? jsonEncode(QuestionnaireFiller.of(
-                                                    context)
-                                                .aggregator<
-                                                    QuestionnaireResponseAggregator>()
-                                                .aggregate()
-                                                ?.toJson())
-                                            : QuestionnaireFiller.of(context)
-                                                .aggregator<
-                                                    NarrativeAggregator>()
-                                                .aggregate()
-                                                ?.div))
-                                    .then((_) {
-                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                      content: _drawerMode
-                                          ? const Text(
-                                              'QuestionnaireResponse copied to clipboard')
-                                          : const Text(
-                                              'Narrative copied to clipboard')));
-                                });
-                              },
-                            ),
-                            value: _drawerMode,
-                            onChanged: (newState) {
-                              setState(() {
-                                _drawerMode = newState;
+          child: Container(
+            padding: const EdgeInsets.all(16.0),
+            child: Builder(
+              builder: (context) => AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  child: Column(
+                      key: UniqueKey(),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SwitchListTile(
+                          key: UniqueKey(),
+                          title: Text(
+                            !_drawerMode ? 'Narrative' : 'FHIR R4 JSON',
+                            style: Theme.of(context).textTheme.headline5,
+                          ),
+                          secondary: IconButton(
+                            icon: const Icon(Icons.copy),
+                            onPressed: () {
+                              Clipboard.setData(ClipboardData(
+                                      text: _drawerMode
+                                          ? jsonEncode(QuestionnaireFiller.of(
+                                                  context)
+                                              .aggregator<
+                                                  QuestionnaireResponseAggregator>()
+                                              .aggregate()
+                                              ?.toJson())
+                                          : QuestionnaireFiller.of(context)
+                                              .aggregator<NarrativeAggregator>()
+                                              .aggregate()
+                                              ?.div))
+                                  .then((_) {
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                    content: _drawerMode
+                                        ? const Text(
+                                            'QuestionnaireResponse copied to clipboard')
+                                        : const Text(
+                                            'Narrative copied to clipboard')));
                               });
                             },
                           ),
-                          const Divider(),
-                          ConstrainedBox(
-                            constraints: BoxConstraints(
-                                minHeight: preferredHeight - 70,
-                                maxHeight: preferredHeight - 70),
-                            child: (!_drawerMode)
-                                ? HTML.toRichText(
-                                    context,
-                                    QuestionnaireFiller.of(context)
-                                            .aggregator<NarrativeAggregator>()
-                                            .aggregate()
-                                            ?.div ??
-                                        NarrativeAggregator.emptyNarrative.div,
-                                    defaultTextStyle:
-                                        Theme.of(context).textTheme.bodyText1)
-                                : ResourceJsonTree(
-                                    QuestionnaireFiller.of(context)
-                                        .aggregator<
-                                            QuestionnaireResponseAggregator>()
-                                        .aggregate()
-                                        ?.toJson(),
-                                  ),
+                          value: _drawerMode,
+                          onChanged: (newState) {
+                            setState(() {
+                              _drawerMode = newState;
+                            });
+                          },
+                        ),
+                        const Divider(),
+                        ConstrainedBox(
+                          constraints: BoxConstraints(
+                              minHeight: preferredHeight - 70,
+                              maxHeight: preferredHeight - 70),
+                          child: Scrollbar(
+                            isAlwaysShown: true,
+                            controller: _narrativeScrollController,
+                            child: SingleChildScrollView(
+                              controller: _narrativeScrollController,
+                              child: (!_drawerMode)
+                                  ? HTML.toRichText(
+                                      context,
+                                      QuestionnaireFiller.of(context)
+                                              .aggregator<NarrativeAggregator>()
+                                              .aggregate()
+                                              ?.div ??
+                                          NarrativeAggregator
+                                              .emptyNarrative.div,
+                                      defaultTextStyle:
+                                          Theme.of(context).textTheme.bodyText1)
+                                  : ResourceJsonTree(
+                                      QuestionnaireFiller.of(context)
+                                          .aggregator<
+                                              QuestionnaireResponseAggregator>()
+                                          .aggregate()
+                                          ?.toJson(),
+                                    ),
+                            ),
                           ),
-                        ])),
-              ),
+                        ),
+                      ])),
             ),
           ),
         ),

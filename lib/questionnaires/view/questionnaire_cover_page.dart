@@ -17,6 +17,7 @@ class QuestionnaireCoverPage extends StatelessWidget {
           Xhtml.toXhtml(questionnaire.title,
                   questionnaire.titleElement?.extension_) ??
               'Untitled'),
+      const Divider(),
       HTML.toRichText(
           context,
           Xhtml.toXhtml(questionnaire.publisher,
