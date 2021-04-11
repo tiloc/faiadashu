@@ -102,6 +102,8 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
                     builder: (BuildContext context) {
                       return IconButton(
                         icon: const Icon(Icons.arrow_back),
+                        tooltip:
+                            MaterialLocalizations.of(context).backButtonTooltip,
                         onPressed: () {
                           Navigator.pop(context);
                         },
@@ -121,7 +123,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
                     IconButton(
                       icon: const Icon(Icons.help_outline),
                       onPressed: () {
-                        _showQuestionnaireInfo(context, questionnaire);
+                        _showQuestionnaireInfo(context, locale, questionnaire);
                       },
                     ),
                   ]),
@@ -174,12 +176,17 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
   }
 
   Future<void> _showQuestionnaireInfo(
-      BuildContext context, Questionnaire questionnaire) async {
+      BuildContext context, Locale locale, Questionnaire questionnaire) async {
     return showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: const Text('Info'),
+            title: Localizations.override(
+                context: context,
+                locale: locale,
+                child: Builder(
+                    builder: (context) => Text(MaterialLocalizations.of(context)
+                        .aboutListTileTitle(questionnaire.title ?? 'Survey')))),
             content: QuestionnaireCoverPage(questionnaire),
             actions: <Widget>[
               OutlinedButton(
@@ -188,7 +195,13 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
                     Navigator.pop(context);
                   });
                 },
-                child: const Text('Dismiss'),
+                child: Localizations.override(
+                    context: context,
+                    locale: locale,
+                    child: Builder(
+                        builder: (context) => Text(
+                            MaterialLocalizations.of(context)
+                                .closeButtonLabel))),
               ),
             ],
           );
