@@ -31,6 +31,8 @@ class _CodingAnswerState
   Object? _initFailure;
   late final TextEditingController? _otherChoiceController;
 
+  String? _validationText;
+
   static const openChoiceOther = 'open-choice-other';
 
   _CodingAnswerState();
@@ -177,7 +179,10 @@ class _CodingAnswerState
                           ?.value ??
                       '',
                   onChanged: (_) {
-                    value = _itemModel.toggleValue(value, choice.optionCode);
+                    final newValue =
+                        _itemModel.toggleValue(value, choice.optionCode);
+                    _validationText = _itemModel.validate(newValue);
+                    value = newValue;
                   },
                 )
               : CheckboxListTile(
@@ -186,7 +191,10 @@ class _CodingAnswerState
                           coding.code?.value == choice.optionCode) !=
                       null,
                   onChanged: (bool? newValue) {
-                    value = _itemModel.toggleValue(value, choice.optionCode);
+                    final newValue =
+                        _itemModel.toggleValue(value, choice.optionCode);
+                    _validationText = _itemModel.validate(newValue);
+                    value = newValue;
                   })
           : RadioListTile<String>(
               title: styledOptionTitle,
@@ -227,16 +235,42 @@ class _CodingAnswerState
                 ?.value ==
             'horizontal' &&
         MediaQuery.of(context).size.width > 750) {
-      return Card(
-          margin: const EdgeInsets.only(top: 8, bottom: 8),
-          child: Table(children: [TableRow(children: choices)]));
+      return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Card(
+                margin: const EdgeInsets.only(top: 8, bottom: 8),
+                child: Table(children: [TableRow(children: choices)])),
+            if (_validationText != null)
+              Text(
+                _validationText!,
+                style: Theme.of(context)
+                    .textTheme
+                    .caption!
+                    .copyWith(color: Theme.of(context).errorColor),
+              )
+          ]);
     } else {
-      return Card(
-          margin: const EdgeInsets.only(top: 8, bottom: 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: choices,
-          ));
+      return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Card(
+                margin: const EdgeInsets.only(top: 8, bottom: 8),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: choices,
+                )),
+            if (_validationText != null)
+              Text(
+                _validationText!,
+                style: Theme.of(context)
+                    .textTheme
+                    .caption!
+                    .copyWith(color: Theme.of(context).errorColor),
+              )
+          ]);
     }
   }
 

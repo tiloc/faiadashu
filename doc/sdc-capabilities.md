@@ -148,6 +148,9 @@ Support for leaving a question unanswered.
 - rendering-xhtml: in addition to regular capabilities may also contain a base64 encoded image of type PNG or JPEG. 
 - questionnaire-itemControl: check-box, radio-button, autocomplete
 - translation: option choices can be translated using the FHIR translation mechanism
+- minOccurs
+- maxOccurs
+
 #### open-choice 
 Same as `choice` with the following differences:
 - repeats is not supported

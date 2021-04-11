@@ -673,6 +673,55 @@
           }
         }
       ]
+    },
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-minOccurs",
+          "valueInteger": 2
+        },
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-maxOccurs",
+          "valueInteger": 4
+        }
+      ],
+      "linkId": "2.6.b",
+      "text": "Heart History (check at least 2):",
+      "type": "choice",
+      "required": true,
+      "repeats": true,
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "U1",
+            "display": "Heart attack"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "U2",
+            "display": "Heart surgery"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "U3",
+            "display": "Cardiac catheterization"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "U4",
+            "display": "Coronary angioplasty (PTCA)"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "U5",
+            "display": "Cardiac pacemaker"
+          }
+        }
+      ]
     }
   ]
 }

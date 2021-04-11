@@ -191,10 +191,40 @@ class CodingItemModel extends ItemModel<CodeableConcept> {
     }
   }
 
+  late final int minOccurs;
+  late final int? maxOccurs;
+
   CodingItemModel(QuestionnaireLocation location) : super(location) {
     _createAnswerOptions();
+
+    minOccurs = qi.extension_
+            ?.extensionOrNull(
+                'http://hl7.org/fhir/StructureDefinition/questionnaire-minOccurs')
+            ?.valueInteger
+            ?.value ??
+        0;
+
+    maxOccurs = qi.extension_
+        ?.extensionOrNull(
+            'http://hl7.org/fhir/StructureDefinition/questionnaire-maxOccurs')
+        ?.valueInteger
+        ?.value;
   }
 
   @override
-  String? validate(CodeableConcept? inValue) {}
+  String? validate(CodeableConcept? inValue) {
+    if (inValue == null) {
+      return null;
+    }
+
+    final int length = inValue.coding?.length ?? 0;
+
+    if (length < minOccurs) {
+      return 'Select $minOccurs or more options.';
+    }
+
+    if (maxOccurs != null && length > maxOccurs!) {
+      return 'Select $maxOccurs or fewer options.';
+    }
+  }
 }
