@@ -4,9 +4,12 @@ import 'package:simple_html_css/simple_html_css.dart';
 
 import 'xhtml.dart';
 
-class QuestionnaireCoverPage extends StatelessWidget {
+/// Informational tile about a [Questionnaire].
+///
+/// Contains information such as title and publisher.
+class QuestionnaireInformationTile extends StatelessWidget {
   final Questionnaire questionnaire;
-  const QuestionnaireCoverPage(this.questionnaire, {Key? key})
+  const QuestionnaireInformationTile(this.questionnaire, {Key? key})
       : super(key: key);
 
   @override

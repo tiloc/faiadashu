@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:fhir/r4.dart' show Questionnaire;
+import 'package:faiadashu/questionnaires/view/questionnaire_information_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 import '../../resource_provider/resource_provider.dart';
 import '../questionnaires.dart';
 import 'narrative_drawer.dart';
-import 'questionnaire_cover_page.dart';
 
 /// Fill a questionnaire through a vertically scrolling input form.
 class QuestionnaireScrollerPage extends StatefulWidget {
@@ -123,7 +122,12 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
                     IconButton(
                       icon: const Icon(Icons.help_outline),
                       onPressed: () {
-                        _showQuestionnaireInfo(context, locale, questionnaire);
+                        QuestionnaireInformationDialog.showQuestionnaireInfo(
+                            context, locale, questionnaire, (context) {
+                          setState(() {
+                            Navigator.pop(context);
+                          });
+                        });
                       },
                     ),
                   ]),
@@ -173,38 +177,5 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
       aggregators: widget.aggregators,
       onLinkTap: widget.onLinkTap,
     );
-  }
-
-  Future<void> _showQuestionnaireInfo(
-      BuildContext context, Locale locale, Questionnaire questionnaire) async {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Localizations.override(
-                context: context,
-                locale: locale,
-                child: Builder(
-                    builder: (context) => Text(MaterialLocalizations.of(context)
-                        .aboutListTileTitle(questionnaire.title ?? 'Survey')))),
-            content: QuestionnaireCoverPage(questionnaire),
-            actions: <Widget>[
-              OutlinedButton(
-                onPressed: () {
-                  setState(() {
-                    Navigator.pop(context);
-                  });
-                },
-                child: Localizations.override(
-                    context: context,
-                    locale: locale,
-                    child: Builder(
-                        builder: (context) => Text(
-                            MaterialLocalizations.of(context)
-                                .closeButtonLabel))),
-              ),
-            ],
-          );
-        });
   }
 }
