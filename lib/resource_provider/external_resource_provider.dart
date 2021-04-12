@@ -62,3 +62,23 @@ class AssetResourceProvider extends ExternalResourceProvider {
     return resources.containsKey(uri) ? resources[uri] : null;
   }
 }
+
+/// Provide a resource from in-memory.
+///
+/// Mainly for development and testing purposes.
+class InMemoryResourceProvider extends ExternalResourceProvider {
+  final Resource? resource;
+  final Type resourceType;
+  InMemoryResourceProvider.inMemory(this.resourceType, this.resource);
+
+  @override
+  Resource? getResource(String uri) {
+    return (uri == resourceType.toString()) ? resource : null;
+  }
+
+  @override
+  Future<void> init() async {
+    // Do nothing
+    return;
+  }
+}
