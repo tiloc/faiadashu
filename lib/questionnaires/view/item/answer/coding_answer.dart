@@ -64,6 +64,8 @@ class _CodingAnswerState
       // TODO: Set initialValue
       _otherChoiceController = TextEditingController();
     }
+
+    _validationText = _itemModel.validate(value);
   }
 
   @override
