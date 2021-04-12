@@ -185,6 +185,10 @@ class _HomePageState extends State<HomePage> {
             ListTile(
               title: const Text('SDC Demo Scroller'),
               subtitle: const Text('A gallery of SDC feature support.'),
+              trailing: IconButton(
+                icon: const Icon(Icons.edit_off),
+                onPressed: () {},
+              ),
               onTap: () {
                 Navigator.push(
                     context,
