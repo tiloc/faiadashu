@@ -9,7 +9,7 @@ import '../model/questionnaire_location.dart';
 
 /// Extract Xhtml from SDC extensions and build Widgets from Xhtml.
 class Xhtml {
-  static final Logger logger = Logger(Xhtml);
+  static final Logger _logger = Logger(Xhtml);
   const Xhtml._();
 
   static Widget? toWidget(
@@ -20,7 +20,7 @@ class Xhtml {
       {double? width,
       double? height,
       Key? key}) {
-    logger.log('enter toWidget $plainText', level: LogLevel.trace);
+    _logger.trace('enter toWidget $plainText');
     final xhtml = Xhtml.toXhtml(plainText, extension);
 
     if (xhtml == null) {
@@ -33,16 +33,14 @@ class Xhtml {
     if (xhtml.startsWith(imgPngBase64Prefix)) {
       final base64String = xhtml.substring(
           imgPngBase64Prefix.length, xhtml.length - imgSuffix.length);
-      logger.log('Length of base64: ${base64String.length}',
-          level: LogLevel.debug);
+      _logger.debug('Length of base64: ${base64String.length}');
       return Base64Image(base64String,
           width: width, height: height, semanticLabel: plainText);
     }
     if (xhtml.startsWith(imgJpgBase64Prefix)) {
       final base64String = xhtml.substring(
           imgJpgBase64Prefix.length, xhtml.length - imgSuffix.length);
-      logger.log('Length of base64: ${base64String.length}',
-          level: LogLevel.debug);
+      _logger.debug('Length of base64: ${base64String.length}');
       return Base64Image(base64String,
           width: width, height: height, semanticLabel: plainText);
     }

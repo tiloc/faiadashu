@@ -130,11 +130,12 @@ Comprehensive support
 - entryFormat (use regular expressions, *not the "ANA NAN" format as seen in some examples.*)
 - minLength  
 - maxLength
+- regex  
 - questionnaire-itemControl: text-box 
 
 #### choice
 Comprehensive support, incl. optionChoice and choices from ValueSets.
-Support for multiple choice (item.repeats = true) and lookup from ValueSets (triggered automatically by large # of choices).
+Support for multiple choice (item.repeats = true) and autocomplete from ValueSets (triggered automatically by large # of choices).
 
 Support for leaving a question unanswered.
 

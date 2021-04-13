@@ -36,9 +36,8 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
 
   @override
   Widget build(BuildContext context) {
-    logger.log(
-        'build ${widget.location.linkId} hidden: ${widget.location.isHidden}, enabled: ${widget.location.enabled}',
-        level: LogLevel.debug);
+    logger.debug(
+        'build ${widget.location.linkId} hidden: ${widget.location.isHidden}, enabled: ${widget.location.enabled}');
 
     return (!widget.location.isHidden)
         ? AnimatedSwitcher(

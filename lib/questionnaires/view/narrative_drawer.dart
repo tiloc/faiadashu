@@ -2,11 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:simple_html_css/simple_html_css.dart';
 
 import '../../fhir_types/fhir_types.dart';
 import '../model/aggregation/narrative_aggregator.dart';
 import '../model/aggregation/questionnaire_response_aggregator.dart';
+import '../questionnaires.dart';
 import 'questionnaire_filler.dart';
 
 /// "Drawer" which contains the narrative for a questionnaire.
@@ -19,7 +19,6 @@ class NarrativeDrawer extends StatefulWidget {
 }
 
 class _NarrativeDrawerState extends State<NarrativeDrawer> {
-  late final ScrollController _narrativeScrollController;
   late final ScrollController _responseScrollController;
 
   // false = narrative, true = JSON
@@ -28,13 +27,11 @@ class _NarrativeDrawerState extends State<NarrativeDrawer> {
   @override
   void initState() {
     super.initState();
-    _narrativeScrollController = ScrollController();
     _responseScrollController = ScrollController();
   }
 
   @override
   void dispose() {
-    _narrativeScrollController.dispose();
     _responseScrollController.dispose();
     super.dispose();
   }
@@ -96,43 +93,25 @@ class _NarrativeDrawerState extends State<NarrativeDrawer> {
                       ),
                       const Divider(),
                       ConstrainedBox(
-                        constraints: BoxConstraints(
-                            minHeight: preferredHeight - 100,
-                            maxHeight: preferredHeight - 100),
-                        child: _drawerMode
-                            ? Scrollbar(
-                                isAlwaysShown: true,
-                                controller: _responseScrollController,
-                                child: SingleChildScrollView(
+                          constraints: BoxConstraints(
+                              minHeight: preferredHeight - 100,
+                              maxHeight: preferredHeight - 100),
+                          child: _drawerMode
+                              ? Scrollbar(
+                                  isAlwaysShown: true,
                                   controller: _responseScrollController,
-                                  child: ResourceJsonTree(
-                                    QuestionnaireFiller.of(context)
-                                        .aggregator<
-                                            QuestionnaireResponseAggregator>()
-                                        .aggregate()
-                                        ?.toJson(),
-                                  ),
-                                ),
-                              )
-                            : Scrollbar(
-                                isAlwaysShown: true,
-                                controller: _narrativeScrollController,
-                                child: SingleChildScrollView(
-                                  controller: _narrativeScrollController,
-                                  child: HTML.toRichText(
-                                      context,
+                                  child: SingleChildScrollView(
+                                    controller: _responseScrollController,
+                                    child: ResourceJsonTree(
                                       QuestionnaireFiller.of(context)
-                                              .aggregator<NarrativeAggregator>()
-                                              .aggregate()
-                                              ?.div ??
-                                          NarrativeAggregator
-                                              .emptyNarrative.div,
-                                      defaultTextStyle: Theme.of(context)
-                                          .textTheme
-                                          .bodyText1),
-                                ),
-                              ),
-                      ),
+                                          .aggregator<
+                                              QuestionnaireResponseAggregator>()
+                                          .aggregate()
+                                          ?.toJson(),
+                                    ),
+                                  ),
+                                )
+                              : const NarrativeTile()),
                     ])),
           ),
         ),

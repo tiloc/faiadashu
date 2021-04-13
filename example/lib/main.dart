@@ -74,7 +74,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final ScrollController _listScrollController = ScrollController();
 
-  Resource? savedResponse;
+  QuestionnaireResponse? savedResponse;
 
   // It is typically NOT possible to resolve value sets through their URL.
   // This mechanism allows to add them from other sources.
@@ -187,7 +187,23 @@ class _HomePageState extends State<HomePage> {
               subtitle: const Text('A gallery of SDC feature support.'),
               trailing: IconButton(
                 icon: const Icon(Icons.edit_off),
-                onPressed: () {},
+                onPressed: () async {
+                  final resourceProvider = AssetResourceProvider.singleton(
+                      Questionnaire, 'assets/instruments/sdc_demo.json');
+                  await resourceProvider.init();
+                  final top = QuestionnaireTopLocation.fromQuestionnaire(
+                      (resourceProvider.getResource('Questionnaire')
+                          as Questionnaire?)!,
+                      locale: const Locale('en', 'US'),
+                      aggregators: [NarrativeAggregator()]);
+                  top.populate(savedResponse);
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => NarrativePage(
+                                topLocation: top,
+                              )));
+                },
               ),
               onTap: () {
                 Navigator.push(
