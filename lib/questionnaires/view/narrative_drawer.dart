@@ -19,8 +19,25 @@ class NarrativeDrawer extends StatefulWidget {
 }
 
 class _NarrativeDrawerState extends State<NarrativeDrawer> {
+  late final ScrollController _narrativeScrollController;
+  late final ScrollController _responseScrollController;
+
   // false = narrative, true = JSON
   bool _drawerMode = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _narrativeScrollController = ScrollController();
+    _responseScrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _narrativeScrollController.dispose();
+    _responseScrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,28 +99,39 @@ class _NarrativeDrawerState extends State<NarrativeDrawer> {
                         constraints: BoxConstraints(
                             minHeight: preferredHeight - 100,
                             maxHeight: preferredHeight - 100),
-                        child: Scrollbar(
-                          isAlwaysShown: true,
-                          child: SingleChildScrollView(
-                            child: (!_drawerMode)
-                                ? HTML.toRichText(
-                                    context,
-                                    QuestionnaireFiller.of(context)
-                                            .aggregator<NarrativeAggregator>()
-                                            .aggregate()
-                                            ?.div ??
-                                        NarrativeAggregator.emptyNarrative.div,
-                                    defaultTextStyle:
-                                        Theme.of(context).textTheme.bodyText1)
-                                : ResourceJsonTree(
+                        child: _drawerMode
+                            ? Scrollbar(
+                                isAlwaysShown: true,
+                                controller: _responseScrollController,
+                                child: SingleChildScrollView(
+                                  controller: _responseScrollController,
+                                  child: ResourceJsonTree(
                                     QuestionnaireFiller.of(context)
                                         .aggregator<
                                             QuestionnaireResponseAggregator>()
                                         .aggregate()
                                         ?.toJson(),
                                   ),
-                          ),
-                        ),
+                                ),
+                              )
+                            : Scrollbar(
+                                isAlwaysShown: true,
+                                controller: _narrativeScrollController,
+                                child: SingleChildScrollView(
+                                  controller: _narrativeScrollController,
+                                  child: HTML.toRichText(
+                                      context,
+                                      QuestionnaireFiller.of(context)
+                                              .aggregator<NarrativeAggregator>()
+                                              .aggregate()
+                                              ?.div ??
+                                          NarrativeAggregator
+                                              .emptyNarrative.div,
+                                      defaultTextStyle: Theme.of(context)
+                                          .textTheme
+                                          .bodyText1),
+                                ),
+                              ),
                       ),
                     ])),
           ),
