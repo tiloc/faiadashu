@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:fhir/r4.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
+import '../logging/logger.dart';
+
 /// Provide ValueSets based on a Uri.
 /// Time-consuming prep operations need to go into init().
 /// init() needs to be invoked before getValueSet can be used.
@@ -37,14 +39,18 @@ class NestedExternalResourceProvider extends ExternalResourceProvider {
 }
 
 class AssetResourceProvider extends ExternalResourceProvider {
+  static final _logger = Logger(AssetResourceProvider);
+
   final Map<String, Resource> resources = {};
   final Map<String, String> assetMap;
 
   AssetResourceProvider(String key, String assetPath)
       : assetMap = {key: assetPath};
 
-  AssetResourceProvider.singleton(Type resourceType, String assetPath)
-      : assetMap = {resourceType.toString(): assetPath};
+  AssetResourceProvider.singleton(String uri, String assetPath)
+      : assetMap = {uri: assetPath} {
+    _logger.debug('AssetResourceProvider.singleton $uri -> $assetPath');
+  }
 
   AssetResourceProvider.fromMap(this.assetMap);
 
@@ -59,6 +65,7 @@ class AssetResourceProvider extends ExternalResourceProvider {
 
   @override
   Resource? getResource(String uri) {
+    _logger.debug('getResource $uri from: ${resources.keys}');
     return resources.containsKey(uri) ? resources[uri] : null;
   }
 }

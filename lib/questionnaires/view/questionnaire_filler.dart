@@ -22,12 +22,12 @@ class QuestionnaireFiller extends StatefulWidget {
   final void Function(BuildContext context, Uri url)? onLinkTap;
 
   final ExternalResourceProvider? externalResourceProvider;
-  static final logger = Logger(QuestionnaireFiller);
+  static final _logger = Logger(QuestionnaireFiller);
 
   Future<QuestionnaireTopLocation> _createTopLocation() async {
     await questionnaireProvider.init();
     final questionnaire = ArgumentError.checkNotNull(
-        questionnaireProvider.getResource((Questionnaire).toString())
+        questionnaireProvider.getResource(questionnaireResourceUri)
             as Questionnaire?,
         "'Questionnaire' asset");
     final topLocation = QuestionnaireTopLocation.fromQuestionnaire(
@@ -48,7 +48,7 @@ class QuestionnaireFiller extends StatefulWidget {
     ]);
 
     final response = questionnaireResponseProvider?.getResource(
-        (QuestionnaireResponse).toString()) as QuestionnaireResponse?;
+        questionnaireResponseResourceUri) as QuestionnaireResponse?;
     topLocation.populate(response);
 
     return topLocation;
