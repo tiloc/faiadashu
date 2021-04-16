@@ -22,7 +22,6 @@ class QuestionnaireFiller extends StatefulWidget {
   final void Function(BuildContext context, Uri url)? onLinkTap;
 
   final ExternalResourceProvider? externalResourceProvider;
-  static final _logger = Logger(QuestionnaireFiller);
 
   Future<QuestionnaireTopLocation> _createTopLocation() async {
     await questionnaireProvider.init();
@@ -167,7 +166,7 @@ class QuestionnaireFillerData extends InheritedWidget {
     required this.locale,
     this.onLinkTap,
     required WidgetBuilder builder,
-  })   : _revision = topLocation.revision,
+  })  : _revision = topLocation.revision,
         surveyLocations = topLocation.preOrder(),
         _itemFillers = List<QuestionnaireItemFiller?>.filled(
             topLocation.preOrder().length, null),

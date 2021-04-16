@@ -25,7 +25,7 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
   List<QuestionnaireResponseAnswer?> _answers = [];
   static final logger = Logger(QuestionnaireResponseState);
 
-  Coding? _dataAbsentReason;
+  Code? _dataAbsentReason;
 
   QuestionnaireResponseItem? get responseItem => widget.location.responseItem;
   set responseItem(QuestionnaireResponseItem? ri) =>
@@ -100,7 +100,7 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
             ? [
                 FhirExtension(
                     url: DataAbsentReason.extensionUrl,
-                    valueCoding: dataAbsentReason)
+                    valueCode: dataAbsentReason)
               ]
             : null,
         // FHIR cannot have empty arrays.
@@ -109,9 +109,9 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
     return result;
   }
 
-  Coding? get dataAbsentReason => _dataAbsentReason;
+  Code? get dataAbsentReason => _dataAbsentReason;
 
-  set dataAbsentReason(Coding? dataAbsentReason) {
+  set dataAbsentReason(Code? dataAbsentReason) {
     if (mounted) {
       setState(() {
         _dataAbsentReason = dataAbsentReason;
@@ -135,7 +135,7 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
 
   /// Is the response 'asked but declined'
   bool get isAskedButDeclined =>
-      _dataAbsentReason == DataAbsentReason.askedButDeclined;
+      _dataAbsentReason?.value == DataAbsentReason.askedButDeclinedCode;
 
   @override
   Widget build(BuildContext context) {
@@ -149,8 +149,9 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
           Switch(
             value: isAskedButDeclined,
             onChanged: (bool value) {
-              dataAbsentReason =
-                  value ? DataAbsentReason.askedButDeclined : null;
+              dataAbsentReason = value
+                  ? const Code.asConst(DataAbsentReason.askedButDeclinedCode)
+                  : null;
             },
           )
         ])

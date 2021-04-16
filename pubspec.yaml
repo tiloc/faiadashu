@@ -26,7 +26,7 @@ environment:
 dependencies:
   collection: ^1.15.0
 
-  fhir: ^0.4.3
+  fhir: ^0.4.6
 #  fhir:
 #    path: /Users/tilo/Projects/fhir/fhir
 

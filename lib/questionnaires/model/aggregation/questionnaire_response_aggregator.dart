@@ -70,17 +70,29 @@ class QuestionnaireResponseAggregator
             "$questionnaireUrl${(questionnaireVersion != null) ? '|$questionnaireVersion' : ''}")
         : null;
 
-    final questionnaireResponse = QuestionnaireResponse(
-        // TODO: For status = 'complete' the items which are not enabled SHALL be excluded.
-        //  For other status they might be included  (FHIR-31077)
-        status: responseStatus ?? topLocation.responseStatus,
-        questionnaire: questionnaireCanonical,
-        item: (responseItems.isNotEmpty) ? responseItems : null,
-        authored: FhirDateTime(DateTime.now()),
-        text: narrativeAggregator.aggregate());
+    final questionnaireTitle = topLocation.questionnaire.title;
 
-    // TODO: SDC mandates a an extension on "questionnaire", but the FHIR library doesn't have questionnaireElement
-    // see http://hl7.org/fhir/2018Sep/extension-display.html
+    final questionnaireResponse = QuestionnaireResponse(
+      // TODO: For status = 'complete' the items which are not enabled SHALL be excluded.
+      //  For other status they might be included  (FHIR-31077)
+      status: responseStatus ?? topLocation.responseStatus,
+      meta: Meta(profile: [
+        Canonical(
+            'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaireresponse')
+      ]),
+      questionnaire: questionnaireCanonical,
+      item: (responseItems.isNotEmpty) ? responseItems : null,
+      authored: FhirDateTime(DateTime.now()),
+      text: narrativeAggregator.aggregate(),
+      questionnaireElement: (questionnaireTitle != null)
+          ? Element(extension_: [
+              FhirExtension(
+                  url: FhirUri(
+                      'http://hl7.org/fhir/StructureDefinition/display'),
+                  valueString: topLocation.questionnaire.title)
+            ])
+          : null,
+    );
 
     if (notifyListeners) {
       value = questionnaireResponse;

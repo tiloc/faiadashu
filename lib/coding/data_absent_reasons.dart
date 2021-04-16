@@ -50,34 +50,25 @@ class DataAbsentReason {
 
   static const tempUnknownCode = 'temp-unknown';
 
-  static const invalidCode = 'invalid';
+  static const asTextCode = 'as-text';
 
-  /// The value as represented in the instance is not a member of the set of permitted data values in the constrained value domain of a variable.
+  /// The content of the data is represented in the resource narrative.
   ///
-  /// [invalid] is not officially a part of the data-absent-reason ValueSet!
-  static final invalid = Coding(
-      code: const Code.asConst(invalidCode),
-      display: 'Invalid',
+  /// It may be linked by internal references (e.g. xml:id).
+  /// This usually implies that the value could not be represented in the correct format -
+  /// this may be due to system limitations, or this particular data value.
+  static final asText = Coding(
+      code: const Code.asConst(asTextCode),
+      display: 'As Text',
       system: systemUri);
-
-  /// The actual value is not a member of the set of permitted data values in the constrained value domain of a variable. (e.g., concept not provided by required code system).
-  ///
-  /// [other] is not officially a part of the data-absent-reason ValueSet!
-  static final other = Coding(
-      code: const Code.asConst(otherCode), display: 'Other', system: systemUri);
-
-  static const otherCode = 'other';
 }
 
 extension DataAbsentReasonExtension on List<FhirExtension> {
-  Coding? get dataAbsentReason {
-    return extensionOrNull(DataAbsentReason.extensionUrl)?.valueCoding;
+  Code? get dataAbsentReason {
+    return extensionOrNull(DataAbsentReason.extensionUrl)?.valueCode;
   }
 
   String? get dataAbsentReasonCode {
-    return extensionOrNull(DataAbsentReason.extensionUrl)
-        ?.valueCoding
-        ?.code
-        ?.value;
+    return extensionOrNull(DataAbsentReason.extensionUrl)?.valueCode?.value;
   }
 }

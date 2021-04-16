@@ -42,21 +42,22 @@ class NarrativeAggregator extends Aggregator<Narrative> {
       return false;
     }
 
-    final level = location.level;
-
     bool returnValue = false;
 
-    final invalid =
-        item.extension_?.dataAbsentReasonCode == DataAbsentReason.invalidCode;
-
-    if (invalid) {
-      div.write('<div style="color:red">');
+    if (item.text != null) {
+      if (location.questionnaireItem.type == QuestionnaireItemType.group) {
+        div.write('<h2>${item.text}</h2>');
+      } else {
+        div.write('<h3>${item.text}:</h3>');
+      }
+      returnValue = true;
     }
 
-    if (item.text != null) {
-      div.write(
-          '<h${level + 2}>${invalid ? '[INVALID]' : ''}${item.text}</h${level + 2}>');
-      returnValue = true;
+    final invalid =
+        item.extension_?.dataAbsentReasonCode == DataAbsentReason.asTextCode;
+
+    if (invalid) {
+      div.write('<span style="color:red">[INVALID] ');
     }
 
     switch (item.extension_?.dataAbsentReasonCode) {
@@ -96,6 +97,8 @@ class NarrativeAggregator extends Aggregator<Narrative> {
             } else if (answer.valueBoolean != null) {
               div.write(
                   '<p>${(answer.valueBoolean!.value!) ? '[X]' : '[ ]'}</p>');
+            } else if (answer.valueUri != null) {
+              div.write('<p>${answer.valueUri.toString()}</p>');
             } else {
               div.write('<p>${answer.toString()}</p>');
             }
@@ -104,8 +107,9 @@ class NarrativeAggregator extends Aggregator<Narrative> {
         }
     }
     if (invalid) {
-      div.write('</div>');
+      div.write('</span>');
     }
+
     return returnValue;
   }
 
@@ -118,6 +122,8 @@ class NarrativeAggregator extends Aggregator<Narrative> {
       generated = generated | _addResponseItemToDiv(div, location);
     }
     div.write('</div>');
+    div.write('<p>&nbsp;</p>');
+
     return Narrative(
         div: div.toString(),
         status: generated ? NarrativeStatus.generated : NarrativeStatus.empty);

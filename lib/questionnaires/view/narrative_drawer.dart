@@ -64,12 +64,13 @@ class _NarrativeDrawerState extends State<NarrativeDrawer> {
                           onPressed: () {
                             Clipboard.setData(ClipboardData(
                                     text: _drawerMode
-                                        ? jsonEncode(QuestionnaireFiller.of(
-                                                context)
-                                            .aggregator<
-                                                QuestionnaireResponseAggregator>()
-                                            .aggregate()
-                                            ?.toJson())
+                                        ? const JsonEncoder.withIndent('    ')
+                                            .convert(QuestionnaireFiller.of(
+                                                    context)
+                                                .aggregator<
+                                                    QuestionnaireResponseAggregator>()
+                                                .aggregate()
+                                                ?.toJson())
                                         : QuestionnaireFiller.of(context)
                                             .aggregator<NarrativeAggregator>()
                                             .aggregate()

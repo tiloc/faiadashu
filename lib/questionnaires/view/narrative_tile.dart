@@ -34,15 +34,19 @@ class _NarrativeTileState extends State<NarrativeTile> {
   Widget build(BuildContext context) {
     final top =
         widget.topLocation ?? QuestionnaireFiller.of(context).topLocation;
-    return Scrollbar(
+    return SizedBox.expand(
+      child: Scrollbar(
         isAlwaysShown: true,
         controller: _narrativeScrollController,
         child: SingleChildScrollView(
-            controller: _narrativeScrollController,
-            child: HTML.toRichText(
-                context,
-                top.aggregator<NarrativeAggregator>().aggregate()?.div ??
-                    NarrativeAggregator.emptyNarrative.div,
-                defaultTextStyle: Theme.of(context).textTheme.bodyText1)));
+          controller: _narrativeScrollController,
+          child: HTML.toRichText(
+              context,
+              top.aggregator<NarrativeAggregator>().aggregate()?.div ??
+                  NarrativeAggregator.emptyNarrative.div,
+              defaultTextStyle: Theme.of(context).textTheme.bodyText1),
+        ),
+      ),
+    );
   }
 }
