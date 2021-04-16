@@ -248,7 +248,7 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
   }
 
   QuestionnaireResponseStatus responseStatus =
-      QuestionnaireResponseStatus.unknown;
+      QuestionnaireResponseStatus.in_progress;
 
   void _populateItems(List<QuestionnaireResponseItem>? qris) {
     if (qris == null) {

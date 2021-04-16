@@ -41,7 +41,9 @@ class QuestionnaireResponseAggregator
   }
 
   @override
-  QuestionnaireResponse? aggregate({bool notifyListeners = false}) {
+  QuestionnaireResponse? aggregate(
+      {QuestionnaireResponseStatus? responseStatus,
+      bool notifyListeners = false}) {
     _logger.trace('QuestionnaireResponse.aggregrate');
 
     final responseItems = <QuestionnaireResponseItem>[];
@@ -69,10 +71,9 @@ class QuestionnaireResponseAggregator
         : null;
 
     final questionnaireResponse = QuestionnaireResponse(
-        // TODO: Should this come from topLocation, or simply be a param for aggregate?
         // TODO: For status = 'complete' the items which are not enabled SHALL be excluded.
         //  For other status they might be included  (FHIR-31077)
-        status: topLocation.responseStatus,
+        status: responseStatus ?? topLocation.responseStatus,
         questionnaire: questionnaireCanonical,
         item: (responseItems.isNotEmpty) ? responseItems : null,
         authored: FhirDateTime(DateTime.now()),
