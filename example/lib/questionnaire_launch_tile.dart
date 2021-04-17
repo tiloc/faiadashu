@@ -50,7 +50,6 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
       trailing: IconButton(
         icon: const Icon(Icons.edit_off),
         onPressed: () async {
-          await _questionnaireProvider.init();
           final top = await QuestionnaireTopLocation.fromFhirResourceBundle(
               fhirResourceProvider: _questionnaireProvider,
               locale: locale,

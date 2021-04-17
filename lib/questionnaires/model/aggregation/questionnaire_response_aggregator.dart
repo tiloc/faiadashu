@@ -1,6 +1,8 @@
 import 'package:fhir/r4.dart';
 
+import '../../../fhir_types/fhir_types_extensions.dart';
 import '../../../logging/logger.dart';
+import '../../../resource_provider/resource_uris.dart';
 import '../../questionnaires.dart';
 
 class QuestionnaireResponseAggregator
@@ -43,8 +45,12 @@ class QuestionnaireResponseAggregator
   @override
   QuestionnaireResponse? aggregate(
       {QuestionnaireResponseStatus? responseStatus,
-      bool notifyListeners = false}) {
+      bool notifyListeners = false,
+      bool containPatient = false}) {
     _logger.trace('QuestionnaireResponse.aggregrate');
+
+    // Are all minimum fields for SDC profile present?
+    bool isValidSdc = true;
 
     final responseItems = <QuestionnaireResponseItem>[];
 
@@ -72,18 +78,54 @@ class QuestionnaireResponseAggregator
 
     final questionnaireTitle = topLocation.questionnaire.title;
 
+    final contained = <Resource>[];
+
+    final subject = topLocation.fhirResourceProvider
+        .getResource(subjectResourceUri) as Patient?;
+
+    Reference? subjectReference;
+    if (subject != null) {
+      if (!containPatient) {
+        subjectReference = subject.reference;
+      } else {
+        if (subject.id != null) {
+          subjectReference =
+              Reference(type: FhirUri('Patient'), reference: '#${subject.id}');
+          contained.add(subject);
+        }
+      }
+    }
+
+    if (subjectReference == null) {
+      isValidSdc = false;
+    }
+
+    final profiles = [
+      if (isValidSdc)
+        Canonical(
+            'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaireresponse'),
+      if (isValidSdc)
+        Canonical(
+            'http://fhir.org/guides/argonaut/questionnaire/StructureDefinition/argo-questionnaireresponse'),
+    ];
+
+    final meta = (profiles.isNotEmpty)
+        ? Meta(profile: profiles.isNotEmpty ? profiles : null)
+        : null;
+
+    final narrative = narrativeAggregator.aggregate();
+
     final questionnaireResponse = QuestionnaireResponse(
       // TODO: For status = 'complete' the items which are not enabled SHALL be excluded.
       //  For other status they might be included  (FHIR-31077)
       status: responseStatus ?? topLocation.responseStatus,
-      meta: Meta(profile: [
-        Canonical(
-            'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaireresponse')
-      ]),
+      meta: meta,
+      contained: (contained.isNotEmpty) ? contained : null,
       questionnaire: questionnaireCanonical,
       item: (responseItems.isNotEmpty) ? responseItems : null,
       authored: FhirDateTime(DateTime.now()),
-      text: narrativeAggregator.aggregate(),
+      text: (narrative?.status == NarrativeStatus.empty) ? null : narrative,
+      subject: subjectReference,
       questionnaireElement: (questionnaireTitle != null)
           ? Element(extension_: [
               FhirExtension(

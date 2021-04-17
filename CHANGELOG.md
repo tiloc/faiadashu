@@ -1,3 +1,7 @@
+## 0.2.0
+* Numerous enhancements to make QuestionnaireResponse standards compliant.
+* Streamlined API to provide Resources to the QuestionnaireFiller.
+
 ## 0.1.8
 * Support for supportLink
 

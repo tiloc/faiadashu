@@ -132,14 +132,19 @@ class _HomePageState extends State<HomePage> {
     })
   ]);
 
+  late final FhirResourceProvider resourceBundleProvider;
+
   @override
   void initState() {
     super.initState();
-
-    // TODO: Revive the hard-coded pre-filled response for Bluebook.
-    // Preload the saved responses with a hard-coded response for Bluebook questionnaire.
-    AssetResourceProvider.singleton(questionnaireResponseResourceUri,
-        'assets/responses/bluebook_response.json');
+    resourceBundleProvider = RegistryFhirResourceProvider([
+      InMemoryResourceProvider.inMemory(
+          subjectResourceUri,
+          Patient(id: Id('example123'), name: [
+            HumanName(given: ['Emma'], family: 'Lee')
+          ])),
+      valueSetProvider
+    ]);
   }
 
   @override
@@ -210,7 +215,7 @@ class _HomePageState extends State<HomePage> {
             QuestionnaireLaunchTile(
               title: 'SDC Demo Scroller',
               subtitle: 'A gallery of SDC feature support.',
-              fhirResourceProvider: valueSetProvider,
+              fhirResourceProvider: resourceBundleProvider,
               questionnairePath: 'assets/instruments/sdc_demo.json',
               saveResponseFunction: _saveResponse,
               restoreResponseFunction: _restoreResponse,
@@ -218,7 +223,7 @@ class _HomePageState extends State<HomePage> {
             QuestionnaireLaunchTile(
               title: 'FHIR Hot Beverage IG',
               subtitle: 'WIP Beverage Questionnaire',
-              fhirResourceProvider: valueSetProvider,
+              fhirResourceProvider: resourceBundleProvider,
               questionnairePath: 'assets/instruments/beverage_ig.json',
               saveResponseFunction: _saveResponse,
               restoreResponseFunction: _restoreResponse,
@@ -226,7 +231,7 @@ class _HomePageState extends State<HomePage> {
             QuestionnaireLaunchTile(
               title: 'SDC Profile Example Render',
               subtitle: 'The reference questionnaire for SDC render features.',
-              fhirResourceProvider: valueSetProvider,
+              fhirResourceProvider: resourceBundleProvider,
               questionnairePath: 'assets/instruments/sdc-example-render.json',
               saveResponseFunction: _saveResponse,
               restoreResponseFunction: _restoreResponse,
@@ -235,7 +240,7 @@ class _HomePageState extends State<HomePage> {
               title: 'Argonaut Questionnaire Sampler',
               subtitle:
                   'Reference sample from the Argonaut Questionnaire Implementation Guide.',
-              fhirResourceProvider: valueSetProvider,
+              fhirResourceProvider: resourceBundleProvider,
               questionnairePath: 'assets/instruments/argonaut_sampler.json',
               saveResponseFunction: _saveResponse,
               restoreResponseFunction: _restoreResponse,
@@ -244,7 +249,7 @@ class _HomePageState extends State<HomePage> {
               locale: const Locale('de', 'DE'),
               title: 'Der Argonaut-Fragebogen',
               subtitle: 'Ein deutsches Beispiel für einen Fragebogen.',
-              fhirResourceProvider: valueSetProvider,
+              fhirResourceProvider: resourceBundleProvider,
               questionnairePath: 'assets/instruments/argonaut_sampler.json',
               saveResponseFunction: _saveResponse,
               restoreResponseFunction: _restoreResponse,
@@ -253,7 +258,7 @@ class _HomePageState extends State<HomePage> {
               locale: const Locale('ar', 'BH'),
               title: 'استبيان "أرجونوت"',
               subtitle: 'مثال على استبيان عربي.',
-              fhirResourceProvider: valueSetProvider,
+              fhirResourceProvider: resourceBundleProvider,
               questionnairePath: 'assets/instruments/argonaut_sampler.json',
               saveResponseFunction: _saveResponse,
               restoreResponseFunction: _restoreResponse,
@@ -261,7 +266,7 @@ class _HomePageState extends State<HomePage> {
             QuestionnaireLaunchTile(
               title: 'PHQ9 Questionnaire Scroller',
               subtitle: 'Simple choice-based survey with a total score.',
-              fhirResourceProvider: valueSetProvider,
+              fhirResourceProvider: resourceBundleProvider,
               questionnairePath: 'assets/instruments/phq9_instrument.json',
               saveResponseFunction: _saveResponse,
               restoreResponseFunction: _restoreResponse,
@@ -269,7 +274,7 @@ class _HomePageState extends State<HomePage> {
             QuestionnaireLaunchTile(
               title: 'PHQ9 Questionnaire Scroller',
               subtitle: 'Simple choice-based survey with a total score.',
-              fhirResourceProvider: valueSetProvider,
+              fhirResourceProvider: resourceBundleProvider,
               questionnairePath: 'assets/instruments/phq9_instrument.json',
               saveResponseFunction: _saveResponse,
               restoreResponseFunction: _restoreResponse,
@@ -291,7 +296,7 @@ class _HomePageState extends State<HomePage> {
             QuestionnaireLaunchTile(
               title: 'HF Questionnaire Scroller',
               subtitle: 'A heart failure survey with a total score.',
-              fhirResourceProvider: valueSetProvider,
+              fhirResourceProvider: resourceBundleProvider,
               questionnairePath: 'assets/instruments/hf_instrument.json',
               saveResponseFunction: _saveResponse,
               restoreResponseFunction: _restoreResponse,
@@ -299,7 +304,7 @@ class _HomePageState extends State<HomePage> {
             QuestionnaireLaunchTile(
               title: 'PRAPARE Questionnaire Scroller',
               subtitle: 'Real-world, mixed-type survey from the US',
-              fhirResourceProvider: valueSetProvider,
+              fhirResourceProvider: resourceBundleProvider,
               questionnairePath: 'assets/instruments/prapare_instrument.json',
               saveResponseFunction: _saveResponse,
               restoreResponseFunction: _restoreResponse,
@@ -307,7 +312,13 @@ class _HomePageState extends State<HomePage> {
             QuestionnaireLaunchTile(
               title: 'Bluebook Questionnaire Scroller',
               subtitle: 'Real-world, mixed-type survey from Australia',
-              fhirResourceProvider: valueSetProvider,
+              // Provide a hard-coded response for initial population
+              fhirResourceProvider: RegistryFhirResourceProvider([
+                AssetResourceProvider.singleton(
+                    questionnaireResponseResourceUri,
+                    'assets/responses/bluebook_response.json'),
+                resourceBundleProvider
+              ]),
               questionnairePath: 'assets/instruments/bluebook.json',
               saveResponseFunction: _saveResponse,
               restoreResponseFunction: _restoreResponse,
@@ -316,7 +327,7 @@ class _HomePageState extends State<HomePage> {
               title: 'WHO COVID19 Surveillance',
               subtitle:
                   'Real-world example with very long ValueSets and enableWhen',
-              fhirResourceProvider: valueSetProvider,
+              fhirResourceProvider: resourceBundleProvider,
               questionnairePath: 'assets/instruments/who_covid19.json',
               saveResponseFunction: _saveResponse,
               restoreResponseFunction: _restoreResponse,

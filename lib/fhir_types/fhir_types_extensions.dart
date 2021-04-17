@@ -185,10 +185,23 @@ extension FDashCodeableConceptExtension on CodeableConcept {
   }
 }
 
+extension FDashPatientExtension on Patient {
+  /// Returns a [Reference] to the [Patient].
+  ///
+  /// Only returns a reference when id is present.
+  Reference? get reference {
+    if (id == null) {
+      return null;
+    }
+
+    return Reference(type: FhirUri('Patient'), reference: 'Patient/$id');
+  }
+}
+
 /// Access to [FhirExtension]s from a List.
 ///
 /// Mimics a [Map] with String?/FhirUri as the key and FhirExtension as value.
-/// Extensions are treated similar to a [Set]: Only one of each type can exist
+/// Extensions are treated similar to a [Set]: Only one of each type can exist  TODO: Should it be like that???
 /// and their order is not retained.
 ///
 /// Unfortunately, since the [List] is already claiming the operators they

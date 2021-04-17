@@ -69,7 +69,7 @@ class _NarrativeDrawerState extends State<NarrativeDrawer> {
                                                     context)
                                                 .aggregator<
                                                     QuestionnaireResponseAggregator>()
-                                                .aggregate()
+                                                .aggregate(containPatient: true)
                                                 ?.toJson())
                                         : QuestionnaireFiller.of(context)
                                             .aggregator<NarrativeAggregator>()
@@ -107,7 +107,7 @@ class _NarrativeDrawerState extends State<NarrativeDrawer> {
                                       QuestionnaireFiller.of(context)
                                           .aggregator<
                                               QuestionnaireResponseAggregator>()
-                                          .aggregate()
+                                          .aggregate(containPatient: true)
                                           ?.toJson(),
                                     ),
                                   ),

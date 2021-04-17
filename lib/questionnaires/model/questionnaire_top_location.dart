@@ -300,6 +300,8 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
   }
 
   /// Populate the answers in the questionnaire with the answers from a response.
+  ///
+  /// Does nothing if [questionnaireResponse] is null.
   void populate(QuestionnaireResponse? questionnaireResponse) {
     _logger.log('Populating with $questionnaireResponse',
         level: LogLevel.debug);

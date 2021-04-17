@@ -17,6 +17,12 @@ the FHIRFLI 'fhir' library.
 [![Pub Version](https://img.shields.io/pub/v/fhir?label=pub.dev&labelColor=333940&logo=dart)](https://pub.dev/packages/fhir)
 https://pub.dev/packages/fhir
 
+Discussions and support around Faiadashu and the FHIRFLI library can be found on the FHIRFLI Slack channel:
+
+[![FHIR-FLI Slack Channel](images/Slack_RGB-98x40-335cb2d.png)](https://join.slack.com/t/fhir-fli/shared_invite/zt-ofv2cycm-9yjdMj8a~zXp7nDBeB_sNQ)  
+[Join the FHIR-FLI Slack channel!](https://join.slack.com/t/fhir-fli/shared_invite/zt-ofv2cycm-9yjdMj8a~zXp7nDBeB_sNQ)
+
+
 Support for the FHIR Standard is focussed on the R4 release which is located here: [![FHIR R4](fhir-logo-www.png)](https://hl7.org/fhir/R4/)  https://hl7.org/fhir/R4/
 
 ### Theme
