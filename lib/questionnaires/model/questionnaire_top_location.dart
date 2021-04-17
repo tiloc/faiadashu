@@ -10,21 +10,17 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
   final Map<String, QuestionnaireLocation> _cachedItems = {};
   List<QuestionnaireLocation>? _enabledWhens;
   final List<Aggregator>? _aggregators;
-  final ExternalResourceProvider? _extResourceProvider;
+  final FhirResourceProvider fhirResourceProvider;
   int _revision = 1;
   final Locale locale;
   static final _logger = Logger(QuestionnaireTopLocation);
 
-  /// Create the first location top-down of the given [Questionnaire].
-  /// Will throw [Error]s in case this [Questionnaire] has no items.
-  /// A newly constructed [QuestionnaireTopLocation] will require an invocation of
-  /// [init], or it might malfunction!
-  QuestionnaireTopLocation.fromQuestionnaire(Questionnaire questionnaire,
+  QuestionnaireTopLocation._(
       {required this.locale,
-      List<Aggregator>? aggregators,
-      ExternalResourceProvider? externalResourceProvider})
+      required Questionnaire questionnaire,
+      required this.fhirResourceProvider,
+      required List<Aggregator>? aggregators})
       : _aggregators = aggregators,
-        _extResourceProvider = externalResourceProvider,
         super._(
             questionnaire,
             null,
@@ -33,8 +29,6 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
             null,
             0,
             0) {
-    _logger.log('QuestionnaireTopLocation.fromQuestionnaire',
-        level: LogLevel.debug);
     _top = this;
     // This will set up the traversal order and fill up the cache.
     _ensureOrderedItems();
@@ -65,13 +59,53 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
     activateEnableWhen();
   }
 
-  /// Bring the model into a fully functional state.
-  /// Unfortunately, this is necessary, as some operations are async and
-  /// you cannot have an async constructor.
-  Future<void> initState() async {
-    await _extResourceProvider?.init();
+  /// Create the anchor location of a [Questionnaire].
+  ///
+  /// Will introspect the provided [fhirResourceProvider] to locate a
+  /// * mandatory [Questionnaire]
+  /// * mandatory [Subject]
+  /// * optional [QuestionnaireResponse]
+  /// * optional [ValueSet]
+  ///
+  /// Will throw [Error]s in case the [Questionnaire] has no items.
+  ///
+  /// The [fhirResourceProvider] is used for access to any required resources,
+  /// such as ValueSets, Subject, or Encounter.
+  static Future<QuestionnaireTopLocation> fromFhirResourceBundle(
+      {required Locale locale,
+      List<Aggregator>? aggregators,
+      required FhirResourceProvider fhirResourceProvider}) async {
+    _logger.debug('QuestionnaireTopLocation.fromFhirResourceBundle');
+
+    final questionnaire = await fhirResourceProvider
+        .getAsyncResource(questionnaireResourceUri) as Questionnaire?;
+
+    if (questionnaire == null) {
+      throw StateError('No Questionnaire has been provided.');
+    }
+
+    final topLocation = QuestionnaireTopLocation._(
+        questionnaire: questionnaire,
+        locale: locale,
+        aggregators: aggregators ??
+            [
+              TotalScoreAggregator(),
+              NarrativeAggregator(),
+              QuestionnaireResponseAggregator()
+            ],
+        fhirResourceProvider: fhirResourceProvider);
+
+    await topLocation.fhirResourceProvider.init();
+
+    final response =
+        fhirResourceProvider.getResource(questionnaireResponseResourceUri)
+            as QuestionnaireResponse?;
+    topLocation.populate(response);
+
+    return topLocation;
   }
 
+  /// Returns an [Aggregator] of the given type.
   T aggregator<T extends Aggregator>() {
     if (_aggregators == null) {
       throw StateError('Aggregators have not been specified in constructor.');
@@ -91,14 +125,14 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
 
   /// Get a [Resource] which is referenced in the [Questionnaire].
   /// If [uri] starts with '#' then it is located as a contained element.
-  /// Otherwise it is assumed to be external and resolved through [ExternalResourceProvider].
+  /// Otherwise it is assumed to be external and resolved through [FhirResourceProvider].
   ///
   /// Will throw if the Resource does not exist.
   Resource getResource(String uri, {dynamic context}) {
     final isResourceContained = uri.startsWith('#');
     final resource = isResourceContained
         ? findContainedByElementId(uri)
-        : _extResourceProvider?.getResource(uri);
+        : fhirResourceProvider.getResource(uri);
 
     if (resource == null) {
       if (isResourceContained) {

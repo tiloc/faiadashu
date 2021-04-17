@@ -1,15 +1,15 @@
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
-import '../../resource_provider/external_resource_provider.dart';
+import '../../resource_provider/fhir_resource_provider.dart';
 import '../questionnaires.dart';
 import 'narrative_drawer.dart';
 
 /// Fill a questionnaire through a wizard-style series of individual questions.
 class QuestionnaireStepperPage extends StatefulWidget {
-  final ExternalResourceProvider questionnaireProvider;
+  final FhirResourceProvider fhirResourceProvider;
 
-  const QuestionnaireStepperPage(this.questionnaireProvider, {Key? key})
+  const QuestionnaireStepperPage({required this.fhirResourceProvider, Key? key})
       : super(key: key);
 
   @override
@@ -22,8 +22,9 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
   @override
   Widget build(BuildContext context) {
     final controller = PageController();
-    return QuestionnaireFiller(widget.questionnaireProvider,
+    return QuestionnaireFiller(
         locale: Localizations.localeOf(context),
+        fhirResourceProvider: widget.fhirResourceProvider,
         builder: (BuildContext context) => Scaffold(
             appBar: AppBar(
               leading: Builder(

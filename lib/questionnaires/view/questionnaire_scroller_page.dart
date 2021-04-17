@@ -9,22 +9,19 @@ import '../../resource_provider/resource_provider.dart';
 import '../questionnaires.dart';
 import 'narrative_drawer.dart';
 
-/// Fill a questionnaire through a vertically scrolling input form.
+/// Fills a [Questionnaire] through a vertically scrolling input form.
 class QuestionnaireScrollerPage extends StatefulWidget {
   final Locale? locale;
-  final ExternalResourceProvider questionnaireProvider;
   final Widget? floatingActionButton;
   final List<Widget>? frontMatter;
   final List<Widget>? backMatter;
-  final ExternalResourceProvider? questionnaireResponseProvider;
-  final ExternalResourceProvider? resourceProvider;
+  final FhirResourceProvider fhirResourceProvider;
   final List<Aggregator<dynamic>>? aggregators;
   final void Function(BuildContext context, Uri url)? onLinkTap;
 
-  const QuestionnaireScrollerPage(this.questionnaireProvider,
+  const QuestionnaireScrollerPage(
       {this.locale,
-      this.questionnaireResponseProvider,
-      this.resourceProvider,
+      required this.fhirResourceProvider,
       this.floatingActionButton,
       this.frontMatter,
       this.backMatter = const [
@@ -78,9 +75,8 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
     final locale = widget.locale ?? Localizations.localeOf(context);
 
     return QuestionnaireFiller(
-      widget.questionnaireProvider,
+      fhirResourceProvider: widget.fhirResourceProvider,
       locale: locale,
-      questionnaireResponseProvider: widget.questionnaireResponseProvider,
       builder: (BuildContext context) {
         final mainMatterLength =
             QuestionnaireFiller.of(context).surveyLocations.length;
@@ -173,7 +169,6 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
                   ),
                 ))));
       },
-      externalResourceProvider: widget.resourceProvider,
       aggregators: widget.aggregators,
       onLinkTap: widget.onLinkTap,
     );

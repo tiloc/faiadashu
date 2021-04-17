@@ -16,49 +16,22 @@ import '../questionnaires.dart';
 class QuestionnaireFiller extends StatefulWidget {
   final Locale locale;
   final WidgetBuilder builder;
-  final ExternalResourceProvider questionnaireProvider;
-  final ExternalResourceProvider? questionnaireResponseProvider;
   final List<Aggregator<dynamic>>? aggregators;
   final void Function(BuildContext context, Uri url)? onLinkTap;
 
-  final ExternalResourceProvider? externalResourceProvider;
+  final FhirResourceProvider fhirResourceProvider;
 
-  Future<QuestionnaireTopLocation> _createTopLocation() async {
-    await questionnaireProvider.init();
-    final questionnaire = ArgumentError.checkNotNull(
-        questionnaireProvider.getResource(questionnaireResourceUri)
-            as Questionnaire?,
-        "'Questionnaire' asset");
-    final topLocation = QuestionnaireTopLocation.fromQuestionnaire(
-        questionnaire,
-        locale: locale,
-        aggregators: aggregators ??
-            [
-              TotalScoreAggregator(),
-              NarrativeAggregator(),
-              QuestionnaireResponseAggregator()
-            ],
-        externalResourceProvider: externalResourceProvider);
+  Future<QuestionnaireTopLocation> _createTopLocation() async =>
+      QuestionnaireTopLocation.fromFhirResourceBundle(
+          locale: locale,
+          aggregators: aggregators,
+          fhirResourceProvider: fhirResourceProvider);
 
-    await Future.wait([
-      topLocation.initState(),
-      if (questionnaireResponseProvider != null)
-        questionnaireResponseProvider!.init()
-    ]);
-
-    final response = questionnaireResponseProvider?.getResource(
-        questionnaireResponseResourceUri) as QuestionnaireResponse?;
-    topLocation.populate(response);
-
-    return topLocation;
-  }
-
-  const QuestionnaireFiller(this.questionnaireProvider,
+  const QuestionnaireFiller(
       {Key? key,
       required this.locale,
       required this.builder,
-      this.externalResourceProvider,
-      this.questionnaireResponseProvider,
+      required this.fhirResourceProvider,
       this.aggregators,
       this.onLinkTap})
       : super(key: key);

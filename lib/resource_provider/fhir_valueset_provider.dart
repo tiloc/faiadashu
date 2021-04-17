@@ -2,10 +2,9 @@ import 'dart:convert';
 
 import 'package:fhir/r4.dart';
 
-import 'external_resource_provider.dart';
+import 'fhir_resource_provider.dart';
 
-// ignore: avoid_classes_with_only_static_members
-class FhirValueSetProvider extends ExternalResourceProvider {
+class FhirValueSetProvider extends FhirResourceProvider {
   @override
   ValueSet? getResource(String uri) {
     switch (uri) {

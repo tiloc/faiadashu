@@ -1,14 +1,14 @@
 import 'dart:developer' as developer;
 import 'dart:io';
 
-import 'package:faiadashu/questionnaires/questionnaires.dart';
+import 'package:faiadashu/questionnaires/view/questionnaire_stepper_page.dart';
 import 'package:faiadashu/resource_provider/resource_provider.dart';
+import 'package:faiadashu_example/questionnaire_launch_tile.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:logging/logging.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'about_page.dart';
 import 'disclaimer_page.dart';
@@ -74,11 +74,32 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final ScrollController _listScrollController = ScrollController();
 
-  QuestionnaireResponse? savedResponse;
+  final Map<String, QuestionnaireResponse?> _savedResponses = {};
 
-  // It is typically NOT possible to resolve value sets through their URL.
+  void _saveResponse(String id, QuestionnaireResponse? response) {
+    if (response == null) {
+      return;
+    }
+
+    _savedResponses[id] = response;
+  }
+
+  QuestionnaireResponse? _restoreResponse(String id) {
+    if (_savedResponses.containsKey(id)) {
+      return _savedResponses[id];
+    } else {
+      return null;
+    }
+  }
+
+  // Build up a registry of ValueSets and CodeSystems which are being referenced
+  // in the questionnaires.
+  //
+  // It is typically *NOT* possible to resolve value sets through their URI, as
+  // these do not point to real web-servers.
+  //
   // This mechanism allows to add them from other sources.
-  final resourceProvider = NestedExternalResourceProvider([
+  final valueSetProvider = RegistryFhirResourceProvider([
     FhirValueSetProvider(),
     AssetResourceProvider.fromMap(<String, String>{
       'http://hl7.org/fhir/ValueSet/ucum-bodyweight':
@@ -112,13 +133,17 @@ class _HomePageState extends State<HomePage> {
   ]);
 
   @override
-  Widget build(BuildContext context) {
-    final fab = FloatingActionButton.extended(
-      label: const Text('Complete'),
-      icon: const Icon(Icons.thumb_up),
-      onPressed: () {},
-    );
+  void initState() {
+    super.initState();
 
+    // TODO: Revive the hard-coded pre-filled response for Bluebook.
+    // Preload the saved responses with a hard-coded response for Bluebook questionnaire.
+    AssetResourceProvider.singleton(questionnaireResponseResourceUri,
+        'assets/responses/bluebook_response.json');
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Builder(
@@ -182,177 +207,72 @@ class _HomePageState extends State<HomePage> {
                     MaterialPageRoute(builder: (context) => ObservationPage()));
               },
             ),
-            ListTile(
-              title: const Text('SDC Demo Scroller'),
-              subtitle: const Text('A gallery of SDC feature support.'),
-              trailing: IconButton(
-                icon: const Icon(Icons.edit_off),
-                onPressed: () async {
-                  final resourceProvider = AssetResourceProvider.singleton(
-                      questionnaireResourceUri,
-                      'assets/instruments/sdc_demo.json');
-                  await resourceProvider.init();
-                  final top = QuestionnaireTopLocation.fromQuestionnaire(
-                      (resourceProvider.getResource(questionnaireResourceUri)
-                          as Questionnaire?)!,
-                      locale: const Locale('en', 'US'),
-                      aggregators: [NarrativeAggregator()]);
-                  top.populate(savedResponse);
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => NarrativePage(
-                                topLocation: top,
-                              )));
-                },
-              ),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => QuestionnaireScrollerPage(
-                                AssetResourceProvider.singleton(
-                                    questionnaireResourceUri,
-                                    'assets/instruments/sdc_demo.json'),
-                                resourceProvider: resourceProvider,
-                                // Use the response which has been stashed to memory by the Save button.
-                                questionnaireResponseProvider:
-                                    InMemoryResourceProvider.inMemory(
-                                        QuestionnaireResponse, savedResponse),
-                                // Callback for supportLink
-                                onLinkTap: (context, url) async {
-                              if (await canLaunch(url.toString())) {
-                                if (url.scheme == 'https') {
-                                  await launch(url.toString(),
-                                      forceWebView: true,
-                                      enableJavaScript: true);
-                                } else {
-                                  await launch(
-                                    url.toString(),
-                                  );
-                                }
-                              } else {
-                                throw 'Could not launch $url';
-                              }
-                            },
-                                floatingActionButton: Builder(
-                                  builder: (context) =>
-                                      FloatingActionButton.extended(
-                                    label: const Text('Save'),
-                                    icon: const Icon(Icons.thumb_up),
-                                    onPressed: () {
-                                      // Generate a response and store it in-memory.
-                                      // In a real-world scenario one would persist or post the response instead.
-                                      savedResponse = QuestionnaireFiller.of(
-                                              context)
-                                          .aggregator<
-                                              QuestionnaireResponseAggregator>()
-                                          .aggregate();
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(const SnackBar(
-                                              content: Text('Survey saved.')));
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                ))));
-              },
+            QuestionnaireLaunchTile(
+              title: 'SDC Demo Scroller',
+              subtitle: 'A gallery of SDC feature support.',
+              fhirResourceProvider: valueSetProvider,
+              questionnairePath: 'assets/instruments/sdc_demo.json',
+              saveResponseFunction: _saveResponse,
+              restoreResponseFunction: _restoreResponse,
             ),
-            ListTile(
-              title: const Text('FHIR Hot Beverage IG'),
-              subtitle: const Text('WIP Beverage Questionnaire'),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => QuestionnaireScrollerPage(
-                            AssetResourceProvider.singleton(
-                                questionnaireResourceUri,
-                                'assets/instruments/beverage_ig.json'),
-                            resourceProvider: resourceProvider,
-                            floatingActionButton: fab)));
-              },
+            QuestionnaireLaunchTile(
+              title: 'FHIR Hot Beverage IG',
+              subtitle: 'WIP Beverage Questionnaire',
+              fhirResourceProvider: valueSetProvider,
+              questionnairePath: 'assets/instruments/beverage_ig.json',
+              saveResponseFunction: _saveResponse,
+              restoreResponseFunction: _restoreResponse,
             ),
-            ListTile(
-              title: const Text('SDC Profile Example Render'),
-              subtitle: const Text(
-                  'The reference questionnaire for SDC render features.'),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => QuestionnaireScrollerPage(
-                            AssetResourceProvider.singleton(
-                                questionnaireResourceUri,
-                                'assets/instruments/sdc-example-render.json'),
-                            resourceProvider: resourceProvider)));
-              },
+            QuestionnaireLaunchTile(
+              title: 'SDC Profile Example Render',
+              subtitle: 'The reference questionnaire for SDC render features.',
+              fhirResourceProvider: valueSetProvider,
+              questionnairePath: 'assets/instruments/sdc-example-render.json',
+              saveResponseFunction: _saveResponse,
+              restoreResponseFunction: _restoreResponse,
             ),
-            ListTile(
-              title: const Text('Argonaut Questionnaire Sampler'),
-              subtitle: const Text(
-                  'Reference sample from the Argonaut Questionnaire Implementation Guide.'),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => QuestionnaireScrollerPage(
-                        AssetResourceProvider.singleton(
-                            questionnaireResourceUri,
-                            'assets/instruments/argonaut_sampler.json'),
-                        resourceProvider: resourceProvider,
-                      ),
-                    ));
-              },
-            ),
-            ListTile(
-              title: const Text('Der Argonaut-Fragebogen'),
+            QuestionnaireLaunchTile(
+              title: 'Argonaut Questionnaire Sampler',
               subtitle:
-                  const Text('Ein deutsches Beispiel für einen Fragebogen.'),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => QuestionnaireScrollerPage(
-                        AssetResourceProvider.singleton(
-                            questionnaireResourceUri,
-                            'assets/instruments/argonaut_sampler.json'),
-                        resourceProvider: resourceProvider,
-                        locale: const Locale('de', 'DE'),
-                      ),
-                    ));
-              },
+                  'Reference sample from the Argonaut Questionnaire Implementation Guide.',
+              fhirResourceProvider: valueSetProvider,
+              questionnairePath: 'assets/instruments/argonaut_sampler.json',
+              saveResponseFunction: _saveResponse,
+              restoreResponseFunction: _restoreResponse,
             ),
-            ListTile(
-              title: const Text('استبيان "أرجونوت"'),
-              subtitle: const Text('مثال على استبيان عربي.'),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => QuestionnaireScrollerPage(
-                        AssetResourceProvider.singleton(
-                            questionnaireResourceUri,
-                            'assets/instruments/argonaut_sampler.json'),
-                        resourceProvider: resourceProvider,
-                        locale: const Locale('ar', 'BH'),
-                      ),
-                    ));
-              },
+            QuestionnaireLaunchTile(
+              locale: const Locale('de', 'DE'),
+              title: 'Der Argonaut-Fragebogen',
+              subtitle: 'Ein deutsches Beispiel für einen Fragebogen.',
+              fhirResourceProvider: valueSetProvider,
+              questionnairePath: 'assets/instruments/argonaut_sampler.json',
+              saveResponseFunction: _saveResponse,
+              restoreResponseFunction: _restoreResponse,
             ),
-            ListTile(
-              title: const Text('PHQ9 Questionnaire Scroller'),
-              subtitle:
-                  const Text('Simple choice-based survey with a total score.'),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => QuestionnaireScrollerPage(
-                            AssetResourceProvider.singleton(
-                                questionnaireResourceUri,
-                                'assets/instruments/phq9_instrument.json'),
-                            resourceProvider: resourceProvider)));
-              },
+            QuestionnaireLaunchTile(
+              locale: const Locale('ar', 'BH'),
+              title: 'استبيان "أرجونوت"',
+              subtitle: 'مثال على استبيان عربي.',
+              fhirResourceProvider: valueSetProvider,
+              questionnairePath: 'assets/instruments/argonaut_sampler.json',
+              saveResponseFunction: _saveResponse,
+              restoreResponseFunction: _restoreResponse,
+            ),
+            QuestionnaireLaunchTile(
+              title: 'PHQ9 Questionnaire Scroller',
+              subtitle: 'Simple choice-based survey with a total score.',
+              fhirResourceProvider: valueSetProvider,
+              questionnairePath: 'assets/instruments/phq9_instrument.json',
+              saveResponseFunction: _saveResponse,
+              restoreResponseFunction: _restoreResponse,
+            ),
+            QuestionnaireLaunchTile(
+              title: 'PHQ9 Questionnaire Scroller',
+              subtitle: 'Simple choice-based survey with a total score.',
+              fhirResourceProvider: valueSetProvider,
+              questionnairePath: 'assets/instruments/phq9_instrument.json',
+              saveResponseFunction: _saveResponse,
+              restoreResponseFunction: _restoreResponse,
             ),
             ListTile(
               title: const Text('PHQ9 Questionnaire Stepper'),
@@ -363,73 +283,43 @@ class _HomePageState extends State<HomePage> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => QuestionnaireStepperPage(
-                            AssetResourceProvider.singleton(
+                            fhirResourceProvider: AssetResourceProvider.singleton(
                                 questionnaireResourceUri,
                                 'assets/instruments/phq9_instrument.json'))));
               },
             ),
-            ListTile(
-              title: const Text('HF Questionnaire Scroller'),
+            QuestionnaireLaunchTile(
+              title: 'HF Questionnaire Scroller',
+              subtitle: 'A heart failure survey with a total score.',
+              fhirResourceProvider: valueSetProvider,
+              questionnairePath: 'assets/instruments/hf_instrument.json',
+              saveResponseFunction: _saveResponse,
+              restoreResponseFunction: _restoreResponse,
+            ),
+            QuestionnaireLaunchTile(
+              title: 'PRAPARE Questionnaire Scroller',
+              subtitle: 'Real-world, mixed-type survey from the US',
+              fhirResourceProvider: valueSetProvider,
+              questionnairePath: 'assets/instruments/prapare_instrument.json',
+              saveResponseFunction: _saveResponse,
+              restoreResponseFunction: _restoreResponse,
+            ),
+            QuestionnaireLaunchTile(
+              title: 'Bluebook Questionnaire Scroller',
+              subtitle: 'Real-world, mixed-type survey from Australia',
+              fhirResourceProvider: valueSetProvider,
+              questionnairePath: 'assets/instruments/bluebook.json',
+              saveResponseFunction: _saveResponse,
+              restoreResponseFunction: _restoreResponse,
+            ),
+            QuestionnaireLaunchTile(
+              title: 'WHO COVID19 Surveillance',
               subtitle:
-                  const Text('A heart failure survey with a total score.'),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => QuestionnaireScrollerPage(
-                            AssetResourceProvider.singleton(
-                                questionnaireResourceUri,
-                                'assets/instruments/hf_instrument.json'),
-                            resourceProvider: resourceProvider)));
-              },
-            ),
-            ListTile(
-              title: const Text('PRAPARE Questionnaire Scroller'),
-              subtitle: const Text('Real-world, mixed-type survey from the US'),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => QuestionnaireScrollerPage(
-                            AssetResourceProvider.singleton(
-                                questionnaireResourceUri,
-                                'assets/instruments/prapare_instrument.json'),
-                            resourceProvider: resourceProvider)));
-              },
-            ),
-            ListTile(
-              title: const Text('Bluebook Questionnaire Scroller'),
-              subtitle:
-                  const Text('Real-world, mixed-type survey from Australia'),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => QuestionnaireScrollerPage(
-                            AssetResourceProvider.singleton(
-                                questionnaireResourceUri,
-                                'assets/instruments/bluebook.json'),
-                            questionnaireResponseProvider:
-                                AssetResourceProvider.singleton(
-                                    questionnaireResponseResourceUri,
-                                    'assets/responses/bluebook_response.json'),
-                            resourceProvider: resourceProvider)));
-              },
-            ),
-            ListTile(
-              title: const Text('WHO COVID19 Surveillance'),
-              subtitle: const Text(
-                  'Real-world example with very long ValueSets and enableWhen'),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => QuestionnaireScrollerPage(
-                            AssetResourceProvider.singleton(
-                                questionnaireResourceUri,
-                                'assets/instruments/who_covid19.json'),
-                            resourceProvider: resourceProvider)));
-              },
+                  'Real-world example with very long ValueSets and enableWhen',
+              fhirResourceProvider: valueSetProvider,
+              questionnairePath: 'assets/instruments/who_covid19.json',
+              saveResponseFunction: _saveResponse,
+              restoreResponseFunction: _restoreResponse,
             ),
           ],
         ),
