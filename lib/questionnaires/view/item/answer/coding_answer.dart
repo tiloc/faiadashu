@@ -54,7 +54,7 @@ class _CodingAnswerState
                 .toList());
       }
     } catch (exception) {
-      _logger.log(
+      _logger.warn(
           'Could not initialize ${(CodingAnswer).toString()} for ${widget.location.linkId}',
           error: exception);
       _initFailure = exception;

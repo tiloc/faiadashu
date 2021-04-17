@@ -11,7 +11,7 @@ import '../questionnaire_location.dart';
 /// Can deal with incomplete questionnaires.
 /// Will return 0 when no score field exists on the questionnaire.
 class TotalScoreAggregator extends Aggregator<Decimal> {
-  static final logger = Logger(TotalScoreAggregator);
+  static final _logger = Logger(TotalScoreAggregator);
 
   late final QuestionnaireLocation? totalScoreLocation;
   late final String logTag;
@@ -43,20 +43,20 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
       return null;
     }
 
-    logger.debug('totalScore.aggregrate');
+    _logger.debug('totalScore.aggregrate');
     // Special handling if this is the total score
     double sum = 0.0;
     for (final location in topLocation.preOrder()) {
       if (location != totalScoreLocation) {
         final points = location.score;
-        logger.log('Adding $location: $points', level: LogLevel.trace);
+        _logger.trace('Adding $location: $points');
         if (points != null) {
           sum += points.value!;
         }
       }
     }
 
-    logger.debug('sum: $sum');
+    _logger.debug('sum: $sum');
     final result = Decimal(sum);
     if (notifyListeners) {
       value = result;

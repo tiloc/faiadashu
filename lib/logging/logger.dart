@@ -20,18 +20,6 @@ class Logger {
   Logger._(this.name) : loggingLogger = logging.Logger(name);
 
   /// Log. See dart:developer log for meaning of params.
-  void log(
-    String message, {
-    DateTime? time,
-    int? sequenceNumber,
-    logging.Level level = LogLevel.info,
-    Zone? zone,
-    Object? error,
-    StackTrace? stackTrace,
-  }) {
-    loggingLogger.log(level, message, error, stackTrace, zone);
-  }
-
   void warn(
     String message, {
     DateTime? time,
@@ -41,6 +29,18 @@ class Logger {
     StackTrace? stackTrace,
   }) {
     loggingLogger.log(LogLevel.warn, message, error, stackTrace, zone);
+  }
+
+  /// Log. See dart:developer log for meaning of params.
+  void error(
+    String message, {
+    DateTime? time,
+    int? sequenceNumber,
+    Zone? zone,
+    Object? error,
+    StackTrace? stackTrace,
+  }) {
+    loggingLogger.log(LogLevel.error, message, error, stackTrace, zone);
   }
 
   /// Log. See dart:developer log for meaning of params.
@@ -54,6 +54,17 @@ class Logger {
       // Can the compiler kill this code on prod builds?
       loggingLogger.log(LogLevel.trace, message, null, null, zone);
     }
+  }
+
+  /// Log. See dart:developer log for meaning of params.
+  void info(
+    String message, {
+    DateTime? time,
+    int? sequenceNumber,
+    Zone? zone,
+  }) {
+    // Can the compiler kill this code on prod builds?
+    loggingLogger.log(LogLevel.info, message, null, null, zone);
   }
 
   /// Log. See dart:developer log for meaning of params.

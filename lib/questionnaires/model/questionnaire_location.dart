@@ -69,15 +69,15 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
               ?.valueCoding;
           // TODO: More sophistication- System, cardinality, etc.
           if (responseCoding?.code == qew.answerCoding?.code) {
-            logger.log('enableWhen: $responseCoding == ${qew.answerCoding}',
-                level: LogLevel.debug);
+            logger.debug('enableWhen: $responseCoding == ${qew.answerCoding}');
             if (qew.operator_ == QuestionnaireEnableWhenOperator.eq) {
               anyTrigger = true;
               allTriggered++;
             }
           } else {
-            logger.log('enableWhen: $responseCoding != ${qew.answerCoding}',
-                level: LogLevel.debug);
+            logger.debug(
+              'enableWhen: $responseCoding != ${qew.answerCoding}',
+            );
             if (qew.operator_ == QuestionnaireEnableWhenOperator.ne) {
               anyTrigger = true;
               allTriggered++;
@@ -85,8 +85,7 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
           }
           break;
         default:
-          logger.log('Unsupported operator: ${qew.operator_}.',
-              level: LogLevel.warn);
+          logger.warn('Unsupported operator: ${qew.operator_}.');
           // Err on the side of caution: Enable fields when enableWhen cannot be evaluated.
           anyTrigger = true;
           allTriggered++;
@@ -170,8 +169,7 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
       (questionnaireItem.item != null) && (questionnaireItem.item!.isNotEmpty);
 
   set responseItem(QuestionnaireResponseItem? questionnaireResponseItem) {
-    logger.log('set responseItem $questionnaireResponseItem',
-        level: LogLevel.debug);
+    logger.debug('set responseItem $questionnaireResponseItem');
     if (questionnaireResponseItem != _questionnaireResponseItem) {
       _questionnaireResponseItem = questionnaireResponseItem;
       top.bumpRevision();
@@ -276,7 +274,7 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
   }
 
   LinkedHashMap<String, QuestionnaireLocation> _addChildren() {
-    logger.log('_addChildren $linkId', level: LogLevel.trace);
+    logger.trace('_addChildren $linkId');
     final LinkedHashMap<String, QuestionnaireLocation> locationMap =
         LinkedHashMap<String, QuestionnaireLocation>();
     if (locationMap.containsKey(linkId)) {

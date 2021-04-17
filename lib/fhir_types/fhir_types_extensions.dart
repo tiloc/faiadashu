@@ -73,7 +73,7 @@ extension FDashDateTimeExtension on FhirDateTime {
 }
 
 extension FDashDecimalExtension on Decimal {
-  static final logger = Logger(Decimal);
+  static final _logger = Logger(Decimal);
 
   String format(Locale locale) {
     if (!isValid) {
@@ -84,7 +84,7 @@ extension FDashDecimalExtension on Decimal {
       final decimalFormat = NumberFormat.decimalPattern(locale.toString());
       return decimalFormat.format(value);
     } catch (exception) {
-      logger.log('Cannot format $this', level: LogLevel.warn, error: exception);
+      _logger.warn('Cannot format $this', error: exception);
       rethrow;
     }
   }

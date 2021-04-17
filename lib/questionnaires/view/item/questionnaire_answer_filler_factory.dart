@@ -9,11 +9,11 @@ import 'item.dart';
 
 // ignore: avoid_classes_with_only_static_members
 class QuestionnaireAnswerFillerFactory {
-  static final logger = Logger(QuestionnaireAnswerFillerFactory);
+  static final _logger = Logger(QuestionnaireAnswerFillerFactory);
 
   static QuestionnaireAnswerFiller fromQuestionnaireItem(
       QuestionnaireLocation location, AnswerLocation answerLocation) {
-    logger.log('Creating AnswerFiller for $location', level: LogLevel.debug);
+    _logger.debug('Creating AnswerFiller for $location');
 
     try {
       switch (location.questionnaireItem.type!) {
@@ -46,8 +46,7 @@ class QuestionnaireAnswerFillerFactory {
               'Unsupported item type: ${location.questionnaireItem.type!}');
       }
     } catch (exception) {
-      logger.log('Cannot create answer filler:',
-          level: LogLevel.warn, error: exception);
+      _logger.warn('Cannot create answer filler:', error: exception);
       return _BrokenItem(location, answerLocation, exception);
     }
   }

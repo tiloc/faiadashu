@@ -18,7 +18,7 @@ class StaticItem extends QuestionnaireAnswerFiller {
 }
 
 class _StaticItemState extends QuestionnaireAnswerState {
-  static final logger = Logger(_StaticItemState);
+  static final _logger = Logger(_StaticItemState);
 
   // Bypass the regular 'value' field, as this has too many side-effects for a pure output widget.
   Decimal? calcResult;
@@ -34,15 +34,14 @@ class _StaticItemState extends QuestionnaireAnswerState {
             widget.location.responseItem?.answer?.first.valueQuantity?.value;
 
     if (widget.location.isCalculatedExpression) {
-      logger.log(
+      _logger.debug(
           'Adding listener to ${widget.location} for calculated expression');
       widget.location.top.addListener(() => _questionnaireChanged());
     }
   }
 
   void _questionnaireChanged() {
-    logger.log('questionnaireChanged(): ${widget.location.responseItem}',
-        level: LogLevel.debug);
+    _logger.debug('questionnaireChanged(): ${widget.location.responseItem}');
     if (widget.location.responseItem != null) {
       setState(() {
         calcResult =
@@ -50,7 +49,7 @@ class _StaticItemState extends QuestionnaireAnswerState {
                 widget.location.responseItem!.answer?.firstOrNull?.valueQuantity
                     ?.value;
       });
-      logger.log('calculated result: $calcResult');
+      _logger.debug('calculated result: $calcResult');
     }
   }
 

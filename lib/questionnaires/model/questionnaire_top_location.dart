@@ -44,7 +44,7 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
       }
     }
 
-    _logger.log('_enabledWhens: $_enabledWhens', level: LogLevel.debug);
+    _logger.debug('_enabledWhens: $_enabledWhens');
 
     if (aggregators != null) {
       for (final aggregator in aggregators) {
@@ -180,7 +180,7 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
             valueSetInclude.concept ?? [];
 
         if (valueSetConcepts.isEmpty) {
-          _logger.log('Concepts in ValueSet $uri is empty.');
+          _logger.debug('Concepts in ValueSet $uri is empty.');
           // TODO: Do I need something recursive here? Can there be nested inclusion?
           // ValueSets may contain references to further included ValueSets.
           final includeUri =
@@ -303,8 +303,7 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
   ///
   /// Does nothing if [questionnaireResponse] is null.
   void populate(QuestionnaireResponse? questionnaireResponse) {
-    _logger.log('Populating with $questionnaireResponse',
-        level: LogLevel.debug);
+    _logger.debug('Populating with $questionnaireResponse');
     if (questionnaireResponse == null) {
       return;
     }
@@ -322,16 +321,17 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
   /// Update the current enablement status of all items.
   void updateEnableWhen({bool notifyListeners = true}) {
     if (_enabledWhens == null) {
-      _logger.log('updateEnableWhen: no conditional items',
-          level: LogLevel.trace);
+      _logger.trace(
+        'updateEnableWhen: no conditional items',
+      );
       return;
     }
-    _logger.log('updateEnableWhen()', level: LogLevel.trace);
+    _logger.trace('updateEnableWhen()');
 
     final previouslyEnabled = List<bool>.generate(
         preOrder().length, (index) => preOrder().elementAt(index).enabled,
         growable: false);
-    _logger.log('prevEnabled: $previouslyEnabled', level: LogLevel.trace);
+    _logger.trace('prevEnabled: $previouslyEnabled');
     for (final location in preOrder()) {
       location._enabled = true;
     }
@@ -342,12 +342,12 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
     final afterEnabled = List<bool>.generate(
         preOrder().length, (index) => preOrder().elementAt(index).enabled,
         growable: false);
-    _logger.log('afterEnabled: $afterEnabled', level: LogLevel.trace);
+    _logger.trace('afterEnabled: $afterEnabled');
 
     if (!listEquals(previouslyEnabled, afterEnabled)) {
       bumpRevision(notifyListeners: notifyListeners);
     } else {
-      _logger.log('enableWhen unchanged.', level: LogLevel.debug);
+      _logger.debug('enableWhen unchanged.');
     }
   }
 

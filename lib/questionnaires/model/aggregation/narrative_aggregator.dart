@@ -131,12 +131,10 @@ class NarrativeAggregator extends Aggregator<Narrative> {
 
   @override
   Narrative? aggregate({bool notifyListeners = false}) {
-    _logger.log(
-        '$this.aggregate (topRev: ${topLocation.revision}, rev: $_revision)',
-        level: LogLevel.debug);
+    _logger.debug(
+        '$this.aggregate (topRev: ${topLocation.revision}, rev: $_revision)');
     if (topLocation.revision == _revision) {
-      _logger.log('Regurgitating narrative revision $_revision',
-          level: LogLevel.debug);
+      _logger.debug('Regurgitating narrative revision $_revision');
       return _narrative;
     }
     // Manually invoke the update, because the order matters and enableWhen calcs need to come after answer value updates.

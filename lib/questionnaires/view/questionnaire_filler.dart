@@ -48,7 +48,7 @@ class QuestionnaireFiller extends StatefulWidget {
 }
 
 class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
-  static final logger = Logger(_QuestionnaireFillerState);
+  static final _logger = Logger(_QuestionnaireFillerState);
 
   late final Future<QuestionnaireTopLocation> builderFuture;
   QuestionnaireTopLocation? _topLocation;
@@ -62,7 +62,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
 
   @override
   void dispose() {
-    logger.trace('dispose');
+    _logger.trace('dispose');
 
     if (_onTopChangeListenerFunction != null && _topLocation != null) {
       _topLocation!.removeListener(_onTopChangeListenerFunction!);
@@ -73,7 +73,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
   }
 
   void _onTopChange() {
-    logger.trace('_onTopChange');
+    _logger.trace('_onTopChange');
     if (mounted) {
       setState(() {});
     }
@@ -81,28 +81,27 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
 
   @override
   Widget build(BuildContext context) {
-    logger.trace('Enter build()');
+    _logger.trace('Enter build()');
     return FutureBuilder<QuestionnaireTopLocation>(
         future: builderFuture,
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.active:
               // This should never happen in our use-case (is for streaming)
-              logger.warn('FutureBuilder is active...');
+              _logger.warn('FutureBuilder is active...');
               return QuestionnaireLoadingIndicator(snapshot);
             case ConnectionState.none:
               return QuestionnaireLoadingIndicator(snapshot);
             case ConnectionState.waiting:
-              logger.log('FutureBuilder still waiting for data...',
-                  level: LogLevel.debug);
+              _logger.debug('FutureBuilder still waiting for data...');
               return QuestionnaireLoadingIndicator(snapshot);
             case ConnectionState.done:
               if (snapshot.hasError) {
-                logger.warn('FutureBuilder hasError');
+                _logger.warn('FutureBuilder hasError');
                 return QuestionnaireLoadingIndicator(snapshot);
               }
               if (snapshot.hasData) {
-                logger.log('FutureBuilder hasData');
+                _logger.debug('FutureBuilder hasData');
                 _topLocation = snapshot.data;
                 // TODO: There has got to be a more elegant way! Goal is to register the lister exactly once, after the future has completed.
                 // Dart has abilities to chain Futures.
@@ -139,7 +138,7 @@ class QuestionnaireFillerData extends InheritedWidget {
     required this.locale,
     this.onLinkTap,
     required WidgetBuilder builder,
-  })  : _revision = topLocation.revision,
+  })   : _revision = topLocation.revision,
         surveyLocations = topLocation.preOrder(),
         _itemFillers = List<QuestionnaireItemFiller?>.filled(
             topLocation.preOrder().length, null),

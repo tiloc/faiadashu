@@ -110,6 +110,7 @@ class CodingItemModel extends ItemModel<CodeableConcept> {
         true;
   }
 
+  // TODO: Is this really appropriate?
   // Take the existing extensions that might contain information about
   // ordinal values and convert them from ordinalValue to iso21090-CO-value
   List<FhirExtension>? _createOrdinalExtension(
