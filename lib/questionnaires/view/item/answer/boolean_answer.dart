@@ -25,8 +25,11 @@ class _BooleanItemState
 
   @override
   Widget buildReadOnly(BuildContext context) {
-    // TODO: Localized, human-readable output.
-    return Text(value?.toString() ?? '');
+    return Text((value == null)
+        ? ''
+        : (value == Boolean(true))
+            ? '[X]'
+            : '[ ]');
   }
 
   @override

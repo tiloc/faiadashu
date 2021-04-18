@@ -1,8 +1,21 @@
-## SDC Capabilities
+## Structured Data Capture (SDC) Capabilities
+The Form Filler is based on a specification called [Structured Data Capture (SDC)](https://hl7.org/fhir/uv/sdc/2019May/index.html).
+
+Information on Structured Data Capture can be found here:
+* [SDC Home Page](https://hl7.org/fhir/uv/sdc/2019May/)
+* [YT Video from FHIR DevDays](https://www.youtube.com/watch?v=WPudaF4S7Bk)
+* There is a chat channel at https://chat.fhir.org stream `#questionnaire`.
+
+  
+
 
 **Click this video to watch the capabilities in action**
 
 [![Walkthrough of the capabilities](https://img.youtube.com/vi/k9vEy9Z_L18/hqdefault.jpg)](https://www.youtube.com/watch?v=k9vEy9Z_L18 "Walkthrough of the Capabilities")
+
+### Argonaut
+[Argonaut](http://fhir.org/guides/argonaut/questionnaire/index.html) is a subset of SDC and based on FHIR R3. The Form Filler is based on FHIR R4, which inherently makes it non-conformant
+to Argonaut. It does fill all the corresponding mandatory fields in the R4 QuestionnaireResponse.
 
 ### Advanced Rendering
 #### rendering-style
@@ -155,7 +168,7 @@ Support for leaving a question unanswered.
 #### open-choice 
 Same as `choice` with the following differences:
 - repeats is not supported
-- a single text input field labeled 'Other' is added to the selections
+- a single text input field labeled 'Other' is presented below the selections
 
 #### url
 Supported (accepts http, https, ftp, and sftp)
@@ -191,7 +204,11 @@ Status can be set to any of the supported values. Setting the status to complete
 Will be set to the current time.
 
 #### Narrative
-A narrative will be auto-generated. Its status will be `generated`, unless it is `empty`.
+A narrative will be auto-generated. Its status will be `generated`. Empty narratives will be omitted entirely.
+
+#### Subject
+A reference to the subject will be added if a subject with an `id` is present. The SDK can be requested to place the
+entire `Patient` into the `contained` section of the QuestionnaireResponse.
 
 #### Answers
 All detail from the questions in the questionnaire carries over into the Response.
