@@ -132,7 +132,9 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
     final isResourceContained = uri.startsWith('#');
     final resource = isResourceContained
         ? findContainedByElementId(uri)
-        : fhirResourceProvider.getResource(uri);
+        : RegistryFhirResourceProvider(
+            // Certain Value Sets need to be made available to questionnaires, even if they are not explicitly provided.
+            [FhirValueSetProvider(), fhirResourceProvider]).getResource(uri);
 
     if (resource == null) {
       if (isResourceContained) {

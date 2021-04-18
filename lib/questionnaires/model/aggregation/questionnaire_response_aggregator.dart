@@ -125,6 +125,7 @@ class QuestionnaireResponseAggregator
       item: (responseItems.isNotEmpty) ? responseItems : null,
       authored: FhirDateTime(DateTime.now()),
       text: (narrative?.status == NarrativeStatus.empty) ? null : narrative,
+      language: Code(locale.toLanguageTag()),
       subject: subjectReference,
       questionnaireElement: (questionnaireTitle != null)
           ? Element(extension_: [
