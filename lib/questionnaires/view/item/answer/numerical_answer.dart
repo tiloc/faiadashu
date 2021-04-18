@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -26,8 +28,21 @@ class _NumericalAnswerState
   late final NumericalItemModel _itemModel;
   late final int? _divisions;
   late final TextInputFormatter _numberInputFormatter;
+  late final LinkedHashMap<String, Coding> _units;
 
   _NumericalAnswerState();
+
+  String _keyStringFromCoding(Coding coding) {
+    final choiceString =
+        (coding.code != null) ? coding.code?.value : coding.display;
+
+    if (choiceString == null) {
+      throw QuestionnaireFormatException(
+          'Insufficient info for key string in $coding', coding);
+    } else {
+      return choiceString;
+    }
+  }
 
   @override
   void initState() {
@@ -47,6 +62,22 @@ class _NumericalAnswerState
 
     _numberInputFormatter =
         NumericalTextInputFormatter(_itemModel.numberFormat);
+
+    final unit = qi.unit;
+    // ignore: prefer_collection_literals
+    _units = LinkedHashMap<String, Coding>();
+    final unitsUri = qi.extension_
+        ?.extensionOrNull(
+            'http://hl7.org/fhir/StructureDefinition/questionnaire-unitValueSet')
+        ?.valueCanonical
+        .toString();
+    if (unitsUri != null) {
+      top.visitValueSet(unitsUri, (coding) {
+        _units[_keyStringFromCoding(coding)] = coding;
+      }, context: qi.linkId);
+    } else if (unit != null) {
+      _units[_keyStringFromCoding(unit)] = unit;
+    }
 
     // TODO: look at initialValue extension
     Quantity? existingValue;
@@ -69,14 +100,14 @@ class _NumericalAnswerState
     return Text(value?.format(locale) ?? '');
   }
 
-  Widget _buildDropDownFromUnits(BuildContext context, List<Coding> units) {
-    if (units.length == 1) {
+  Widget _buildDropDownFromUnits(BuildContext context) {
+    if (_units.length == 1) {
       return Container(
           alignment: Alignment.topLeft,
           padding: const EdgeInsets.only(left: 8, top: 16),
           width: 96,
           child: Text(
-            units.first.localizedDisplay(locale),
+            _units.values.first.localizedDisplay(locale),
             style: Theme.of(context).textTheme.subtitle1,
           ));
     }
@@ -85,15 +116,27 @@ class _NumericalAnswerState
         padding: const EdgeInsets.only(left: 8),
         width: 96,
         child: DropdownButton<String>(
-          value: value?.unit,
+          value: (value != null)
+              ? _keyStringFromCoding(Coding(
+                  system: value?.system,
+                  code: value?.code,
+                  display: value?.unit))
+              : null,
           onChanged: (String? newValue) {
+            final unitCoding = _units[newValue]!;
             value = (value != null)
-                ? value!.copyWith(unit: newValue)
-                : Quantity(unit: newValue);
+                ? value!.copyWith(
+                    unit: unitCoding.localizedDisplay(locale),
+                    system: unitCoding.system,
+                    code: unitCoding.code)
+                : Quantity(
+                    unit: unitCoding.localizedDisplay(locale),
+                    system: unitCoding.system,
+                    code: unitCoding.code);
           },
-          items: units.map<DropdownMenuItem<String>>((Coding value) {
+          items: _units.values.map<DropdownMenuItem<String>>((Coding value) {
             return DropdownMenuItem<String>(
-              value: value.code!.value,
+              value: _keyStringFromCoding(value),
               child: Text(value.localizedDisplay(locale)),
             );
           }).toList(),
@@ -102,21 +145,6 @@ class _NumericalAnswerState
 
   @override
   Widget buildEditable(BuildContext context) {
-    final unit = qi.unit;
-    final units = <Coding>[];
-    final unitsUri = qi.extension_
-        ?.extensionOrNull(
-            'http://hl7.org/fhir/StructureDefinition/questionnaire-unitValueSet')
-        ?.valueCanonical
-        .toString();
-    if (unitsUri != null) {
-      top.visitValueSet(unitsUri, (coding) {
-        units.add(coding);
-      }, context: qi.linkId);
-    } else if (unit != null) {
-      units.add(Coding(code: Code(unit)));
-    }
-
     return _itemModel.isSliding
         ? Slider(
             min: _itemModel.minValue,
@@ -177,7 +205,7 @@ class _NumericalAnswerState
                   }
                 },
               )),
-              if (units.isNotEmpty) _buildDropDownFromUnits(context, units)
+              if (_units.isNotEmpty) _buildDropDownFromUnits(context)
             ]));
   }
 

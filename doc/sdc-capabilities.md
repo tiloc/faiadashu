@@ -78,6 +78,8 @@ Limited support for operators:
 #### boolean
 Comprehensive support, incl. tri-state for "not answered"
 
+See: http://build.fhir.org/questionnaire.html#booleans for a discussion of tri-state.
+
 #### quantity
 Comprehensive support.
 
@@ -151,6 +153,11 @@ Comprehensive support, incl. optionChoice and choices from ValueSets.
 Support for multiple choice (item.repeats = true) and autocomplete from ValueSets (triggered automatically by large # of choices).
 
 Support for leaving a question unanswered.
+
+##### Value Sets
+The value set `http://hl7.org/fhir/ValueSet/yesnodontknow` is hard-coded into the library and always available.
+
+See: http://build.fhir.org/questionnaire.html#valuesets
 
 ##### Extensions
 - optionExclusive

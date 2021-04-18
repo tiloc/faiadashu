@@ -48,7 +48,12 @@
         "code" : "kg"
       },
         {
-          "code" : "[lb_av]"
+          "code" : "[lb_av]",
+          "display" : "lb"
+        },
+        {
+          "code" : "[stone_av]",
+          "display" : "stone"
         },
         {
           "code" : "g"

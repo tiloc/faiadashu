@@ -47,11 +47,10 @@ extension FDashQuestionnaireItemExtension on QuestionnaireItem {
   }
 
   /// Unit from SDC 'questionnaire-unit' extension.
-  String? get unit {
+  Coding? get unit {
     return extension_
         ?.extensionOrNull(
             'http://hl7.org/fhir/StructureDefinition/questionnaire-unit')
-        ?.valueCoding
-        ?.display;
+        ?.valueCoding;
   }
 }
