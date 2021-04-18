@@ -1,3 +1,6 @@
+## 0.2.1
+* Better support for units
+
 ## 0.2.0
 * Numerous enhancements to make QuestionnaireResponse standards compliant.
 * Streamlined API to provide Resources to the QuestionnaireFiller.
