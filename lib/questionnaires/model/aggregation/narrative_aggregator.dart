@@ -111,7 +111,9 @@ class NarrativeAggregator extends Aggregator<Narrative> {
   }
 
   Narrative _generateNarrative(QuestionnaireLocation topLocation) {
-    final div = StringBuffer('<div xmlns="http://www.w3.org/1999/xhtml">');
+    final languageTag = locale.toLanguageTag();
+    final div = StringBuffer(
+        '<div xmlns="http://www.w3.org/1999/xhtml" lang="$languageTag" xml:lang="$languageTag">');
 
     bool generated = false;
 

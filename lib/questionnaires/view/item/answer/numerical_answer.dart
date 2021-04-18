@@ -32,6 +32,8 @@ class _NumericalAnswerState
 
   _NumericalAnswerState();
 
+  // TODO: Move this and _units to the model.
+  // TODO: Return a unique key for "no unit" instead of throwing.
   String _keyStringFromCoding(Coding coding) {
     final choiceString =
         (coding.code != null) ? coding.code?.value : coding.display;
