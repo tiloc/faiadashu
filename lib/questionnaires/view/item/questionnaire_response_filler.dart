@@ -149,9 +149,8 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
           Switch(
             value: isAskedButDeclined,
             onChanged: (bool value) {
-              dataAbsentReason = value
-                  ? const Code.asConst(DataAbsentReason.askedButDeclinedCode)
-                  : null;
+              dataAbsentReason =
+                  value ? DataAbsentReason.askedButDeclinedCode : null;
             },
           )
         ])

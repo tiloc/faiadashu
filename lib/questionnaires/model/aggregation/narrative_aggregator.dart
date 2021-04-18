@@ -7,7 +7,6 @@ import '../../questionnaires.dart';
 import 'aggregator.dart';
 
 /// Create a narrative from the responses to a [Questionnaire].
-/// Updates immediately after responses have changed.
 class NarrativeAggregator extends Aggregator<Narrative> {
   static final _logger = Logger(NarrativeAggregator);
 
@@ -54,57 +53,55 @@ class NarrativeAggregator extends Aggregator<Narrative> {
     }
 
     final invalid =
-        item.extension_?.dataAbsentReasonCode == DataAbsentReason.asTextCode;
+        item.extension_?.dataAbsentReason == DataAbsentReason.asTextCode;
 
     if (invalid) {
-      div.write('<span style="color:red">[INVALID] ');
+      div.write('<span style="color:red">[AS TEXT] ');
     }
 
-    switch (item.extension_?.dataAbsentReasonCode) {
-      case DataAbsentReason.maskedCode:
-        div.write('<p>***</p>');
-        returnValue = true;
-        break;
-      case DataAbsentReason.askedButDeclinedCode:
-        div.write(
-            '<p><i><span style="color:red">X </span>Declined to answer</i></p>');
-        returnValue = true;
-        break;
-      default:
-        if (item.answer != null) {
-          for (final answer in item.answer!) {
-            if (answer.valueString != null) {
-              div.write('<p>${answer.valueString}</p>');
-            } else if (answer.valueDecimal != null) {
-              if (location.isCalculatedExpression) {
-                div.write('<h3>${answer.valueDecimal!.format(locale)}</h3>');
-              } else {
-                div.write('<p>${answer.valueDecimal!.format(locale)}</p>');
-              }
-            } else if (answer.valueQuantity != null) {
-              div.write('<p>${answer.valueQuantity!.format(locale)}</p>');
-            } else if (answer.valueInteger != null) {
-              div.write('<p>${answer.valueInteger!.value}</p>');
-            } else if (answer.valueCoding != null) {
-              div.write(
-                  '<p>- ${answer.valueCoding!.localizedDisplay(locale)}</p>');
-            } else if (answer.valueDateTime != null) {
-              div.write('<p>${answer.valueDateTime!.format(locale)}</p>');
-            } else if (answer.valueDate != null) {
-              div.write('<p>${answer.valueDate!.format(locale)}</p>');
-            } else if (answer.valueTime != null) {
-              div.write('<p>${answer.valueTime!.format(locale)}</p>');
-            } else if (answer.valueBoolean != null) {
-              div.write(
-                  '<p>${(answer.valueBoolean!.value!) ? '[X]' : '[ ]'}</p>');
-            } else if (answer.valueUri != null) {
-              div.write('<p>${answer.valueUri.toString()}</p>');
+    final dataAbsentReason = item.extension_?.dataAbsentReason;
+    if (dataAbsentReason == DataAbsentReason.maskedCode) {
+      div.write('<p>***</p>');
+      returnValue = true;
+    } else if (dataAbsentReason == DataAbsentReason.askedButDeclinedCode) {
+      div.write(
+          '<p><i><span style="color:red">X </span>Declined to answer</i></p>');
+      returnValue = true;
+    } else {
+      if (item.answer != null) {
+        for (final answer in item.answer!) {
+          if (answer.valueString != null) {
+            div.write('<p>${answer.valueString}</p>');
+          } else if (answer.valueDecimal != null) {
+            if (location.isCalculatedExpression) {
+              div.write('<h3>${answer.valueDecimal!.format(locale)}</h3>');
             } else {
-              div.write('<p>${answer.toString()}</p>');
+              div.write('<p>${answer.valueDecimal!.format(locale)}</p>');
             }
-            returnValue = true;
+          } else if (answer.valueQuantity != null) {
+            div.write('<p>${answer.valueQuantity!.format(locale)}</p>');
+          } else if (answer.valueInteger != null) {
+            div.write('<p>${answer.valueInteger!.value}</p>');
+          } else if (answer.valueCoding != null) {
+            div.write(
+                '<p>- ${answer.valueCoding!.localizedDisplay(locale)}</p>');
+          } else if (answer.valueDateTime != null) {
+            div.write('<p>${answer.valueDateTime!.format(locale)}</p>');
+          } else if (answer.valueDate != null) {
+            div.write('<p>${answer.valueDate!.format(locale)}</p>');
+          } else if (answer.valueTime != null) {
+            div.write('<p>${answer.valueTime!.format(locale)}</p>');
+          } else if (answer.valueBoolean != null) {
+            div.write(
+                '<p>${(answer.valueBoolean!.value!) ? '[X]' : '[ ]'}</p>');
+          } else if (answer.valueUri != null) {
+            div.write('<p>${answer.valueUri.toString()}</p>');
+          } else {
+            div.write('<p>${answer.toString()}</p>');
           }
+          returnValue = true;
         }
+      }
     }
     if (invalid) {
       div.write('</span>');

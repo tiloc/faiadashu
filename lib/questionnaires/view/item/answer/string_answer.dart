@@ -72,7 +72,7 @@ class _StringAnswerState
         ? [
             FhirExtension(
                 url: DataAbsentReason.extensionUrl,
-                valueCode: const Code.asConst(DataAbsentReason.asTextCode))
+                valueCode: DataAbsentReason.asTextCode)
           ]
         : null;
 
