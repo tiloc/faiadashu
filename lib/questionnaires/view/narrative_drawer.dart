@@ -93,10 +93,7 @@ class _NarrativeDrawerState extends State<NarrativeDrawer> {
                         },
                       ),
                       const Divider(),
-                      ConstrainedBox(
-                          constraints: BoxConstraints(
-                              minHeight: preferredHeight - 100,
-                              maxHeight: preferredHeight - 100),
+                      Expanded(
                           child: _drawerMode
                               ? Scrollbar(
                                   isAlwaysShown: true,
