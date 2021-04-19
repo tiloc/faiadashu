@@ -97,9 +97,15 @@ class _NumericalAnswerState
     final firstAnswer = location.responseItem?.answer?.firstOrNull;
     if (firstAnswer != null) {
       existingValue = firstAnswer.valueQuantity ??
-          ((firstAnswer.valueDecimal != null)
+          ((firstAnswer.valueDecimal != null &&
+                  firstAnswer.valueDecimal!.isValid)
               ? Quantity(value: firstAnswer.valueDecimal)
-              : null);
+              : (firstAnswer.valueInteger != null &&
+                      firstAnswer.valueInteger!.isValid)
+                  ? Quantity(
+                      value:
+                          Decimal(firstAnswer.valueInteger!.value!.toDouble()))
+                  : null);
     }
     initialValue = (existingValue == null && _itemModel.isSliding)
         ? Quantity(
