@@ -9,6 +9,7 @@ import '../../../model/item/coding_item_model.dart';
 import '../../../questionnaires.dart';
 import '../../broken_questionnaire_item.dart';
 import '../../xhtml.dart';
+import 'null_dash_text.dart';
 
 /// Answer questions which require code(s) as a response.
 ///
@@ -140,16 +141,7 @@ class _CodingAnswerState
     final choices = <Widget>[];
     if (!isMultipleChoice) {
       choices.add(RadioListTile<String?>(
-          title: Text(
-            '   ',
-            style: Theme.of(context).textTheme.bodyText2?.copyWith(
-                decoration: TextDecoration.lineThrough,
-                color: Theme.of(context)
-                    .textTheme
-                    .bodyText1!
-                    .color!
-                    .withOpacity(0.54)),
-          ),
+          title: const NullDashText(),
           value: null,
           groupValue: _itemModel.toChoiceString(value),
           onChanged: (String? newValue) {

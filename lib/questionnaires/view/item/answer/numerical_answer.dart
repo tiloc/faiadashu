@@ -9,6 +9,7 @@ import '../../../../fhir_types/fhir_types_extensions.dart';
 import '../../../../logging/logging.dart';
 import '../../../model/item/numerical_item_model.dart';
 import '../../../questionnaires.dart';
+import 'null_dash_text.dart';
 import 'numerical_input.dart';
 
 class NumericalAnswer extends QuestionnaireAnswerFiller {
@@ -32,8 +33,18 @@ class _NumericalAnswerState
 
   _NumericalAnswerState();
 
+  bool _hasUnit(Quantity? quantity) {
+    if (quantity == null) {
+      return false;
+    }
+    if (quantity.code == null && quantity.unit == null) {
+      return false;
+    }
+
+    return true;
+  }
+
   // TODO: Move this and _units to the model.
-  // TODO: Return a unique key for "no unit" instead of throwing.
   String _keyStringFromCoding(Coding coding) {
     final choiceString =
         (coding.code != null) ? coding.code?.value : coding.display;
@@ -118,31 +129,36 @@ class _NumericalAnswerState
         padding: const EdgeInsets.only(left: 8),
         width: 96,
         child: DropdownButton<String>(
-          value: (value != null)
-              ? _keyStringFromCoding(Coding(
-                  system: value?.system,
-                  code: value?.code,
-                  display: value?.unit))
-              : null,
-          onChanged: (String? newValue) {
-            final unitCoding = _units[newValue]!;
-            value = (value != null)
-                ? value!.copyWith(
-                    unit: unitCoding.localizedDisplay(locale),
-                    system: unitCoding.system,
-                    code: unitCoding.code)
-                : Quantity(
-                    unit: unitCoding.localizedDisplay(locale),
-                    system: unitCoding.system,
-                    code: unitCoding.code);
-          },
-          items: _units.values.map<DropdownMenuItem<String>>((Coding value) {
-            return DropdownMenuItem<String>(
-              value: _keyStringFromCoding(value),
-              child: Text(value.localizedDisplay(locale)),
-            );
-          }).toList(),
-        ));
+            value: (_hasUnit(value))
+                ? _keyStringFromCoding(Coding(
+                    system: value?.system,
+                    code: value?.code,
+                    display: value?.unit))
+                : null,
+            hint: const NullDashText(),
+            onChanged: (String? newValue) {
+              final unitCoding = (newValue != null) ? _units[newValue]! : null;
+              value = (value != null)
+                  ? value!.copyWith(
+                      unit: unitCoding?.localizedDisplay(locale),
+                      system: unitCoding?.system,
+                      code: unitCoding?.code)
+                  : Quantity(
+                      unit: unitCoding?.localizedDisplay(locale),
+                      system: unitCoding?.system,
+                      code: unitCoding?.code);
+            },
+            items: [
+              const DropdownMenuItem<String>(
+                child: NullDashText(),
+              ),
+              ..._units.values.map<DropdownMenuItem<String>>((Coding value) {
+                return DropdownMenuItem<String>(
+                  value: _keyStringFromCoding(value),
+                  child: Text(value.localizedDisplay(locale)),
+                );
+              }).toList()
+            ]));
   }
 
   @override
