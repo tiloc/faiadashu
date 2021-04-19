@@ -135,7 +135,7 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
 
   /// Is the response 'asked but declined'
   bool get isAskedButDeclined =>
-      _dataAbsentReason?.value == DataAbsentReason.askedButDeclinedCode;
+      _dataAbsentReason == DataAbsentReason.askedButDeclinedCode;
 
   @override
   Widget build(BuildContext context) {
