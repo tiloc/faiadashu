@@ -32,6 +32,9 @@ abstract class FhirResourceProvider {
     await init();
     return getResource(uri);
   }
+
+  /// Return the provider for the given [uri].
+  FhirResourceProvider? providerFor(String uri);
 }
 
 /// Provide resources from a multitude of other [FhirResourceProvider]s.
@@ -60,6 +63,17 @@ class RegistryFhirResourceProvider extends FhirResourceProvider {
       final resource = externalResourceProvider.getResource(uri);
       if (resource != null) {
         return resource;
+      }
+    }
+    return null;
+  }
+
+  @override
+  FhirResourceProvider? providerFor(String uri) {
+    for (final externalResourceProvider in fhirResourceProviders) {
+      final resourceProvider = externalResourceProvider.providerFor(uri);
+      if (resourceProvider != null) {
+        return resourceProvider;
       }
     }
     return null;
@@ -97,6 +111,11 @@ class AssetResourceProvider extends FhirResourceProvider {
     _logger.debug('getResource $uri from: ${resources.keys}');
     return resources.containsKey(uri) ? resources[uri] : null;
   }
+
+  @override
+  FhirResourceProvider? providerFor(String uri) {
+    return resources.containsKey(uri) ? this : null;
+  }
 }
 
 /// Provide a resource from in-memory.
@@ -116,5 +135,10 @@ class InMemoryResourceProvider extends FhirResourceProvider {
   Future<void> init() async {
     // Do nothing
     return;
+  }
+
+  @override
+  FhirResourceProvider? providerFor(String uri) {
+    return (this.uri == uri) ? this : null;
   }
 }

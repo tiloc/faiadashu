@@ -213,7 +213,7 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
       }
 
       if (questionnaireItem.readOnly == Boolean(true) &&
-          questionnaireItem.unit == '{score}') {
+          questionnaireItem.unit?.code?.value == '{score}') {
         return true;
       }
     }

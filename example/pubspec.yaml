@@ -35,6 +35,7 @@ flutter:
     - assets/valuesets/
     - assets/codesystems/
     - assets/responses/
+    - assets/images/
 
 
 

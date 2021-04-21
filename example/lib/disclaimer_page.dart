@@ -18,6 +18,8 @@ This product includes all or a portion of the UCUM table, UCUM codes, and UCUM d
     
 This material contains the following artwork: 
 "Sectional Anatomy of the Heart with Path of Blood Flow" - licensed from Blausen Medical Communications, Inc. under the Creative Commons Attribution 3.0 Unported license (https://creativecommons.org/licenses/by/3.0/deed.en)
+
+"small-n-flat icon set" (https://www.iconfinder.com/iconsets/small-n-flat) - licensed from Paomedia under the Creative Commons Attribution 3.0 Unported license (https://creativecommons.org/licenses/by/3.0/deed.en) 
     ''');
   }
 

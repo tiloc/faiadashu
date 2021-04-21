@@ -1,3 +1,7 @@
+## 0.2.2
+* Support for http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-itemImage
+* Bugfixes
+
 ## 0.2.1
 * Better support for units
 

@@ -82,4 +82,9 @@ class FhirValueSetProvider extends FhirResourceProvider {
     // Do nothing
     return;
   }
+
+  @override
+  FhirResourceProvider? providerFor(String uri) {
+    return (uri == 'http://hl7.org/fhir/ValueSet/yesnodontknow') ? this : null;
+  }
 }

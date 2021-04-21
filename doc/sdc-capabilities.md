@@ -17,6 +17,15 @@ Information on Structured Data Capture can be found here:
 [Argonaut](http://fhir.org/guides/argonaut/questionnaire/index.html) is a subset of SDC and based on FHIR R3. The Form Filler is based on FHIR R4, which inherently makes it non-conformant
 to Argonaut. It does fill all the corresponding mandatory fields in the R4 QuestionnaireResponse.
 
+### FHIR Clinical Guidelines (CPG IG)
+[CPG](http://build.fhir.org/ig/HL7/cqf-recommendations/index.html) is generally not supported by this Form Filler. 
+
+It does support select extensions for visual control:
+#### itemImage
+An image to display as a visual accompaniment to the question being asked.
+
+This extension can be applied to question items.
+
 ### Advanced Rendering
 #### rendering-style
 Support for colors. Usable in many places (title, text, option) as permitted by the specification.

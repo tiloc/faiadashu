@@ -7,6 +7,7 @@ import 'package:simple_html_css/simple_html_css.dart';
 
 import '../../../fhir_types/fhir_types_extensions.dart';
 import '../../../logging/logging.dart';
+import '../../../resource_provider/asset_image_attachment_provider.dart';
 import '../../questionnaires.dart';
 
 class QuestionnaireItemFiller extends StatefulWidget {
@@ -214,11 +215,12 @@ class _QuestionnaireItemFillerSupportLink extends StatelessWidget {
 }
 
 class QuestionnaireItemFillerTitleLeading extends StatelessWidget {
-  final QuestionnaireLocation location;
-  final String category;
-  const QuestionnaireItemFillerTitleLeading._(this.location, this.category,
-      {Key? key})
-      : super(key: key);
+  final Widget _leadingWidget;
+  static final _logger = Logger(QuestionnaireItemFillerTitleLeading);
+
+  const QuestionnaireItemFillerTitleLeading._(Widget leadingWidget, {Key? key})
+      : _leadingWidget = leadingWidget,
+        super(key: key);
 
   static Widget? forLocation(QuestionnaireLocation location, {Key? key}) {
     final displayCategory = location.questionnaireItem.extension_
@@ -230,25 +232,38 @@ class QuestionnaireItemFillerTitleLeading extends StatelessWidget {
         ?.code
         ?.value;
 
-    if (displayCategory == null) {
-      return null;
-    }
+    if (displayCategory != null) {
+      final leadingWidget = (displayCategory == 'instructions')
+          ? const Icon(Icons.info)
+          : (displayCategory == 'security')
+              ? const Icon(Icons.lock)
+              : const Icon(Icons.help_center_outlined); // Error / unclear
 
-    return ((displayCategory == 'instructions') ||
-            (displayCategory == 'security'))
-        ? QuestionnaireItemFillerTitleLeading._(location, displayCategory,
-            key: key)
-        : null;
+      return QuestionnaireItemFillerTitleLeading._(leadingWidget);
+    } else {
+      final itemImageUri = location.questionnaireItem.extension_
+          ?.extensionOrNull(
+              'http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-itemImage')
+          ?.valueAttachment
+          ?.url
+          .toString();
+      if (itemImageUri == null) {
+        return null;
+      }
+
+      final itemImageWidget = (location.top.fhirResourceProvider
+              .providerFor(itemImageUri) as AssetImageAttachmentProvider?)
+          ?.getImage(itemImageUri, height: 24.0);
+      if (itemImageWidget == null) {
+        _logger.warn('Could not find image asset for $itemImageUri.');
+        return null;
+      }
+      return QuestionnaireItemFillerTitleLeading._(itemImageWidget);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final leading = (category == 'instructions')
-        ? const Icon(Icons.info)
-        : (category == 'security')
-            ? const Icon(Icons.lock)
-            : const Icon(Icons.help_center_outlined); // Error / unclear
-
-    return leading;
+    return _leadingWidget;
   }
 }

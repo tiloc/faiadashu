@@ -12,7 +12,7 @@
       "title": "Timing of harm assessment [AHRQ]",
       "status": "active",
       "description": "The answer list for timing of harm assessment",
-      "copyright": "This content from LOINCÂ® is copyright Â© 1995 Regenstrief Institute, Inc. and the LOINC Committee, and available at no cost under the license at http://loinc.org/terms-of-use",
+      "copyright": "This content from LOINC is copyright © 1995 Regenstrief Institute, Inc. and the LOINC Committee, and available at no cost under the license at http://loinc.org/terms-of-use",
       "compose": {
         "include": [
           {
@@ -238,7 +238,15 @@
           "linkId": "1.5",
           "text": "Last Name",
           "type": "string",
-          "required": true
+          "required": true,
+          "extension" : [
+            {
+              "url" : "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-itemImage",
+              "valueAttachment" : {
+                "url" : "http://example.org/images/user-id.png"
+              }
+            }
+          ]
         },
         {
           "extension": [
@@ -250,7 +258,15 @@
           "linkId": "1.6",
           "text": "Birth Date (MM/DD/YYYY)",
           "type": "date",
-          "required": true
+          "required": true,
+          "extension" : [
+            {
+              "url" : "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-itemImage",
+              "valueAttachment" : {
+                "url" : "http://example.org/images/calendar.png"
+              }
+            }
+          ]
         },
         {
           "extension": [

@@ -148,6 +148,8 @@ class _HomePageState extends State<HomePage> {
           Patient(id: Id('example123'), name: [
             HumanName(given: ['Emma'], family: 'Lee')
           ])),
+      AssetImageAttachmentProvider(
+          'http://example.org/images', 'assets/images'),
       valueSetProvider
     ]);
   }

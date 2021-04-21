@@ -10,6 +10,10 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
   final Map<String, QuestionnaireLocation> _cachedItems = {};
   List<QuestionnaireLocation>? _enabledWhens;
   final List<Aggregator>? _aggregators;
+
+  /// Direct access to [FhirResourceProvider]s for special use-cases.
+  ///
+  /// see: [getResource] for the preferred access method.
   final FhirResourceProvider fhirResourceProvider;
   int _revision = 1;
   final Locale locale;
