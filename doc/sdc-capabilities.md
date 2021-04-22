@@ -48,7 +48,7 @@ integration point of the SDK.
 ![item_help](images/item_help.png)
 #### displayCategory
 `security` and `instructions` are supported.
-![displaycategory](images/displaycategory.png)
+![displayCategory](images/displaycategory.png)
 
 #### optionalDisplay
 The filler never chooses to omit a field from display.

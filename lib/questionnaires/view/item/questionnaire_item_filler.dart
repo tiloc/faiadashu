@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:faiadashu/questionnaires/view/item/cpg_item_image.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -7,7 +8,6 @@ import 'package:simple_html_css/simple_html_css.dart';
 
 import '../../../fhir_types/fhir_types_extensions.dart';
 import '../../../logging/logging.dart';
-import '../../../resource_provider/asset_image_attachment_provider.dart';
 import '../../questionnaires.dart';
 
 class QuestionnaireItemFiller extends StatefulWidget {
@@ -241,21 +241,8 @@ class QuestionnaireItemFillerTitleLeading extends StatelessWidget {
 
       return QuestionnaireItemFillerTitleLeading._(leadingWidget);
     } else {
-      final itemImageUri = location.questionnaireItem.extension_
-          ?.extensionOrNull(
-              'http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-itemImage')
-          ?.valueAttachment
-          ?.url
-          .toString();
-      if (itemImageUri == null) {
-        return null;
-      }
-
-      final itemImageWidget = (location.top.fhirResourceProvider
-              .providerFor(itemImageUri) as AssetImageAttachmentProvider?)
-          ?.getImage(itemImageUri, height: 24.0);
+      final itemImageWidget = CpgItemImage.forLocation(location, height: 24.0);
       if (itemImageWidget == null) {
-        _logger.warn('Could not find image asset for $itemImageUri.');
         return null;
       }
       return QuestionnaireItemFillerTitleLeading._(itemImageWidget);
