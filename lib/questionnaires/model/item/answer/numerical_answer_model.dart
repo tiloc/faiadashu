@@ -1,19 +1,11 @@
 import 'dart:collection';
 
-import 'package:faiadashu/questionnaires/view/item/questionnaire_response_filler.dart';
-import 'package:fhir/primitive_types/decimal.dart';
-import 'package:fhir/primitive_types/integer.dart';
-import 'package:fhir/r4/general_types/general_types.dart';
-import 'package:fhir/r4/resource_types/clinical/diagnostics/diagnostics.dart';
-import 'package:fhir/r4/resource_types/specialized/definitional_artifacts/definitional_artifacts.dart';
+import 'package:fhir/r4.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../fhir_types/fhir_types_extensions.dart';
 import '../../../../logging/logger.dart';
-import '../../questionnaire_exceptions.dart';
-import '../../questionnaire_extensions.dart';
-import '../../questionnaire_location.dart';
-import 'answer_model.dart';
+import '../../../questionnaires.dart';
 
 /// Models numerical answers.
 class NumericalAnswerModel extends AnswerModel<String, Quantity> {

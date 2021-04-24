@@ -1,3 +1,6 @@
+## 0.2.5
+* Cleanup of model-view relationship: Moved lots of functionality from view to model.
+
 ## 0.2.2
 * Support for http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-itemImage
 * Bugfixes

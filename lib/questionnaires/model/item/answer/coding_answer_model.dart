@@ -5,10 +5,10 @@ import 'package:fhir/r4.dart';
 
 import '../../../../fhir_types/fhir_types_extensions.dart';
 import '../../../../logging/logger.dart';
-import '../../../view/item/questionnaire_response_filler.dart';
 import '../../questionnaire_exceptions.dart';
 import '../../questionnaire_extensions.dart';
 import '../../questionnaire_location.dart';
+import '../response_model.dart';
 import 'answer_model.dart';
 
 /// Model answers which are [Coding]s.
@@ -217,12 +217,14 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
         ?.value;
 
     if (location.responseItem != null) {
-      value = CodeableConcept(
-          coding: location.responseItem!.answer
-              ?.map((answer) =>
-                  answerOptions[choiceStringFromCoding(answer.valueCoding)]!
-                      .valueCoding!)
-              .toList());
+      value = (location.responseItem!.answer != null)
+          ? CodeableConcept(
+              coding: location.responseItem!.answer
+                  ?.map((answer) =>
+                      answerOptions[choiceStringFromCoding(answer.valueCoding)]!
+                          .valueCoding!)
+                  .toList())
+          : null;
     }
   }
 
