@@ -32,9 +32,7 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
   _CodingAnswerState();
 
   @override
-  void initState() {
-    super.initState();
-
+  void postInitState() {
     if (qi.type == QuestionnaireItemType.open_choice) {
       // TODO: Set initialValue
       _otherChoiceController = TextEditingController();

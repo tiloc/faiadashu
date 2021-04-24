@@ -27,9 +27,7 @@ class _StringAnswerState extends QuestionnaireAnswerState<String,
   }
 
   @override
-  void initState() {
-    super.initState();
-
+  void postInitState() {
     _controller.text = value ?? '';
   }
 

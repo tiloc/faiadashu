@@ -27,9 +27,7 @@ class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
   _NumericalAnswerState();
 
   @override
-  void initState() {
-    super.initState();
-
+  void postInitState() {
     if (answerModel.isSliding) {
       final sliderStepValueExtension = qi.extension_?.extensionOrNull(
           'http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue');

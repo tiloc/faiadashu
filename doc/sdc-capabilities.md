@@ -11,7 +11,7 @@ Information on Structured Data Capture can be found here:
 
 **Click this video to watch the capabilities in action**
 
-[![Walkthrough of the capabilities](https://img.youtube.com/vi/k9vEy9Z_L18/hqdefault.jpg)](https://www.youtube.com/watch?v=k9vEy9Z_L18 "Walkthrough of the Capabilities")
+[![Walk-through of the capabilities](https://img.youtube.com/vi/k9vEy9Z_L18/hqdefault.jpg)](https://www.youtube.com/watch?v=k9vEy9Z_L18 "Walk-through of the Capabilities")
 
 ### Argonaut
 [Argonaut](http://fhir.org/guides/argonaut/questionnaire/index.html) is a subset of SDC and based on FHIR R3. The Form Filler is based on FHIR R4, which inherently makes it non-conformant
@@ -47,7 +47,7 @@ integration point of the SDK.
 
 ![item_help](images/item_help.png)
 #### displayCategory
-`security` and `instructions` are supported.
+Supports `security` and `instructions`.
 ![displayCategory](images/displaycategory.png)
 
 #### optionalDisplay
@@ -204,7 +204,7 @@ Total score will be entered into any field which meets one of the following:
 - is readOnly and has unit `{score}`
 
 **No true support for FHIRPath or CQL expressions is provided!** Any field which has one of the trigger extensions will
-have a total score calculcated, regardless of content of the expression!
+have a total score calculated, regardless of content of the expression!
 
 ### Response creation
 

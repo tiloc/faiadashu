@@ -39,12 +39,20 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller,
               as M;
 
       answerModelError = null;
+      postInitState();
     } catch (exception) {
       _abstractLogger.warn('Could not initialize model for ${location.linkId}',
           error: exception);
       answerModelError = exception;
     }
   }
+
+  /// Initialize the filler after the model has been successfully finished.
+  ///
+  /// Do not place initialization code into [initState], but place it here.
+  ///
+  /// Guarantees a properly initialized [answerModel].
+  void postInitState();
 
   Widget _guardedBuildReadOnly(BuildContext context) {
     if (answerModelError != null) {

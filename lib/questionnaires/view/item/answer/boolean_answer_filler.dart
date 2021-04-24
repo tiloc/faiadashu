@@ -17,6 +17,11 @@ class _BooleanItemState extends QuestionnaireAnswerState<Boolean,
   _BooleanItemState();
 
   @override
+  void postInitState() {
+    // Intentionally do nothing.
+  }
+
+  @override
   Widget buildEditable(BuildContext context) {
     return Container(
         alignment: Alignment.centerLeft,

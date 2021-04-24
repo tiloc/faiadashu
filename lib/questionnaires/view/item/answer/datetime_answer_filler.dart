@@ -21,6 +21,11 @@ class _DateTimeAnswerState extends QuestionnaireAnswerState<FhirDateTime,
   _DateTimeAnswerState();
 
   @override
+  void postInitState() {
+    // Intentionally do nothing.
+  }
+
+  @override
   Widget buildEditable(BuildContext context) {
     final itemType = qi.type;
 
