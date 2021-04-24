@@ -211,7 +211,7 @@ have a total score calculcated, regardless of content of the expression!
 #### Reference to Questionnaire
 A canonical reference to the questionnaire will be generated, including a version number.
 
-The `http://hl7.org/fhir/StructureDefinition/display` extension will not be set.
+The optional `http://hl7.org/fhir/StructureDefinition/display` extension will be set when the questionnaire has a title.
 
 #### Status
 Status can be set to any of the supported values. Setting the status to complete does currently not have impact on items affected by enableWhen (they should be discarded).
