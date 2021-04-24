@@ -3,11 +3,11 @@ import 'dart:ui';
 import 'package:faiadashu/faiadashu.dart';
 import 'package:fhir/r4.dart';
 
-import '../../../fhir_types/fhir_types_extensions.dart';
-import '../questionnaire_location.dart';
+import '../../../../fhir_types/fhir_types_extensions.dart';
+import '../../questionnaire_location.dart';
 
-/// Models a [QuestionnaireResponseItem].
-abstract class ItemModel<I, V> {
+/// Models an answer within a [QuestionnaireResponseItem].
+abstract class AnswerModel<I, V> {
   static const nullText = '—';
 
   final QuestionnaireLocation location;
@@ -26,7 +26,8 @@ abstract class ItemModel<I, V> {
         ?.valueString;
   }
 
-  ItemModel(this.location, this.answerLocation) : locale = location.top.locale;
+  AnswerModel(this.location, this.answerLocation)
+      : locale = location.top.locale;
 
   /// Returns a human-readable, localized, textual description of the model.
   String get display;

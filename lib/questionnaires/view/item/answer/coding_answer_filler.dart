@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../fhir_types/fhir_types_extensions.dart';
 import '../../../../questionnaires/model/questionnaire_extensions.dart';
-import '../../../model/item/coding_item_model.dart';
+import '../../../model/item/answer/coding_answer_model.dart';
 import '../../../questionnaires.dart';
 import '../../broken_questionnaire_item.dart';
 import '../../xhtml.dart';
@@ -14,8 +14,8 @@ import 'null_dash_text.dart';
 ///
 /// This class uses [CodeableConcept] to model multiple choice and open choice.
 /// Future R5 releases of the FHIR standard will likely have a `coding` item type.
-class CodingAnswer extends QuestionnaireAnswerFiller {
-  const CodingAnswer(
+class CodingAnswerFiller extends QuestionnaireAnswerFiller {
+  const CodingAnswerFiller(
       QuestionnaireLocation location, AnswerLocation answerLocation,
       {Key? key})
       : super(location, answerLocation, key: key);
@@ -24,7 +24,7 @@ class CodingAnswer extends QuestionnaireAnswerFiller {
 }
 
 class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
-    CodingAnswer, CodingItemModel> {
+    CodingAnswerFiller, CodingAnswerModel> {
   late final TextEditingController? _otherChoiceController;
 
   String? _validationText;
@@ -40,14 +40,14 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
       _otherChoiceController = TextEditingController();
     }
 
-    _validationText = itemModel.validate(value);
+    _validationText = answerModel.validate(value);
   }
 
   @override
   Widget buildEditable(BuildContext context) {
     try {
       if (!(qi.repeats == Boolean(true)) &&
-          (itemModel.answerOptions.length > 10 ||
+          (answerModel.answerOptions.length > 10 ||
               qi.isItemControl('autocomplete'))) {
         return _buildLookupAnswers(context);
       } else {
@@ -67,12 +67,12 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
       choices.add(RadioListTile<String?>(
           title: const NullDashText(),
           value: null,
-          groupValue: itemModel.toChoiceString(value),
+          groupValue: answerModel.toChoiceString(value),
           onChanged: (String? newValue) {
-            value = itemModel.fromChoiceString(newValue);
+            value = answerModel.fromChoiceString(newValue);
           }));
     }
-    for (final choice in itemModel.answerOptions.values) {
+    for (final choice in answerModel.answerOptions.values) {
       final optionPrefix = choice.extension_
           ?.extensionOrNull(
               'http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix')
@@ -81,12 +81,12 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
           (optionPrefix != null) ? '$optionPrefix ' : '';
       final optionTitle =
           '$optionPrefixDisplay${choice.localizedDisplay(locale)}';
-      final styledOptionTitle = Xhtml.toWidget(
-          context, top, optionTitle, choice.valueStringElement?.extension_,
+      final styledOptionTitle = Xhtml.toWidget(context, location.top,
+          optionTitle, choice.valueStringElement?.extension_,
           width: 100, height: 100);
 
       choices.add(isMultipleChoice
-          ? itemModel.isExclusive(choice.valueCoding!)
+          ? answerModel.isExclusive(choice.valueCoding!)
               ? RadioListTile<String>(
                   title: styledOptionTitle,
                   groupValue: choice.optionCode,
@@ -98,8 +98,8 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
                       '',
                   onChanged: (_) {
                     final newValue =
-                        itemModel.toggleValue(value, choice.optionCode);
-                    _validationText = itemModel.validate(newValue);
+                        answerModel.toggleValue(value, choice.optionCode);
+                    _validationText = answerModel.validate(newValue);
                     value = newValue;
                   },
                 )
@@ -110,26 +110,26 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
                       null,
                   onChanged: (bool? newValue) {
                     final newValue =
-                        itemModel.toggleValue(value, choice.optionCode);
-                    _validationText = itemModel.validate(newValue);
+                        answerModel.toggleValue(value, choice.optionCode);
+                    _validationText = answerModel.validate(newValue);
                     value = newValue;
                   })
           : RadioListTile<String>(
               title: styledOptionTitle,
               value: choice.optionCode,
-              groupValue: itemModel.toChoiceString(value),
+              groupValue: answerModel.toChoiceString(value),
               onChanged: (String? newValue) {
-                value = itemModel.fromChoiceString(newValue);
+                value = answerModel.fromChoiceString(newValue);
               }));
     }
 
     if (qi.type == QuestionnaireItemType.open_choice) {
       choices.add(RadioListTile<String>(
-        value: CodingItemModel.openChoiceOther,
-        groupValue: itemModel.toChoiceString(value),
+        value: CodingAnswerModel.openChoiceOther,
+        groupValue: answerModel.toChoiceString(value),
         onChanged: (String? newValue) {
           value = CodeableConcept(
-              coding: [Coding(code: Code(CodingItemModel.openChoiceOther))],
+              coding: [Coding(code: Code(CodingAnswerModel.openChoiceOther))],
               text: _otherChoiceController!.text);
         },
         title: TextFormField(
@@ -138,7 +138,7 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
             value = (newText.isEmpty)
                 ? null
                 : CodeableConcept(coding: [
-                    Coding(code: Code(CodingItemModel.openChoiceOther))
+                    Coding(code: Code(CodingAnswerModel.openChoiceOther))
                   ], text: _otherChoiceController!.text);
           },
         ),
@@ -201,7 +201,7 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
         if (textEditingValue.text.isEmpty) {
           return const Iterable<QuestionnaireAnswerOption>.empty();
         }
-        return itemModel.answerOptions.values
+        return answerModel.answerOptions.values
             .where((QuestionnaireAnswerOption option) {
           return option
               .localizedDisplay(locale)
@@ -210,7 +210,7 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
         });
       },
       onSelected: (QuestionnaireAnswerOption selectedOption) {
-        value = itemModel.fromChoiceString(selectedOption.optionCode);
+        value = answerModel.fromChoiceString(selectedOption.optionCode);
       },
     );
   }

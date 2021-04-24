@@ -7,13 +7,13 @@ import 'package:fhir/r4.dart'
         QuestionnaireResponseAnswer,
         Time;
 
-import '../../../fhir_types/fhir_types_extensions.dart';
-import '../../view/item/questionnaire_response_filler.dart';
-import '../questionnaire_location.dart';
-import 'item_model.dart';
+import '../../../../fhir_types/fhir_types_extensions.dart';
+import '../../../view/item/questionnaire_response_filler.dart';
+import '../../questionnaire_location.dart';
+import 'answer_model.dart';
 
-class DateTimeItemModel extends ItemModel<FhirDateTime, FhirDateTime> {
-  DateTimeItemModel(
+class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
+  DateTimeAnswerModel(
       QuestionnaireLocation location, AnswerLocation answerLocation)
       : super(location, answerLocation) {
     value = answerLocation.answer?.valueDateTime ??
@@ -33,7 +33,7 @@ class DateTimeItemModel extends ItemModel<FhirDateTime, FhirDateTime> {
   }
 
   @override
-  String get display => value?.format(locale) ?? ItemModel.nullText;
+  String get display => value?.format(locale) ?? AnswerModel.nullText;
 
   @override
   QuestionnaireResponseAnswer? fillAnswer() {

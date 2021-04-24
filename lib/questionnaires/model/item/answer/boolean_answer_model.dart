@@ -1,12 +1,12 @@
 import 'package:fhir/primitive_types/boolean.dart';
 import 'package:fhir/r4/resource_types/clinical/diagnostics/diagnostics.dart';
 
-import '../../view/item/questionnaire_response_filler.dart';
-import '../questionnaire_location.dart';
-import 'item.dart';
+import '../../../view/item/questionnaire_response_filler.dart';
+import '../../questionnaire_location.dart';
+import '../item.dart';
 
-class BooleanItemModel extends ItemModel<Boolean, Boolean> {
-  BooleanItemModel(
+class BooleanAnswerModel extends AnswerModel<Boolean, Boolean> {
+  BooleanAnswerModel(
       QuestionnaireLocation location, AnswerLocation answerLocation)
       : super(location, answerLocation) {
     value = answerLocation.answer?.valueBoolean;
@@ -18,7 +18,7 @@ class BooleanItemModel extends ItemModel<Boolean, Boolean> {
 
   @override
   String get display => (value == null)
-      ? ItemModel.nullText
+      ? AnswerModel.nullText
       : (value == Boolean(true))
           ? '[X]'
           : '[ ]';

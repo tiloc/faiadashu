@@ -4,23 +4,23 @@ import 'package:flutter/services.dart';
 
 import '../../../../coding/coding.dart';
 import '../../../../fhir_types/fhir_types_extensions.dart';
-import '../../../model/item/numerical_item_model.dart';
+import '../../../model/item/answer/numerical_answer_model.dart';
 import '../../../questionnaires.dart';
 import 'null_dash_text.dart';
 import 'numerical_input.dart';
 
-class NumericalAnswer extends QuestionnaireAnswerFiller {
-  const NumericalAnswer(
+class NumericalAnswerFiller extends QuestionnaireAnswerFiller {
+  const NumericalAnswerFiller(
       QuestionnaireLocation location, AnswerLocation answerLocation,
       {Key? key})
       : super(location, answerLocation, key: key);
 
   @override
-  State<NumericalAnswer> createState() => _NumericalAnswerState();
+  State<NumericalAnswerFiller> createState() => _NumericalAnswerState();
 }
 
 class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
-    NumericalAnswer, NumericalItemModel> {
+    NumericalAnswerFiller, NumericalAnswerModel> {
   late final int? _divisions;
   late final TextInputFormatter _numberInputFormatter;
 
@@ -30,28 +30,29 @@ class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
   void initState() {
     super.initState();
 
-    if (itemModel.isSliding) {
+    if (answerModel.isSliding) {
       final sliderStepValueExtension = qi.extension_?.extensionOrNull(
           'http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue');
       final sliderStepValue = sliderStepValueExtension?.valueDecimal?.value ??
           sliderStepValueExtension?.valueInteger?.value?.toDouble();
       _divisions = (sliderStepValue != null)
-          ? ((itemModel.maxValue - itemModel.minValue) / sliderStepValue)
+          ? ((answerModel.maxValue - answerModel.minValue) / sliderStepValue)
               .round()
           : null;
     }
 
-    _numberInputFormatter = NumericalTextInputFormatter(itemModel.numberFormat);
+    _numberInputFormatter =
+        NumericalTextInputFormatter(answerModel.numberFormat);
   }
 
   Widget _buildDropDownFromUnits(BuildContext context) {
-    if (itemModel.units.length == 1) {
+    if (answerModel.units.length == 1) {
       return Container(
           alignment: Alignment.topLeft,
           padding: const EdgeInsets.only(left: 8, top: 16),
           width: 96,
           child: Text(
-            itemModel.units.values.first.localizedDisplay(locale),
+            answerModel.units.values.first.localizedDisplay(locale),
             style: Theme.of(context).textTheme.subtitle1,
           ));
     }
@@ -60,8 +61,8 @@ class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
         padding: const EdgeInsets.only(left: 8),
         width: 96,
         child: DropdownButton<String>(
-            value: (itemModel.hasUnit(value))
-                ? itemModel.keyStringFromCoding(Coding(
+            value: (answerModel.hasUnit(value))
+                ? answerModel.keyStringFromCoding(Coding(
                     system: value?.system,
                     code: value?.code,
                     display: value?.unit))
@@ -69,7 +70,7 @@ class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
             hint: const NullDashText(),
             onChanged: (String? newValue) {
               final unitCoding =
-                  (newValue != null) ? itemModel.units[newValue]! : null;
+                  (newValue != null) ? answerModel.units[newValue]! : null;
               value = (value != null)
                   ? value!.copyWith(
                       unit: unitCoding?.localizedDisplay(locale),
@@ -84,10 +85,10 @@ class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
               const DropdownMenuItem<String>(
                 child: NullDashText(),
               ),
-              ...itemModel.units.values
+              ...answerModel.units.values
                   .map<DropdownMenuItem<String>>((Coding value) {
                 return DropdownMenuItem<String>(
-                  value: itemModel.keyStringFromCoding(value),
+                  value: answerModel.keyStringFromCoding(value),
                   child: Text(value.localizedDisplay(locale)),
                 );
               }).toList()
@@ -96,10 +97,10 @@ class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
 
   @override
   Widget buildEditable(BuildContext context) {
-    return itemModel.isSliding
+    return answerModel.isSliding
         ? Slider(
-            min: itemModel.minValue,
-            max: itemModel.maxValue,
+            min: answerModel.minValue,
+            max: answerModel.maxValue,
             divisions: _divisions,
             value: value!.value!.value!, // Yay, triple value!
             onChanged: (sliderValue) {
@@ -116,16 +117,16 @@ class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
                     : null,
                 decoration: InputDecoration(
                   border: const OutlineInputBorder(),
-                  hintText: itemModel.entryFormat,
+                  hintText: answerModel.entryFormat,
                 ),
                 inputFormatters: [_numberInputFormatter],
                 keyboardType: TextInputType.number,
                 validator: (inputValue) {
-                  return itemModel.validate(inputValue);
+                  return answerModel.validate(inputValue);
                 },
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 onChanged: (content) {
-                  final valid = itemModel.validate(content) == null;
+                  final valid = answerModel.validate(content) == null;
                   final dataAbsentReasonExtension = !valid
                       ? [
                           FhirExtension(
@@ -144,17 +145,19 @@ class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
                   } else {
                     if (value == null) {
                       value = Quantity(
-                          value: Decimal(itemModel.numberFormat.parse(content)),
+                          value:
+                              Decimal(answerModel.numberFormat.parse(content)),
                           extension_: dataAbsentReasonExtension);
                     } else {
                       value = value!.copyWith(
-                          value: Decimal(itemModel.numberFormat.parse(content)),
+                          value:
+                              Decimal(answerModel.numberFormat.parse(content)),
                           extension_: dataAbsentReasonExtension);
                     }
                   }
                 },
               )),
-              if (itemModel.units.isNotEmpty) _buildDropDownFromUnits(context)
+              if (answerModel.units.isNotEmpty) _buildDropDownFromUnits(context)
             ]));
   }
 }

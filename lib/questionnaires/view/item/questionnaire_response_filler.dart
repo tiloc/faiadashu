@@ -1,5 +1,4 @@
 import 'package:fhir/r4.dart';
-import 'package:fhir/r4/r4.dart';
 import 'package:flutter/material.dart';
 
 import '../../../coding/coding.dart';

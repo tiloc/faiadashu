@@ -1,8 +1,8 @@
-import 'package:faiadashu/questionnaires/model/item/item_model_factory.dart';
 import 'package:fhir/r4/r4.dart';
 import 'package:flutter/material.dart';
 
 import '../../../logging/logging.dart';
+import '../../model/item/answer/answer_model_factory.dart';
 import '../../questionnaires.dart';
 import '../broken_questionnaire_item.dart';
 
@@ -17,15 +17,14 @@ abstract class QuestionnaireAnswerFiller extends StatefulWidget {
 }
 
 abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller,
-    M extends ItemModel<Object, V>> extends State<W> {
+    M extends AnswerModel<Object, V>> extends State<W> {
   static final _abstractLogger = Logger(QuestionnaireAnswerState);
-  late final M itemModel;
+  late final M answerModel;
 
-  late final Object? itemModelError;
+  late final Object? answerModelError;
 
   QuestionnaireItem get qi => widget.location.questionnaireItem;
   Locale get locale => widget.location.top.locale;
-  QuestionnaireTopLocation get top => widget.location.top;
   QuestionnaireLocation get location => widget.location;
 
   QuestionnaireAnswerState();
@@ -35,35 +34,36 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller,
     super.initState();
 
     try {
-      itemModel =
-          ItemModelFactory.createModel<M>(location, widget.answerLocation) as M;
+      answerModel =
+          AnswerModelFactory.createModel<M>(location, widget.answerLocation)
+              as M;
 
-      itemModelError = null;
+      answerModelError = null;
     } catch (exception) {
       _abstractLogger.warn('Could not initialize model for ${location.linkId}',
           error: exception);
-      itemModelError = exception;
+      answerModelError = exception;
     }
   }
 
   Widget _guardedBuildReadOnly(BuildContext context) {
-    if (itemModelError != null) {
-      return BrokenQuestionnaireItem.fromException(itemModelError!);
+    if (answerModelError != null) {
+      return BrokenQuestionnaireItem.fromException(answerModelError!);
     }
 
     return buildReadOnly(context);
   }
 
   Widget _guardedBuildEditable(BuildContext context) {
-    if (itemModelError != null) {
-      return BrokenQuestionnaireItem.fromException(itemModelError!);
+    if (answerModelError != null) {
+      return BrokenQuestionnaireItem.fromException(answerModelError!);
     }
 
     return buildEditable(context);
   }
 
   Widget buildReadOnly(BuildContext context) {
-    return Text(itemModel.display);
+    return Text(answerModel.display);
   }
 
   Widget buildEditable(BuildContext context);
@@ -71,18 +71,19 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller,
   set value(V? newValue) {
     if (mounted) {
       setState(() {
-        itemModel.value = newValue;
+        answerModel.value = newValue;
       });
 
-      if (itemModel.hasCodingAnswers()) {
-        widget.answerLocation.stashCodingAnswers(itemModel.fillCodingAnswers());
+      if (answerModel.hasCodingAnswers()) {
+        widget.answerLocation
+            .stashCodingAnswers(answerModel.fillCodingAnswers());
       } else {
-        widget.answerLocation.stashAnswer(itemModel.fillAnswer());
+        widget.answerLocation.stashAnswer(answerModel.fillAnswer());
       }
     }
   }
 
-  V? get value => itemModel.value;
+  V? get value => answerModel.value;
 
   @override
   Widget build(BuildContext context) {

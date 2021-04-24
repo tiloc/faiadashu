@@ -3,19 +3,19 @@ import 'dart:collection';
 import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
 
-import '../../../fhir_types/fhir_types_extensions.dart';
-import '../../../logging/logger.dart';
-import '../../view/item/questionnaire_response_filler.dart';
-import '../questionnaire_exceptions.dart';
-import '../questionnaire_extensions.dart';
-import '../questionnaire_location.dart';
-import 'item_model.dart';
+import '../../../../fhir_types/fhir_types_extensions.dart';
+import '../../../../logging/logger.dart';
+import '../../../view/item/questionnaire_response_filler.dart';
+import '../../questionnaire_exceptions.dart';
+import '../../questionnaire_extensions.dart';
+import '../../questionnaire_location.dart';
+import 'answer_model.dart';
 
 /// Model answers which are [Coding]s.
-class CodingItemModel extends ItemModel<CodeableConcept, CodeableConcept> {
+class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
   // ignore: prefer_collection_literals
   final _answerOptions = LinkedHashMap<String, QuestionnaireAnswerOption>();
-  static final _logger = Logger(CodingItemModel);
+  static final _logger = Logger(CodingAnswerModel);
 
   LinkedHashMap<String, QuestionnaireAnswerOption> get answerOptions =>
       _answerOptions;
@@ -198,7 +198,8 @@ class CodingItemModel extends ItemModel<CodeableConcept, CodeableConcept> {
   late final int minOccurs;
   late final int? maxOccurs;
 
-  CodingItemModel(QuestionnaireLocation location, AnswerLocation answerLocation)
+  CodingAnswerModel(
+      QuestionnaireLocation location, AnswerLocation answerLocation)
       : super(location, answerLocation) {
     _createAnswerOptions();
 
@@ -226,7 +227,7 @@ class CodingItemModel extends ItemModel<CodeableConcept, CodeableConcept> {
   }
 
   @override
-  String get display => value?.localizedDisplay(locale) ?? ItemModel.nullText;
+  String get display => value?.localizedDisplay(locale) ?? AnswerModel.nullText;
 
   @override
   String? validate(CodeableConcept? inValue) {
@@ -248,7 +249,7 @@ class CodingItemModel extends ItemModel<CodeableConcept, CodeableConcept> {
   @override
   QuestionnaireResponseAnswer? fillAnswer() {
     throw UnsupportedError(
-        'CodingItemModel will always return coding answers.');
+        'CodingAnswerModel will always return coding answers.');
   }
 
   @override

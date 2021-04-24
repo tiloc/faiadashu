@@ -3,14 +3,14 @@ import 'package:fhir/r4/basic_types/fhir_extension.dart';
 import 'package:fhir/r4/resource_types/clinical/diagnostics/diagnostics.dart';
 import 'package:fhir/r4/resource_types/specialized/definitional_artifacts/definitional_artifacts.dart';
 
-import '../../../coding/data_absent_reasons.dart';
-import '../../../fhir_types/fhir_types_extensions.dart';
-import '../../view/item/questionnaire_response_filler.dart';
-import '../questionnaire_location.dart';
-import 'item_model.dart';
+import '../../../../coding/data_absent_reasons.dart';
+import '../../../../fhir_types/fhir_types_extensions.dart';
+import '../../../view/item/questionnaire_response_filler.dart';
+import '../../questionnaire_location.dart';
+import 'answer_model.dart';
 
 /// Models string answers, incl. URLs.
-class StringItemModel extends ItemModel<String, String> {
+class StringAnswerModel extends AnswerModel<String, String> {
   static final _urlRegExp = RegExp(
       r'^(http|https|ftp|sftp)://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+');
 
@@ -18,7 +18,8 @@ class StringItemModel extends ItemModel<String, String> {
   late final int minLength;
   late final int? maxLength;
 
-  StringItemModel(QuestionnaireLocation location, AnswerLocation answerLocation)
+  StringAnswerModel(
+      QuestionnaireLocation location, AnswerLocation answerLocation)
       : super(location, answerLocation) {
     final regexPattern = qi.extension_
         ?.extensionOrNull('http://hl7.org/fhir/StructureDefinition/regex')
@@ -40,7 +41,7 @@ class StringItemModel extends ItemModel<String, String> {
   }
 
   @override
-  String get display => value ?? ItemModel.nullText;
+  String get display => value ?? AnswerModel.nullText;
 
   @override
   String? validate(String? inValue) {

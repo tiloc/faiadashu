@@ -19,26 +19,26 @@ class QuestionnaireAnswerFillerFactory {
       switch (location.questionnaireItem.type!) {
         case QuestionnaireItemType.choice:
         case QuestionnaireItemType.open_choice:
-          return CodingAnswer(location, answerLocation);
+          return CodingAnswerFiller(location, answerLocation);
         case QuestionnaireItemType.quantity:
         case QuestionnaireItemType.decimal:
         case QuestionnaireItemType.integer:
           return (location.isCalculatedExpression)
               ? StaticItem(location, answerLocation)
-              : NumericalAnswer(location, answerLocation);
+              : NumericalAnswerFiller(location, answerLocation);
         case QuestionnaireItemType.string:
         case QuestionnaireItemType.text:
         case QuestionnaireItemType.url:
-          return StringAnswer(location, answerLocation);
+          return StringAnswerFiller(location, answerLocation);
         case QuestionnaireItemType.display:
         case QuestionnaireItemType.group:
           return StaticItem(location, answerLocation);
         case QuestionnaireItemType.date:
         case QuestionnaireItemType.datetime:
         case QuestionnaireItemType.time:
-          return DateTimeAnswer(location, answerLocation);
+          return DateTimeAnswerFiller(location, answerLocation);
         case QuestionnaireItemType.boolean:
-          return BooleanAnswer(location, answerLocation);
+          return BooleanAnswerFiller(location, answerLocation);
         case QuestionnaireItemType.attachment:
         case QuestionnaireItemType.unknown:
         case QuestionnaireItemType.reference:

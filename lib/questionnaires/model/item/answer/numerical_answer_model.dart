@@ -8,16 +8,16 @@ import 'package:fhir/r4/resource_types/clinical/diagnostics/diagnostics.dart';
 import 'package:fhir/r4/resource_types/specialized/definitional_artifacts/definitional_artifacts.dart';
 import 'package:intl/intl.dart';
 
-import '../../../fhir_types/fhir_types_extensions.dart';
-import '../../../logging/logger.dart';
-import '../questionnaire_exceptions.dart';
-import '../questionnaire_extensions.dart';
-import '../questionnaire_location.dart';
-import 'item_model.dart';
+import '../../../../fhir_types/fhir_types_extensions.dart';
+import '../../../../logging/logger.dart';
+import '../../questionnaire_exceptions.dart';
+import '../../questionnaire_extensions.dart';
+import '../../questionnaire_location.dart';
+import 'answer_model.dart';
 
 /// Models numerical answers.
-class NumericalItemModel extends ItemModel<String, Quantity> {
-  static final _logger = Logger(NumericalItemModel);
+class NumericalAnswerModel extends AnswerModel<String, Quantity> {
+  static final _logger = Logger(NumericalAnswerModel);
 
   late final String _numberPattern;
   late final bool _isSliding;
@@ -58,7 +58,7 @@ class NumericalItemModel extends ItemModel<String, Quantity> {
     }
   }
 
-  NumericalItemModel(
+  NumericalAnswerModel(
       QuestionnaireLocation location, AnswerLocation answerLocation)
       : super(location, answerLocation) {
     _isSliding = location.questionnaireItem.isItemControl('slider');
@@ -148,7 +148,7 @@ class NumericalItemModel extends ItemModel<String, Quantity> {
   }
 
   @override
-  String get display => value?.format(locale) ?? ItemModel.nullText;
+  String get display => value?.format(locale) ?? AnswerModel.nullText;
 
   @override
   String? validate(String? inputValue) {

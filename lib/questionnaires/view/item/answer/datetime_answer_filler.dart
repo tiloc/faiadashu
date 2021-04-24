@@ -3,12 +3,12 @@ import 'package:fhir/r4.dart'
 import 'package:flutter/material.dart';
 
 import '../../../../fhir_types/date_time_picker.dart';
-import '../../../model/item/datetime_item_model.dart';
+import '../../../model/item/answer/datetime_answer_model.dart';
 import '../../../questionnaires.dart';
 import '../questionnaire_answer_filler.dart';
 
-class DateTimeAnswer extends QuestionnaireAnswerFiller {
-  const DateTimeAnswer(
+class DateTimeAnswerFiller extends QuestionnaireAnswerFiller {
+  const DateTimeAnswerFiller(
       QuestionnaireLocation location, AnswerLocation answerLocation,
       {Key? key})
       : super(location, answerLocation, key: key);
@@ -17,7 +17,7 @@ class DateTimeAnswer extends QuestionnaireAnswerFiller {
 }
 
 class _DateTimeAnswerState extends QuestionnaireAnswerState<FhirDateTime,
-    DateTimeAnswer, DateTimeItemModel> {
+    DateTimeAnswerFiller, DateTimeAnswerModel> {
   _DateTimeAnswerState();
 
   @override
