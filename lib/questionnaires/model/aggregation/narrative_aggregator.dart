@@ -47,7 +47,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
       if (location.questionnaireItem.type == QuestionnaireItemType.group) {
         div.write('<h2>${item.text}</h2>');
       } else {
-        div.write('<h3>${item.text}:</h3>');
+        div.write('<h3>${item.text}</h3>');
       }
       returnValue = true;
     }

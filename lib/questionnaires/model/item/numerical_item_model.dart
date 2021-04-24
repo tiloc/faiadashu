@@ -1,15 +1,22 @@
+import 'dart:collection';
+
+import 'package:faiadashu/questionnaires/view/item/questionnaire_response_filler.dart';
 import 'package:fhir/primitive_types/decimal.dart';
+import 'package:fhir/primitive_types/integer.dart';
+import 'package:fhir/r4/general_types/general_types.dart';
+import 'package:fhir/r4/resource_types/clinical/diagnostics/diagnostics.dart';
 import 'package:fhir/r4/resource_types/specialized/definitional_artifacts/definitional_artifacts.dart';
 import 'package:intl/intl.dart';
 
 import '../../../fhir_types/fhir_types_extensions.dart';
 import '../../../logging/logger.dart';
+import '../questionnaire_exceptions.dart';
 import '../questionnaire_extensions.dart';
 import '../questionnaire_location.dart';
 import 'item_model.dart';
 
 /// Models numerical answers.
-class NumericalItemModel extends ItemModel<String> {
+class NumericalItemModel extends ItemModel<String, Quantity> {
   static final _logger = Logger(NumericalItemModel);
 
   late final String _numberPattern;
@@ -26,7 +33,34 @@ class NumericalItemModel extends ItemModel<String> {
   int get maxDecimal => _maxDecimal;
   NumberFormat get numberFormat => _numberFormat;
 
-  NumericalItemModel(QuestionnaireLocation location) : super(location) {
+  late final LinkedHashMap<String, Coding> units;
+
+  bool hasUnit(Quantity? quantity) {
+    if (quantity == null) {
+      return false;
+    }
+    if (quantity.code == null && quantity.unit == null) {
+      return false;
+    }
+
+    return true;
+  }
+
+  String keyStringFromCoding(Coding coding) {
+    final choiceString =
+        (coding.code != null) ? coding.code?.value : coding.display;
+
+    if (choiceString == null) {
+      throw QuestionnaireFormatException(
+          'Insufficient info for key string in $coding', coding);
+    } else {
+      return choiceString;
+    }
+  }
+
+  NumericalItemModel(
+      QuestionnaireLocation location, AnswerLocation answerLocation)
+      : super(location, answerLocation) {
     _isSliding = location.questionnaireItem.isItemControl('slider');
 
     final minValueExtension = qi.extension_
@@ -74,6 +108,43 @@ class NumericalItemModel extends ItemModel<String> {
 
     _numberFormat = NumberFormat(_numberPattern,
         locale.toLanguageTag()); // TODO: toString or toLanguageTag?
+
+    final unit = qi.unit;
+    // ignore: prefer_collection_literals
+    units = LinkedHashMap<String, Coding>();
+    final unitsUri = qi.extension_
+        ?.extensionOrNull(
+            'http://hl7.org/fhir/StructureDefinition/questionnaire-unitValueSet')
+        ?.valueCanonical
+        .toString();
+    if (unitsUri != null) {
+      location.top.visitValueSet(unitsUri, (coding) {
+        units[keyStringFromCoding(coding)] = coding;
+      }, context: qi.linkId);
+    } else if (unit != null) {
+      units[keyStringFromCoding(unit)] = unit;
+    }
+
+    // TODO: look at initialValue extension
+    Quantity? existingValue;
+    final firstAnswer = location.responseItem?.answer?.firstOrNull;
+    if (firstAnswer != null) {
+      existingValue = firstAnswer.valueQuantity ??
+          ((firstAnswer.valueDecimal != null &&
+                  firstAnswer.valueDecimal!.isValid)
+              ? Quantity(value: firstAnswer.valueDecimal)
+              : (firstAnswer.valueInteger != null &&
+                      firstAnswer.valueInteger!.isValid)
+                  ? Quantity(
+                      value:
+                          Decimal(firstAnswer.valueInteger!.value!.toDouble()))
+                  : null);
+    }
+    value = (existingValue == null && isSliding)
+        ? Quantity(
+            value: Decimal(
+                (maxValue - minValue) / 2.0)) // Slider needs a guaranteed value
+        : existingValue;
   }
 
   @override
@@ -95,6 +166,33 @@ class NumericalItemModel extends ItemModel<String> {
     }
     if (number < _minValue) {
       return 'Enter a number ${Decimal(_minValue).format(locale)}, or higher.';
+    }
+  }
+
+  @override
+  QuestionnaireResponseAnswer? fillAnswer() {
+    _logger.debug('fillAnswer: $value');
+    if (value == null) {
+      return null;
+    }
+
+    switch (qi.type) {
+      case QuestionnaireItemType.decimal:
+        return (value!.value != null)
+            ? QuestionnaireResponseAnswer(
+                valueDecimal: value!.value, extension_: value!.extension_)
+            : null;
+      case QuestionnaireItemType.quantity:
+        return QuestionnaireResponseAnswer(
+            valueQuantity: value, extension_: value!.extension_);
+      case QuestionnaireItemType.integer:
+        return (value!.value != null)
+            ? QuestionnaireResponseAnswer(
+                valueInteger: Integer(value!.value!.value!.round()),
+                extension_: value!.extension_)
+            : null;
+      default:
+        throw StateError('item.type cannot be ${qi.type}');
     }
   }
 }

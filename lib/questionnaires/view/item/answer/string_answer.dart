@@ -1,7 +1,6 @@
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../coding/data_absent_reasons.dart';
 import '../../../model/item/string_item_model.dart';
 import '../../../questionnaires.dart';
 import '../questionnaire_answer_filler.dart';
@@ -16,9 +15,7 @@ class StringAnswer extends QuestionnaireAnswerFiller {
 }
 
 class _StringAnswerState
-    extends QuestionnaireAnswerState<String, StringAnswer> {
-  late final StringItemModel _itemModel;
-
+    extends QuestionnaireAnswerState<String, StringAnswer, StringItemModel> {
   final _controller = TextEditingController();
 
   _StringAnswerState();
@@ -33,9 +30,6 @@ class _StringAnswerState
   void initState() {
     super.initState();
 
-    _itemModel = StringItemModel(location);
-
-    initialValue = widget.answerLocation.answer?.valueString;
     _controller.text = value ?? '';
   }
 
@@ -54,34 +48,14 @@ class _StringAnswerState
           maxLines: (qi.type == QuestionnaireItemType.text) ? 4 : 1,
           decoration: InputDecoration(
             border: const OutlineInputBorder(),
-            hintText: _itemModel.entryFormat,
+            hintText: itemModel.entryFormat,
           ),
-          validator: (inputValue) => _itemModel.validate(inputValue),
+          validator: (inputValue) => itemModel.validate(inputValue),
           autovalidateMode: AutovalidateMode.onUserInteraction,
           onChanged: (content) {
             value = content;
           },
-          maxLength: _itemModel.maxLength,
+          maxLength: itemModel.maxLength,
         ));
-  }
-
-  @override
-  QuestionnaireResponseAnswer? fillAnswer() {
-    final valid = _itemModel.validate(value) == null;
-    final dataAbsentReasonExtension = !valid
-        ? [
-            FhirExtension(
-                url: DataAbsentReason.extensionUrl,
-                valueCode: DataAbsentReason.asTextCode)
-          ]
-        : null;
-
-    return (value != null && value!.isNotEmpty)
-        ? (qi.type != QuestionnaireItemType.url)
-            ? QuestionnaireResponseAnswer(
-                valueString: value, extension_: dataAbsentReasonExtension)
-            : QuestionnaireResponseAnswer(
-                valueUri: FhirUri(value), extension_: dataAbsentReasonExtension)
-        : null;
   }
 }

@@ -1,14 +1,17 @@
 import 'dart:ui';
 
+import 'package:faiadashu/faiadashu.dart';
 import 'package:fhir/r4.dart';
 
 import '../../../fhir_types/fhir_types_extensions.dart';
 import '../questionnaire_location.dart';
 
-/// Validates a [QuestionnaireResponseItem].
-abstract class ItemModel<T> {
+/// Models a [QuestionnaireResponseItem].
+abstract class ItemModel<I, V> {
   final QuestionnaireLocation location;
+  final AnswerLocation answerLocation;
   final Locale locale;
+  V? value;
 
   QuestionnaireItem get qi => location.questionnaireItem;
 
@@ -21,8 +24,17 @@ abstract class ItemModel<T> {
         ?.valueString;
   }
 
-  ItemModel(this.location) : locale = location.top.locale;
+  ItemModel(this.location, this.answerLocation) : locale = location.top.locale;
 
   /// Returns null when [inValue] is valid, or a localized message when it is not.
-  String? validate(T? inValue);
+  String? validate(I? inValue);
+
+  /// Returns a [QuestionnaireResponseAnswer] based on the current value.
+  QuestionnaireResponseAnswer? fillAnswer();
+
+  List<QuestionnaireResponseAnswer>? fillCodingAnswers() {
+    throw UnimplementedError('fillCodingAnswers() not implemented.');
+  }
+
+  bool hasCodingAnswers() => false;
 }
