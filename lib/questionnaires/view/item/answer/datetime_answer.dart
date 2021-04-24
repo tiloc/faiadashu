@@ -1,10 +1,10 @@
-import 'package:fhir/r4.dart';
-import 'package:fhir/r4/resource_types/clinical/diagnostics/diagnostics.dart';
+import 'package:fhir/r4.dart'
+    show Date, FhirDateTime, QuestionnaireItemType, Time;
 import 'package:flutter/material.dart';
 
 import '../../../../fhir_types/date_time_picker.dart';
 import '../../../../fhir_types/fhir_types.dart';
-import '../../../../fhir_types/fhir_types_extensions.dart';
+import '../../../model/item/datetime_item_model.dart';
 import '../../../questionnaires.dart';
 import '../questionnaire_answer_filler.dart';
 
@@ -17,28 +17,9 @@ class DateTimeAnswer extends QuestionnaireAnswerFiller {
   State<StatefulWidget> createState() => _DateTimeAnswerState();
 }
 
-class _DateTimeAnswerState
-    extends QuestionnaireAnswerState<FhirDateTime, DateTimeAnswer> {
+class _DateTimeAnswerState extends QuestionnaireAnswerState<FhirDateTime,
+    DateTimeAnswer, DateTimeItemModel> {
   _DateTimeAnswerState();
-
-  @override
-  void initState() {
-    super.initState();
-    initialValue = widget.answerLocation.answer?.valueDateTime ??
-        ((widget.answerLocation.answer?.valueDate != null)
-            ? FhirDateTime(widget.answerLocation.answer?.valueDate
-                .toString()) // TODO: File a PR to allow construction of FhirDateTime directly from Date.
-            : null) ??
-        ((qi.extension_
-                    ?.extensionOrNull(
-                        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression')
-                    ?.valueExpression
-                    ?.expression ==
-                'today()')
-            ? FhirDateTime.fromDateTime(
-                DateTime.now(), DateTimePrecision.YYYYMMDD)
-            : null);
-  }
 
   @override
   Widget buildReadOnly(BuildContext context) {
@@ -75,26 +56,5 @@ class _DateTimeAnswerState
         onChanged: (fhirDatetime) => value = fhirDatetime,
       ),
     );
-  }
-
-  @override
-  QuestionnaireResponseAnswer? fillAnswer() {
-    final itemType = qi.type;
-
-    if (value?.value == null) {
-      return null;
-    }
-
-    if (itemType == QuestionnaireItemType.date) {
-      return QuestionnaireResponseAnswer(valueDate: Date(value!.value));
-    } else if (itemType == QuestionnaireItemType.datetime) {
-      return QuestionnaireResponseAnswer(valueDateTime: value);
-    } else if (itemType == QuestionnaireItemType.time) {
-      return QuestionnaireResponseAnswer(
-          valueTime: Time(
-              value!.value!.toIso8601String().substring('yyyy-MM-ddT'.length)));
-    } else {
-      throw StateError('Unexpected itemType: $itemType');
-    }
   }
 }

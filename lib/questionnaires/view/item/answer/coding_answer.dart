@@ -3,7 +3,6 @@ import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../fhir_types/fhir_types_extensions.dart';
-import '../../../../logging/logging.dart';
 import '../../../../questionnaires/model/questionnaire_extensions.dart';
 import '../../../model/item/coding_item_model.dart';
 import '../../../questionnaires.dart';
@@ -24,17 +23,11 @@ class CodingAnswer extends QuestionnaireAnswerFiller {
   State<StatefulWidget> createState() => _CodingAnswerState();
 }
 
-class _CodingAnswerState
-    extends QuestionnaireAnswerState<CodeableConcept, CodingAnswer> {
-  static final _logger = Logger(_CodingAnswerState);
-  late final CodingItemModel _itemModel;
-
-  Object? _initFailure;
+class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
+    CodingAnswer, CodingItemModel> {
   late final TextEditingController? _otherChoiceController;
 
   String? _validationText;
-
-  static const openChoiceOther = 'open-choice-other';
 
   _CodingAnswerState();
 
@@ -42,88 +35,24 @@ class _CodingAnswerState
   void initState() {
     super.initState();
 
-    try {
-      _itemModel = CodingItemModel(location);
-
-      if (widget.location.responseItem != null) {
-        initialValue = CodeableConcept(
-            coding: widget.location.responseItem!.answer
-                ?.map((answer) => _itemModel
-                    .answerOptions[
-                        _itemModel.choiceStringFromCoding(answer.valueCoding)]!
-                    .valueCoding!)
-                .toList());
-      }
-    } catch (exception) {
-      _logger.warn(
-          'Could not initialize ${(CodingAnswer).toString()} for ${widget.location.linkId}',
-          error: exception);
-      _initFailure = exception;
-    }
-
     if (qi.type == QuestionnaireItemType.open_choice) {
       // TODO: Set initialValue
       _otherChoiceController = TextEditingController();
     }
 
-    _validationText = _itemModel.validate(value);
-  }
-
-  @override
-  QuestionnaireResponseAnswer? fillAnswer() {
-    throw UnsupportedError(
-        '${(CodingAnswer).toString()} will always return coding answers.');
-  }
-
-  @override
-  List<QuestionnaireResponseAnswer>? fillCodingAnswers() {
-    if (value == null) {
-      return null;
-    }
-
-    // TODO(tiloc): Return the order of the codings in the order of the choices?
-
-    // TODO: This is only supporting a single other text.
-    final result = (value!.coding?.firstOrNull?.code?.value == openChoiceOther)
-        ? [
-            QuestionnaireResponseAnswer(
-                valueCoding: Coding(display: _otherChoiceController!.text))
-          ]
-        : value!.coding?.map<QuestionnaireResponseAnswer>((coding) {
-            // Some answers may only be a display, not have a code
-            return coding.code != null
-                ? QuestionnaireResponseAnswer(
-                    valueCoding: _itemModel
-                        .answerOptions[
-                            _itemModel.choiceStringFromCoding(coding)]!
-                        .valueCoding)
-                : QuestionnaireResponseAnswer(valueCoding: coding);
-          }).toList();
-
-    return result;
-  }
-
-  @override
-  bool hasCodingAnswers() {
-    return true;
+    _validationText = itemModel.validate(value);
   }
 
   @override
   Widget buildReadOnly(BuildContext context) {
-    return (_initFailure == null)
-        ? Text(value?.localizedDisplay(locale) ?? '-')
-        : BrokenQuestionnaireItem.fromException(_initFailure!);
+    return Text(value?.localizedDisplay(locale) ?? '-');
   }
 
   @override
   Widget buildEditable(BuildContext context) {
-    if (_initFailure != null) {
-      return BrokenQuestionnaireItem.fromException(_initFailure!);
-    }
-
     try {
       if (!(qi.repeats == Boolean(true)) &&
-          (_itemModel.answerOptions.length > 10 ||
+          (itemModel.answerOptions.length > 10 ||
               qi.isItemControl('autocomplete'))) {
         return _buildLookupAnswers(context);
       } else {
@@ -143,12 +72,12 @@ class _CodingAnswerState
       choices.add(RadioListTile<String?>(
           title: const NullDashText(),
           value: null,
-          groupValue: _itemModel.toChoiceString(value),
+          groupValue: itemModel.toChoiceString(value),
           onChanged: (String? newValue) {
-            value = _itemModel.fromChoiceString(newValue);
+            value = itemModel.fromChoiceString(newValue);
           }));
     }
-    for (final choice in _itemModel.answerOptions.values) {
+    for (final choice in itemModel.answerOptions.values) {
       final optionPrefix = choice.extension_
           ?.extensionOrNull(
               'http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix')
@@ -162,7 +91,7 @@ class _CodingAnswerState
           width: 100, height: 100);
 
       choices.add(isMultipleChoice
-          ? _itemModel.isExclusive(choice.valueCoding!)
+          ? itemModel.isExclusive(choice.valueCoding!)
               ? RadioListTile<String>(
                   title: styledOptionTitle,
                   groupValue: choice.optionCode,
@@ -174,8 +103,8 @@ class _CodingAnswerState
                       '',
                   onChanged: (_) {
                     final newValue =
-                        _itemModel.toggleValue(value, choice.optionCode);
-                    _validationText = _itemModel.validate(newValue);
+                        itemModel.toggleValue(value, choice.optionCode);
+                    _validationText = itemModel.validate(newValue);
                     value = newValue;
                   },
                 )
@@ -186,26 +115,26 @@ class _CodingAnswerState
                       null,
                   onChanged: (bool? newValue) {
                     final newValue =
-                        _itemModel.toggleValue(value, choice.optionCode);
-                    _validationText = _itemModel.validate(newValue);
+                        itemModel.toggleValue(value, choice.optionCode);
+                    _validationText = itemModel.validate(newValue);
                     value = newValue;
                   })
           : RadioListTile<String>(
               title: styledOptionTitle,
               value: choice.optionCode,
-              groupValue: _itemModel.toChoiceString(value),
+              groupValue: itemModel.toChoiceString(value),
               onChanged: (String? newValue) {
-                value = _itemModel.fromChoiceString(newValue);
+                value = itemModel.fromChoiceString(newValue);
               }));
     }
 
     if (qi.type == QuestionnaireItemType.open_choice) {
       choices.add(RadioListTile<String>(
-        value: openChoiceOther,
-        groupValue: _itemModel.toChoiceString(value),
+        value: CodingItemModel.openChoiceOther,
+        groupValue: itemModel.toChoiceString(value),
         onChanged: (String? newValue) {
           value = CodeableConcept(
-              coding: [Coding(code: Code(openChoiceOther))],
+              coding: [Coding(code: Code(CodingItemModel.openChoiceOther))],
               text: _otherChoiceController!.text);
         },
         title: TextFormField(
@@ -213,9 +142,9 @@ class _CodingAnswerState
           onChanged: (newText) {
             value = (newText.isEmpty)
                 ? null
-                : CodeableConcept(
-                    coding: [Coding(code: Code(openChoiceOther))],
-                    text: _otherChoiceController!.text);
+                : CodeableConcept(coding: [
+                    Coding(code: Code(CodingItemModel.openChoiceOther))
+                  ], text: _otherChoiceController!.text);
           },
         ),
         secondary: const Text('Other'),
@@ -277,7 +206,7 @@ class _CodingAnswerState
         if (textEditingValue.text.isEmpty) {
           return const Iterable<QuestionnaireAnswerOption>.empty();
         }
-        return _itemModel.answerOptions.values
+        return itemModel.answerOptions.values
             .where((QuestionnaireAnswerOption option) {
           return option
               .localizedDisplay(locale)
@@ -286,7 +215,7 @@ class _CodingAnswerState
         });
       },
       onSelected: (QuestionnaireAnswerOption selectedOption) {
-        value = _itemModel.fromChoiceString(selectedOption.optionCode);
+        value = itemModel.fromChoiceString(selectedOption.optionCode);
       },
     );
   }

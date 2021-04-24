@@ -5,19 +5,22 @@ import 'package:fhir/r4.dart';
 
 import '../../../fhir_types/fhir_types_extensions.dart';
 import '../../../logging/logger.dart';
+import '../../view/item/questionnaire_response_filler.dart';
 import '../questionnaire_exceptions.dart';
 import '../questionnaire_extensions.dart';
 import '../questionnaire_location.dart';
 import 'item_model.dart';
 
 /// Model answers which are [Coding]s.
-class CodingItemModel extends ItemModel<CodeableConcept> {
+class CodingItemModel extends ItemModel<CodeableConcept, CodeableConcept> {
   // ignore: prefer_collection_literals
   final _answerOptions = LinkedHashMap<String, QuestionnaireAnswerOption>();
   static final _logger = Logger(CodingItemModel);
 
   LinkedHashMap<String, QuestionnaireAnswerOption> get answerOptions =>
       _answerOptions;
+
+  static const openChoiceOther = 'open-choice-other';
 
   /// Turn on/off the checkbox with the provided [toggleValue].
   /// Used in repeating items.
@@ -195,7 +198,8 @@ class CodingItemModel extends ItemModel<CodeableConcept> {
   late final int minOccurs;
   late final int? maxOccurs;
 
-  CodingItemModel(QuestionnaireLocation location) : super(location) {
+  CodingItemModel(QuestionnaireLocation location, AnswerLocation answerLocation)
+      : super(location, answerLocation) {
     _createAnswerOptions();
 
     minOccurs = qi.extension_
@@ -210,6 +214,15 @@ class CodingItemModel extends ItemModel<CodeableConcept> {
             'http://hl7.org/fhir/StructureDefinition/questionnaire-maxOccurs')
         ?.valueInteger
         ?.value;
+
+    if (location.responseItem != null) {
+      value = CodeableConcept(
+          coding: location.responseItem!.answer
+              ?.map((answer) =>
+                  answerOptions[choiceStringFromCoding(answer.valueCoding)]!
+                      .valueCoding!)
+              .toList());
+    }
   }
 
   @override
@@ -227,5 +240,42 @@ class CodingItemModel extends ItemModel<CodeableConcept> {
     if (maxOccurs != null && length > maxOccurs!) {
       return 'Select $maxOccurs or fewer options.';
     }
+  }
+
+  @override
+  QuestionnaireResponseAnswer? fillAnswer() {
+    throw UnsupportedError(
+        'CodingItemModel will always return coding answers.');
+  }
+
+  @override
+  List<QuestionnaireResponseAnswer>? fillCodingAnswers() {
+    if (value == null) {
+      return null;
+    }
+
+    // TODO(tiloc): Return the order of the codings in the order of the choices?
+
+    // TODO: This is only supporting a single other text.
+    final result = (value!.coding?.firstOrNull?.code?.value == openChoiceOther)
+        ? [
+            QuestionnaireResponseAnswer(
+                valueCoding: Coding(display: value!.text))
+          ]
+        : value!.coding?.map<QuestionnaireResponseAnswer>((coding) {
+            // Some answers may only be a display, not have a code
+            return coding.code != null
+                ? QuestionnaireResponseAnswer(
+                    valueCoding: answerOptions[choiceStringFromCoding(coding)]!
+                        .valueCoding)
+                : QuestionnaireResponseAnswer(valueCoding: coding);
+          }).toList();
+
+    return result;
+  }
+
+  @override
+  bool hasCodingAnswers() {
+    return true;
   }
 }

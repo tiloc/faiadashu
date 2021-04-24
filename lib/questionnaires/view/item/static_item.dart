@@ -1,6 +1,5 @@
 import 'package:fhir/primitive_types/decimal.dart';
 import 'package:fhir/r4.dart';
-import 'package:fhir/r4/resource_types/clinical/diagnostics/diagnostics.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_html_css/simple_html_css.dart';
 
@@ -17,10 +16,9 @@ class StaticItem extends QuestionnaireAnswerFiller {
   State<StatefulWidget> createState() => _StaticItemState();
 }
 
-class _StaticItemState extends QuestionnaireAnswerState {
+class _StaticItemState extends State<StaticItem> {
   static final _logger = Logger(_StaticItemState);
 
-  // Bypass the regular 'value' field, as this has too many side-effects for a pure output widget.
   Decimal? calcResult;
 
   _StaticItemState();
@@ -78,7 +76,7 @@ class _StaticItemState extends QuestionnaireAnswerState {
   }
 
   @override
-  Widget buildReadOnly(BuildContext context) {
+  Widget build(BuildContext context) {
     if (widget.location.isCalculatedExpression) {
       final score = calcResult?.value?.round();
       final feedback = findDanishFeedback(score);
@@ -100,17 +98,5 @@ class _StaticItemState extends QuestionnaireAnswerState {
     return const SizedBox(
       height: 16.0,
     );
-  }
-
-  @override
-  QuestionnaireResponseAnswer? fillAnswer() {
-    // Not required for a static item
-    throw UnimplementedError();
-  }
-
-  @override
-  Widget buildEditable(BuildContext context) {
-    // Not required for a read-only item
-    throw UnimplementedError();
   }
 }

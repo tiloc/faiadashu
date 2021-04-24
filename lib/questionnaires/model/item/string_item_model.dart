@@ -1,11 +1,16 @@
+import 'package:fhir/primitive_types/fhir_uri.dart';
+import 'package:fhir/r4/basic_types/fhir_extension.dart';
+import 'package:fhir/r4/resource_types/clinical/diagnostics/diagnostics.dart';
 import 'package:fhir/r4/resource_types/specialized/definitional_artifacts/definitional_artifacts.dart';
 
+import '../../../coding/data_absent_reasons.dart';
 import '../../../fhir_types/fhir_types_extensions.dart';
+import '../../view/item/questionnaire_response_filler.dart';
 import '../questionnaire_location.dart';
 import 'item_model.dart';
 
 /// Models string answers, incl. URLs.
-class StringItemModel extends ItemModel<String> {
+class StringItemModel extends ItemModel<String, String> {
   static final _urlRegExp = RegExp(
       r'^(http|https|ftp|sftp)://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+');
 
@@ -13,7 +18,8 @@ class StringItemModel extends ItemModel<String> {
   late final int minLength;
   late final int? maxLength;
 
-  StringItemModel(QuestionnaireLocation location) : super(location) {
+  StringItemModel(QuestionnaireLocation location, AnswerLocation answerLocation)
+      : super(location, answerLocation) {
     final regexPattern = qi.extension_
         ?.extensionOrNull('http://hl7.org/fhir/StructureDefinition/regex')
         ?.valueString;
@@ -29,6 +35,8 @@ class StringItemModel extends ItemModel<String> {
         0;
 
     maxLength = qi.maxLength?.value;
+
+    value = answerLocation.answer?.valueString;
   }
 
   @override
@@ -62,5 +70,25 @@ class StringItemModel extends ItemModel<String> {
     }
 
     return null;
+  }
+
+  @override
+  QuestionnaireResponseAnswer? fillAnswer() {
+    final valid = validate(value) == null;
+    final dataAbsentReasonExtension = !valid
+        ? [
+            FhirExtension(
+                url: DataAbsentReason.extensionUrl,
+                valueCode: DataAbsentReason.asTextCode)
+          ]
+        : null;
+
+    return (value != null && value!.isNotEmpty)
+        ? (qi.type != QuestionnaireItemType.url)
+            ? QuestionnaireResponseAnswer(
+                valueString: value, extension_: dataAbsentReasonExtension)
+            : QuestionnaireResponseAnswer(
+                valueUri: FhirUri(value), extension_: dataAbsentReasonExtension)
+        : null;
   }
 }

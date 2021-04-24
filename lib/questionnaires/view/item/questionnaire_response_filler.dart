@@ -158,6 +158,8 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
   }
 }
 
+// TODO(tiloc): This is really a model and also has a smell to it. Eliminate?
+
 /// A place where [QuestionnaireAnswerFiller]s can stash their result.
 /// Provides isolation from underlying response filler and answers.
 class AnswerLocation {
