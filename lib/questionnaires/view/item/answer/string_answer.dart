@@ -34,11 +34,6 @@ class _StringAnswerState
   }
 
   @override
-  Widget buildReadOnly(BuildContext context) {
-    return Text(value ?? '');
-  }
-
-  @override
   Widget buildEditable(BuildContext context) {
     return Container(
         padding: const EdgeInsets.only(top: 8, bottom: 8),

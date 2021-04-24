@@ -44,11 +44,6 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
   }
 
   @override
-  Widget buildReadOnly(BuildContext context) {
-    return Text(value?.localizedDisplay(locale) ?? '-');
-  }
-
-  @override
   Widget buildEditable(BuildContext context) {
     try {
       if (!(qi.repeats == Boolean(true)) &&

@@ -148,6 +148,9 @@ class NumericalItemModel extends ItemModel<String, Quantity> {
   }
 
   @override
+  String get display => value?.format(locale) ?? ItemModel.nullText;
+
+  @override
   String? validate(String? inputValue) {
     if (inputValue == null || inputValue.isEmpty) {
       return null;

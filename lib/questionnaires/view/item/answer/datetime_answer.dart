@@ -3,7 +3,6 @@ import 'package:fhir/r4.dart'
 import 'package:flutter/material.dart';
 
 import '../../../../fhir_types/date_time_picker.dart';
-import '../../../../fhir_types/fhir_types.dart';
 import '../../../model/item/datetime_item_model.dart';
 import '../../../questionnaires.dart';
 import '../questionnaire_answer_filler.dart';
@@ -20,15 +19,6 @@ class DateTimeAnswer extends QuestionnaireAnswerFiller {
 class _DateTimeAnswerState extends QuestionnaireAnswerState<FhirDateTime,
     DateTimeAnswer, DateTimeItemModel> {
   _DateTimeAnswerState();
-
-  @override
-  Widget buildReadOnly(BuildContext context) {
-    return FhirDateTimeText(
-      value,
-      locale: locale,
-      defaultText: '-',
-    );
-  }
 
   @override
   Widget buildEditable(BuildContext context) {

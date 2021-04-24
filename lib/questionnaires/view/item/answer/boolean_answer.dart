@@ -17,15 +17,6 @@ class _BooleanItemState
   _BooleanItemState();
 
   @override
-  Widget buildReadOnly(BuildContext context) {
-    return Text((value == null)
-        ? ''
-        : (value == Boolean(true))
-            ? '[X]'
-            : '[ ]');
-  }
-
-  @override
   Widget buildEditable(BuildContext context) {
     return Container(
         alignment: Alignment.centerLeft,

@@ -44,11 +44,6 @@ class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
     _numberInputFormatter = NumericalTextInputFormatter(itemModel.numberFormat);
   }
 
-  @override
-  Widget buildReadOnly(BuildContext context) {
-    return Text(value?.format(locale) ?? '');
-  }
-
   Widget _buildDropDownFromUnits(BuildContext context) {
     if (itemModel.units.length == 1) {
       return Container(

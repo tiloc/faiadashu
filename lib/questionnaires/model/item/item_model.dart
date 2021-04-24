@@ -8,6 +8,8 @@ import '../questionnaire_location.dart';
 
 /// Models a [QuestionnaireResponseItem].
 abstract class ItemModel<I, V> {
+  static const nullText = '—';
+
   final QuestionnaireLocation location;
   final AnswerLocation answerLocation;
   final Locale locale;
@@ -25,6 +27,9 @@ abstract class ItemModel<I, V> {
   }
 
   ItemModel(this.location, this.answerLocation) : locale = location.top.locale;
+
+  /// Returns a human-readable, localized, textual description of the model.
+  String get display;
 
   /// Returns null when [inValue] is valid, or a localized message when it is not.
   String? validate(I? inValue);

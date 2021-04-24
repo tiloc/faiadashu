@@ -62,7 +62,9 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller,
     return buildEditable(context);
   }
 
-  Widget buildReadOnly(BuildContext context);
+  Widget buildReadOnly(BuildContext context) {
+    return Text(itemModel.display);
+  }
 
   Widget buildEditable(BuildContext context);
 

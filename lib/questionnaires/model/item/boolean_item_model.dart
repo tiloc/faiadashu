@@ -17,6 +17,13 @@ class BooleanItemModel extends ItemModel<Boolean, Boolean> {
       (value != null) ? QuestionnaireResponseAnswer(valueBoolean: value) : null;
 
   @override
+  String get display => (value == null)
+      ? ItemModel.nullText
+      : (value == Boolean(true))
+          ? '[X]'
+          : '[ ]';
+
+  @override
   String? validate(Boolean? inValue) {
     return null;
   }

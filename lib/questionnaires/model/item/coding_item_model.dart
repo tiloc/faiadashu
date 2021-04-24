@@ -226,6 +226,9 @@ class CodingItemModel extends ItemModel<CodeableConcept, CodeableConcept> {
   }
 
   @override
+  String get display => value?.localizedDisplay(locale) ?? ItemModel.nullText;
+
+  @override
   String? validate(CodeableConcept? inValue) {
     if (inValue == null) {
       return null;

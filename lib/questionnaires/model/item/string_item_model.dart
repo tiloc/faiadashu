@@ -40,6 +40,9 @@ class StringItemModel extends ItemModel<String, String> {
   }
 
   @override
+  String get display => value ?? ItemModel.nullText;
+
+  @override
   String? validate(String? inValue) {
     if (inValue == null || inValue.isEmpty) {
       return null;

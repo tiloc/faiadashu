@@ -33,6 +33,9 @@ class DateTimeItemModel extends ItemModel<FhirDateTime, FhirDateTime> {
   }
 
   @override
+  String get display => value?.format(locale) ?? ItemModel.nullText;
+
+  @override
   QuestionnaireResponseAnswer? fillAnswer() {
     final itemType = qi.type;
 
