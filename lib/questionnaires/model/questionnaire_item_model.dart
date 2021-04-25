@@ -60,7 +60,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
       allCount++;
       switch (qew.operator_) {
         case QuestionnaireEnableWhenOperator.exists:
-          if (questionnaireModel.findByLinkId(qew.question!).responseItem !=
+          if (questionnaireModel.fromLinkId(qew.question!).responseItem !=
               null) {
             anyTrigger = true;
             allTriggered++;
@@ -69,7 +69,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
         case QuestionnaireEnableWhenOperator.eq:
         case QuestionnaireEnableWhenOperator.ne:
           final responseCoding = questionnaireModel
-              .findByLinkId(qew.question!)
+              .fromLinkId(qew.question!)
               .responseItem
               ?.answer
               ?.firstOrNull
@@ -181,7 +181,6 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     if (questionnaireResponseItem != _questionnaireResponseItem) {
       _questionnaireResponseItem = questionnaireResponseItem;
       questionnaireModel.bumpRevision();
-      notifyListeners();
     }
   }
 

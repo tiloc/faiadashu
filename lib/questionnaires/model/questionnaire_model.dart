@@ -291,10 +291,10 @@ class QuestionnaireModel extends QuestionnaireItemModel {
 
   int get revision => _revision;
 
-  /// Finds the [QuestionnaireItemModel] that corresponds to the linkId.
+  /// Returns the [QuestionnaireItemModel] that corresponds to the linkId.
   ///
   /// Throws an [Exception] when no such [QuestionnaireItemModel] exists.
-  QuestionnaireItemModel findByLinkId(String linkId) {
+  QuestionnaireItemModel fromLinkId(String linkId) {
     final result = _orderedItems![linkId];
     if (result == null) {
       throw QuestionnaireFormatException("Location '$linkId' not found.");
@@ -311,7 +311,7 @@ class QuestionnaireModel extends QuestionnaireItemModel {
       return;
     }
     for (final item in qris) {
-      findByLinkId(item.linkId!).responseItem = item;
+      fromLinkId(item.linkId!).responseItem = item;
       _populateItems(item.item);
       if (item.answer != null) {
         for (final answer in item.answer!) {
@@ -351,7 +351,8 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     _logger.trace('updateEnableWhen()');
 
     final previouslyEnabled = List<bool>.generate(
-        orderedQuestionnaireItemModels().length, (index) => orderedQuestionnaireItemModels().elementAt(index).enabled,
+        orderedQuestionnaireItemModels().length,
+        (index) => orderedQuestionnaireItemModels().elementAt(index).enabled,
         growable: false);
     _logger.trace('prevEnabled: $previouslyEnabled');
     for (final itemModel in orderedQuestionnaireItemModels()) {
@@ -362,7 +363,8 @@ class QuestionnaireModel extends QuestionnaireItemModel {
       itemModel._calculateEnabled();
     }
     final afterEnabled = List<bool>.generate(
-        orderedQuestionnaireItemModels().length, (index) => orderedQuestionnaireItemModels().elementAt(index).enabled,
+        orderedQuestionnaireItemModels().length,
+        (index) => orderedQuestionnaireItemModels().elementAt(index).enabled,
         growable: false);
     _logger.trace('afterEnabled: $afterEnabled');
 
@@ -377,7 +379,7 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   void activateEnableWhen() {
     for (final itemModel in orderedQuestionnaireItemModels()) {
       itemModel.forEnableWhens((qew) {
-        findByLinkId(qew.question!).addListener(() => updateEnableWhen());
+        fromLinkId(qew.question!).addListener(() => updateEnableWhen());
       });
     }
 
