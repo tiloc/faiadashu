@@ -7,7 +7,7 @@ import '../../fhir_types/fhir_types_extensions.dart';
 
 extension FDashQuestionnaireAnswerOptionExtensions
     on QuestionnaireAnswerOption {
-  /// Localized access to  display value
+  /// Returns localized display value.
   String localizedDisplay(Locale locale) {
     return valueString ?? valueCoding?.localizedDisplay(locale) ?? toString();
   }

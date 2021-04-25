@@ -278,14 +278,6 @@ class _HomePageState extends State<HomePage> {
               saveResponseFunction: _saveResponse,
               restoreResponseFunction: _restoreResponse,
             ),
-            QuestionnaireLaunchTile(
-              title: 'PHQ9 Questionnaire Scroller',
-              subtitle: 'Simple choice-based survey with a total score.',
-              fhirResourceProvider: resourceBundleProvider,
-              questionnairePath: 'assets/instruments/phq9_instrument.json',
-              saveResponseFunction: _saveResponse,
-              restoreResponseFunction: _restoreResponse,
-            ),
             ListTile(
               title: const Text('PHQ9 Questionnaire Stepper'),
               subtitle:

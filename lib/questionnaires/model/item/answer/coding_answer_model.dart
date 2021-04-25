@@ -113,17 +113,22 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
         true;
   }
 
-  // TODO: Is this really appropriate?
   // Take the existing extensions that might contain information about
-  // ordinal values and convert them from ordinalValue to iso21090-CO-value
+  // ordinal values and provide them as both ordinalValue and iso21090-CO-value.
   List<FhirExtension>? _createOrdinalExtension(
       List<FhirExtension>? inExtension) {
     List<FhirExtension>? responseOrdinalExtension;
 
     final FhirExtension? ordinalExtension = inExtension?.extensionOrNull(
-        'http://hl7.org/fhir/StructureDefinition/ordinalValue');
+            'http://hl7.org/fhir/StructureDefinition/ordinalValue') ??
+        inExtension?.extensionOrNull(
+            'http://hl7.org/fhir/StructureDefinition/iso21090-CO-value');
     if (ordinalExtension != null) {
       responseOrdinalExtension = <FhirExtension>[
+        FhirExtension(
+            url:
+                FhirUri('http://hl7.org/fhir/StructureDefinition/ordinalValue'),
+            valueDecimal: ordinalExtension.valueDecimal),
         FhirExtension(
             url: FhirUri(
                 'http://hl7.org/fhir/StructureDefinition/iso21090-CO-value'),

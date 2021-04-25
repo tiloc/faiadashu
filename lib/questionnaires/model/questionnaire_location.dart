@@ -180,18 +180,21 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
   QuestionnaireResponseItem? get responseItem => _questionnaireResponseItem;
 
   /// Get a [Decimal] value which can be added to a score.
+  ///
   /// Returns null if not applicable (either question unanswered, or wrong type)
   Decimal? get score {
-    // TODO(tiloc): isReadOnly is probably the wrong condition?
-    if ((responseItem == null) || isReadOnly) {
+    if (responseItem == null) {
       return null;
     }
 
-    // Sum up ordinal values from extensions
+    // Find ordinal value in extensions
     final ordinalExtension = responseItem
-        ?.answer?.firstOrNull?.valueCoding?.extension_
-        ?.extensionOrNull(
-            'http://hl7.org/fhir/StructureDefinition/iso21090-CO-value');
+            ?.answer?.firstOrNull?.valueCoding?.extension_
+            ?.extensionOrNull(
+                'http://hl7.org/fhir/StructureDefinition/iso21090-CO-value') ??
+        responseItem?.answer?.firstOrNull?.valueCoding?.extension_
+            ?.extensionOrNull(
+                'http://hl7.org/fhir/StructureDefinition/ordinalValue');
     if (ordinalExtension == null) {
       return null;
     }
@@ -212,8 +215,11 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
         return true;
       }
 
+      // From the description of the extension it is not entirely clear
+      // whether the unit should be in display or code.
+      // NLM Forms Builder puts it into display.
       if (questionnaireItem.readOnly == Boolean(true) &&
-          questionnaireItem.unit?.code?.value == '{score}') {
+          questionnaireItem.unit?.display == '{score}') {
         return true;
       }
     }
