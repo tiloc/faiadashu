@@ -1,3 +1,11 @@
+## 0.3.0
+* Documented that the architectural model is a variant of the "Presentation Model".
+  This is explained in [the developer overview](doc/overview.md#presentation-model)
+* Cleanup of class naming. Most notable QuestionnaireTopLocation and QuestionnaireLocation are now
+QuestionnaireModel and QuestionnaireItemModel. 
+* Further cleanup of model-view relationship.
+
+
 ## 0.2.5
 * Cleanup of model-view relationship: Moved lots of functionality from view to model.
 

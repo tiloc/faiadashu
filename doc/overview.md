@@ -167,8 +167,9 @@ The filler will display informative error boxes.
 
 ![error_widget](images/error_widget.png)
 
-#### Internals
-The Questionnaire Filler is based on a bespoke variation of the [PM model](https://martinfowler.com/eaaDev/PresentationModel.html).
+#### Architecture
+##### Presentation Model
+The Questionnaire Filler is based on a bespoke variation of the [Presentation Model - PM](https://martinfowler.com/eaaDev/PresentationModel.html).
 It is focussed on filling an information model with user-input and does not have any true business-logic, storage,
 or communication.
 
