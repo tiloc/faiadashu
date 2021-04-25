@@ -98,7 +98,7 @@ The filler widget comes in two flavors:
 * `QuestionnaireStepperPage`: A side-ways, wizard-style filler
 
 Both of these flavors will take over the entire screen and bring their own Scaffold. An embeddable filler is contained in
-`QuestionnaireFiller`. This will return a list of Widgets - one for each question - that can be used for arbitrary UI designs.
+`QuestionnaireFiller`. This will return a list of Widgets — one for each question — that can be used for arbitrary UI designs.
 
 #### Integration points
 The main integration point is the `ResourceProvider` which is being used by the library to obtain
@@ -166,3 +166,17 @@ A `QuestionnaireFormatException` is thrown.
 The filler will display informative error boxes.
 
 ![error_widget](images/error_widget.png)
+
+#### Internals
+The Questionnaire Filler is based on a bespoke variation of the [PM model](https://martinfowler.com/eaaDev/PresentationModel.html).
+It is focussed on filling an information model with user-input and does not have any true business-logic, storage,
+or communication.
+
+| View                |          Presentation Model  |  Domain Model (FHIR) |
+|---------------------|----------------------|---------------------|
+| QuestionnaireFiller | QuestionnaireModel| Questionnaire |
+| QuestionnaireItemFiller | QuestionnaireItemModel| QuestionnaireItem | 
+| QuestionnaireResponseFiller | ResponseModel|  QuestionnaireResponseItem |
+| QuestionnaireAnswerFiller | AnswerModel|  QuestionnaireAnswerItem |
+
+

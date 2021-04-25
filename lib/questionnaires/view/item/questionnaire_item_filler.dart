@@ -11,7 +11,6 @@ import '../../../logging/logging.dart';
 import '../../questionnaires.dart';
 
 class QuestionnaireItemFiller extends StatefulWidget {
-  static final logger = Logger(QuestionnaireItemFiller);
   final Widget? _titleWidget;
   final QuestionnaireItemModel itemModel;
   final QuestionnaireResponseFiller _responseFiller;
@@ -32,11 +31,11 @@ class QuestionnaireItemFiller extends StatefulWidget {
 }
 
 class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
-  static final logger = Logger(QuestionnaireItemFillerState);
+  static final _logger = Logger(QuestionnaireItemFillerState);
 
   @override
   Widget build(BuildContext context) {
-    logger.debug(
+    _logger.debug(
         'build ${widget.itemModel.linkId} hidden: ${widget.itemModel.isHidden}, enabled: ${widget.itemModel.enabled}');
 
     return (!widget.itemModel.isHidden)
