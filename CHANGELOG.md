@@ -1,4 +1,4 @@
-## 0.3.0
+## 0.3.0-beta.1
 * Documented that the architectural model is a variant of the "Presentation Model".
   This is explained in [the developer overview](doc/overview.md#presentation-model)
 * Cleanup of class naming. Most notable QuestionnaireTopLocation and QuestionnaireLocation are now
