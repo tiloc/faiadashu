@@ -6,7 +6,6 @@ import '../../../coding/data_absent_reasons.dart';
 import '../../../fhir_types/fhir_types_extensions.dart';
 import '../../model/item/response_model.dart';
 import '../../questionnaires.dart';
-import 'questionnaire_answer_filler_factory.dart';
 
 /// Filler for a [QuestionnaireResponseItem].
 class QuestionnaireResponseFiller extends StatefulWidget {
@@ -34,7 +33,7 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
     // This assumes that all answers are of the same kind
     // and repeats = true is only supported for choice items
     _answerFillers = [
-      QuestionnaireAnswerFillerFactory.fromQuestionnaireItem(widget.itemModel,
+      QuestionnaireAnswerFiller.fromQuestionnaireItem(widget.itemModel,
           AnswerLocation(responseModel.answers, 0, _stashAnswers))
     ];
   }
