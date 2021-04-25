@@ -117,6 +117,7 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
     return (_aggregators?.firstWhere((aggregator) => aggregator is T) as T?)!;
   }
 
+  /// Increases the [revision] and notifies all listeners.
   void bumpRevision({bool notifyListeners = true}) {
     final newRevision = _revision + 1;
     _logger.debug(
@@ -127,12 +128,15 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
     }
   }
 
-  /// Get a [Resource] which is referenced in the [Questionnaire].
+  /// Returns a [Resource] which is referenced in the [Questionnaire].
+  ///
   /// If [uri] starts with '#' then it is located as a contained element.
   /// Otherwise it is assumed to be external and resolved through [FhirResourceProvider].
   ///
+  /// [context] is optional information for logging or throwing.
+  ///
   /// Will throw if the Resource does not exist.
-  Resource getResource(String uri, {dynamic context}) {
+  Resource getResource(String uri, {Object? context}) {
     final isResourceContained = uri.startsWith('#');
     final resource = isResourceContained
         ? findContainedByElementId(uri)
@@ -154,9 +158,13 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
     return resource;
   }
 
-  /// Invoke a function on every entry of a ValueSet, incl. all the contained, included, etc. elements.
-  void visitValueSet(String uri, void Function(Coding coding) visitor,
-      {dynamic context}) {
+  /// Applies the function `f` to each entry of a ValueSet.
+  ///
+  /// The ValueSet is identified through the [uri].
+  ///
+  /// Includes all the contained, included, etc. elements.
+  void forEachInValueSet(String uri, void Function(Coding coding) f,
+      {Object? context}) {
     final valueSet = getResource(uri, context: context) as ValueSet;
 
     final List<ValueSetContains>? valueSetContains =
@@ -171,7 +179,7 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
             display: contains.display,
             extension_: contains.extension_);
 
-        visitor.call(coding);
+        f.call(coding);
       }
     } else {
       final List<ValueSetInclude>? valueSetIncludes = valueSet.compose?.include;
@@ -214,7 +222,7 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
                     code: concept.code,
                     display: concept.display,
                     extension_: concept.extension_);
-                visitor.call(coding);
+                f.call(coding);
               }
             }
           }
@@ -227,13 +235,14 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
               display: concept.display,
               extension_: concept.extension_);
 
-          visitor.call(coding);
+          f.call(coding);
         }
       }
     }
   }
 
-  /// Find a contained element by its id.
+  /// Finds a contained element by its id.
+  ///
   /// Id may start with a leading '#', which will be stripped.
   /// [elementId] == null will return null.
   /// Will throw [QuestionnaireFormatException] if [elementId] cannot be found.
@@ -276,7 +285,8 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
 
   int get revision => _revision;
 
-  /// Find the [QuestionnaireLocation] that corresponds to the linkId.
+  /// Finds the [QuestionnaireLocation] that corresponds to the linkId.
+  ///
   /// Throws an [Exception] when no such [QuestionnaireLocation] exists.
   QuestionnaireLocation findByLinkId(String linkId) {
     final result = _orderedItems![linkId];

@@ -194,17 +194,19 @@ Not supported
 
 
 ### Scoring
-Ability to add up the ordinalValue of all choice questions into a total score.
+Ability to add up the ordinalValue or iso21090-CO-value of all choice questions into a total score.
 
 ![total_score](images/total_score.png)
 
 Total score will be entered into any field which meets one of the following:
-- has extension `sdc-questionnaire-calculatedExpression` (**regardless of content of the expression!**)
-- has extension `cqf-expression` (**regardless of content of the expression!**)
-- is readOnly and has unit `{score}`
+- has extension `sdc-questionnaire-calculatedExpression` with valueExpression.expression = `answers().sum(value.ordinal())`.
+- is readOnly and has extension `http://hl7.org/fhir/StructureDefinition/questionnaire-unit` with *display* value = `{score}`
 
-**No true support for FHIRPath or CQL expressions is provided!** Any field which has one of the trigger extensions will
-have a total score calculated, regardless of content of the expression!
+> The well-known [NLM Form Builder](https://lhcformbuilder.nlm.nih.gov) will set the `questionnaire-unit` extension 
+> to `{score}`, but will not set the item to `readOnly`. Setting this manually to `true` will result in a questionnaire
+> with fully functioning scoring.
+
+**No true support for FHIRPath is provided.**
 
 ### Response creation
 

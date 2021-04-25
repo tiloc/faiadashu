@@ -110,7 +110,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
         ?.valueCanonical
         .toString();
     if (unitsUri != null) {
-      location.top.visitValueSet(unitsUri, (coding) {
+      location.top.forEachInValueSet(unitsUri, (coding) {
         units[keyStringFromCoding(coding)] = coding;
       }, context: qi.linkId);
     } else if (unit != null) {

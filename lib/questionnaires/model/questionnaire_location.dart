@@ -41,7 +41,8 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
     }
   }
 
-  /// Calculate the current enablement status of this item.
+  /// Calculates the current enablement status of this item.
+  ///
   /// Sets the [enabled] property
   void _calculateEnabled() {
     logger.trace('Enter _calculateEnabled()');
@@ -107,7 +108,7 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
         break;
       case QuestionnaireItemEnableBehavior.unknown:
         throw QuestionnaireFormatException(
-            'enableWhen with unclear enableBehavior: ${questionnaireItem.enableBehavior}',
+            'enableWhen with unknown enableBehavior: ${questionnaireItem.enableBehavior}',
             questionnaireItem);
     }
   }
@@ -179,10 +180,10 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
 
   QuestionnaireResponseItem? get responseItem => _questionnaireResponseItem;
 
-  /// Get a [Decimal] value which can be added to a score.
+  /// A [Decimal] value which can be added to a score.
   ///
   /// Returns null if not applicable (either question unanswered, or wrong type)
-  Decimal? get score {
+  Decimal? get ordinalValue {
     if (responseItem == null) {
       return null;
     }
@@ -218,6 +219,9 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
       // From the description of the extension it is not entirely clear
       // whether the unit should be in display or code.
       // NLM Forms Builder puts it into display.
+      //
+      // Checking for read-only is relevant,
+      // as there are also input fields (e.g. pain score) with unit {score}.
       if (questionnaireItem.readOnly == Boolean(true) &&
           questionnaireItem.unit?.display == '{score}') {
         return true;

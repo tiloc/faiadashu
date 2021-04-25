@@ -180,7 +180,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
             'Questionnaire choice item does not specify a key', qi);
       }
 
-      location.top.visitValueSet(key, _addAnswerOption, context: qi);
+      location.top.forEachInValueSet(key, _addAnswerOption, context: qi);
     } else {
       if (qi.answerOption != null) {
         _answerOptions.addEntries(qi.answerOption!.map<
