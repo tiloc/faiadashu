@@ -13,17 +13,18 @@ import '../../questionnaires.dart';
 class QuestionnaireItemFiller extends StatefulWidget {
   static final logger = Logger(QuestionnaireItemFiller);
   final Widget? _titleWidget;
-  final QuestionnaireLocation location;
+  final QuestionnaireItemModel itemModel;
   final QuestionnaireResponseFiller _responseFiller;
 
   factory QuestionnaireItemFiller.fromQuestionnaireItem(
-      QuestionnaireLocation location) {
+      QuestionnaireItemModel itemModel) {
     return QuestionnaireItemFiller._(
-        location, QuestionnaireResponseFiller(location));
+        itemModel, QuestionnaireResponseFiller(itemModel));
   }
 
-  QuestionnaireItemFiller._(this.location, this._responseFiller, {Key? key})
-      : _titleWidget = QuestionnaireItemFillerTitle.forLocation(location),
+  QuestionnaireItemFiller._(this.itemModel, this._responseFiller, {Key? key})
+      : _titleWidget =
+            QuestionnaireItemFillerTitle.fromQuestionnaireItem(itemModel),
         super(key: key);
 
   @override
@@ -36,12 +37,12 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
   @override
   Widget build(BuildContext context) {
     logger.debug(
-        'build ${widget.location.linkId} hidden: ${widget.location.isHidden}, enabled: ${widget.location.enabled}');
+        'build ${widget.itemModel.linkId} hidden: ${widget.itemModel.isHidden}, enabled: ${widget.itemModel.enabled}');
 
-    return (!widget.location.isHidden)
+    return (!widget.itemModel.isHidden)
         ? AnimatedSwitcher(
             duration: const Duration(milliseconds: 500),
-            child: widget.location.enabled
+            child: widget.itemModel.enabled
                 ? (MediaQuery.of(context).size.width > 1000)
                     ? Table(
                         columnWidths: {
@@ -72,38 +73,41 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
 }
 
 class QuestionnaireItemFillerTitle extends StatelessWidget {
-  final QuestionnaireLocation location;
-  const QuestionnaireItemFillerTitle._(this.location, {Key? key})
+  final QuestionnaireItemModel itemModel;
+  const QuestionnaireItemFillerTitle._(this.itemModel, {Key? key})
       : super(key: key);
 
-  static Widget? forLocation(QuestionnaireLocation location, {Key? key}) {
-    if (location.titleText == null) {
+  static Widget? fromQuestionnaireItem(QuestionnaireItemModel itemModel,
+      {Key? key}) {
+    if (itemModel.titleText == null) {
       return null;
     } else {
-      return QuestionnaireItemFillerTitle._(location, key: key);
+      return QuestionnaireItemFillerTitle._(itemModel, key: key);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     // TODO: Move more work out of the build method.
-    final leading = QuestionnaireItemFillerTitleLeading.forLocation(location);
-    final help = _QuestionnaireItemFillerHelpFactory.forLocation(location);
+    final leading =
+        QuestionnaireItemFillerTitleLeading.fromQuestionnaireItem(itemModel);
+    final help =
+        _QuestionnaireItemFillerHelpFactory.fromQuestionnaireItem(itemModel);
 
     final requiredTag =
-        (location.questionnaireItem.required_?.value == true) ? '*' : '';
+        (itemModel.questionnaireItem.required_?.value == true) ? '*' : '';
 
     final openStyleTag =
-        (location.questionnaireItem.type == QuestionnaireItemType.group)
+        (itemModel.questionnaireItem.type == QuestionnaireItemType.group)
             ? '<h2>'
             : '<b>';
 
     final closeStyleTag =
-        (location.questionnaireItem.type == QuestionnaireItemType.group)
+        (itemModel.questionnaireItem.type == QuestionnaireItemType.group)
             ? '</h2>'
             : '$requiredTag</b>';
 
-    final titleText = location.titleText;
+    final titleText = itemModel.titleText;
     return Container(
         padding: const EdgeInsets.only(top: 8.0),
         child: Text.rich(
@@ -123,14 +127,15 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
 }
 
 class _QuestionnaireItemFillerHelpFactory {
-  static Widget? forLocation(QuestionnaireLocation location, {Key? key}) {
-    final helpLocation = location.helpLocation;
+  static Widget? fromQuestionnaireItem(QuestionnaireItemModel itemModel,
+      {Key? key}) {
+    final helpItem = itemModel.helpItem;
 
-    if (helpLocation != null) {
-      return _QuestionnaireItemFillerHelp(helpLocation, key: key);
+    if (helpItem != null) {
+      return _QuestionnaireItemFillerHelp(helpItem, key: key);
     }
 
-    final supportLink = location.questionnaireItem.extension_
+    final supportLink = itemModel.questionnaireItem.extension_
         ?.extensionOrNull(
             'http://hl7.org/fhir/StructureDefinition/questionnaire-supportLink')
         ?.valueUri
@@ -145,7 +150,7 @@ class _QuestionnaireItemFillerHelpFactory {
 }
 
 class _QuestionnaireItemFillerHelp extends StatefulWidget {
-  final QuestionnaireLocation ql;
+  final QuestionnaireItemModel ql;
 
   const _QuestionnaireItemFillerHelp(this.ql, {Key? key}) : super(key: key);
 
@@ -167,15 +172,15 @@ class _QuestionnaireItemFillerHelpState
     );
   }
 
-  Future<void> _showHelp(
-      BuildContext context, QuestionnaireLocation questionnaireLocation) async {
+  Future<void> _showHelp(BuildContext context,
+      QuestionnaireItemModel questionnaireItemModel) async {
     return showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
             title: const Text('Help'),
             content: HTML.toRichText(
-                context, questionnaireLocation.titleText ?? '',
+                context, questionnaireItemModel.titleText ?? '',
                 defaultTextStyle: Theme.of(context).textTheme.bodyText1),
             actions: <Widget>[
               OutlinedButton(
@@ -193,7 +198,7 @@ class _QuestionnaireItemFillerHelpState
 }
 
 class _QuestionnaireItemFillerSupportLink extends StatelessWidget {
-  static final logger = Logger(_QuestionnaireItemFillerSupportLink);
+  static final _logger = Logger(_QuestionnaireItemFillerSupportLink);
   final Uri supportLink;
 
   const _QuestionnaireItemFillerSupportLink(this.supportLink, {Key? key})
@@ -206,7 +211,7 @@ class _QuestionnaireItemFillerSupportLink extends StatelessWidget {
       color: Theme.of(context).accentColor,
       icon: const Icon(Icons.info_outline),
       onPressed: () {
-        logger.debug("supportLink '${supportLink.toString()}'");
+        _logger.debug("supportLink '${supportLink.toString()}'");
         QuestionnaireFiller.of(context).onLinkTap?.call(context, supportLink);
       },
     );
@@ -221,8 +226,9 @@ class QuestionnaireItemFillerTitleLeading extends StatelessWidget {
       : _leadingWidget = leadingWidget,
         super(key: key);
 
-  static Widget? forLocation(QuestionnaireLocation location, {Key? key}) {
-    final displayCategory = location.questionnaireItem.extension_
+  static Widget? fromQuestionnaireItem(QuestionnaireItemModel itemModel,
+      {Key? key}) {
+    final displayCategory = itemModel.questionnaireItem.extension_
         ?.extensionOrNull(
             'http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory')
         ?.valueCodeableConcept
@@ -240,7 +246,8 @@ class QuestionnaireItemFillerTitleLeading extends StatelessWidget {
 
       return QuestionnaireItemFillerTitleLeading._(leadingWidget);
     } else {
-      final itemImageWidget = CpgItemImage.forLocation(location, height: 24.0);
+      final itemImageWidget =
+          CpgItemImage.fromQuestionnaireItem(itemModel, height: 24.0);
       if (itemImageWidget == null) {
         return null;
       }

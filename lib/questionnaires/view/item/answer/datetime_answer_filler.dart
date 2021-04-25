@@ -9,9 +9,9 @@ import '../questionnaire_answer_filler.dart';
 
 class DateTimeAnswerFiller extends QuestionnaireAnswerFiller {
   const DateTimeAnswerFiller(
-      QuestionnaireLocation location, AnswerLocation answerLocation,
+      QuestionnaireItemModel itemModel, AnswerLocation answerLocation,
       {Key? key})
-      : super(location, answerLocation, key: key);
+      : super(itemModel, answerLocation, key: key);
   @override
   State<StatefulWidget> createState() => _DateTimeAnswerState();
 }

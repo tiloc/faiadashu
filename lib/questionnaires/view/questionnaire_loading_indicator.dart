@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../model/questionnaire_location.dart';
+import '../model/questionnaire_item_model.dart';
 
 /// Loading indicator during retrieval / decoding of a questionnaire.
 class QuestionnaireLoadingIndicator extends StatelessWidget {
@@ -8,8 +8,7 @@ class QuestionnaireLoadingIndicator extends StatelessWidget {
   final Object? detail;
   final bool hasError;
 
-  QuestionnaireLoadingIndicator(
-      AsyncSnapshot<QuestionnaireTopLocation> snapshot,
+  QuestionnaireLoadingIndicator(AsyncSnapshot<QuestionnaireModel> snapshot,
       {Key? key})
       : state = snapshot.connectionState,
         hasError = snapshot.hasError,

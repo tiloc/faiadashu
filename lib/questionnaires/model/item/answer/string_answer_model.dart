@@ -2,7 +2,7 @@ import 'package:fhir/r4.dart';
 
 import '../../../../coding/data_absent_reasons.dart';
 import '../../../../fhir_types/fhir_types_extensions.dart';
-import '../../questionnaire_location.dart';
+import '../../questionnaire_item_model.dart';
 import '../response_model.dart';
 import 'answer_model.dart';
 
@@ -16,8 +16,8 @@ class StringAnswerModel extends AnswerModel<String, String> {
   late final int? maxLength;
 
   StringAnswerModel(
-      QuestionnaireLocation location, AnswerLocation answerLocation)
-      : super(location, answerLocation) {
+      QuestionnaireItemModel itemModel, AnswerLocation answerLocation)
+      : super(itemModel, answerLocation) {
     final regexPattern = qi.extension_
         ?.extensionOrNull('http://hl7.org/fhir/StructureDefinition/regex')
         ?.valueString;

@@ -5,21 +5,16 @@ import 'package:simple_html_css/simple_html_css.dart';
 import '../../fhir_types/fhir_types.dart';
 import '../../logging/logging.dart';
 import '../model/questionnaire_exceptions.dart';
-import '../model/questionnaire_location.dart';
+import '../model/questionnaire_item_model.dart';
 
 /// Extract Xhtml from SDC extensions and build Widgets from Xhtml.
 class Xhtml {
   static final Logger _logger = Logger(Xhtml);
   const Xhtml._();
 
-  static Widget? toWidget(
-      BuildContext context,
-      QuestionnaireTopLocation topLocation,
-      String? plainText,
-      List<FhirExtension>? extension,
-      {double? width,
-      double? height,
-      Key? key}) {
+  static Widget? toWidget(BuildContext context, QuestionnaireModel questionnaireModel,
+      String? plainText, List<FhirExtension>? extension,
+      {double? width, double? height, Key? key}) {
     _logger.trace('enter toWidget $plainText');
     final xhtml = Xhtml.toXhtml(plainText, extension);
 
@@ -48,7 +43,7 @@ class Xhtml {
       final elementId = xhtml.substring(
           imgHashPrefix.length, xhtml.length - imgSuffix.length + 1);
       final base64Binary =
-          topLocation.findContainedByElementId(elementId) as Binary?;
+          questionnaireModel.findContainedByElementId(elementId) as Binary?;
       final base64String = base64Binary?.data?.value;
       if (base64String == null) {
         throw QuestionnaireFormatException(

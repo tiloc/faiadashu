@@ -2,7 +2,7 @@ import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
 import '../../../faiadashu.dart';
-import '../../model/questionnaire_location.dart';
+import '../../model/questionnaire_item_model.dart';
 import '../broken_questionnaire_item.dart';
 import 'answer/answer.dart';
 import 'item.dart';
@@ -12,42 +12,42 @@ class QuestionnaireAnswerFillerFactory {
   static final _logger = Logger(QuestionnaireAnswerFillerFactory);
 
   static QuestionnaireAnswerFiller fromQuestionnaireItem(
-      QuestionnaireLocation location, AnswerLocation answerLocation) {
-    _logger.debug('Creating AnswerFiller for $location');
+      QuestionnaireItemModel itemModel, AnswerLocation answerLocation) {
+    _logger.debug('Creating AnswerFiller for $itemModel');
 
     try {
-      switch (location.questionnaireItem.type!) {
+      switch (itemModel.questionnaireItem.type!) {
         case QuestionnaireItemType.choice:
         case QuestionnaireItemType.open_choice:
-          return CodingAnswerFiller(location, answerLocation);
+          return CodingAnswerFiller(itemModel, answerLocation);
         case QuestionnaireItemType.quantity:
         case QuestionnaireItemType.decimal:
         case QuestionnaireItemType.integer:
-          return (location.isCalculatedExpression)
-              ? StaticItem(location, answerLocation)
-              : NumericalAnswerFiller(location, answerLocation);
+          return (itemModel.isCalculatedExpression)
+              ? StaticItem(itemModel, answerLocation)
+              : NumericalAnswerFiller(itemModel, answerLocation);
         case QuestionnaireItemType.string:
         case QuestionnaireItemType.text:
         case QuestionnaireItemType.url:
-          return StringAnswerFiller(location, answerLocation);
+          return StringAnswerFiller(itemModel, answerLocation);
         case QuestionnaireItemType.display:
         case QuestionnaireItemType.group:
-          return StaticItem(location, answerLocation);
+          return StaticItem(itemModel, answerLocation);
         case QuestionnaireItemType.date:
         case QuestionnaireItemType.datetime:
         case QuestionnaireItemType.time:
-          return DateTimeAnswerFiller(location, answerLocation);
+          return DateTimeAnswerFiller(itemModel, answerLocation);
         case QuestionnaireItemType.boolean:
-          return BooleanAnswerFiller(location, answerLocation);
+          return BooleanAnswerFiller(itemModel, answerLocation);
         case QuestionnaireItemType.attachment:
         case QuestionnaireItemType.unknown:
         case QuestionnaireItemType.reference:
           throw QuestionnaireFormatException(
-              'Unsupported item type: ${location.questionnaireItem.type!}');
+              'Unsupported item type: ${itemModel.questionnaireItem.type!}');
       }
     } catch (exception) {
       _logger.warn('Cannot create answer filler:', error: exception);
-      return _BrokenItem(location, answerLocation, exception);
+      return _BrokenItem(itemModel, answerLocation, exception);
     }
   }
 }
@@ -55,9 +55,9 @@ class QuestionnaireAnswerFillerFactory {
 class _BrokenItem extends QuestionnaireAnswerFiller {
   final Object exception;
 
-  const _BrokenItem(QuestionnaireLocation location,
+  const _BrokenItem(QuestionnaireItemModel itemModel,
       AnswerLocation answerLocation, this.exception)
-      : super(location, answerLocation);
+      : super(itemModel, answerLocation);
 
   @override
   State<StatefulWidget> createState() => _BrokenItemState();
@@ -73,7 +73,7 @@ class _BrokenItemState extends State<_BrokenItem> {
   Widget build(BuildContext context) {
     return BrokenQuestionnaireItem(
         'Could not initialize QuestionnaireAnswerFiller',
-        widget.location.questionnaireItem,
+        widget.itemModel.questionnaireItem,
         widget.exception);
   }
 }

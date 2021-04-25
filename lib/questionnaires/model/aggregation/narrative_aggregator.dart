@@ -10,7 +10,7 @@ import 'aggregator.dart';
 class NarrativeAggregator extends Aggregator<Narrative> {
   static final _logger = Logger(NarrativeAggregator);
 
-  // Revision of topLocation when _narrative was calculated
+  // Revision of questionnaireModel when _narrative was calculated
   int _revision = -1;
   // Cached narrative
   Narrative? _narrative;
@@ -23,28 +23,29 @@ class NarrativeAggregator extends Aggregator<Narrative> {
       : super(NarrativeAggregator.emptyNarrative, autoAggregate: false);
 
   @override
-  void init(QuestionnaireTopLocation topLocation) {
-    super.init(topLocation);
+  void init(QuestionnaireModel questionnaireModel) {
+    super.init(questionnaireModel);
 
     _revision = -1;
     _narrative = value;
   }
 
-  bool _addResponseItemToDiv(StringBuffer div, QuestionnaireLocation location) {
-    final item = location.responseItem;
+  bool _addResponseItemToDiv(
+      StringBuffer div, QuestionnaireItemModel itemModel) {
+    final item = itemModel.responseItem;
 
     if (item == null) {
       return false;
     }
 
-    if (!location.enabled) {
+    if (!itemModel.enabled) {
       return false;
     }
 
     bool returnValue = false;
 
     if (item.text != null) {
-      if (location.questionnaireItem.type == QuestionnaireItemType.group) {
+      if (itemModel.questionnaireItem.type == QuestionnaireItemType.group) {
         div.write('<h2>${item.text}</h2>');
       } else {
         div.write('<h3>${item.text}</h3>');
@@ -73,7 +74,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
           if (answer.valueString != null) {
             div.write('<p>${answer.valueString}</p>');
           } else if (answer.valueDecimal != null) {
-            if (location.isCalculatedExpression) {
+            if (itemModel.isCalculatedExpression) {
               div.write('<h3>${answer.valueDecimal!.format(locale)}</h3>');
             } else {
               div.write('<p>${answer.valueDecimal!.format(locale)}</p>');
@@ -110,15 +111,15 @@ class NarrativeAggregator extends Aggregator<Narrative> {
     return returnValue;
   }
 
-  Narrative _generateNarrative(QuestionnaireLocation topLocation) {
+  Narrative _generateNarrative(QuestionnaireItemModel questionnaireModel) {
     final languageTag = locale.toLanguageTag();
     final div = StringBuffer(
         '<div xmlns="http://www.w3.org/1999/xhtml" lang="$languageTag" xml:lang="$languageTag">');
 
     bool generated = false;
 
-    for (final location in topLocation.preOrder()) {
-      generated = generated | _addResponseItemToDiv(div, location);
+    for (final itemModel in questionnaireModel.preOrder()) {
+      generated = generated | _addResponseItemToDiv(div, itemModel);
     }
     div.write('</div>');
     div.write('<p>&nbsp;</p>');
@@ -131,17 +132,17 @@ class NarrativeAggregator extends Aggregator<Narrative> {
   @override
   Narrative? aggregate({bool notifyListeners = false}) {
     _logger.debug(
-        '$this.aggregate (topRev: ${topLocation.revision}, rev: $_revision)');
-    if (topLocation.revision == _revision) {
+        '$this.aggregate (topRev: ${questionnaireModel.revision}, rev: $_revision)');
+    if (questionnaireModel.revision == _revision) {
       _logger.debug('Regurgitating narrative revision $_revision');
       return _narrative;
     }
     // Manually invoke the update, because the order matters and enableWhen calcs need to come after answer value updates.
-    topLocation.updateEnableWhen(
+    questionnaireModel.updateEnableWhen(
         notifyListeners:
             false); // Setting this to true might result in endless refresh and stack overflow
-    _narrative = _generateNarrative(topLocation);
-    _revision = topLocation.revision;
+    _narrative = _generateNarrative(questionnaireModel);
+    _revision = questionnaireModel.revision;
     if (notifyListeners) {
       value = _narrative!;
     }

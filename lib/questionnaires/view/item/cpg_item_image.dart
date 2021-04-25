@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../fhir_types/fhir_types_extensions.dart';
 import '../../../logging/logger.dart';
 import '../../../resource_provider/asset_image_attachment_provider.dart';
-import '../../model/questionnaire_location.dart';
+import '../../model/questionnaire_item_model.dart';
 
 /// Image [Widget] for CPG itemImage extension
 class CpgItemImage extends StatelessWidget {
@@ -13,12 +13,12 @@ class CpgItemImage extends StatelessWidget {
 
   const CpgItemImage._(this.itemImageWidget, {Key? key}) : super(key: key);
 
-  /// Return the itemImage [Widget] for a given [QuestionnaireLocation].
+  /// Returns the itemImage [Widget] for a given [QuestionnaireItemModel].
   ///
   /// Returns null if no itemImage has been specified for the given item.
-  static Widget? forLocation(QuestionnaireLocation location,
+  static Widget? fromQuestionnaireItem(QuestionnaireItemModel itemModel,
       {Key? key, double? width, double? height}) {
-    final itemImageUri = location.questionnaireItem.extension_
+    final itemImageUri = itemModel.questionnaireItem.extension_
         ?.extensionOrNull(
             'http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-itemImage')
         ?.valueAttachment
@@ -28,7 +28,7 @@ class CpgItemImage extends StatelessWidget {
       return null;
     }
 
-    final itemImageWidget = (location.top.fhirResourceProvider
+    final itemImageWidget = (itemModel.questionnaireModel.fhirResourceProvider
             .providerFor(itemImageUri) as AssetImageAttachmentProvider?)
         ?.getImage(itemImageUri, width: width, height: height);
     if (itemImageWidget == null) {

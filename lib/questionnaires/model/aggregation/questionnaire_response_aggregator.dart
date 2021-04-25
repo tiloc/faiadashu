@@ -14,14 +14,14 @@ class QuestionnaireResponseAggregator
 
   /// Initialize the aggregator.
   @override
-  void init(QuestionnaireTopLocation topLocation) {
-    super.init(topLocation);
+  void init(QuestionnaireModel questionnaireModel) {
+    super.init(questionnaireModel);
   }
 
-  QuestionnaireResponseItem? _fromGroupItem(QuestionnaireLocation location) {
+  QuestionnaireResponseItem? _fromGroupItem(QuestionnaireItemModel itemModel) {
     final nestedItems = <QuestionnaireResponseItem>[];
 
-    for (final nestedItem in location.children) {
+    for (final nestedItem in itemModel.children) {
       if (nestedItem.questionnaireItem.type == QuestionnaireItemType.group) {
         final groupItem = _fromGroupItem(nestedItem);
         if (groupItem != null) {
@@ -36,7 +36,9 @@ class QuestionnaireResponseAggregator
 
     if (nestedItems.isNotEmpty) {
       return QuestionnaireResponseItem(
-          linkId: location.linkId, text: location.titleText, item: nestedItems);
+          linkId: itemModel.linkId,
+          text: itemModel.titleText,
+          item: nestedItems);
     } else {
       return null;
     }
@@ -54,33 +56,34 @@ class QuestionnaireResponseAggregator
 
     final responseItems = <QuestionnaireResponseItem>[];
 
-    for (final location in topLocation.siblings) {
-      if (location.questionnaireItem.type == QuestionnaireItemType.group) {
-        final groupItem = _fromGroupItem(location);
+    for (final itemModel in questionnaireModel.siblings) {
+      if (itemModel.questionnaireItem.type == QuestionnaireItemType.group) {
+        final groupItem = _fromGroupItem(itemModel);
         if (groupItem != null) {
           responseItems.add(groupItem);
         }
       } else {
-        if (location.responseItem != null) {
-          responseItems.add(location.responseItem!);
+        if (itemModel.responseItem != null) {
+          responseItems.add(itemModel.responseItem!);
         }
       }
     }
 
-    final narrativeAggregator = topLocation.aggregator<NarrativeAggregator>();
+    final narrativeAggregator =
+        questionnaireModel.aggregator<NarrativeAggregator>();
 
-    final questionnaireUrl = topLocation.questionnaire.url?.toString();
-    final questionnaireVersion = topLocation.questionnaire.version;
+    final questionnaireUrl = questionnaireModel.questionnaire.url?.toString();
+    final questionnaireVersion = questionnaireModel.questionnaire.version;
     final questionnaireCanonical = (questionnaireUrl != null)
         ? Canonical(
             "$questionnaireUrl${(questionnaireVersion != null) ? '|$questionnaireVersion' : ''}")
         : null;
 
-    final questionnaireTitle = topLocation.questionnaire.title;
+    final questionnaireTitle = questionnaireModel.questionnaire.title;
 
     final contained = <Resource>[];
 
-    final subject = topLocation.fhirResourceProvider
+    final subject = questionnaireModel.fhirResourceProvider
         .getResource(subjectResourceUri) as Patient?;
 
     Reference? subjectReference;
@@ -118,7 +121,7 @@ class QuestionnaireResponseAggregator
     final questionnaireResponse = QuestionnaireResponse(
       // TODO: For status = 'complete' the items which are not enabled SHALL be excluded.
       //  For other status they might be included  (FHIR-31077)
-      status: responseStatus ?? topLocation.responseStatus,
+      status: responseStatus ?? questionnaireModel.responseStatus,
       meta: meta,
       contained: (contained.isNotEmpty) ? contained : null,
       questionnaire: questionnaireCanonical,
@@ -132,7 +135,7 @@ class QuestionnaireResponseAggregator
               FhirExtension(
                   url: FhirUri(
                       'http://hl7.org/fhir/StructureDefinition/display'),
-                  valueString: topLocation.questionnaire.title)
+                  valueString: questionnaireModel.questionnaire.title)
             ])
           : null,
     );

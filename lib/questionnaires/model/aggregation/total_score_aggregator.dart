@@ -15,23 +15,23 @@ import '../../model/model.dart';
 class TotalScoreAggregator extends Aggregator<Decimal> {
   static final _logger = Logger(TotalScoreAggregator);
 
-  late final QuestionnaireLocation? totalScoreLocation;
+  late final QuestionnaireItemModel? totalScoreItem;
   late final String logTag;
   TotalScoreAggregator({bool autoAggregate = true})
       : super(Decimal(0), autoAggregate: autoAggregate);
 
   @override
-  void init(QuestionnaireTopLocation topLocation) {
-    super.init(topLocation);
+  void init(QuestionnaireModel questionnaireModel) {
+    super.init(questionnaireModel);
 
-    totalScoreLocation = topLocation.preOrder().firstWhereOrNull(
-        (location) => TotalScoreAggregator.isTotalScoreExpression(location));
-    // if there is no total score location then leave value at 0 indefinitely
+    totalScoreItem = questionnaireModel.preOrder().firstWhereOrNull(
+        (itemModel) => TotalScoreAggregator.isTotalScoreExpression(itemModel));
+    // if there is no total score itemModel then leave value at 0 indefinitely
     if (autoAggregate) {
-      if (totalScoreLocation != null) {
-        for (final location in topLocation.preOrder()) {
-          if (!location.isStatic && location != totalScoreLocation) {
-            location.addListener(() => aggregate(notifyListeners: true));
+      if (totalScoreItem != null) {
+        for (final itemModel in questionnaireModel.preOrder()) {
+          if (!itemModel.isStatic && itemModel != totalScoreItem) {
+            itemModel.addListener(() => aggregate(notifyListeners: true));
           }
         }
       }
@@ -40,12 +40,12 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
 
   @override
   Decimal? aggregate({bool notifyListeners = false}) {
-    if (totalScoreLocation == null) {
+    if (totalScoreItem == null) {
       return null;
     }
 
     _logger.trace('totalScore.aggregate');
-    final sum = topLocation.preOrder().fold<double>(
+    final sum = questionnaireModel.preOrder().fold<double>(
         0.0,
         (previousValue, element) =>
             previousValue + (element.ordinalValue?.value ?? 0.0));
@@ -56,33 +56,33 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
       value = result;
     }
 
-    final unit = totalScoreLocation!.questionnaireItem.extension_
+    final unit = totalScoreItem!.questionnaireItem.extension_
         ?.extensionOrNull(
             'http://hl7.org/fhir/StructureDefinition/questionnaire-unit')
         ?.valueCoding
         ?.display;
 
     if (unit != null) {
-      totalScoreLocation!.responseItem = QuestionnaireResponseItem(
-          linkId: totalScoreLocation!.linkId,
-          text: totalScoreLocation!.questionnaireItem.text,
+      totalScoreItem!.responseItem = QuestionnaireResponseItem(
+          linkId: totalScoreItem!.linkId,
+          text: totalScoreItem!.questionnaireItem.text,
           answer: [
             QuestionnaireResponseAnswer(
                 valueQuantity: Quantity(value: value, unit: unit))
           ]);
     } else {
-      totalScoreLocation!.responseItem = QuestionnaireResponseItem(
-          linkId: totalScoreLocation!.linkId,
-          text: totalScoreLocation!.questionnaireItem.text,
+      totalScoreItem!.responseItem = QuestionnaireResponseItem(
+          linkId: totalScoreItem!.linkId,
+          text: totalScoreItem!.questionnaireItem.text,
           answer: [QuestionnaireResponseAnswer(valueDecimal: value)]);
     }
 
     return result;
   }
 
-  /// Returns whether the [QuestionnaireLocation] asks to calculate a total score.
-  static bool isTotalScoreExpression(QuestionnaireLocation location) {
-    final questionnaireItem = location.questionnaireItem;
+  /// Returns whether the [QuestionnaireItemModel] asks to calculate a total score.
+  static bool isTotalScoreExpression(QuestionnaireItemModel itemModel) {
+    final questionnaireItem = itemModel.questionnaireItem;
 
     if (questionnaireItem.type == QuestionnaireItemType.quantity ||
         questionnaireItem.type == QuestionnaireItemType.decimal) {

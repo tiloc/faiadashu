@@ -38,7 +38,7 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
                 },
               ),
               title: Text(QuestionnaireFiller.of(context)
-                      .topLocation
+                      .questionnaireModel
                       .questionnaire
                       .title ??
                   'Untitled'),

@@ -50,17 +50,18 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
       trailing: IconButton(
         icon: const Icon(Icons.edit_off),
         onPressed: () async {
-          final top = await QuestionnaireTopLocation.fromFhirResourceBundle(
-              fhirResourceProvider: _questionnaireProvider,
-              locale: locale,
-              aggregators: [NarrativeAggregator()]);
-          top.populate(
+          final questionnaireModel =
+              await QuestionnaireModel.fromFhirResourceBundle(
+                  fhirResourceProvider: _questionnaireProvider,
+                  locale: locale,
+                  aggregators: [NarrativeAggregator()]);
+          questionnaireModel.populate(
               widget.restoreResponseFunction.call(widget.questionnairePath));
           Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (context) => NarrativePage(
-                        topLocation: top,
+                        questionnaireModel: questionnaireModel,
                       )));
         },
       ),

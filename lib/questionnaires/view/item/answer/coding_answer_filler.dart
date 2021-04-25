@@ -16,9 +16,9 @@ import 'null_dash_text.dart';
 /// Future R5 releases of the FHIR standard will likely have a `coding` item type.
 class CodingAnswerFiller extends QuestionnaireAnswerFiller {
   const CodingAnswerFiller(
-      QuestionnaireLocation location, AnswerLocation answerLocation,
+      QuestionnaireItemModel itemModel, AnswerLocation answerLocation,
       {Key? key})
-      : super(location, answerLocation, key: key);
+      : super(itemModel, answerLocation, key: key);
   @override
   State<StatefulWidget> createState() => _CodingAnswerState();
 }
@@ -79,9 +79,13 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
           (optionPrefix != null) ? '$optionPrefix ' : '';
       final optionTitle =
           '$optionPrefixDisplay${choice.localizedDisplay(locale)}';
-      final styledOptionTitle = Xhtml.toWidget(context, location.top,
-          optionTitle, choice.valueStringElement?.extension_,
-          width: 100, height: 100);
+      final styledOptionTitle = Xhtml.toWidget(
+          context,
+          itemModel.questionnaireModel,
+          optionTitle,
+          choice.valueStringElement?.extension_,
+          width: 100,
+          height: 100);
 
       choices.add(isMultipleChoice
           ? answerModel.isExclusive(choice.valueCoding!)

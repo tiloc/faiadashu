@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-import '../questionnaire_location.dart';
+import '../questionnaire_item_model.dart';
 
 /// Aggregators can combine numerous items from a questionnaire into a combined result.
 /// Examples: Total score; Narrative; QuestionnaireResponse; Percentage of answered questions
 /// Some aggregators can 'autoAggregate': They update automatically when the underlying questionnaire changes.
 /// More expensive aggregators require manual invocations of their aggregate method.
 abstract class Aggregator<T> extends ValueNotifier<T> {
-  late final QuestionnaireTopLocation topLocation;
+  late final QuestionnaireModel questionnaireModel;
   late final Locale locale;
   final bool autoAggregate;
 
@@ -18,9 +18,9 @@ abstract class Aggregator<T> extends ValueNotifier<T> {
   // ignore: use_setters_to_change_properties
   /// Initialize the aggregator.
   @mustCallSuper
-  void init(QuestionnaireTopLocation topLocation) {
-    this.topLocation = topLocation;
-    locale = topLocation.locale;
+  void init(QuestionnaireModel questionnaireModel) {
+    this.questionnaireModel = questionnaireModel;
+    locale = questionnaireModel.locale;
   }
 
   /// Aggregate the questionnaire. Return [null] if currently not possible.

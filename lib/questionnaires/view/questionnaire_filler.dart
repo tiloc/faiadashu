@@ -21,8 +21,8 @@ class QuestionnaireFiller extends StatefulWidget {
 
   final FhirResourceProvider fhirResourceProvider;
 
-  Future<QuestionnaireTopLocation> _createTopLocation() async =>
-      QuestionnaireTopLocation.fromFhirResourceBundle(
+  Future<QuestionnaireModel> _createQuestionnaireModel() async =>
+      QuestionnaireModel.fromFhirResourceBundle(
           locale: locale,
           aggregators: aggregators,
           fhirResourceProvider: fhirResourceProvider);
@@ -50,24 +50,26 @@ class QuestionnaireFiller extends StatefulWidget {
 class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
   static final _logger = Logger(_QuestionnaireFillerState);
 
-  late final Future<QuestionnaireTopLocation> builderFuture;
-  QuestionnaireTopLocation? _topLocation;
-  void Function()? _onTopChangeListenerFunction;
+  late final Future<QuestionnaireModel> builderFuture;
+  QuestionnaireModel? _questionnaireModel;
+  void Function()? _onQuestionnaireModelChangeListenerFunction;
 
   @override
   void initState() {
     super.initState();
-    builderFuture = widget._createTopLocation();
+    builderFuture = widget._createQuestionnaireModel();
   }
 
   @override
   void dispose() {
     _logger.trace('dispose');
 
-    if (_onTopChangeListenerFunction != null && _topLocation != null) {
-      _topLocation!.removeListener(_onTopChangeListenerFunction!);
-      _topLocation = null;
-      _onTopChangeListenerFunction = null;
+    if (_onQuestionnaireModelChangeListenerFunction != null &&
+        _questionnaireModel != null) {
+      _questionnaireModel!
+          .removeListener(_onQuestionnaireModelChangeListenerFunction!);
+      _questionnaireModel = null;
+      _onQuestionnaireModelChangeListenerFunction = null;
     }
     super.dispose();
   }
@@ -82,7 +84,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
   @override
   Widget build(BuildContext context) {
     _logger.trace('Enter build()');
-    return FutureBuilder<QuestionnaireTopLocation>(
+    return FutureBuilder<QuestionnaireModel>(
         future: builderFuture,
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
@@ -102,15 +104,17 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
               }
               if (snapshot.hasData) {
                 _logger.debug('FutureBuilder hasData');
-                _topLocation = snapshot.data;
+                _questionnaireModel = snapshot.data;
                 // TODO: There has got to be a more elegant way! Goal is to register the lister exactly once, after the future has completed.
                 // Dart has abilities to chain Futures.
-                if (_onTopChangeListenerFunction == null) {
-                  _onTopChangeListenerFunction = () => _onTopChange();
-                  _topLocation!.addListener(_onTopChangeListenerFunction!);
+                if (_onQuestionnaireModelChangeListenerFunction == null) {
+                  _onQuestionnaireModelChangeListenerFunction =
+                      () => _onTopChange();
+                  _questionnaireModel!.addListener(
+                      _onQuestionnaireModelChangeListenerFunction!);
                 }
                 return QuestionnaireFillerData._(
-                  _topLocation!,
+                  _questionnaireModel!,
                   locale: widget.locale,
                   builder: widget.builder,
                   onLinkTap: widget.onLinkTap,
@@ -126,26 +130,26 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
 class QuestionnaireFillerData extends InheritedWidget {
   static final logger = Logger(QuestionnaireFillerData);
   final Locale locale;
-  final QuestionnaireTopLocation topLocation;
-  final Iterable<QuestionnaireLocation> surveyLocations;
+  final QuestionnaireModel questionnaireModel;
+  final Iterable<QuestionnaireItemModel> surveyLocations;
   final void Function(BuildContext context, Uri url)? onLinkTap;
   late final List<QuestionnaireItemFiller?> _itemFillers;
   late final int _revision;
 
   QuestionnaireFillerData._(
-    this.topLocation, {
+    this.questionnaireModel, {
     Key? key,
     required this.locale,
     this.onLinkTap,
     required WidgetBuilder builder,
-  })   : _revision = topLocation.revision,
-        surveyLocations = topLocation.preOrder(),
+  })   : _revision = questionnaireModel.revision,
+        surveyLocations = questionnaireModel.preOrder(),
         _itemFillers = List<QuestionnaireItemFiller?>.filled(
-            topLocation.preOrder().length, null),
+            questionnaireModel.preOrder().length, null),
         super(key: key, child: Builder(builder: builder));
 
   T aggregator<T extends Aggregator>() {
-    return topLocation.aggregator<T>();
+    return questionnaireModel.aggregator<T>();
   }
 
   static QuestionnaireFillerData of(BuildContext context) {

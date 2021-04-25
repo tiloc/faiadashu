@@ -1,22 +1,22 @@
-import '../../questionnaire_location.dart';
+import '../../questionnaire_item_model.dart';
 import '../item.dart';
 
 class AnswerModelFactory {
   static AnswerModel createModel<T>(
-      QuestionnaireLocation location, AnswerLocation answerLocation) {
+      QuestionnaireItemModel itemModel, AnswerLocation answerLocation) {
     switch (T) {
       case NumericalAnswerModel:
-        return NumericalAnswerModel(location, answerLocation);
+        return NumericalAnswerModel(itemModel, answerLocation);
       case CodingAnswerModel:
-        return CodingAnswerModel(location, answerLocation);
+        return CodingAnswerModel(itemModel, answerLocation);
       case StringAnswerModel:
-        return StringAnswerModel(location, answerLocation);
+        return StringAnswerModel(itemModel, answerLocation);
       case DateTimeAnswerModel:
-        return DateTimeAnswerModel(location, answerLocation);
+        return DateTimeAnswerModel(itemModel, answerLocation);
       case BooleanAnswerModel:
-        return BooleanAnswerModel(location, answerLocation);
+        return BooleanAnswerModel(itemModel, answerLocation);
       default:
-        throw StateError('Cannot create a model for $location');
+        throw StateError('Cannot create a model for $itemModel');
     }
   }
 }

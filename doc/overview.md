@@ -109,7 +109,7 @@ a set of reference implementations, but it is very easy to implement your own pr
 sources of information (web-server, EMR, file system,...).
 
 ##### Questionnaire
-The library is looking for the Questionnaire under the URI 'Questionnaire'.
+The library is looking for the Questionnaire through the URI in constant `questionnaireResourceUri`.
 
 ##### ValueSets and CodeSystems
 The library is looking for the ValueSets and CodeSystems under the URI through which they are referenced.

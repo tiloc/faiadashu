@@ -13,26 +13,31 @@ import 'aggregation/aggregation.dart';
 import 'questionnaire_exceptions.dart';
 import 'questionnaire_extensions.dart';
 
-part 'questionnaire_top_location.dart';
+part 'questionnaire_model.dart';
 
-/// Visit FHIR [Questionnaire] through linkIds.
-/// Can provide properties of current location and move to adjacent items.
-class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
+/// Models an individual item of a questionnaire.
+///
+/// Combines the [QuestionnaireItem] and the corresponding [QuestionnaireResponseItem].
+///
+/// Provides properties of the item.
+///
+/// Provides access to adjacent items (parent, siblings, children).
+class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   final Questionnaire questionnaire;
   final QuestionnaireItem questionnaireItem;
   QuestionnaireResponse? questionnaireResponse;
   QuestionnaireResponseItem? _questionnaireResponseItem;
   final String linkId;
-  final QuestionnaireLocation? parent;
-  late QuestionnaireTopLocation? _top;
+  final QuestionnaireItemModel? parent;
+  late QuestionnaireModel? _questionnaireModel;
   final int siblingIndex;
   final int level;
   late final String logTag;
-  static final logger = Logger(QuestionnaireLocation);
+  static final logger = Logger(QuestionnaireItemModel);
 
-  QuestionnaireTopLocation get top => _top!;
+  QuestionnaireModel get questionnaireModel => _questionnaireModel!;
 
-  LinkedHashMap<String, QuestionnaireLocation>? _orderedItems;
+  LinkedHashMap<String, QuestionnaireItemModel>? _orderedItems;
 
   void _disableWithChildren() {
     _enabled = false;
@@ -55,14 +60,15 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
       allCount++;
       switch (qew.operator_) {
         case QuestionnaireEnableWhenOperator.exists:
-          if (top.findByLinkId(qew.question!).responseItem != null) {
+          if (questionnaireModel.findByLinkId(qew.question!).responseItem !=
+              null) {
             anyTrigger = true;
             allTriggered++;
           }
           break;
         case QuestionnaireEnableWhenOperator.eq:
         case QuestionnaireEnableWhenOperator.ne:
-          final responseCoding = top
+          final responseCoding = questionnaireModel
               .findByLinkId(qew.question!)
               .responseItem
               ?.answer
@@ -146,14 +152,14 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
     }
   }
 
-  List<QuestionnaireLocation> get siblings {
-    return _LocationListBuilder._buildLocationList(
-        questionnaire, top, siblingQuestionnaireItems, parent, level);
+  List<QuestionnaireItemModel> get siblings {
+    return _LocationListBuilder._buildLocationList(questionnaire,
+        questionnaireModel, siblingQuestionnaireItems, parent, level);
   }
 
-  List<QuestionnaireLocation> get children {
-    return _LocationListBuilder._buildLocationList(
-        questionnaire, top, childQuestionnaireItems, this, level + 1);
+  List<QuestionnaireItemModel> get children {
+    return _LocationListBuilder._buildLocationList(questionnaire,
+        questionnaireModel, childQuestionnaireItems, this, level + 1);
   }
 
   bool get hasNextSibling {
@@ -162,7 +168,8 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
 
   bool get hasPreviousSibling => siblingIndex > 0;
 
-  QuestionnaireLocation get nextSibling => siblings.elementAt(siblingIndex + 1);
+  QuestionnaireItemModel get nextSibling =>
+      siblings.elementAt(siblingIndex + 1);
 
   bool get hasParent => parent != null;
 
@@ -173,7 +180,7 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
     logger.debug('set responseItem $questionnaireResponseItem');
     if (questionnaireResponseItem != _questionnaireResponseItem) {
       _questionnaireResponseItem = questionnaireResponseItem;
-      top.bumpRevision();
+      questionnaireModel.bumpRevision();
       notifyListeners();
     }
   }
@@ -231,13 +238,13 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
     return false;
   }
 
-  /// Is this location unable to hold a value?
+  /// Is this itemModel unable to hold a value?
   bool get isStatic {
     return (questionnaireItem.type == QuestionnaireItemType.group) ||
         (questionnaireItem.type == QuestionnaireItemType.display);
   }
 
-  /// Is this location not changeable by end-users?
+  /// Is this itemModel not changeable by end-users?
   /// Read-only items might still hold a value, such as a calculated value.
   bool get isReadOnly {
     return isStatic ||
@@ -255,10 +262,11 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
         isHelp;
   }
 
-  /// Get the [QuestionnaireLocation] which contains help text about the current item.
-  /// Returns null, if this doesn't exist.
-  QuestionnaireLocation? get helpLocation =>
-      children.firstWhereOrNull((location) => location.isHelp);
+  /// The [QuestionnaireItemModel] which contains help text about the current item.
+  ///
+  /// null, if this doesn't exist.
+  QuestionnaireItemModel? get helpItem =>
+      children.firstWhereOrNull((itemModel) => itemModel.isHelp);
 
   bool get isHelp {
     return questionnaireItem.isItemControl('help') ||
@@ -283,45 +291,45 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
     return (prefix != null) ? '$prefix $title' : title;
   }
 
-  LinkedHashMap<String, QuestionnaireLocation> _addChildren() {
+  LinkedHashMap<String, QuestionnaireItemModel> _addChildren() {
     logger.trace('_addChildren $linkId');
-    final LinkedHashMap<String, QuestionnaireLocation> locationMap =
-        LinkedHashMap<String, QuestionnaireLocation>();
-    if (locationMap.containsKey(linkId)) {
+    final LinkedHashMap<String, QuestionnaireItemModel> itemModelMap =
+        LinkedHashMap<String, QuestionnaireItemModel>();
+    if (itemModelMap.containsKey(linkId)) {
       throw QuestionnaireFormatException('Duplicate linkId: $linkId', this);
     }
-    locationMap[linkId] = this;
+    itemModelMap[linkId] = this;
     if (hasChildren) {
       for (final child in children) {
-        locationMap.addAll(child._addChildren());
+        itemModelMap.addAll(child._addChildren());
       }
     }
 
-    return locationMap;
+    return itemModelMap;
   }
 
   void _ensureOrderedItems() {
     if (_orderedItems == null) {
-      final LinkedHashMap<String, QuestionnaireLocation> locationMap =
-          LinkedHashMap<String, QuestionnaireLocation>();
-      locationMap.addAll(_addChildren());
-      QuestionnaireLocation currentSibling = this;
+      final LinkedHashMap<String, QuestionnaireItemModel> itemModelMap =
+          LinkedHashMap<String, QuestionnaireItemModel>();
+      itemModelMap.addAll(_addChildren());
+      QuestionnaireItemModel currentSibling = this;
       while (currentSibling.hasNextSibling) {
         currentSibling = currentSibling.nextSibling;
-        if (locationMap.containsKey(currentSibling.linkId)) {
+        if (itemModelMap.containsKey(currentSibling.linkId)) {
           throw QuestionnaireFormatException(
               'Duplicate linkId $linkId', currentSibling);
         } else {
-          locationMap.addAll(currentSibling._addChildren());
+          itemModelMap.addAll(currentSibling._addChildren());
         }
       }
-      _orderedItems = locationMap;
+      _orderedItems = itemModelMap;
     }
   }
 
-  /// Get an [Iterable] of [QuestionnaireLocation] in pre-order.
+  /// Get an [Iterable] of [QuestionnaireItemModel] in pre-order.
   /// see: https://en.wikipedia.org/wiki/Tree_traversal
-  Iterable<QuestionnaireLocation> preOrder() {
+  Iterable<QuestionnaireItemModel> preOrder() {
     _ensureOrderedItems();
     return _orderedItems!.values;
   }
@@ -338,49 +346,55 @@ class QuestionnaireLocation extends ChangeNotifier with Diagnosticable {
     properties.add(IntProperty('siblings', siblings.length));
   }
 
-  QuestionnaireLocation._(
+  QuestionnaireItemModel._(
       this.questionnaire,
-      QuestionnaireTopLocation? top,
+      QuestionnaireModel? questionnaireModel,
       this.questionnaireItem,
       this.linkId,
       this.parent,
       this.siblingIndex,
       this.level) {
-    _top = top;
+    _questionnaireModel = questionnaireModel;
   }
 
-  factory QuestionnaireLocation._cached(
+  factory QuestionnaireItemModel._cached(
       Questionnaire questionnaire,
-      QuestionnaireTopLocation top,
+      QuestionnaireModel questionnaireModel,
       QuestionnaireItem questionnaireItem,
       String linkId,
-      QuestionnaireLocation? parent,
+      QuestionnaireItemModel? parent,
       int siblingIndex,
       int level) {
-    return top._cachedItems.putIfAbsent(
+    return questionnaireModel._cachedItems.putIfAbsent(
         linkId,
-        () => QuestionnaireLocation._(questionnaire, top, questionnaireItem,
-            linkId, parent, siblingIndex, level));
+        () => QuestionnaireItemModel._(questionnaire, questionnaireModel,
+            questionnaireItem, linkId, parent, siblingIndex, level));
   }
 }
 
-/// Build list of [QuestionnaireLocation] from [QuestionnaireItem] and meta-data.
+/// Build list of [QuestionnaireItemModel] from [QuestionnaireItem] and meta-data.
 class _LocationListBuilder {
-  static List<QuestionnaireLocation> _buildLocationList(
+  static List<QuestionnaireItemModel> _buildLocationList(
       Questionnaire _questionnaire,
-      QuestionnaireTopLocation top,
+      QuestionnaireModel questionnaireModel,
       List<QuestionnaireItem> _items,
-      QuestionnaireLocation? _parent,
+      QuestionnaireItemModel? _parent,
       int _level) {
     int siblingIndex = 0;
-    final locationList = <QuestionnaireLocation>[];
+    final itemModelList = <QuestionnaireItemModel>[];
 
     for (final item in _items) {
-      locationList.add(QuestionnaireLocation._cached(_questionnaire, top, item,
-          item.linkId!, _parent, siblingIndex, _level));
+      itemModelList.add(QuestionnaireItemModel._cached(
+          _questionnaire,
+          questionnaireModel,
+          item,
+          item.linkId!,
+          _parent,
+          siblingIndex,
+          _level));
       siblingIndex++;
     }
 
-    return locationList;
+    return itemModelList;
   }
 }

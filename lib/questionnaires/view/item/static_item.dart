@@ -1,4 +1,3 @@
-import 'package:fhir/primitive_types/decimal.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_html_css/simple_html_css.dart';
@@ -9,9 +8,9 @@ import '../../questionnaires.dart';
 
 class StaticItem extends QuestionnaireAnswerFiller {
   const StaticItem(
-      QuestionnaireLocation location, AnswerLocation answerLocation,
+      QuestionnaireItemModel itemModel, AnswerLocation answerLocation,
       {Key? key})
-      : super(location, answerLocation, key: key);
+      : super(itemModel, answerLocation, key: key);
   @override
   State<StatefulWidget> createState() => _StaticItemState();
 }
@@ -28,24 +27,25 @@ class _StaticItemState extends State<StaticItem> {
     super.initState();
 
     calcResult =
-        widget.location.responseItem?.answer?.firstOrNull?.valueDecimal ??
-            widget.location.responseItem?.answer?.first.valueQuantity?.value;
+        widget.itemModel.responseItem?.answer?.firstOrNull?.valueDecimal ??
+            widget.itemModel.responseItem?.answer?.first.valueQuantity?.value;
 
-    if (widget.location.isCalculatedExpression) {
+    if (widget.itemModel.isCalculatedExpression) {
       _logger.debug(
-          'Adding listener to ${widget.location} for calculated expression');
-      widget.location.top.addListener(() => _questionnaireChanged());
+          'Adding listener to ${widget.itemModel} for calculated expression');
+      widget.itemModel.questionnaireModel
+          .addListener(() => _questionnaireChanged());
     }
   }
 
   void _questionnaireChanged() {
-    _logger.debug('questionnaireChanged(): ${widget.location.responseItem}');
-    if (widget.location.responseItem != null) {
+    _logger.debug('questionnaireChanged(): ${widget.itemModel.responseItem}');
+    if (widget.itemModel.responseItem != null) {
       setState(() {
         calcResult =
-            widget.location.responseItem!.answer?.firstOrNull?.valueDecimal ??
-                widget.location.responseItem!.answer?.firstOrNull?.valueQuantity
-                    ?.value;
+            widget.itemModel.responseItem!.answer?.firstOrNull?.valueDecimal ??
+                widget.itemModel.responseItem!.answer?.firstOrNull
+                    ?.valueQuantity?.value;
       });
       _logger.debug('calculated result: $calcResult');
     }
@@ -59,7 +59,7 @@ class _StaticItemState extends State<StaticItem> {
       return null;
     }
     final matchExtension =
-        widget.location.questionnaireItem.extension_?.firstWhere((ext) {
+        widget.itemModel.questionnaireItem.extension_?.firstWhere((ext) {
       return (ext.url?.value.toString() ==
               'http://ehealth.sundhed.dk/fhir/StructureDefinition/ehealth-questionnaire-feedback') &&
           (ext.extension_!.extensionOrNull('min')!.valueInteger!.value! <=
@@ -77,7 +77,7 @@ class _StaticItemState extends State<StaticItem> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.location.isCalculatedExpression) {
+    if (widget.itemModel.isCalculatedExpression) {
       final score = calcResult?.value?.round();
       final feedback = findDanishFeedback(score);
       return Center(

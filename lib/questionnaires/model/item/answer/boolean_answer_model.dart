@@ -1,12 +1,12 @@
 import 'package:fhir/r4.dart';
 
-import '../../questionnaire_location.dart';
+import '../../questionnaire_item_model.dart';
 import '../item.dart';
 
 class BooleanAnswerModel extends AnswerModel<Boolean, Boolean> {
   BooleanAnswerModel(
-      QuestionnaireLocation location, AnswerLocation answerLocation)
-      : super(location, answerLocation) {
+      QuestionnaireItemModel itemModel, AnswerLocation answerLocation)
+      : super(itemModel, answerLocation) {
     value = answerLocation.answer?.valueBoolean;
   }
 

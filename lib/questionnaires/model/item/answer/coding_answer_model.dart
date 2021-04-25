@@ -7,7 +7,7 @@ import '../../../../fhir_types/fhir_types_extensions.dart';
 import '../../../../logging/logger.dart';
 import '../../questionnaire_exceptions.dart';
 import '../../questionnaire_extensions.dart';
-import '../../questionnaire_location.dart';
+import '../../questionnaire_item_model.dart';
 import '../response_model.dart';
 import 'answer_model.dart';
 
@@ -180,7 +180,8 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
             'Questionnaire choice item does not specify a key', qi);
       }
 
-      location.top.forEachInValueSet(key, _addAnswerOption, context: qi);
+      itemModel.questionnaireModel
+          .forEachInValueSet(key, _addAnswerOption, context: qi);
     } else {
       if (qi.answerOption != null) {
         _answerOptions.addEntries(qi.answerOption!.map<
@@ -204,8 +205,8 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
   late final int? maxOccurs;
 
   CodingAnswerModel(
-      QuestionnaireLocation location, AnswerLocation answerLocation)
-      : super(location, answerLocation) {
+      QuestionnaireItemModel itemModel, AnswerLocation answerLocation)
+      : super(itemModel, answerLocation) {
     _createAnswerOptions();
 
     minOccurs = qi.extension_
@@ -221,10 +222,10 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
         ?.valueInteger
         ?.value;
 
-    if (location.responseItem != null) {
-      value = (location.responseItem!.answer != null)
+    if (itemModel.responseItem != null) {
+      value = (itemModel.responseItem!.answer != null)
           ? CodeableConcept(
-              coding: location.responseItem!.answer
+              coding: itemModel.responseItem!.answer
                   ?.map((answer) =>
                       answerOptions[choiceStringFromCoding(answer.valueCoding)]!
                           .valueCoding!)

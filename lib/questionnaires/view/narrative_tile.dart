@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:simple_html_css/simple_html_css.dart';
 
 import '../model/aggregation/narrative_aggregator.dart';
-import '../model/questionnaire_location.dart';
+import '../model/questionnaire_item_model.dart';
 import 'questionnaire_filler.dart';
 
 /// Display a narrative
 class NarrativeTile extends StatefulWidget {
-  final QuestionnaireTopLocation? topLocation;
+  final QuestionnaireModel? questionnaireModel;
 
-  const NarrativeTile({this.topLocation, Key? key}) : super(key: key);
+  const NarrativeTile({this.questionnaireModel, Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _NarrativeTileState();
@@ -32,8 +32,8 @@ class _NarrativeTileState extends State<NarrativeTile> {
 
   @override
   Widget build(BuildContext context) {
-    final top =
-        widget.topLocation ?? QuestionnaireFiller.of(context).topLocation;
+    final questionnaireModel = widget.questionnaireModel ??
+        QuestionnaireFiller.of(context).questionnaireModel;
     return SizedBox.expand(
       child: Scrollbar(
         isAlwaysShown: true,
@@ -42,7 +42,10 @@ class _NarrativeTileState extends State<NarrativeTile> {
           controller: _narrativeScrollController,
           child: HTML.toRichText(
               context,
-              top.aggregator<NarrativeAggregator>().aggregate()?.div ??
+              questionnaireModel
+                      .aggregator<NarrativeAggregator>()
+                      .aggregate()
+                      ?.div ??
                   NarrativeAggregator.emptyNarrative.div,
               defaultTextStyle: Theme.of(context).textTheme.bodyText1),
         ),

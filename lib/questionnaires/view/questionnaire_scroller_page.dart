@@ -86,7 +86,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
             frontMatterLength + mainMatterLength + backMatterLength;
 
         final questionnaire =
-            QuestionnaireFiller.of(context).topLocation.questionnaire;
+            QuestionnaireFiller.of(context).questionnaireModel.questionnaire;
 
         return Localizations.override(
             context: context,

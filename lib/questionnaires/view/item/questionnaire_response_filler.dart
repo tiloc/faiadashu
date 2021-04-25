@@ -10,10 +10,10 @@ import 'questionnaire_answer_filler_factory.dart';
 
 /// Filler for a [QuestionnaireResponseItem].
 class QuestionnaireResponseFiller extends StatefulWidget {
-  final QuestionnaireLocation location;
+  final QuestionnaireItemModel itemModel;
 
-  QuestionnaireResponseFiller(this.location)
-      : super(key: ValueKey<String>(location.linkId));
+  QuestionnaireResponseFiller(this.itemModel)
+      : super(key: ValueKey<String>(itemModel.linkId));
 
   @override
   State<StatefulWidget> createState() => QuestionnaireResponseState();
@@ -28,13 +28,13 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
   @override
   void initState() {
     super.initState();
-    responseModel = ResponseModel(widget.location);
+    responseModel = ResponseModel(widget.itemModel);
 
     // TODO: Enhancement: Allow repeats = true for other kinds of items
     // This assumes that all answers are of the same kind
     // and repeats = true is only supported for choice items
     _answerFillers = [
-      QuestionnaireAnswerFillerFactory.fromQuestionnaireItem(widget.location,
+      QuestionnaireAnswerFillerFactory.fromQuestionnaireItem(widget.itemModel,
           AnswerLocation(responseModel.answers, 0, _stashAnswers))
     ];
   }
@@ -71,8 +71,8 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
     // TODO(tiloc) show a list of answers, and buttons to add/remove if repeat
     return Column(mainAxisSize: MainAxisSize.min, children: [
       if (!responseModel.isAskedButDeclined) ..._answerFillers,
-      if (!widget.location.isReadOnly &&
-          widget.location.questionnaireItem.required_ != Boolean(true))
+      if (!widget.itemModel.isReadOnly &&
+          widget.itemModel.questionnaireItem.required_ != Boolean(true))
         Row(children: [
           const Text('I choose not to answer'),
           Switch(

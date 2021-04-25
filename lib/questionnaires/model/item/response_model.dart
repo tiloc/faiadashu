@@ -1,7 +1,7 @@
 import 'package:fhir/r4.dart';
 
 import '../../../coding/data_absent_reasons.dart';
-import '../questionnaire_location.dart';
+import '../questionnaire_item_model.dart';
 
 /// Model a response item, which might consist of multiple answers.
 class ResponseModel {
@@ -12,12 +12,12 @@ class ResponseModel {
   ///
   /// see [DataAbsentReason]
   Code? dataAbsentReason;
-  final QuestionnaireLocation location;
+  final QuestionnaireItemModel itemModel;
 
-  QuestionnaireResponseItem? get responseItem => location.responseItem;
-  set responseItem(QuestionnaireResponseItem? ri) => location.responseItem = ri;
+  QuestionnaireResponseItem? get responseItem => itemModel.responseItem;
+  set responseItem(QuestionnaireResponseItem? ri) => itemModel.responseItem = ri;
 
-  ResponseModel(this.location) {
+  ResponseModel(this.itemModel) {
     final int? answerCount = responseItem?.answer?.length;
     if (answerCount != null && answerCount > 0) {
       answers = responseItem!.answer!;
@@ -34,7 +34,7 @@ class ResponseModel {
 
   /// Update the response with all the answers which are not null.
   ///
-  /// Sets the response in the related [QuestionnaireLocation].
+  /// Sets the response in the related [QuestionnaireItemModel].
   void updateResponse() {
     final filledAnswers = answers
         .where((answer) => answer != null)
@@ -42,11 +42,11 @@ class ResponseModel {
         .toList(growable: false);
 
     if (filledAnswers.isEmpty && dataAbsentReason == null) {
-      location.responseItem = null;
+      itemModel.responseItem = null;
     }
     final result = QuestionnaireResponseItem(
-        linkId: location.linkId,
-        text: location.questionnaireItem.text,
+        linkId: itemModel.linkId,
+        text: itemModel.questionnaireItem.text,
         extension_: (dataAbsentReason != null)
             ? [
                 FhirExtension(
@@ -57,7 +57,7 @@ class ResponseModel {
         // FHIR cannot have empty arrays.
         answer: filledAnswers.isEmpty ? null : filledAnswers);
 
-    location.responseItem = result;
+    itemModel.responseItem = result;
   }
 }
 

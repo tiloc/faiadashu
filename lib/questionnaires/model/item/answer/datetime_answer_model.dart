@@ -8,14 +8,14 @@ import 'package:fhir/r4.dart'
         Time;
 
 import '../../../../fhir_types/fhir_types_extensions.dart';
-import '../../questionnaire_location.dart';
+import '../../questionnaire_item_model.dart';
 import '../response_model.dart';
 import 'answer_model.dart';
 
 class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
   DateTimeAnswerModel(
-      QuestionnaireLocation location, AnswerLocation answerLocation)
-      : super(location, answerLocation) {
+      QuestionnaireItemModel itemModel, AnswerLocation answerLocation)
+      : super(itemModel, answerLocation) {
     value = answerLocation.answer?.valueDateTime ??
         ((answerLocation.answer?.valueDate != null)
             ? FhirDateTime(answerLocation.answer?.valueDate

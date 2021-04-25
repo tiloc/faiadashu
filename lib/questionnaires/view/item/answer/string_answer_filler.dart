@@ -7,9 +7,9 @@ import '../questionnaire_answer_filler.dart';
 
 class StringAnswerFiller extends QuestionnaireAnswerFiller {
   const StringAnswerFiller(
-      QuestionnaireLocation location, AnswerLocation answerLocation,
+      QuestionnaireItemModel itemModel, AnswerLocation answerLocation,
       {Key? key})
-      : super(location, answerLocation, key: key);
+      : super(itemModel, answerLocation, key: key);
   @override
   State<StatefulWidget> createState() => _StringAnswerState();
 }

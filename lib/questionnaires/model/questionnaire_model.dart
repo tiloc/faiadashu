@@ -1,14 +1,20 @@
 // Going with 'part of' here. 'import' would be preferred, but would force me to
 // expose internal methods from QuestionnaireLocation to the public.
 // TODO: Would it make sense if TopLocation was not a Location? has-a instead of is-a relationship?
-part of 'questionnaire_location.dart';
+part of 'questionnaire_item_model.dart';
 
-/// Visit FHIR [Questionnaire] through linkIds.
-/// This marks the entry point into the [Questionnaire].
-/// All contained items and children are expressed as [QuestionnaireLocation].
-class QuestionnaireTopLocation extends QuestionnaireLocation {
-  final Map<String, QuestionnaireLocation> _cachedItems = {};
-  List<QuestionnaireLocation>? _enabledWhens;
+/// Models a questionnaire.
+///
+/// Combined higher-level abstraction of [Questionnaire] and [QuestionnaireResponse].
+///
+/// Any properties and functions that affect the overall questionnaire are provided by [QuestionnaireModel].
+///
+/// Properties and functions that affect an individual item are in [QuestionnaireItemModel].
+///
+/// [QuestionnaireModel] provides direct access to any [QuestionnaireItemModel] through linkId.
+class QuestionnaireModel extends QuestionnaireItemModel {
+  final Map<String, QuestionnaireItemModel> _cachedItems = {};
+  List<QuestionnaireItemModel>? _enabledWhens;
   final List<Aggregator>? _aggregators;
 
   /// Direct access to [FhirResourceProvider]s for special use-cases.
@@ -17,9 +23,9 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
   final FhirResourceProvider fhirResourceProvider;
   int _revision = 1;
   final Locale locale;
-  static final _logger = Logger(QuestionnaireTopLocation);
+  static final _logger = Logger(QuestionnaireModel);
 
-  QuestionnaireTopLocation._(
+  QuestionnaireModel._(
       {required this.locale,
       required Questionnaire questionnaire,
       required this.fhirResourceProvider,
@@ -33,17 +39,17 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
             null,
             0,
             0) {
-    _top = this;
+    _questionnaireModel = this;
     // This will set up the traversal order and fill up the cache.
     _ensureOrderedItems();
 
-    for (final location in preOrder()) {
-      final enableWhens = location.questionnaireItem.enableWhen;
+    for (final itemModel in preOrder()) {
+      final enableWhens = itemModel.questionnaireItem.enableWhen;
       if ((enableWhens != null) && enableWhens.isNotEmpty) {
         if (_enabledWhens == null) {
-          _enabledWhens = [location];
+          _enabledWhens = [itemModel];
         } else {
-          _enabledWhens!.add(location);
+          _enabledWhens!.add(itemModel);
         }
       }
     }
@@ -63,7 +69,7 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
     activateEnableWhen();
   }
 
-  /// Create the anchor location of a [Questionnaire].
+  /// Create the anchor itemModel of a [Questionnaire].
   ///
   /// Will introspect the provided [fhirResourceProvider] to locate a
   /// * mandatory [Questionnaire]
@@ -75,7 +81,7 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
   ///
   /// The [fhirResourceProvider] is used for access to any required resources,
   /// such as ValueSets, Subject, or Encounter.
-  static Future<QuestionnaireTopLocation> fromFhirResourceBundle(
+  static Future<QuestionnaireModel> fromFhirResourceBundle(
       {required Locale locale,
       List<Aggregator>? aggregators,
       required FhirResourceProvider fhirResourceProvider}) async {
@@ -88,7 +94,7 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
       throw StateError('No Questionnaire has been provided.');
     }
 
-    final topLocation = QuestionnaireTopLocation._(
+    final questionnaireModel = QuestionnaireModel._(
         questionnaire: questionnaire,
         locale: locale,
         aggregators: aggregators ??
@@ -99,14 +105,14 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
             ],
         fhirResourceProvider: fhirResourceProvider);
 
-    await topLocation.fhirResourceProvider.init();
+    await questionnaireModel.fhirResourceProvider.init();
 
     final response =
         fhirResourceProvider.getResource(questionnaireResponseResourceUri)
             as QuestionnaireResponse?;
-    topLocation.populate(response);
+    questionnaireModel.populate(response);
 
-    return topLocation;
+    return questionnaireModel;
   }
 
   /// Returns an [Aggregator] of the given type.
@@ -285,10 +291,10 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
 
   int get revision => _revision;
 
-  /// Finds the [QuestionnaireLocation] that corresponds to the linkId.
+  /// Finds the [QuestionnaireItemModel] that corresponds to the linkId.
   ///
-  /// Throws an [Exception] when no such [QuestionnaireLocation] exists.
-  QuestionnaireLocation findByLinkId(String linkId) {
+  /// Throws an [Exception] when no such [QuestionnaireItemModel] exists.
+  QuestionnaireItemModel findByLinkId(String linkId) {
     final result = _orderedItems![linkId];
     if (result == null) {
       throw QuestionnaireFormatException("Location '$linkId' not found.");
@@ -348,12 +354,12 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
         preOrder().length, (index) => preOrder().elementAt(index).enabled,
         growable: false);
     _logger.trace('prevEnabled: $previouslyEnabled');
-    for (final location in preOrder()) {
-      location._enabled = true;
+    for (final itemModel in preOrder()) {
+      itemModel._enabled = true;
     }
 
-    for (final location in _enabledWhens!) {
-      location._calculateEnabled();
+    for (final itemModel in _enabledWhens!) {
+      itemModel._calculateEnabled();
     }
     final afterEnabled = List<bool>.generate(
         preOrder().length, (index) => preOrder().elementAt(index).enabled,
@@ -369,8 +375,8 @@ class QuestionnaireTopLocation extends QuestionnaireLocation {
 
   /// Activate the "enableWhen" behaviors.
   void activateEnableWhen() {
-    for (final location in preOrder()) {
-      location.forEnableWhens((qew) {
+    for (final itemModel in preOrder()) {
+      itemModel.forEnableWhens((qew) {
         findByLinkId(qew.question!).addListener(() => updateEnableWhen());
       });
     }

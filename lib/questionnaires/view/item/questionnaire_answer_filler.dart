@@ -8,10 +8,10 @@ import '../broken_questionnaire_item.dart';
 
 /// Filler for an individual [QuestionnaireResponseAnswer].
 abstract class QuestionnaireAnswerFiller extends StatefulWidget {
-  final QuestionnaireLocation location;
+  final QuestionnaireItemModel itemModel;
   final AnswerLocation answerLocation;
 
-  const QuestionnaireAnswerFiller(this.location, this.answerLocation,
+  const QuestionnaireAnswerFiller(this.itemModel, this.answerLocation,
       {Key? key})
       : super(key: key);
 }
@@ -23,9 +23,9 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller,
 
   late final Object? answerModelError;
 
-  QuestionnaireItem get qi => widget.location.questionnaireItem;
-  Locale get locale => widget.location.top.locale;
-  QuestionnaireLocation get location => widget.location;
+  QuestionnaireItem get qi => widget.itemModel.questionnaireItem;
+  Locale get locale => widget.itemModel.questionnaireModel.locale;
+  QuestionnaireItemModel get itemModel => widget.itemModel;
 
   QuestionnaireAnswerState();
 
@@ -35,13 +35,13 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller,
 
     try {
       answerModel =
-          AnswerModelFactory.createModel<M>(location, widget.answerLocation)
+          AnswerModelFactory.createModel<M>(itemModel, widget.answerLocation)
               as M;
 
       answerModelError = null;
       postInitState();
     } catch (exception) {
-      _abstractLogger.warn('Could not initialize model for ${location.linkId}',
+      _abstractLogger.warn('Could not initialize model for ${itemModel.linkId}',
           error: exception);
       answerModelError = exception;
     }
@@ -94,7 +94,7 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller,
 
   @override
   Widget build(BuildContext context) {
-    return widget.location.isReadOnly
+    return widget.itemModel.isReadOnly
         ? _guardedBuildReadOnly(context)
         : _guardedBuildEditable(context);
   }

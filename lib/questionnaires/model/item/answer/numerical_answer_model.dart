@@ -51,13 +51,13 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
   }
 
   NumericalAnswerModel(
-      QuestionnaireLocation location, AnswerLocation answerLocation)
-      : super(location, answerLocation) {
-    _isSliding = location.questionnaireItem.isItemControl('slider');
+      QuestionnaireItemModel itemModel, AnswerLocation answerLocation)
+      : super(itemModel, answerLocation) {
+    _isSliding = itemModel.questionnaireItem.isItemControl('slider');
 
     final minValueExtension = qi.extension_
         ?.extensionOrNull('http://hl7.org/fhir/StructureDefinition/minValue');
-    final maxValueExtension = location.questionnaireItem.extension_
+    final maxValueExtension = itemModel.questionnaireItem.extension_
         ?.extensionOrNull('http://hl7.org/fhir/StructureDefinition/maxValue');
     _minValue = minValueExtension?.valueDecimal?.value ??
         minValueExtension?.valueInteger?.value?.toDouble() ??
@@ -95,7 +95,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
     _numberPattern = '$maxIntegerDigits$maxFractionDigits';
 
     _logger.debug(
-      'input format for ${location.linkId}: "$_numberPattern"',
+      'input format for ${itemModel.linkId}: "$_numberPattern"',
     );
 
     _numberFormat = NumberFormat(_numberPattern,
@@ -110,7 +110,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
         ?.valueCanonical
         .toString();
     if (unitsUri != null) {
-      location.top.forEachInValueSet(unitsUri, (coding) {
+      itemModel.questionnaireModel.forEachInValueSet(unitsUri, (coding) {
         units[keyStringFromCoding(coding)] = coding;
       }, context: qi.linkId);
     } else if (unit != null) {
@@ -119,7 +119,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
 
     // TODO: look at initialValue extension
     Quantity? existingValue;
-    final firstAnswer = location.responseItem?.answer?.firstOrNull;
+    final firstAnswer = itemModel.responseItem?.answer?.firstOrNull;
     if (firstAnswer != null) {
       existingValue = firstAnswer.valueQuantity ??
           ((firstAnswer.valueDecimal != null &&

@@ -11,9 +11,9 @@ import 'numerical_input.dart';
 
 class NumericalAnswerFiller extends QuestionnaireAnswerFiller {
   const NumericalAnswerFiller(
-      QuestionnaireLocation location, AnswerLocation answerLocation,
+      QuestionnaireItemModel itemModel, AnswerLocation answerLocation,
       {Key? key})
-      : super(location, answerLocation, key: key);
+      : super(itemModel, answerLocation, key: key);
 
   @override
   State<NumericalAnswerFiller> createState() => _NumericalAnswerState();

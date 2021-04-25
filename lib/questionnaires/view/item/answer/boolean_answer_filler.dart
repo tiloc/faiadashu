@@ -5,9 +5,9 @@ import '../../../questionnaires.dart';
 
 class BooleanAnswerFiller extends QuestionnaireAnswerFiller {
   const BooleanAnswerFiller(
-      QuestionnaireLocation location, AnswerLocation answerLocation,
+      QuestionnaireItemModel itemModel, AnswerLocation answerLocation,
       {Key? key})
-      : super(location, answerLocation, key: key);
+      : super(itemModel, answerLocation, key: key);
   @override
   State<StatefulWidget> createState() => _BooleanItemState();
 }
