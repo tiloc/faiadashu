@@ -54,17 +54,17 @@ class NarrativeAggregator extends Aggregator<Narrative> {
     }
 
     final invalid =
-        item.extension_?.dataAbsentReason == DataAbsentReason.asTextCode;
+        item.extension_?.dataAbsentReason == dataAbsentReasonAsTextCode;
 
     if (invalid) {
       div.write('<span style="color:red">[AS TEXT] ');
     }
 
     final dataAbsentReason = item.extension_?.dataAbsentReason;
-    if (dataAbsentReason == DataAbsentReason.maskedCode) {
+    if (dataAbsentReason == dataAbsentReasonMaskedCode) {
       div.write('<p>***</p>');
       returnValue = true;
-    } else if (dataAbsentReason == DataAbsentReason.askedButDeclinedCode) {
+    } else if (dataAbsentReason == dataAbsentReasonAskedButDeclinedCode) {
       div.write(
           '<p><i><span style="color:red">X </span>Declined to answer</i></p>');
       returnValue = true;
@@ -118,7 +118,8 @@ class NarrativeAggregator extends Aggregator<Narrative> {
 
     bool generated = false;
 
-    for (final itemModel in questionnaireModel.preOrder()) {
+    for (final itemModel
+        in questionnaireModel.orderedQuestionnaireItemModels()) {
       generated = generated | _addResponseItemToDiv(div, itemModel);
     }
     div.write('</div>');

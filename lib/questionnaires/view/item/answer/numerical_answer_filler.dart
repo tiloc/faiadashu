@@ -2,7 +2,7 @@ import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../coding/coding.dart';
+import '../../../../coding/data_absent_reasons.dart' as dar;
 import '../../../../fhir_types/fhir_types_extensions.dart';
 import '../../../model/item/answer/numerical_answer_model.dart';
 import '../../../questionnaires.dart';
@@ -114,8 +114,8 @@ class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
                   final dataAbsentReasonExtension = !valid
                       ? [
                           FhirExtension(
-                              url: DataAbsentReason.extensionUrl,
-                              valueCode: DataAbsentReason.asTextCode)
+                              url: dar.dataAbsentReasonExtension,
+                              valueCode: dar.dataAbsentReasonAsTextCode)
                         ]
                       : null;
 

@@ -1,6 +1,6 @@
 import 'package:fhir/r4.dart';
 
-import '../../../../coding/data_absent_reasons.dart';
+import '../../../../coding/data_absent_reasons.dart' as dar;
 import '../../../../fhir_types/fhir_types_extensions.dart';
 import '../../questionnaire_item_model.dart';
 import '../response_model.dart';
@@ -79,8 +79,8 @@ class StringAnswerModel extends AnswerModel<String, String> {
     final dataAbsentReasonExtension = !valid
         ? [
             FhirExtension(
-                url: DataAbsentReason.extensionUrl,
-                valueCode: DataAbsentReason.asTextCode)
+                url: dar.dataAbsentReasonExtension,
+                valueCode: dar.dataAbsentReasonAsTextCode)
           ]
         : null;
 

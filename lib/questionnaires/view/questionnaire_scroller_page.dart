@@ -79,7 +79,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
       locale: locale,
       builder: (BuildContext context) {
         final mainMatterLength =
-            QuestionnaireFiller.of(context).surveyLocations.length;
+            QuestionnaireFiller.of(context).questionnaireItemModels.length;
         final frontMatterLength = widget.frontMatter?.length ?? 0;
         final backMatterLength = widget.backMatter?.length ?? 0;
         final totalLength =

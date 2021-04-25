@@ -24,12 +24,15 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
   void init(QuestionnaireModel questionnaireModel) {
     super.init(questionnaireModel);
 
-    totalScoreItem = questionnaireModel.preOrder().firstWhereOrNull(
-        (itemModel) => TotalScoreAggregator.isTotalScoreExpression(itemModel));
+    totalScoreItem = questionnaireModel
+        .orderedQuestionnaireItemModels()
+        .firstWhereOrNull((itemModel) =>
+            TotalScoreAggregator.isTotalScoreExpression(itemModel));
     // if there is no total score itemModel then leave value at 0 indefinitely
     if (autoAggregate) {
       if (totalScoreItem != null) {
-        for (final itemModel in questionnaireModel.preOrder()) {
+        for (final itemModel
+            in questionnaireModel.orderedQuestionnaireItemModels()) {
           if (!itemModel.isStatic && itemModel != totalScoreItem) {
             itemModel.addListener(() => aggregate(notifyListeners: true));
           }
@@ -45,10 +48,12 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
     }
 
     _logger.trace('totalScore.aggregate');
-    final sum = questionnaireModel.preOrder().fold<double>(
-        0.0,
-        (previousValue, element) =>
-            previousValue + (element.ordinalValue?.value ?? 0.0));
+    final sum = questionnaireModel
+        .orderedQuestionnaireItemModels()
+        .fold<double>(
+            0.0,
+            (previousValue, element) =>
+                previousValue + (element.ordinalValue?.value ?? 0.0));
 
     _logger.debug('sum: $sum');
     final result = Decimal(sum);

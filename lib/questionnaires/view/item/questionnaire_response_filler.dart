@@ -79,7 +79,7 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
             value: responseModel.isAskedButDeclined,
             onChanged: (bool value) {
               _setDataAbsentReason(
-                  value ? DataAbsentReason.askedButDeclinedCode : null);
+                  value ? dataAbsentReasonAskedButDeclinedCode : null);
             },
           )
         ])

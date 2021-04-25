@@ -43,7 +43,7 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     // This will set up the traversal order and fill up the cache.
     _ensureOrderedItems();
 
-    for (final itemModel in preOrder()) {
+    for (final itemModel in orderedQuestionnaireItemModels()) {
       final enableWhens = itemModel.questionnaireItem.enableWhen;
       if ((enableWhens != null) && enableWhens.isNotEmpty) {
         if (_enabledWhens == null) {
@@ -351,10 +351,10 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     _logger.trace('updateEnableWhen()');
 
     final previouslyEnabled = List<bool>.generate(
-        preOrder().length, (index) => preOrder().elementAt(index).enabled,
+        orderedQuestionnaireItemModels().length, (index) => orderedQuestionnaireItemModels().elementAt(index).enabled,
         growable: false);
     _logger.trace('prevEnabled: $previouslyEnabled');
-    for (final itemModel in preOrder()) {
+    for (final itemModel in orderedQuestionnaireItemModels()) {
       itemModel._enabled = true;
     }
 
@@ -362,7 +362,7 @@ class QuestionnaireModel extends QuestionnaireItemModel {
       itemModel._calculateEnabled();
     }
     final afterEnabled = List<bool>.generate(
-        preOrder().length, (index) => preOrder().elementAt(index).enabled,
+        orderedQuestionnaireItemModels().length, (index) => orderedQuestionnaireItemModels().elementAt(index).enabled,
         growable: false);
     _logger.trace('afterEnabled: $afterEnabled');
 
@@ -375,7 +375,7 @@ class QuestionnaireModel extends QuestionnaireItemModel {
 
   /// Activate the "enableWhen" behaviors.
   void activateEnableWhen() {
-    for (final itemModel in preOrder()) {
+    for (final itemModel in orderedQuestionnaireItemModels()) {
       itemModel.forEnableWhens((qew) {
         findByLinkId(qew.question!).addListener(() => updateEnableWhen());
       });

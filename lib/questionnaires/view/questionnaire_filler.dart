@@ -52,7 +52,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
 
   late final Future<QuestionnaireModel> builderFuture;
   QuestionnaireModel? _questionnaireModel;
-  void Function()? _onQuestionnaireModelChangeListenerFunction;
+  VoidCallback? _onQuestionnaireModelChangeListenerFunction;
 
   @override
   void initState() {
@@ -131,7 +131,7 @@ class QuestionnaireFillerData extends InheritedWidget {
   static final logger = Logger(QuestionnaireFillerData);
   final Locale locale;
   final QuestionnaireModel questionnaireModel;
-  final Iterable<QuestionnaireItemModel> surveyLocations;
+  final Iterable<QuestionnaireItemModel> questionnaireItemModels;
   final void Function(BuildContext context, Uri url)? onLinkTap;
   late final List<QuestionnaireItemFiller?> _itemFillers;
   late final int _revision;
@@ -143,9 +143,10 @@ class QuestionnaireFillerData extends InheritedWidget {
     this.onLinkTap,
     required WidgetBuilder builder,
   })   : _revision = questionnaireModel.revision,
-        surveyLocations = questionnaireModel.preOrder(),
+        questionnaireItemModels =
+            questionnaireModel.orderedQuestionnaireItemModels(),
         _itemFillers = List<QuestionnaireItemFiller?>.filled(
-            questionnaireModel.preOrder().length, null),
+            questionnaireModel.orderedQuestionnaireItemModels().length, null),
         super(key: key, child: Builder(builder: builder));
 
   T aggregator<T extends Aggregator>() {
@@ -174,7 +175,7 @@ class QuestionnaireFillerData extends InheritedWidget {
 
   QuestionnaireItemFiller itemFillerAt(int index) {
     _itemFillers[index] ??= QuestionnaireItemFiller.fromQuestionnaireItem(
-        surveyLocations.elementAt(index));
+        questionnaireItemModels.elementAt(index));
 
     return _itemFillers[index]!;
   }

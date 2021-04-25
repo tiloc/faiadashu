@@ -15,7 +15,8 @@ class ResponseModel {
   final QuestionnaireItemModel itemModel;
 
   QuestionnaireResponseItem? get responseItem => itemModel.responseItem;
-  set responseItem(QuestionnaireResponseItem? ri) => itemModel.responseItem = ri;
+  set responseItem(QuestionnaireResponseItem? ri) =>
+      itemModel.responseItem = ri;
 
   ResponseModel(this.itemModel) {
     final int? answerCount = responseItem?.answer?.length;
@@ -30,7 +31,7 @@ class ResponseModel {
 
   /// Is the response 'asked but declined'
   bool get isAskedButDeclined =>
-      dataAbsentReason == DataAbsentReason.askedButDeclinedCode;
+      dataAbsentReason == dataAbsentReasonAskedButDeclinedCode;
 
   /// Update the response with all the answers which are not null.
   ///
@@ -50,8 +51,7 @@ class ResponseModel {
         extension_: (dataAbsentReason != null)
             ? [
                 FhirExtension(
-                    url: DataAbsentReason.extensionUrl,
-                    valueCode: dataAbsentReason)
+                    url: dataAbsentReasonExtension, valueCode: dataAbsentReason)
               ]
             : null,
         // FHIR cannot have empty arrays.

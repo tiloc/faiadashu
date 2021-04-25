@@ -327,9 +327,10 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     }
   }
 
-  /// Get an [Iterable] of [QuestionnaireItemModel] in pre-order.
+  /// Returns an [Iterable] of [QuestionnaireItemModel]s in "pre-order".
+  ///
   /// see: https://en.wikipedia.org/wiki/Tree_traversal
-  Iterable<QuestionnaireItemModel> preOrder() {
+  Iterable<QuestionnaireItemModel> orderedQuestionnaireItemModels() {
     _ensureOrderedItems();
     return _orderedItems!.values;
   }

@@ -73,7 +73,13 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
 
 class QuestionnaireItemFillerTitle extends StatelessWidget {
   final QuestionnaireItemModel itemModel;
-  const QuestionnaireItemFillerTitle._(this.itemModel, {Key? key})
+  final Widget? leading;
+  final Widget? help;
+  final String htmlTitleText;
+
+  const QuestionnaireItemFillerTitle._(
+      this.itemModel, this.htmlTitleText, this.leading, this.help,
+      {Key? key})
       : super(key: key);
 
   static Widget? fromQuestionnaireItem(QuestionnaireItemModel itemModel,
@@ -81,46 +87,48 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
     if (itemModel.titleText == null) {
       return null;
     } else {
-      return QuestionnaireItemFillerTitle._(itemModel, key: key);
+      final leading =
+          QuestionnaireItemFillerTitleLeading.fromQuestionnaireItem(itemModel);
+      final help =
+          _QuestionnaireItemFillerHelpFactory.fromQuestionnaireItem(itemModel);
+
+      final requiredTag =
+          (itemModel.questionnaireItem.required_?.value == true) ? '*' : '';
+
+      final openStyleTag =
+          (itemModel.questionnaireItem.type == QuestionnaireItemType.group)
+              ? '<h2>'
+              : '<b>';
+
+      final closeStyleTag =
+          (itemModel.questionnaireItem.type == QuestionnaireItemType.group)
+              ? '</h2>'
+              : '$requiredTag</b>';
+
+      final htmlTitleText =
+          '$openStyleTag${htmlEscape.convert(itemModel.titleText!)}$closeStyleTag';
+
+      return QuestionnaireItemFillerTitle._(
+          itemModel, htmlTitleText, leading, help,
+          key: key);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // TODO: Move more work out of the build method.
-    final leading =
-        QuestionnaireItemFillerTitleLeading.fromQuestionnaireItem(itemModel);
-    final help =
-        _QuestionnaireItemFillerHelpFactory.fromQuestionnaireItem(itemModel);
-
-    final requiredTag =
-        (itemModel.questionnaireItem.required_?.value == true) ? '*' : '';
-
-    final openStyleTag =
-        (itemModel.questionnaireItem.type == QuestionnaireItemType.group)
-            ? '<h2>'
-            : '<b>';
-
-    final closeStyleTag =
-        (itemModel.questionnaireItem.type == QuestionnaireItemType.group)
-            ? '</h2>'
-            : '$requiredTag</b>';
-
-    final titleText = itemModel.titleText;
     return Container(
         padding: const EdgeInsets.only(top: 8.0),
         child: Text.rich(
           TextSpan(
             children: <InlineSpan>[
-              if (leading != null) WidgetSpan(child: leading),
-              if (titleText != null)
-                HTML.toTextSpan(context,
-                    '$openStyleTag${htmlEscape.convert(titleText)}$closeStyleTag',
+              if (leading != null) WidgetSpan(child: leading!),
+              if (itemModel.titleText != null)
+                HTML.toTextSpan(context, htmlTitleText,
                     defaultTextStyle: Theme.of(context).textTheme.bodyText1),
-              if (help != null) WidgetSpan(child: help),
+              if (help != null) WidgetSpan(child: help!),
             ],
           ),
-          semanticsLabel: titleText,
+          semanticsLabel: itemModel.titleText,
         ));
   }
 }
