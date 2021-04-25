@@ -1,6 +1,5 @@
 // Going with 'part of' here. 'import' would be preferred, but would force me to
-// expose internal methods from QuestionnaireLocation to the public.
-// TODO: Would it make sense if TopLocation was not a Location? has-a instead of is-a relationship?
+// expose numerous internal methods to the public.
 part of 'questionnaire_item_model.dart';
 
 /// Models a questionnaire.

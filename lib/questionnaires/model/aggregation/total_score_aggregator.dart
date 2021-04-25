@@ -5,7 +5,9 @@ import '../../../fhir_types/fhir_types_extensions.dart';
 import '../../../logging/logging.dart';
 import '../../model/model.dart';
 
-/// Aggregate responses into a total score.
+/// Aggregate answers into a total score.
+///
+/// The score is the sum of the ordinalValue of all answers.
 ///
 /// Updates immediately when questionnaire is updated and [autoAggregate] is true.
 ///

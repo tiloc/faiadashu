@@ -32,8 +32,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   late QuestionnaireModel? _questionnaireModel;
   final int siblingIndex;
   final int level;
-  late final String logTag;
-  static final logger = Logger(QuestionnaireItemModel);
+  static final _qimLogger = Logger(QuestionnaireItemModel);
 
   QuestionnaireModel get questionnaireModel => _questionnaireModel!;
 
@@ -50,7 +49,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   ///
   /// Sets the [enabled] property
   void _calculateEnabled() {
-    logger.trace('Enter _calculateEnabled()');
+    _qimLogger.trace('Enter _calculateEnabled()');
 
     bool anyTrigger = false;
     int allTriggered = 0;
@@ -76,13 +75,14 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
               ?.valueCoding;
           // TODO: More sophistication- System, cardinality, etc.
           if (responseCoding?.code == qew.answerCoding?.code) {
-            logger.debug('enableWhen: $responseCoding == ${qew.answerCoding}');
+            _qimLogger
+                .debug('enableWhen: $responseCoding == ${qew.answerCoding}');
             if (qew.operator_ == QuestionnaireEnableWhenOperator.eq) {
               anyTrigger = true;
               allTriggered++;
             }
           } else {
-            logger.debug(
+            _qimLogger.debug(
               'enableWhen: $responseCoding != ${qew.answerCoding}',
             );
             if (qew.operator_ == QuestionnaireEnableWhenOperator.ne) {
@@ -92,7 +92,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
           }
           break;
         default:
-          logger.warn('Unsupported operator: ${qew.operator_}.');
+          _qimLogger.warn('Unsupported operator: ${qew.operator_}.');
           // Err on the side of caution: Enable fields when enableWhen cannot be evaluated.
           anyTrigger = true;
           allTriggered++;
@@ -177,10 +177,12 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
       (questionnaireItem.item != null) && (questionnaireItem.item!.isNotEmpty);
 
   set responseItem(QuestionnaireResponseItem? questionnaireResponseItem) {
-    logger.debug('set responseItem $questionnaireResponseItem');
+    _qimLogger.debug('set responseItem $questionnaireResponseItem');
     if (questionnaireResponseItem != _questionnaireResponseItem) {
       _questionnaireResponseItem = questionnaireResponseItem;
       questionnaireModel.bumpRevision();
+      // This notifies aggregators on changes to individual items
+      notifyListeners();
     }
   }
 
@@ -291,7 +293,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   }
 
   LinkedHashMap<String, QuestionnaireItemModel> _addChildren() {
-    logger.trace('_addChildren $linkId');
+    _qimLogger.trace('_addChildren $linkId');
     final LinkedHashMap<String, QuestionnaireItemModel> itemModelMap =
         LinkedHashMap<String, QuestionnaireItemModel>();
     if (itemModelMap.containsKey(linkId)) {
