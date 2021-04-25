@@ -128,7 +128,6 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
 }
 
 class QuestionnaireFillerData extends InheritedWidget {
-  static final logger = Logger(QuestionnaireFillerData);
   final Locale locale;
   final QuestionnaireModel questionnaireModel;
   final Iterable<QuestionnaireItemModel> questionnaireItemModels;
