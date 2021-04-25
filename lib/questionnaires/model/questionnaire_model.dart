@@ -69,7 +69,7 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     activateEnableWhen();
   }
 
-  /// Create the anchor itemModel of a [Questionnaire].
+  /// Create the model for a [Questionnaire].
   ///
   /// Will introspect the provided [fhirResourceProvider] to locate a
   /// * mandatory [Questionnaire]
@@ -81,6 +81,9 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   ///
   /// The [fhirResourceProvider] is used for access to any required resources,
   /// such as ValueSets, Subject, or Encounter.
+  ///
+  /// If no [QuestionnaireResponse] has been provided here, it can still later
+  /// be provided through the [populate] function.
   static Future<QuestionnaireModel> fromFhirResourceBundle(
       {required Locale locale,
       List<Aggregator>? aggregators,
