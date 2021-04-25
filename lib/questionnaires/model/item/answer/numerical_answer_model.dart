@@ -17,6 +17,11 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
   late final double _maxValue;
   late final int _maxDecimal;
   late final NumberFormat _numberFormat;
+  late final double? _sliderStepValue;
+  late final int? _sliderDivisions;
+
+  int? get sliderDivisions => _sliderDivisions;
+  double? get sliderStepValue => _sliderStepValue;
 
   String get numberPattern => _numberPattern;
   bool get isSliding => _isSliding;
@@ -65,6 +70,16 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
     _maxValue = maxValueExtension?.valueDecimal?.value ??
         maxValueExtension?.valueInteger?.value?.toDouble() ??
         (_isSliding ? 100.0 : double.maxFinite);
+
+    if (_isSliding) {
+      final sliderStepValueExtension = qi.extension_?.extensionOrNull(
+          'http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue');
+      _sliderStepValue = sliderStepValueExtension?.valueDecimal?.value ??
+          sliderStepValueExtension?.valueInteger?.value?.toDouble();
+      _sliderDivisions = (_sliderStepValue != null)
+          ? ((_maxValue - _minValue) / _sliderStepValue!).round()
+          : null;
+    }
 
     // TODO: Evaluate max length
     switch (qi.type) {

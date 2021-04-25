@@ -21,24 +21,10 @@ class NumericalAnswerFiller extends QuestionnaireAnswerFiller {
 
 class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
     NumericalAnswerFiller, NumericalAnswerModel> {
-  late final int? _divisions;
   late final TextInputFormatter _numberInputFormatter;
-
-  _NumericalAnswerState();
 
   @override
   void postInitState() {
-    if (answerModel.isSliding) {
-      final sliderStepValueExtension = qi.extension_?.extensionOrNull(
-          'http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue');
-      final sliderStepValue = sliderStepValueExtension?.valueDecimal?.value ??
-          sliderStepValueExtension?.valueInteger?.value?.toDouble();
-      _divisions = (sliderStepValue != null)
-          ? ((answerModel.maxValue - answerModel.minValue) / sliderStepValue)
-              .round()
-          : null;
-    }
-
     _numberInputFormatter =
         NumericalTextInputFormatter(answerModel.numberFormat);
   }
@@ -99,7 +85,7 @@ class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
         ? Slider(
             min: answerModel.minValue,
             max: answerModel.maxValue,
-            divisions: _divisions,
+            divisions: answerModel.sliderDivisions,
             value: value!.value!.value!, // Yay, triple value!
             onChanged: (sliderValue) {
               value = Quantity(value: Decimal(sliderValue));
