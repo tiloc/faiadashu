@@ -19,9 +19,7 @@ class QuestionnaireItemFiller extends StatefulWidget {
   factory QuestionnaireItemFiller.fromQuestionnaireItem(
       QuestionnaireLocation location) {
     return QuestionnaireItemFiller._(
-        // TODO: Error handling for failed response filler creation
-        location,
-        QuestionnaireResponseFiller(location));
+        location, QuestionnaireResponseFiller(location));
   }
 
   QuestionnaireItemFiller._(this.location, this._responseFiller, {Key? key})
@@ -88,6 +86,7 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // TODO: Move more work out of the build method.
     final leading = QuestionnaireItemFillerTitleLeading.forLocation(location);
     final help = _QuestionnaireItemFillerHelpFactory.forLocation(location);
 

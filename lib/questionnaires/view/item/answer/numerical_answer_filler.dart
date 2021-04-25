@@ -134,12 +134,7 @@ class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
                       : null;
 
                   if (content.trim().isEmpty) {
-                    // TODO: Will copyWith value: null leave the value untouched or kill it?
-                    if (value == null) {
-                      value = null;
-                    } else {
-                      value = value!.copyWith(value: null);
-                    }
+                    value = value?.copyWith(value: null);
                   } else {
                     if (value == null) {
                       value = Quantity(

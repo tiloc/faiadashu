@@ -83,10 +83,9 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller,
       });
 
       if (answerModel.hasCodingAnswers()) {
-        widget.answerLocation
-            .stashCodingAnswers(answerModel.fillCodingAnswers());
+        widget.answerLocation.updateAnswers(answerModel.fillCodingAnswers());
       } else {
-        widget.answerLocation.stashAnswer(answerModel.fillAnswer());
+        widget.answerLocation.updateAnswer(answerModel.fillAnswer());
       }
     }
   }

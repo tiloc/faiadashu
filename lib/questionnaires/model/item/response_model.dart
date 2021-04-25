@@ -32,8 +32,10 @@ class ResponseModel {
   bool get isAskedButDeclined =>
       dataAbsentReason == DataAbsentReason.askedButDeclinedCode;
 
-  /// Fill the response with all the answers which are not null.
-  void fillResponse() {
+  /// Update the response with all the answers which are not null.
+  ///
+  /// Sets the response in the related [QuestionnaireLocation].
+  void updateResponse() {
     final filledAnswers = answers
         .where((answer) => answer != null)
         .map<QuestionnaireResponseAnswer>((answer) => answer!)
@@ -74,12 +76,12 @@ class AnswerLocation {
         _answerIndex = answerIndex,
         _onAnswered = onAnswered;
 
-  void stashAnswer(QuestionnaireResponseAnswer? answer) {
+  void updateAnswer(QuestionnaireResponseAnswer? answer) {
     _onAnswered.call([answer], _answerIndex);
   }
 
   /// Special functionality to allow choice and open-choice items with "repeats".
-  void stashCodingAnswers(List<QuestionnaireResponseAnswer?>? answers) {
+  void updateAnswers(List<QuestionnaireResponseAnswer?>? answers) {
     _onAnswered.call(answers, _answerIndex);
   }
 

@@ -52,7 +52,7 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
     }
 
     // Report the response up the model hierarchy
-    responseModel.fillResponse();
+    responseModel.updateResponse();
   }
 
   void _setDataAbsentReason(Code? dataAbsentReason) {
@@ -63,7 +63,7 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
     }
 
     // Bubble up the response
-    responseModel.fillResponse();
+    responseModel.updateResponse();
   }
 
   @override
