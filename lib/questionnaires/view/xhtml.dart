@@ -12,9 +12,14 @@ class Xhtml {
   static final Logger _logger = Logger(Xhtml);
   const Xhtml._();
 
-  static Widget? toWidget(BuildContext context, QuestionnaireModel questionnaireModel,
-      String? plainText, List<FhirExtension>? extension,
-      {double? width, double? height, Key? key}) {
+  static Widget? toWidget(
+      BuildContext context,
+      QuestionnaireModel questionnaireModel,
+      String? plainText,
+      List<FhirExtension>? extension,
+      {double? width,
+      double? height,
+      Key? key}) {
     _logger.trace('enter toWidget $plainText');
     final xhtml = Xhtml.toXhtml(plainText, extension);
 
