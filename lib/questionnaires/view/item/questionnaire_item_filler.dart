@@ -62,9 +62,16 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
                           ])
                         ],
                       )
-                    : ListTile(
-                        title: widget._titleWidget,
-                        subtitle: widget._responseFiller,
+                    : Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (widget._titleWidget != null)
+                            Container(
+                                padding: const EdgeInsets.only(top: 8),
+                                child: widget._titleWidget),
+                          widget._responseFiller,
+                        ],
                       )
                 : const SizedBox())
         : const SizedBox();
@@ -117,6 +124,7 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+        alignment: AlignmentDirectional.centerStart,
         padding: const EdgeInsets.only(top: 8.0),
         child: Text.rich(
           TextSpan(
