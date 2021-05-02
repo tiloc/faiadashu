@@ -1,3 +1,8 @@
+## 0.3.1
+* Better error display
+* Locale support for QuestionnaireStepperPage
+* Better documentation
+
 ## 0.3.0
 * Fixed a bug on macOS that made it impossible to enter spaces into text fields.
 * Documented that the architectural model is a variant of the "Presentation Model".

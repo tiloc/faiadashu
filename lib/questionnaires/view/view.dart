@@ -4,6 +4,7 @@ export 'narrative_drawer.dart';
 export 'narrative_page.dart';
 export 'narrative_tile.dart';
 export 'questionnaire_filler.dart';
+export 'questionnaire_information_dialog.dart';
 export 'questionnaire_information_tile.dart';
 export 'questionnaire_loading_indicator.dart';
 export 'questionnaire_scroller_page.dart';

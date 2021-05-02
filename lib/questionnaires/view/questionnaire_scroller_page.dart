@@ -1,15 +1,24 @@
 import 'dart:math';
 
-import 'package:faiadashu/questionnaires/view/questionnaire_information_dialog.dart';
+import 'package:fhir/r4.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../resource_provider/resource_provider.dart';
 import '../questionnaires.dart';
-import 'narrative_drawer.dart';
 
 /// Fills a [Questionnaire] through a vertically scrolling input form.
+///
+/// Takes the [QuestionnaireItemFiller]s as provided by the [QuestionnaireFiller]
+/// and presents them as a scrolling [ListView].
+///
+/// A set of mandatory and optional FHIR resources need to be provided through
+/// the [fhirResourceProvider]:
+/// * (mandatory) [questionnaireResourceUri] - the [Questionnaire]
+/// * (mandatory) [subjectResourceUri] - the [Patient]
+/// * (optional) [questionnaireResponseResourceUri] - the [QuestionnaireResponse].
+/// Will be used to prefill the filler, if present.
 class QuestionnaireScrollerPage extends StatefulWidget {
   final Locale? locale;
   final Widget? floatingActionButton;

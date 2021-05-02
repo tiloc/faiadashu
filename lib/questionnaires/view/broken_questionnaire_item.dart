@@ -1,10 +1,9 @@
 import 'dart:convert';
 
 import 'package:fhir/r4.dart';
-import 'package:fhir/r4/resource/resource.dart';
 import 'package:flutter/material.dart';
 
-import '../../faiadashu.dart';
+import '../questionnaires.dart';
 
 /// A place-holder for a broken item on a questionnaire.
 /// Can display error information.
@@ -34,27 +33,21 @@ class BrokenQuestionnaireItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.red,
+      color: Theme.of(context).errorColor,
       child: Container(
         padding: const EdgeInsets.all(8),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (cause != null)
-              SelectableText(
-                cause.toString(),
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600),
-              ),
-            SelectableText(
-              message,
-              style: const TextStyle(
-                  color: Colors.yellow,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600),
-            ),
+              SelectableText(cause.toString(),
+                  style: Theme.of(context).textTheme.headline6?.copyWith(
+                        color: Theme.of(context).cardColor,
+                      )),
+            SelectableText(message,
+                style: Theme.of(context).textTheme.subtitle1?.copyWith(
+                      color: Colors.yellow,
+                    )),
             if (element != null)
               SelectableText((element is Resource)
                   ? jsonEncode((element! as Resource).toJson())

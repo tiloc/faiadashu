@@ -17,7 +17,7 @@ class QuestionnaireLoadingIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final shortAxis = MediaQuery.of(context).size.shortestSide * 0.75;
+    final shortAxis = MediaQuery.of(context).size.shortestSide * 0.50;
 
     return Card(
         color: hasError ? Colors.amber : null,
