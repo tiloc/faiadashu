@@ -293,6 +293,24 @@ class QuestionnaireModel extends QuestionnaireItemModel {
 
   int get revision => _revision;
 
+  /// Returns the index of the first [QuestionnaireItemModel] which matches the predicate function.
+  ///
+  /// The items are examined as returned by [orderedQuestionnaireItemModels].
+  ///
+  /// Returns [notFound] if no matching item exists.
+  int? indexOf(bool Function(QuestionnaireItemModel) predicate,
+      [int? notFound = -1]) {
+    int index = 0;
+    for (final qim in orderedQuestionnaireItemModels()) {
+      if (predicate.call(qim)) {
+        return index;
+      }
+      index++;
+    }
+
+    return notFound;
+  }
+
   /// Returns the [QuestionnaireItemModel] that corresponds to the linkId.
   ///
   /// Throws an [Exception] when no such [QuestionnaireItemModel] exists.

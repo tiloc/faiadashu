@@ -18,6 +18,7 @@ class QuestionnaireFiller extends StatefulWidget {
   final WidgetBuilder builder;
   final List<Aggregator<dynamic>>? aggregators;
   final void Function(BuildContext context, Uri url)? onLinkTap;
+  final void Function(QuestionnaireModel)? onDataAvailable;
 
   final FhirResourceProvider fhirResourceProvider;
 
@@ -33,6 +34,7 @@ class QuestionnaireFiller extends StatefulWidget {
       required this.builder,
       required this.fhirResourceProvider,
       this.aggregators,
+      this.onDataAvailable,
       this.onLinkTap})
       : super(key: key);
 
@@ -118,6 +120,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
                   locale: widget.locale,
                   builder: widget.builder,
                   onLinkTap: widget.onLinkTap,
+                  onDataAvailable: widget.onDataAvailable,
                 );
               }
               throw StateError(
@@ -132,6 +135,7 @@ class QuestionnaireFillerData extends InheritedWidget {
   final QuestionnaireModel questionnaireModel;
   final Iterable<QuestionnaireItemModel> questionnaireItemModels;
   final void Function(BuildContext context, Uri url)? onLinkTap;
+  final void Function(QuestionnaireModel)? onDataAvailable;
   late final List<QuestionnaireItemFiller?> _itemFillers;
   late final int _revision;
 
@@ -139,6 +143,7 @@ class QuestionnaireFillerData extends InheritedWidget {
     this.questionnaireModel, {
     Key? key,
     required this.locale,
+    this.onDataAvailable,
     this.onLinkTap,
     required WidgetBuilder builder,
   })   : _revision = questionnaireModel.revision,
@@ -146,7 +151,9 @@ class QuestionnaireFillerData extends InheritedWidget {
             questionnaireModel.orderedQuestionnaireItemModels(),
         _itemFillers = List<QuestionnaireItemFiller?>.filled(
             questionnaireModel.orderedQuestionnaireItemModels().length, null),
-        super(key: key, child: Builder(builder: builder));
+        super(key: key, child: Builder(builder: builder)) {
+    onDataAvailable?.call(questionnaireModel);
+  }
 
   T aggregator<T extends Aggregator>() {
     return questionnaireModel.aggregator<T>();
