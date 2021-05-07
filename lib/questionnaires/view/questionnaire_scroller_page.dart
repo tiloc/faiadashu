@@ -52,7 +52,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
       ItemPositionsListener.create();
 
   // Has the scroller already been scrolled once to the desired position?
-  bool _positioned = false;
+  bool _isPositioned = false;
 
   final FocusNode _focusNode = FocusNode();
 
@@ -168,12 +168,9 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
       },
       aggregators: widget.aggregators,
       onDataAvailable: (questionnaireModel) {
-        if (_positioned) {
+        if (_isPositioned) {
           return;
         }
-
-        // TODO: This is scrolling after initial scrolling has already happened
-        // TODO: This is scrolling even if item is already in view
 
         // Locate the first unfilled, answerable item
         final focusIndex =
@@ -186,7 +183,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
         }
 
         _itemPositionsListener.itemPositions.addListener(() {
-          if (_positioned) {
+          if (_isPositioned) {
             // TODO: Can I remove the listener instead?
             return;
           }
@@ -194,7 +191,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
           _logger.trace(
               'Scroll positions changed to: ${_itemPositionsListener.itemPositions.value}');
 
-          _positioned = true;
+          _isPositioned = true;
 
           final isItemVisible = _itemPositionsListener.itemPositions.value
               .any((element) => element.index == focusIndex);
