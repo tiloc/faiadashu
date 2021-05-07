@@ -48,6 +48,12 @@ class QuestionnaireScrollerPage extends StatefulWidget {
 
 class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
   final ItemScrollController _listScrollController = ItemScrollController();
+  final ItemPositionsListener _itemPositionsListener =
+      ItemPositionsListener.create();
+
+  // Has the scroller already been scrolled once to the desired position?
+  bool _positioned = false;
+
   final FocusNode _focusNode = FocusNode();
 
   static final _logger = Logger(_QuestionnaireScrollerState);
@@ -84,6 +90,9 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
 
         final questionnaire =
             questionnaireFiller.questionnaireModel.questionnaire;
+
+        _logger.trace(
+            'Scroll position: ${_itemPositionsListener.itemPositions.value}');
 
         return Localizations.override(
             context: context,
@@ -130,6 +139,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
               body: SafeArea(
                 child: ScrollablePositionedList.builder(
                     itemScrollController: _listScrollController,
+                    itemPositionsListener: _itemPositionsListener,
                     itemCount: totalLength,
                     padding: const EdgeInsets.all(8),
                     itemBuilder: (BuildContext context, int i) {
@@ -158,30 +168,58 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
       },
       aggregators: widget.aggregators,
       onDataAvailable: (questionnaireModel) {
-        // TODO: This is not working as expected yet.
-        // Locate the first unfilled, answerable item
-        final index = questionnaireModel.indexOf(
-            (qim) => !qim.isReadOnly && qim.responseItem == null, 0)!;
-
-        _logger.debug('First unfilled response: $index');
-
-        if (index == 0) {
+        if (_positioned) {
           return;
         }
 
-        // After the model data is loaded, wait until the end of the current frame,
-        // and then scroll to the desired location.
-        //
-        // Rationale: Before the data is loaded the QuestionnaireFiller is still
-        // showing progress indicator and no scrolling is possible.
-        // During the frame when data is loaded the _listScrollController is not
-        // properly attached yet and will throw an exception.
-        WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-          final milliseconds = (index < 10) ? 1000 : 1000 + (index - 10) * 100;
-          _listScrollController.scrollTo(
-              index: index,
-              duration: Duration(milliseconds: milliseconds),
-              curve: Curves.easeInOutCubic);
+        // TODO: This is scrolling after initial scrolling has already happened
+        // TODO: This is scrolling even if item is already in view
+
+        // Locate the first unfilled, answerable item
+        final focusIndex =
+            questionnaireModel.indexOf((qim) => qim.isUnanswered, 0)!;
+
+        _logger.debug('First unanswered item: $focusIndex');
+
+        if (focusIndex == 0) {
+          return;
+        }
+
+        _itemPositionsListener.itemPositions.addListener(() {
+          if (_positioned) {
+            // TODO: Can I remove the listener instead?
+            return;
+          }
+
+          _logger.trace(
+              'Scroll positions changed to: ${_itemPositionsListener.itemPositions.value}');
+
+          _positioned = true;
+
+          final isItemVisible = _itemPositionsListener.itemPositions.value
+              .any((element) => element.index == focusIndex);
+
+          _logger.debug('Item $focusIndex already visible: $isItemVisible');
+
+          if (isItemVisible) {
+            return;
+          }
+
+          // After the model data is loaded, wait until the end of the current frame,
+          // and then scroll to the desired location.
+          //
+          // Rationale: Before the data is loaded the QuestionnaireFiller is still
+          // showing progress indicator and no scrolling is possible.
+          // During the frame when data is loaded the _listScrollController is not
+          // properly attached yet and will throw an exception.
+          WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+            final milliseconds =
+                (focusIndex < 10) ? 1000 : 1000 + (focusIndex - 10) * 100;
+            _listScrollController.scrollTo(
+                index: focusIndex,
+                duration: Duration(milliseconds: milliseconds),
+                curve: Curves.easeInOutCubic);
+          });
         });
       },
       onLinkTap: widget.onLinkTap,

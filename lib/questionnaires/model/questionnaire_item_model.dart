@@ -186,7 +186,27 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     }
   }
 
+  /// Returns the associated [QuestionnaireResponseItem].
   QuestionnaireResponseItem? get responseItem => _questionnaireResponseItem;
+
+  /// Is the item unanswered?
+  ///
+  /// Static or read-only items are not unanswered.
+  /// Items which are not enabled are not unanswered.
+  bool get isUnanswered {
+    _qimLogger.debug('isUnanswered $linkId');
+    if (isReadOnly || !enabled) {
+      return false;
+    }
+
+    if (responseItem != null) {
+      return false;
+    }
+
+    _qimLogger.debug('$linkId is unanswered.');
+
+    return true;
+  }
 
   /// A [Decimal] value which can be added to a score.
   ///
