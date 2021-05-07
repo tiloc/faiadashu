@@ -39,7 +39,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   LinkedHashMap<String, QuestionnaireItemModel>? _orderedItems;
 
   void _disableWithChildren() {
-    _enabled = false;
+    _isEnabled = false;
     for (final child in children) {
       child._disableWithChildren();
     }
@@ -47,7 +47,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
 
   /// Calculates the current enablement status of this item.
   ///
-  /// Sets the [enabled] property
+  /// Sets the [isEnabled] property
   void _calculateEnabled() {
     _qimLogger.trace('Enter _calculateEnabled()');
 
@@ -119,8 +119,8 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     }
   }
 
-  bool _enabled = true;
-  bool get enabled => _enabled;
+  bool _isEnabled = true;
+  bool get isEnabled => _isEnabled;
 
   /// Iterate over all enableWhen conditions and do something with them.
   void forEnableWhens(void Function(QuestionnaireEnableWhen qew) f) {
@@ -195,7 +195,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   /// Items which are not enabled are not unanswered.
   bool get isUnanswered {
     _qimLogger.debug('isUnanswered $linkId');
-    if (isReadOnly || !enabled) {
+    if (isReadOnly || !isEnabled) {
       return false;
     }
 

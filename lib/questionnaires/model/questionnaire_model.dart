@@ -372,11 +372,11 @@ class QuestionnaireModel extends QuestionnaireItemModel {
 
     final previouslyEnabled = List<bool>.generate(
         orderedQuestionnaireItemModels().length,
-        (index) => orderedQuestionnaireItemModels().elementAt(index).enabled,
+        (index) => orderedQuestionnaireItemModels().elementAt(index).isEnabled,
         growable: false);
     _logger.trace('prevEnabled: $previouslyEnabled');
     for (final itemModel in orderedQuestionnaireItemModels()) {
-      itemModel._enabled = true;
+      itemModel._isEnabled = true;
     }
 
     for (final itemModel in _enabledWhens!) {
@@ -384,7 +384,7 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     }
     final afterEnabled = List<bool>.generate(
         orderedQuestionnaireItemModels().length,
-        (index) => orderedQuestionnaireItemModels().elementAt(index).enabled,
+        (index) => orderedQuestionnaireItemModels().elementAt(index).isEnabled,
         growable: false);
     _logger.trace('afterEnabled: $afterEnabled');
 

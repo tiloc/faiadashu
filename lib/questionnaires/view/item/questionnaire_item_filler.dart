@@ -36,12 +36,12 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
   @override
   Widget build(BuildContext context) {
     _logger.debug(
-        'build ${widget.itemModel.linkId} hidden: ${widget.itemModel.isHidden}, enabled: ${widget.itemModel.enabled}');
+        'build ${widget.itemModel.linkId} hidden: ${widget.itemModel.isHidden}, enabled: ${widget.itemModel.isEnabled}');
 
     return (!widget.itemModel.isHidden)
         ? AnimatedSwitcher(
             duration: const Duration(milliseconds: 500),
-            child: widget.itemModel.enabled
+            child: widget.itemModel.isEnabled
                 ? (MediaQuery.of(context).size.width > 1000)
                     ? Table(
                         columnWidths: {

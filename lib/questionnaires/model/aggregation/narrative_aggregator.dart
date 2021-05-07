@@ -38,7 +38,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
       return false;
     }
 
-    if (!itemModel.enabled) {
+    if (!itemModel.isEnabled) {
       return false;
     }
 
