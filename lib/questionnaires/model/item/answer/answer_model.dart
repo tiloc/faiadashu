@@ -8,6 +8,7 @@ import '../../questionnaire_item_model.dart';
 
 /// Models an answer within a [QuestionnaireResponseItem].
 abstract class AnswerModel<I, V> {
+  /// Textual depiction of an unanswered question.
   static const nullText = '—';
 
   final QuestionnaireItemModel itemModel;
@@ -30,6 +31,8 @@ abstract class AnswerModel<I, V> {
       : locale = itemModel.questionnaireModel.locale;
 
   /// Returns a human-readable, localized, textual description of the model.
+  ///
+  /// Returns [nullText] if the question is unanswered.
   String get display;
 
   /// Returns null when [inValue] is valid, or a localized message when it is not.
@@ -43,4 +46,22 @@ abstract class AnswerModel<I, V> {
   }
 
   bool hasCodingAnswers() => false;
+
+  static AnswerModel createModel<T>(
+      QuestionnaireItemModel itemModel, AnswerLocation answerLocation) {
+    switch (T) {
+      case NumericalAnswerModel:
+        return NumericalAnswerModel(itemModel, answerLocation);
+      case CodingAnswerModel:
+        return CodingAnswerModel(itemModel, answerLocation);
+      case StringAnswerModel:
+        return StringAnswerModel(itemModel, answerLocation);
+      case DateTimeAnswerModel:
+        return DateTimeAnswerModel(itemModel, answerLocation);
+      case BooleanAnswerModel:
+        return BooleanAnswerModel(itemModel, answerLocation);
+      default:
+        throw StateError('Cannot create a model for $itemModel');
+    }
+  }
 }

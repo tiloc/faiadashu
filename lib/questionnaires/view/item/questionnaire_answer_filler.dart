@@ -2,7 +2,6 @@ import 'package:fhir/r4/r4.dart';
 import 'package:flutter/material.dart';
 
 import '../../../logging/logging.dart';
-import '../../model/item/answer/answer_model_factory.dart';
 import '../../questionnaires.dart';
 import '../broken_questionnaire_item.dart';
 
@@ -76,8 +75,7 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller,
 
     try {
       answerModel =
-          AnswerModelFactory.createModel<M>(itemModel, widget.answerLocation)
-              as M;
+          AnswerModel.createModel<M>(itemModel, widget.answerLocation) as M;
 
       answerModelError = null;
       postInitState();

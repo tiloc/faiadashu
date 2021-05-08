@@ -172,7 +172,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
           return;
         }
 
-        // Locate the first unfilled, answerable item
+        // Locate the first unanswered question
         final focusIndex =
             questionnaireModel.indexOf((qim) => qim.isUnanswered, 0)!;
 

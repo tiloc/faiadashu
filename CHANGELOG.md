@@ -1,3 +1,8 @@
+## 0.3.2
+* QuestionnaireScrollerPage will scroll to first unfilled item
+* QuestionnaireItemModel has new property 'unanswered'
+* Naming cleanups according to Effective Dart guidance
+
 ## 0.3.1
 * Better error display
 * Locale support for QuestionnaireStepperPage
