@@ -53,6 +53,8 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
 
   // Has the scroller already been scrolled once to the desired position?
   bool _isPositioned = false;
+  // What is the desired position to scroll to?
+  int _focusIndex = -1;
 
   final FocusNode _focusNode = FocusNode();
 
@@ -173,53 +175,54 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
         }
 
         // Locate the first unanswered question
-        final focusIndex =
-            questionnaireModel.indexOf((qim) => qim.isUnanswered, 0)!;
+        _focusIndex = questionnaireModel.indexOf((qim) => qim.isUnanswered, 0)!;
 
-        _logger.debug('First unanswered item: $focusIndex');
+        _logger.debug('First unanswered item: $_focusIndex');
 
-        if (focusIndex == 0) {
+        if (_focusIndex == 0) {
           return;
         }
 
-        _itemPositionsListener.itemPositions.addListener(() {
-          if (_isPositioned) {
-            // TODO: Can I remove the listener instead?
-            return;
-          }
-
-          _logger.trace(
-              'Scroll positions changed to: ${_itemPositionsListener.itemPositions.value}');
-
-          _isPositioned = true;
-
-          final isItemVisible = _itemPositionsListener.itemPositions.value
-              .any((element) => element.index == focusIndex);
-
-          _logger.debug('Item $focusIndex already visible: $isItemVisible');
-
-          if (isItemVisible) {
-            return;
-          }
-
-          // After the model data is loaded, wait until the end of the current frame,
-          // and then scroll to the desired location.
-          //
-          // Rationale: Before the data is loaded the QuestionnaireFiller is still
-          // showing progress indicator and no scrolling is possible.
-          // During the frame when data is loaded the _listScrollController is not
-          // properly attached yet and will throw an exception.
-          WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-            final milliseconds =
-                (focusIndex < 10) ? 1000 : 1000 + (focusIndex - 10) * 100;
-            _listScrollController.scrollTo(
-                index: focusIndex,
-                duration: Duration(milliseconds: milliseconds),
-                curve: Curves.easeInOutCubic);
-          });
-        });
+        _itemPositionsListener.itemPositions
+            .addListener(_initialPositionListener);
       },
       onLinkTap: widget.onLinkTap,
     );
+  }
+
+  void _initialPositionListener() {
+    // This is one-time only
+    _itemPositionsListener.itemPositions
+        .removeListener(_initialPositionListener);
+
+    _logger.trace(
+        'Scroll positions changed to: ${_itemPositionsListener.itemPositions.value}');
+
+    _isPositioned = true;
+
+    final isItemVisible = _itemPositionsListener.itemPositions.value
+        .any((element) => element.index == _focusIndex);
+
+    _logger.debug('Item $_focusIndex already visible: $isItemVisible');
+
+    if (isItemVisible) {
+      return;
+    }
+
+    // After the model data is loaded, wait until the end of the current frame,
+    // and then scroll to the desired location.
+    //
+    // Rationale: Before the data is loaded the QuestionnaireFiller is still
+    // showing progress indicator and no scrolling is possible.
+    // During the frame when data is loaded the _listScrollController is not
+    // properly attached yet and will throw an exception.
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+      final milliseconds =
+          (_focusIndex < 10) ? 1000 : 1000 + (_focusIndex - 10) * 100;
+      _listScrollController.scrollTo(
+          index: _focusIndex,
+          duration: Duration(milliseconds: milliseconds),
+          curve: Curves.easeInOutCubic);
+    });
   }
 }

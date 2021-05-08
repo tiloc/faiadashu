@@ -1,10 +1,9 @@
 import 'dart:ui';
 
-import 'package:faiadashu/faiadashu.dart';
 import 'package:fhir/r4.dart';
 
 import '../../../../fhir_types/fhir_types_extensions.dart';
-import '../../questionnaire_item_model.dart';
+import '../../../questionnaires.dart';
 
 /// Models an answer within a [QuestionnaireResponseItem].
 abstract class AnswerModel<I, V> {
