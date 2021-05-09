@@ -44,7 +44,7 @@ class _StringAnswerState extends QuestionnaireAnswerState<String,
             hintText: answerModel.entryFormat,
           ),
           validator: (inputValue) => answerModel.validate(inputValue),
-          autovalidateMode: AutovalidateMode.onUserInteraction,
+          autovalidateMode: AutovalidateMode.always,
           onChanged: (content) {
             value = content;
           },

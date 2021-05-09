@@ -108,7 +108,7 @@ class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
                 validator: (inputValue) {
                   return answerModel.validate(inputValue);
                 },
-                autovalidateMode: AutovalidateMode.onUserInteraction,
+                autovalidateMode: AutovalidateMode.always,
                 onChanged: (content) {
                   final valid = answerModel.validate(content) == null;
                   final dataAbsentReasonExtension = !valid
