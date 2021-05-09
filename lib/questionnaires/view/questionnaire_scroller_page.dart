@@ -56,8 +56,6 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
   // What is the desired position to scroll to?
   int _focusIndex = -1;
 
-  final FocusNode _focusNode = FocusNode();
-
   static final _logger = Logger(_QuestionnaireScrollerState);
 
   _QuestionnaireScrollerState() : super();
@@ -69,7 +67,6 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
 
   @override
   void dispose() {
-    _focusNode.dispose();
     super.dispose();
   }
 
@@ -156,7 +153,8 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
                               ? (i - (frontMatterLength + mainMatterLength))
                               : -1;
                       if (mainMatterIndex != -1) {
-                        return QuestionnaireFiller.of(context).itemFillerAt(i);
+                        return QuestionnaireFiller.of(context)
+                            .itemFillerAt(mainMatterIndex);
                       } else if (backMatterIndex != -1) {
                         return widget.backMatter![backMatterIndex];
                       } else if (frontMatterIndex != -1) {
