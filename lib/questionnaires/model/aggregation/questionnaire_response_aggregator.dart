@@ -49,7 +49,7 @@ class QuestionnaireResponseAggregator
       {QuestionnaireResponseStatus? responseStatus,
       bool notifyListeners = false,
       bool containPatient = false}) {
-    _logger.trace('QuestionnaireResponse.aggregrate');
+    _logger.trace('QuestionnaireResponse.aggregate');
 
     // Are all minimum fields for SDC profile present?
     bool isValidSdc = true;

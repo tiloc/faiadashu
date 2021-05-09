@@ -58,8 +58,10 @@ class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
 
   @override
   String? validate(FhirDateTime? inValue) {
-    // TODO: The view is currently making it impossible to select invalid date/time.
-    // But that is making assumptions about the view.
-    return null;
+    if (inValue == null || inValue.isValid) {
+      return null;
+    } else {
+      return "Enter a valid date/time.";
+    }
   }
 }

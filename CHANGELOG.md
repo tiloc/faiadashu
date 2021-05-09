@@ -1,5 +1,6 @@
 ## 0.3.2
 * QuestionnaireScrollerPage will scroll to first unfilled item
+* Numbers and strings will be validated when a pre-populated questionnaire is opened.  
 * QuestionnaireItemModel has new property 'unanswered'
 * Naming cleanups according to Effective Dart guidance
 
@@ -9,7 +10,7 @@
 * Better documentation
 
 ## 0.3.0
-* Fixed a bug on macOS that made it impossible to enter spaces into text fields.
+* Fixed a bug on desktop that made it impossible to enter spaces into text fields (workaround for [Flutter Issue 81233](https://github.com/flutter/flutter/issues/81233)).
 * Documented that the architectural model is a variant of the "Presentation Model".
   This is explained in [the developer overview](doc/overview.md#presentation-model)
 * Cleanup of class naming. Most notable QuestionnaireTopLocation and QuestionnaireLocation are now
