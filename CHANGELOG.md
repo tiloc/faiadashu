@@ -1,10 +1,8 @@
-## 0.3.2
+## 0.3.1
 * QuestionnaireScrollerPage will scroll to first unfilled item
 * Numbers and strings will be validated when a pre-populated questionnaire is opened.  
 * QuestionnaireItemModel has new property 'unanswered'
 * Naming cleanups according to Effective Dart guidance
-
-## 0.3.1
 * Better error display
 * Locale support for QuestionnaireStepperPage
 * Better documentation
