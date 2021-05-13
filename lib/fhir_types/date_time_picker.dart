@@ -36,6 +36,7 @@ class _FhirDateTimePickerState extends State<FhirDateTimePicker> {
   final _dateTimeFieldController = TextEditingController();
   FhirDateTime? _dateTimeValue;
   bool _fieldInitialized = false;
+  final _clearFocusNode = FocusNode(skipTraversal: true);
 
   @override
   void initState() {
@@ -47,6 +48,7 @@ class _FhirDateTimePickerState extends State<FhirDateTimePicker> {
   @override
   void dispose() {
     _dateTimeFieldController.dispose();
+    _clearFocusNode.dispose();
     super.dispose();
   }
 
@@ -119,6 +121,7 @@ class _FhirDateTimePickerState extends State<FhirDateTimePicker> {
         ),
         if (_dateTimeFieldController.text.isNotEmpty)
           IconButton(
+              focusNode: _clearFocusNode,
               onPressed: () {
                 setState(() {
                   _dateTimeFieldController.text = '';

@@ -22,6 +22,8 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
   late final List<QuestionnaireAnswerFiller> _answerFillers;
   late final ResponseModel responseModel;
 
+  final _skipSwitchFocusNode = FocusNode(skipTraversal: true);
+
   QuestionnaireResponseState();
 
   @override
@@ -36,6 +38,12 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
       QuestionnaireAnswerFiller.fromQuestionnaireItem(widget.itemModel,
           AnswerLocation(responseModel.answers, 0, _stashAnswers))
     ];
+  }
+
+  @override
+  void dispose() {
+    _skipSwitchFocusNode.dispose();
+    super.dispose();
   }
 
   void _stashAnswers(
@@ -75,6 +83,7 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
         Row(children: [
           const Text('I choose not to answer'),
           Switch(
+            focusNode: _skipSwitchFocusNode,
             value: responseModel.isAskedButDeclined,
             onChanged: (bool value) {
               _setDataAbsentReason(

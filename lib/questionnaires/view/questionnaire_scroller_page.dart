@@ -51,10 +51,14 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
   final ItemPositionsListener _itemPositionsListener =
       ItemPositionsListener.create();
 
-  // Has the scroller already been scrolled once to the desired position?
-  bool _isPositioned = false;
   // What is the desired position to scroll to?
   int _focusIndex = -1;
+
+  // Has the scroller already been scrolled once to the desired position?
+  bool _isPositioned = false;
+
+  // Has the focus already been placed?
+  bool _isFocussed = false;
 
   static final _logger = Logger(_QuestionnaireScrollerState);
 
@@ -153,8 +157,13 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
                               ? (i - (frontMatterLength + mainMatterLength))
                               : -1;
                       if (mainMatterIndex != -1) {
-                        return QuestionnaireFiller.of(context)
+                        final qif = QuestionnaireFiller.of(context)
                             .itemFillerAt(mainMatterIndex);
+                        if (!_isFocussed) {
+                          // TODO: Tell the QIF to focus.
+                          _isFocussed = true;
+                        }
+                        return qif;
                       } else if (backMatterIndex != -1) {
                         return widget.backMatter![backMatterIndex];
                       } else if (frontMatterIndex != -1) {

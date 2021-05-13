@@ -31,7 +31,7 @@ Build beautiful healthcare apps fast — use the Flutter™ SDK and follow the H
 
 ### Related projects
 [![Pub Version](https://img.shields.io/pub/v/fhir?label=pub.dev&labelColor=333940&logo=dart)](https://pub.dev/packages/fhir)
-This is mainly a user interface add-on to the awesome FHIRFLI "fhir" library: https://pub.dev/packages/fhir
+This is mainly a user interface add-on to the awesome FHIR-FLI "fhir" library: https://pub.dev/packages/fhir
 
 ### Contributing
 Contributions and discussions are welcome! This is currently not well-defined yet. I am posting an invite link to the awesome FHIR-FLI

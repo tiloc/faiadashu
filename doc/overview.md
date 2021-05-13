@@ -12,12 +12,12 @@ This library depends on Flutter™ SDK 2.0, or later. It is null-safe. It cannot
 
 ### Support for the FHIR Standard
 Faiadashu FHIRDash focuses on the user interface. The underlying data models and specifications are adopted from the FHIR standard and
-the FHIRFLI 'fhir' library.
+the FHIR-FLI 'fhir' library.
 
 [![Pub Version](https://img.shields.io/pub/v/fhir?label=pub.dev&labelColor=333940&logo=dart)](https://pub.dev/packages/fhir)
 https://pub.dev/packages/fhir
 
-Discussions and support around Faiadashu and the FHIRFLI library can be found on the FHIRFLI Slack channel:
+Discussions and support around Faiadashu and the FHIR-FLI library can be found on the FHIR-FLI Slack channel:
 
 [![FHIR-FLI Slack Channel](images/Slack_RGB-98x40-335cb2d.png)](https://join.slack.com/t/fhir-fli/shared_invite/zt-ofv2cycm-9yjdMj8a~zXp7nDBeB_sNQ)  
 [Join the FHIR-FLI Slack channel!](https://join.slack.com/t/fhir-fli/shared_invite/zt-ofv2cycm-9yjdMj8a~zXp7nDBeB_sNQ)
@@ -46,18 +46,18 @@ Flutter SDK (StatefulWidget, ValueNotifier) and should be interoperable with any
 The library does not persist anything. It is up to your app to obtain persisted information and to persist the output
 of the library as you see fit. See the sections on the individual use-cases for integration points.
 
-The FHIRFLI `fhir_db` package is compatible with the `fhir` library which is underlying this library: https://pub.dev/packages/fhir_db  
+The FHIR-FLI `fhir_db` package is compatible with the `fhir` library which is underlying this library: https://pub.dev/packages/fhir_db  
 
 ### Communication
 The library does not communicate to servers. It is up to your app to obtain remoted information and to send the output
 of the library as you see fit. See the sections on the individual use-cases for integration points.
 
-The FHIRFLI `fhir_at_rest` package is compatible with the `fhir` library which is underlying this library: https://pub.dev/packages/fhir_at_rest
+The FHIR-FLI `fhir_at_rest` package is compatible with the `fhir` library which is underlying this library: https://pub.dev/packages/fhir_at_rest
 
-Communication might require authentication. The FHIRFLI `fhir_auth` package is compatible with the `fhir` library which is underlying this library: https://pub.dev/packages/fhir_auth
+Communication might require authentication. The FHIR-FLI `fhir_auth` package is compatible with the `fhir` library which is underlying this library: https://pub.dev/packages/fhir_auth
 
 ### Use-Case: Display an Observation
-```dart
+```
 final bpObservation = Observation(...); // Construct your FHIR Observation here.
 
 return ObservationWidget(

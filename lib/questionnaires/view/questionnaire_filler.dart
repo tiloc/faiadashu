@@ -179,6 +179,11 @@ class QuestionnaireFillerData extends InheritedWidget {
         .toList();
   }
 
+  /// Returns the [QuestionnaireItemFiller] at [index].
+  ///
+  /// The [QuestionnaireItemFiller]s are ordered based on 'pre-order'.
+  ///
+  /// see: https://en.wikipedia.org/wiki/Tree_traversal#Pre-order,_NLR
   QuestionnaireItemFiller itemFillerAt(int index) {
     _itemFillers[index] ??= QuestionnaireItemFiller.fromQuestionnaireItem(
         questionnaireItemModels.elementAt(index));

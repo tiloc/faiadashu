@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:faiadashu/questionnaires/view/item/cpg_item_image.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
