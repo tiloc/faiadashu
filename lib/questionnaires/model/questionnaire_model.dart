@@ -87,7 +87,7 @@ class QuestionnaireModel extends QuestionnaireItemModel {
       {required Locale locale,
       List<Aggregator>? aggregators,
       required FhirResourceProvider fhirResourceProvider}) async {
-    _logger.debug('QuestionnaireTopLocation.fromFhirResourceBundle');
+    _logger.debug('QuestionnaireModel.fromFhirResourceBundle');
 
     final questionnaire = await fhirResourceProvider
         .getAsyncResource(questionnaireResourceUri) as Questionnaire?;
@@ -129,7 +129,7 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   void bumpRevision({bool notifyListeners = true}) {
     final newRevision = _revision + 1;
     _logger.debug(
-        'QuestionnaireTopLocation.bumpRevision $notifyListeners: $_revision -> $newRevision');
+        'QuestionnaireModel.bumpRevision $notifyListeners: $_revision -> $newRevision');
     _revision = newRevision;
     if (notifyListeners) {
       this.notifyListeners();

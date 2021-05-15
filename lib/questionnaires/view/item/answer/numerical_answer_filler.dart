@@ -4,11 +4,11 @@ import 'package:flutter/services.dart';
 
 import '../../../../coding/data_absent_reasons.dart' as dar;
 import '../../../../fhir_types/fhir_types_extensions.dart';
-import '../../../model/item/answer/numerical_answer_model.dart';
 import '../../../questionnaires.dart';
 import 'null_dash_text.dart';
 import 'numerical_input.dart';
 
+/// Filler for answers of type [Integer], [Decimal], and [Quantity].
 class NumericalAnswerFiller extends QuestionnaireAnswerFiller {
   const NumericalAnswerFiller(
       QuestionnaireItemModel itemModel, AnswerLocation answerLocation,

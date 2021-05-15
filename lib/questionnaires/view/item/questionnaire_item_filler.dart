@@ -15,9 +15,11 @@ class QuestionnaireItemFiller extends StatefulWidget {
   final QuestionnaireResponseFiller _responseFiller;
 
   factory QuestionnaireItemFiller.fromQuestionnaireItem(
-      QuestionnaireItemModel itemModel) {
+      QuestionnaireItemModel itemModel,
+      {Key? key}) {
     return QuestionnaireItemFiller._(
-        itemModel, QuestionnaireResponseFiller(itemModel));
+        itemModel, QuestionnaireResponseFiller(itemModel),
+        key: key);
   }
 
   QuestionnaireItemFiller._(this.itemModel, this._responseFiller, {Key? key})
@@ -32,47 +34,74 @@ class QuestionnaireItemFiller extends StatefulWidget {
 class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
   static final _logger = Logger(QuestionnaireItemFillerState);
 
+  late final FocusNode _focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode =
+        FocusNode(debugLabel: widget.itemModel.linkId, skipTraversal: true);
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  /// Requests focus on this [QuestionnaireItemFiller].
+  void requestFocus() {
+    _focusNode.requestFocus();
+  }
+
   @override
   Widget build(BuildContext context) {
-    _logger.debug(
+    _logger.trace(
         'build ${widget.itemModel.linkId} hidden: ${widget.itemModel.isHidden}, enabled: ${widget.itemModel.isEnabled}');
 
     return (!widget.itemModel.isHidden)
-        ? AnimatedSwitcher(
-            duration: const Duration(milliseconds: 500),
-            child: widget.itemModel.isEnabled
-                ? (MediaQuery.of(context).size.width > 1000)
-                    ? Table(
-                        columnWidths: {
-                          0: FixedColumnWidth(
-                              MediaQuery.of(context).size.width / 3.2),
-                          1: FixedColumnWidth(
-                              MediaQuery.of(context).size.width / 3.2 * 2)
-                        },
-                        children: [
-                          TableRow(children: [
+        ? Focus(
+            focusNode: _focusNode,
+            onFocusChange: (gainedFocus) {
+              debugDumpFocusTree();
+            },
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 500),
+              child: widget.itemModel.isEnabled
+                  ? (MediaQuery.of(context).size.width > 1000)
+                      ? Table(
+                          columnWidths: {
+                            0: FixedColumnWidth(
+                                MediaQuery.of(context).size.width / 3.2),
+                            1: FixedColumnWidth(
+                                MediaQuery.of(context).size.width / 3.2 * 2)
+                          },
+                          children: [
+                            TableRow(children: [
+                              if (widget._titleWidget != null)
+                                Container(
+                                    padding: const EdgeInsets.only(top: 8),
+                                    child: widget._titleWidget)
+                              else
+                                Container(),
+                              widget._responseFiller
+                            ])
+                          ],
+                        )
+                      : Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
                             if (widget._titleWidget != null)
                               Container(
                                   padding: const EdgeInsets.only(top: 8),
-                                  child: widget._titleWidget)
-                            else
-                              Container(),
-                            widget._responseFiller
-                          ])
-                        ],
-                      )
-                    : Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (widget._titleWidget != null)
-                            Container(
-                                padding: const EdgeInsets.only(top: 8),
-                                child: widget._titleWidget),
-                          widget._responseFiller,
-                        ],
-                      )
-                : const SizedBox())
+                                  child: widget._titleWidget),
+                            widget._responseFiller,
+                          ],
+                        )
+                  : const SizedBox(),
+            ),
+          )
         : const SizedBox();
   }
 }

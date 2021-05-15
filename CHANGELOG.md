@@ -1,3 +1,7 @@
+## 0.3.2
+* Improvements in focus traversal
+* Prevent unnecessary recreation of QuestionnaireItemFillerData
+
 ## 0.3.1
 * QuestionnaireScrollerPage will scroll to first unfilled item
 * Numbers and strings will be validated when a pre-populated questionnaire is opened.  

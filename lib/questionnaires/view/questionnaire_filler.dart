@@ -55,6 +55,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
   late final Future<QuestionnaireModel> builderFuture;
   QuestionnaireModel? _questionnaireModel;
   VoidCallback? _onQuestionnaireModelChangeListenerFunction;
+  QuestionnaireFillerData? _questionnaireFillerData;
 
   @override
   void initState() {
@@ -76,8 +77,8 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
     super.dispose();
   }
 
-  void _onTopChange() {
-    _logger.trace('_onTopChange');
+  void _onQuestionnaireModelChange() {
+    _logger.trace('_onQuestionnaireModelChange');
     if (mounted) {
       setState(() {});
     }
@@ -111,17 +112,19 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
                 // Dart has abilities to chain Futures.
                 if (_onQuestionnaireModelChangeListenerFunction == null) {
                   _onQuestionnaireModelChangeListenerFunction =
-                      () => _onTopChange();
+                      () => _onQuestionnaireModelChange();
                   _questionnaireModel!.addListener(
                       _onQuestionnaireModelChangeListenerFunction!);
+
+                  _questionnaireFillerData = QuestionnaireFillerData._(
+                    _questionnaireModel!,
+                    locale: widget.locale,
+                    builder: widget.builder,
+                    onLinkTap: widget.onLinkTap,
+                    onDataAvailable: widget.onDataAvailable,
+                  );
                 }
-                return QuestionnaireFillerData._(
-                  _questionnaireModel!,
-                  locale: widget.locale,
-                  builder: widget.builder,
-                  onLinkTap: widget.onLinkTap,
-                  onDataAvailable: widget.onDataAvailable,
-                );
+                return _questionnaireFillerData!;
               }
               throw StateError(
                   'FutureBuilder snapshot has unexpected state: $snapshot');
@@ -131,12 +134,15 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
 }
 
 class QuestionnaireFillerData extends InheritedWidget {
+  static final _logger = Logger(QuestionnaireFillerData);
+
   final Locale locale;
   final QuestionnaireModel questionnaireModel;
   final Iterable<QuestionnaireItemModel> questionnaireItemModels;
   final void Function(BuildContext context, Uri url)? onLinkTap;
   final void Function(QuestionnaireModel)? onDataAvailable;
   late final List<QuestionnaireItemFiller?> _itemFillers;
+  late final List<GlobalKey<QuestionnaireItemFillerState>> _globalKeys;
   late final int _revision;
 
   QuestionnaireFillerData._(
@@ -152,6 +158,14 @@ class QuestionnaireFillerData extends InheritedWidget {
         _itemFillers = List<QuestionnaireItemFiller?>.filled(
             questionnaireModel.orderedQuestionnaireItemModels().length, null),
         super(key: key, child: Builder(builder: builder)) {
+    _logger.trace('constructor _');
+    // TODO: This constructor is being invoked from a build() method.
+    // GlobalKeys should not be generated within a build() method.
+    _globalKeys = questionnaireModel
+        .orderedQuestionnaireItemModels()
+        .map<GlobalKey<QuestionnaireItemFillerState>>(
+            (qim) => GlobalKey(debugLabel: qim.linkId))
+        .toList();
     onDataAvailable?.call(questionnaireModel);
   }
 
@@ -159,14 +173,28 @@ class QuestionnaireFillerData extends InheritedWidget {
     return questionnaireModel.aggregator<T>();
   }
 
-  static QuestionnaireFillerData of(BuildContext context) {
-    final result =
-        context.dependOnInheritedWidgetOfExactType<QuestionnaireFillerData>();
-    assert(result != null, 'No QuestionnaireFillerData found in context');
-    return result!;
+  /// Requests focus on a [QuestionnaireItemFiller].
+  ///
+  /// The item filler will be determined as by [itemFillerAt].
+  void requestFocus(int index) {
+    _logger.trace('requestFocus $index');
+    final currentState =
+        (itemFillerAt(index).key as GlobalKey<QuestionnaireItemFillerState>?)
+            ?.currentState;
+    if (currentState == null) {
+      _logger.warn('requestFocus $index: currentState == null');
+    } else {
+      currentState.requestFocus();
+    }
   }
 
+  /// Returns a list of all [QuestionnaireItemFiller]s.
+  ///
+  /// The [QuestionnaireItemFiller]s are ordered based on 'pre-order'.
+  ///
+  /// see: https://en.wikipedia.org/wiki/Tree_traversal#Pre-order,_NLR
   List<QuestionnaireItemFiller> itemFillers() {
+    _logger.trace('itemFillers');
     for (int i = 0; i < _itemFillers.length; i++) {
       if (_itemFillers[i] == null) {
         _itemFillers[i] = itemFillerAt(i);
@@ -185,14 +213,24 @@ class QuestionnaireFillerData extends InheritedWidget {
   ///
   /// see: https://en.wikipedia.org/wiki/Tree_traversal#Pre-order,_NLR
   QuestionnaireItemFiller itemFillerAt(int index) {
-    _itemFillers[index] ??= QuestionnaireItemFiller.fromQuestionnaireItem(
-        questionnaireItemModels.elementAt(index));
+    _logger.trace('itemFillerAt $index');
+
+    if (_itemFillers[index] == null) {
+      _logger.debug('itemFillerAt $index will be created.');
+      _itemFillers[index] = QuestionnaireItemFiller.fromQuestionnaireItem(
+          questionnaireItemModels.elementAt(index),
+          key: _globalKeys[index]);
+    } else {
+      _logger.debug('itemFillerAt $index already exists.');
+    }
 
     return _itemFillers[index]!;
   }
 
   @override
   bool updateShouldNotify(QuestionnaireFillerData oldWidget) {
-    return oldWidget._revision != _revision;
+    final shouldNotify = oldWidget._revision != _revision;
+    _logger.debug('updateShouldNotify: $shouldNotify');
+    return shouldNotify;
   }
 }

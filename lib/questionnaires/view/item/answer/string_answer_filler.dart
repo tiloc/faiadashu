@@ -17,7 +17,6 @@ class StringAnswerFiller extends QuestionnaireAnswerFiller {
 class _StringAnswerState extends QuestionnaireAnswerState<String,
     StringAnswerFiller, StringAnswerModel> {
   final _controller = TextEditingController();
-
   _StringAnswerState();
 
   @override

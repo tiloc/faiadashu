@@ -145,6 +145,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
                     itemPositionsListener: _itemPositionsListener,
                     itemCount: totalLength,
                     padding: const EdgeInsets.all(8),
+                    minCacheExtent: 200, // Allow tabbing to prev/next items
                     itemBuilder: (BuildContext context, int i) {
                       final frontMatterIndex = (i < frontMatterLength) ? i : -1;
                       final mainMatterIndex = (i >= frontMatterLength &&
@@ -157,10 +158,14 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
                               ? (i - (frontMatterLength + mainMatterLength))
                               : -1;
                       if (mainMatterIndex != -1) {
-                        final qif = QuestionnaireFiller.of(context)
-                            .itemFillerAt(mainMatterIndex);
-                        if (!_isFocussed) {
-                          // TODO: Tell the QIF to focus.
+                        final qf = QuestionnaireFiller.of(context);
+                        final qif = qf.itemFillerAt(mainMatterIndex);
+                        if (!_isFocussed && _focusIndex == mainMatterIndex) {
+                          WidgetsBinding.instance
+                              ?.addPostFrameCallback((timeStamp) {
+                            qf.requestFocus(mainMatterIndex);
+                          });
+
                           _isFocussed = true;
                         }
                         return qif;
