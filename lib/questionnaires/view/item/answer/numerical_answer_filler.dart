@@ -83,6 +83,7 @@ class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
   Widget buildEditable(BuildContext context) {
     return answerModel.isSliding
         ? Slider(
+            focusNode: firstFocusNode,
             min: answerModel.minValue,
             max: answerModel.maxValue,
             divisions: answerModel.sliderDivisions,
