@@ -148,12 +148,6 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
       ));
     }
 
-    final cardShape = (firstFocusNode.hasFocus)
-        ? RoundedRectangleBorder(
-            side: BorderSide(color: Theme.of(context).accentColor, width: 2.0),
-            borderRadius: BorderRadius.circular(4.0))
-        : null;
-
     if (qi.extension_
                 ?.extensionOrNull(
                     'http://hl7.org/fhir/StructureDefinition/questionnaire-choiceOrientation')
@@ -168,7 +162,12 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
             Focus(
               focusNode: firstFocusNode,
               child: Card(
-                shape: cardShape,
+                shape: (firstFocusNode.hasFocus)
+                    ? RoundedRectangleBorder(
+                        side: BorderSide(
+                            color: Theme.of(context).accentColor, width: 2.0),
+                        borderRadius: BorderRadius.circular(4.0))
+                    : null,
                 margin: const EdgeInsets.only(top: 8, bottom: 8),
                 child: Table(children: [TableRow(children: choices)]),
               ),
@@ -190,7 +189,12 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
             Focus(
               focusNode: firstFocusNode,
               child: Card(
-                shape: cardShape,
+                shape: (firstFocusNode.hasFocus)
+                    ? RoundedRectangleBorder(
+                        side: BorderSide(
+                            color: Theme.of(context).accentColor, width: 2.0),
+                        borderRadius: BorderRadius.circular(4.0))
+                    : null,
                 margin: const EdgeInsets.only(top: 8, bottom: 8),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
