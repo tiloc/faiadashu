@@ -55,7 +55,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
   late final Future<QuestionnaireModel> builderFuture;
   QuestionnaireModel? _questionnaireModel;
   VoidCallback? _onQuestionnaireModelChangeListenerFunction;
-  QuestionnaireFillerData? _questionnaireFillerData;
+  late final QuestionnaireFillerData _questionnaireFillerData;
 
   @override
   void initState() {
@@ -124,7 +124,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
                     onDataAvailable: widget.onDataAvailable,
                   );
                 }
-                return _questionnaireFillerData!;
+                return _questionnaireFillerData;
               }
               throw StateError(
                   'FutureBuilder snapshot has unexpected state: $snapshot');

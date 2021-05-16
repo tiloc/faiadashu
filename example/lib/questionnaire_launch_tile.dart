@@ -48,7 +48,7 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
       title: Text(widget.title),
       subtitle: (widget.subtitle != null) ? Text(widget.subtitle!) : null,
       trailing: IconButton(
-        icon: const Icon(Icons.edit_off),
+        icon: const Icon(Icons.preview),
         onPressed: () async {
           final questionnaireModel =
               await QuestionnaireModel.fromFhirResourceBundle(

@@ -200,6 +200,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     }
 
     if (responseItem != null) {
+      _qimLogger.debug('responseItem $responseItem');
       return false;
     }
 
@@ -266,10 +267,12 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   }
 
   /// Is this itemModel not changeable by end-users?
+  ///
   /// Read-only items might still hold a value, such as a calculated value.
   bool get isReadOnly {
     return isStatic ||
         questionnaireItem.readOnly == Boolean(true) ||
+        isHidden ||
         isCalculatedExpression;
   }
 
@@ -354,6 +357,13 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   Iterable<QuestionnaireItemModel> orderedQuestionnaireItemModels() {
     _ensureOrderedItems();
     return _orderedItems!.values;
+  }
+
+  /// Returns a single [QuestionnaireItemModel] by [index].
+  ///
+  /// The order of the items is the same as with [orderedQuestionnaireItemModels].
+  QuestionnaireItemModel itemModelAt(int index) {
+    return orderedQuestionnaireItemModels().elementAt(index);
   }
 
   @override

@@ -96,6 +96,7 @@ class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Expanded(
                   child: TextFormField(
+                focusNode: firstFocusNode,
                 initialValue: (value?.value != null)
                     ? value!.value!.format(locale)
                     : null,

@@ -17,7 +17,7 @@ class QuestionnaireLoadingIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final shortAxis = MediaQuery.of(context).size.shortestSide * 0.50;
+    const shortAxis = 50.0;
 
     return Card(
         color: hasError ? Colors.amber : null,
@@ -28,10 +28,10 @@ class QuestionnaireLoadingIndicator extends StatelessWidget {
               color: Colors.red,
             )
           else
-            SizedBox(
+            const SizedBox(
                 width: shortAxis,
                 height: shortAxis,
-                child: const CircularProgressIndicator(
+                child: CircularProgressIndicator(
                   semanticsLabel: 'The questionnaire is loading.',
                 )),
           const SizedBox(

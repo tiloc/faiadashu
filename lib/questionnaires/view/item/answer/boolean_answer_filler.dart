@@ -27,6 +27,7 @@ class _BooleanItemState extends QuestionnaireAnswerState<Boolean,
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.only(top: 8, bottom: 8),
         child: Checkbox(
+          focusNode: firstFocusNode,
           value: value?.value,
           tristate: true,
           onChanged: (newValue) {

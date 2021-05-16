@@ -42,22 +42,20 @@ class ResponseModel {
         .map<QuestionnaireResponseAnswer>((answer) => answer!)
         .toList(growable: false);
 
-    if (filledAnswers.isEmpty && dataAbsentReason == null) {
-      itemModel.responseItem = null;
-    }
-    final result = QuestionnaireResponseItem(
-        linkId: itemModel.linkId,
-        text: itemModel.questionnaireItem.text,
-        extension_: (dataAbsentReason != null)
-            ? [
-                FhirExtension(
-                    url: dataAbsentReasonExtension, valueCode: dataAbsentReason)
-              ]
-            : null,
-        // FHIR cannot have empty arrays.
-        answer: filledAnswers.isEmpty ? null : filledAnswers);
-
-    itemModel.responseItem = result;
+    itemModel.responseItem = (filledAnswers.isEmpty && dataAbsentReason == null)
+        ? null
+        : QuestionnaireResponseItem(
+            linkId: itemModel.linkId,
+            text: itemModel.questionnaireItem.text,
+            extension_: (dataAbsentReason != null)
+                ? [
+                    FhirExtension(
+                        url: dataAbsentReasonExtension,
+                        valueCode: dataAbsentReason)
+                  ]
+                : null,
+            // FHIR cannot have empty arrays.
+            answer: filledAnswers.isEmpty ? null : filledAnswers);
   }
 }
 

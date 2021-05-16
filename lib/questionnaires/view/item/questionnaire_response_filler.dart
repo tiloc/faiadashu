@@ -22,7 +22,7 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
   late final List<QuestionnaireAnswerFiller> _answerFillers;
   late final ResponseModel responseModel;
 
-  final _skipSwitchFocusNode = FocusNode(skipTraversal: true);
+  late final FocusNode _skipSwitchFocusNode;
 
   QuestionnaireResponseState();
 
@@ -30,6 +30,10 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
   void initState() {
     super.initState();
     responseModel = ResponseModel(widget.itemModel);
+
+    _skipSwitchFocusNode = FocusNode(
+        skipTraversal: true,
+        debugLabel: 'SkipSwitch ${widget.itemModel.linkId}');
 
     // TODO: Enhancement: Allow repeats = true for other kinds of items
     // This assumes that all answers are of the same kind

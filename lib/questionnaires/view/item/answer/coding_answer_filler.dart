@@ -148,6 +148,12 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
       ));
     }
 
+    final cardShape = (firstFocusNode.hasFocus)
+        ? RoundedRectangleBorder(
+            side: BorderSide(color: Theme.of(context).accentColor, width: 2.0),
+            borderRadius: BorderRadius.circular(4.0))
+        : null;
+
     if (qi.extension_
                 ?.extensionOrNull(
                     'http://hl7.org/fhir/StructureDefinition/questionnaire-choiceOrientation')
@@ -159,9 +165,14 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Card(
+            Focus(
+              focusNode: firstFocusNode,
+              child: Card(
+                shape: cardShape,
                 margin: const EdgeInsets.only(top: 8, bottom: 8),
-                child: Table(children: [TableRow(children: choices)])),
+                child: Table(children: [TableRow(children: choices)]),
+              ),
+            ),
             if (_validationText != null)
               Text(
                 _validationText!,
@@ -176,12 +187,17 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Card(
+            Focus(
+              focusNode: firstFocusNode,
+              child: Card(
+                shape: cardShape,
                 margin: const EdgeInsets.only(top: 8, bottom: 8),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: choices,
-                )),
+                ),
+              ),
+            ),
             if (_validationText != null)
               Text(
                 _validationText!,

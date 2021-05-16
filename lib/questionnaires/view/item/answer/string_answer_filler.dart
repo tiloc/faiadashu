@@ -17,6 +17,7 @@ class StringAnswerFiller extends QuestionnaireAnswerFiller {
 class _StringAnswerState extends QuestionnaireAnswerState<String,
     StringAnswerFiller, StringAnswerModel> {
   final _controller = TextEditingController();
+
   _StringAnswerState();
 
   @override
@@ -35,6 +36,7 @@ class _StringAnswerState extends QuestionnaireAnswerState<String,
     return Container(
         padding: const EdgeInsets.only(top: 8, bottom: 8),
         child: TextFormField(
+          focusNode: firstFocusNode,
           keyboardType: TextInputType.text,
           controller: _controller,
           maxLines: (qi.type == QuestionnaireItemType.text) ? 4 : 1,

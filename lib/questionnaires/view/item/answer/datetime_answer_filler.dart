@@ -40,6 +40,7 @@ class _DateTimeAnswerState extends QuestionnaireAnswerState<FhirDateTime,
     return Container(
       padding: const EdgeInsets.only(top: 8, bottom: 8),
       child: FhirDateTimePicker(
+        focusNode: firstFocusNode,
         locale: locale,
         initialDateTime: initialDate,
         firstDate: DateTime(1860),

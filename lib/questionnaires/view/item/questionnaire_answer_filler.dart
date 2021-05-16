@@ -63,6 +63,9 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller,
 
   late final Object? answerModelError;
 
+  late final FocusNode firstFocusNode;
+  bool _isFocusHookedUp = false;
+
   QuestionnaireItem get qi => widget.itemModel.questionnaireItem;
   Locale get locale => widget.itemModel.questionnaireModel.locale;
   QuestionnaireItemModel get itemModel => widget.itemModel;
@@ -78,6 +81,11 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller,
           AnswerModel.createModel<M>(itemModel, widget.answerLocation) as M;
 
       answerModelError = null;
+
+      firstFocusNode = FocusNode(
+          debugLabel:
+              'AnswerFiller firstFocusNode: ${widget.itemModel.linkId}');
+
       postInitState();
     } catch (exception) {
       _abstractLogger.warn('Could not initialize model for ${itemModel.linkId}',
@@ -93,6 +101,12 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller,
   /// Guarantees a properly initialized [answerModel].
   void postInitState();
 
+  @override
+  void dispose() {
+    firstFocusNode.dispose();
+    super.dispose();
+  }
+
   Widget _guardedBuildReadOnly(BuildContext context) {
     if (answerModelError != null) {
       return BrokenQuestionnaireItem.fromException(answerModelError!);
@@ -104,6 +118,20 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller,
   Widget _guardedBuildEditable(BuildContext context) {
     if (answerModelError != null) {
       return BrokenQuestionnaireItem.fromException(answerModelError!);
+    }
+
+    // TODO: Is there a more elegant solution? Do I have to unregister the listener?
+    // Listen to the parent FocusNode and become focussed when it does.
+    if (!_isFocusHookedUp) {
+      WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+        Focus.of(context).addListener(() {
+          if ((firstFocusNode.parent?.hasPrimaryFocus ?? false) &&
+              !firstFocusNode.hasPrimaryFocus) {
+            firstFocusNode.requestFocus();
+          }
+        });
+      });
+      _isFocusHookedUp = true;
     }
 
     return buildEditable(context);

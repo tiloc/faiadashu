@@ -1,6 +1,8 @@
 ## 0.3.2
+* QuestionnaireScrollerPage will focus on first unfilled item
 * Improvements in focus traversal
-* Prevent unnecessary recreation of QuestionnaireItemFillerData
+* Improvements to determination whether a field has response
+* Performance: Prevent unnecessary recreation of QuestionnaireItemFillerData
 
 ## 0.3.1
 * QuestionnaireScrollerPage will scroll to first unfilled item

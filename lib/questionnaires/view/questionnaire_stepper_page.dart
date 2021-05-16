@@ -26,7 +26,10 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
     return QuestionnaireFiller(
         locale: widget.locale ?? Localizations.localeOf(context),
         fhirResourceProvider: widget.fhirResourceProvider,
-        builder: (BuildContext context) => Scaffold(
+        builder: (BuildContext context) {
+          final questionnaireFiller = QuestionnaireFiller.of(context);
+          final itemCount = questionnaireFiller.questionnaireItemModels.length;
+          return Scaffold(
             appBar: AppBar(
               leading: Builder(
                 builder: (BuildContext context) {
@@ -47,11 +50,18 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
             endDrawer: const NarrativeDrawer(),
             body: Column(children: [
               Expanded(
-                child: PageView(
-                  /// [PageView.scrollDirection] defaults to [Axis.horizontal].
-                  /// Use [Axis.vertical] to scroll vertically.
-                  controller: controller,
-                  children: QuestionnaireFiller.of(context).itemFillers(),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: PageView.builder(
+                    /// [PageView.scrollDirection] defaults to [Axis.horizontal].
+                    /// Use [Axis.vertical] to scroll vertically.
+                    controller: controller,
+                    itemCount: itemCount,
+                    itemBuilder: (BuildContext context, int index) {
+                      return QuestionnaireFiller.of(context)
+                          .itemFillerAt(index);
+                    },
+                  ),
                 ),
               ),
               Row(
@@ -82,6 +92,8 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
                   ),
                 ],
               ),
-            ])));
+            ]),
+          );
+        });
   }
 }
