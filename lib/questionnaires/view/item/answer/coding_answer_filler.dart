@@ -216,6 +216,7 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
 
   Widget _buildLookupAnswers(BuildContext context) {
     return FDashAutocomplete<QuestionnaireAnswerOption>(
+      focusNode: firstFocusNode,
       initialValue: value?.localizedDisplay(locale),
       displayStringForOption: (answerOption) =>
           answerOption.localizedDisplay(locale),

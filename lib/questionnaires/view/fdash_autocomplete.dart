@@ -122,10 +122,11 @@ import 'package:flutter/material.dart';
 ///
 ///  * [RawAutocomplete], which is what Autocomplete is built upon, and which
 ///    contains more detailed examples.
-class FDashAutocomplete<T extends Object> extends StatelessWidget {
+class FDashAutocomplete<T extends Object> extends StatefulWidget {
   /// Creates an instance of [FDashAutocomplete].
   const FDashAutocomplete(
       {Key? key,
+      this.focusNode,
       required this.optionsBuilder,
       this.displayStringForOption = RawAutocomplete.defaultStringForOption,
       this.onSelected,
@@ -153,13 +154,35 @@ class FDashAutocomplete<T extends Object> extends StatelessWidget {
 
   final String? initialValue;
 
+  final FocusNode? focusNode;
+
+  @override
+  State<StatefulWidget> createState() => FDashAutocompleteState<T>();
+}
+
+class FDashAutocompleteState<T extends Object>
+    extends State<FDashAutocomplete<T>> {
+  late final TextEditingController _textEditingController;
+
+  @override
+  void initState() {
+    super.initState();
+    _textEditingController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _textEditingController.dispose();
+    super.dispose();
+  }
+
   Widget _defaultFieldViewBuilder(
       BuildContext context,
       TextEditingController textEditingController,
       FocusNode focusNode,
       VoidCallback onFieldSubmitted) {
     return _AutocompleteField(
-      initialValue: initialValue,
+      initialValue: widget.initialValue,
       focusNode: focusNode,
       textEditingController: textEditingController,
       onFieldSubmitted: onFieldSubmitted,
@@ -169,19 +192,21 @@ class FDashAutocomplete<T extends Object> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RawAutocomplete<T>(
-      displayStringForOption: displayStringForOption,
+      focusNode: widget.focusNode,
+      textEditingController: _textEditingController,
+      displayStringForOption: widget.displayStringForOption,
       fieldViewBuilder: _defaultFieldViewBuilder,
-      optionsBuilder: optionsBuilder,
-      optionsViewBuilder: optionsViewBuilder ??
+      optionsBuilder: widget.optionsBuilder,
+      optionsViewBuilder: widget.optionsViewBuilder ??
           (BuildContext context, AutocompleteOnSelected<T> onSelected,
               Iterable<T> options) {
             return _AutocompleteOptions<T>(
-              displayStringForOption: displayStringForOption,
+              displayStringForOption: widget.displayStringForOption,
               onSelected: onSelected,
               options: options,
             );
           },
-      onSelected: onSelected,
+      onSelected: widget.onSelected,
     );
   }
 }
