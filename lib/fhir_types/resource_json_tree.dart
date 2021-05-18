@@ -120,7 +120,7 @@ class _MapNodeState extends _JsonNodeState<_JsonViewerMapNode> {
           children: <Widget>[
             Icon(
               isOpen ? Icons.arrow_drop_down : Icons.arrow_right,
-              color: Theme.of(context).accentColor,
+              color: Theme.of(context).colorScheme.secondary,
             ),
             Text(
               widget.nodeName,
@@ -187,7 +187,7 @@ class _JsonViewerListNodeState extends _JsonNodeState<_JsonViewerListNode> {
             if (count > 0)
               Icon(
                 isOpen ? Icons.arrow_drop_down : Icons.arrow_right,
-                color: Theme.of(context).accentColor,
+                color: Theme.of(context).colorScheme.secondary,
               ),
             Text(
               widget.nodeName,
@@ -239,11 +239,11 @@ class _JsonViewerGenericNode extends StatelessWidget {
       switch (nodeValue.runtimeType) {
         case bool:
           color = (nodeValue as bool) == true
-              ? themeData.accentColor
+              ? themeData.colorScheme.secondary
               : themeData.errorColor;
           break;
         case int:
-          color = themeData.accentColor;
+          color = themeData.colorScheme.secondary;
           break;
       }
     }
@@ -267,7 +267,7 @@ class _JsonViewerGenericNode extends StatelessWidget {
               style: TextStyle(color: color),
             )),
           if (nodeValue == null)
-            Text('null', style: TextStyle(color: themeData.accentColor)),
+            Text('null', style: TextStyle(color: themeData.colorScheme.secondary)),
         ],
       ),
     );

@@ -165,7 +165,8 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
                 shape: (firstFocusNode.hasFocus)
                     ? RoundedRectangleBorder(
                         side: BorderSide(
-                            color: Theme.of(context).accentColor, width: 2.0),
+                            color: Theme.of(context).colorScheme.secondary,
+                            width: 2.0),
                         borderRadius: BorderRadius.circular(4.0))
                     : null,
                 margin: const EdgeInsets.only(top: 8, bottom: 8),
@@ -192,7 +193,8 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
                 shape: (firstFocusNode.hasFocus)
                     ? RoundedRectangleBorder(
                         side: BorderSide(
-                            color: Theme.of(context).accentColor, width: 2.0),
+                            color: Theme.of(context).colorScheme.secondary,
+                            width: 2.0),
                         borderRadius: BorderRadius.circular(4.0))
                     : null,
                 margin: const EdgeInsets.only(top: 8, bottom: 8),

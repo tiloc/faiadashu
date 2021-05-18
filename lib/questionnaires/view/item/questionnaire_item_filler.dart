@@ -207,7 +207,7 @@ class _QuestionnaireItemFillerHelpState
   Widget build(BuildContext context) {
     return IconButton(
       mouseCursor: SystemMouseCursors.help,
-      color: Theme.of(context).accentColor,
+      color: Theme.of(context).colorScheme.secondary,
       icon: const Icon(Icons.info_outline),
       onPressed: () {
         _showHelp(context, widget.ql);
@@ -251,7 +251,7 @@ class _QuestionnaireItemFillerSupportLink extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       mouseCursor: SystemMouseCursors.help,
-      color: Theme.of(context).accentColor,
+      color: Theme.of(context).colorScheme.secondary,
       icon: const Icon(Icons.info_outline),
       onPressed: () {
         _logger.debug("supportLink '${supportLink.toString()}'");
