@@ -1,6 +1,8 @@
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:pedantic/pedantic.dart';
 
 import 'fhir_types_extensions.dart';
 
@@ -54,9 +56,74 @@ class _FhirDateTimePickerState extends State<FhirDateTimePicker> {
     super.dispose();
   }
 
+  KeyEventResult _onKey(
+      Locale locale, FocusNode focusNode, RawKeyEvent rawKeyEvent) {
+    if (rawKeyEvent is RawKeyUpEvent &&
+        (rawKeyEvent.logicalKey == LogicalKeyboardKey.enter ||
+            rawKeyEvent.logicalKey == LogicalKeyboardKey.space)) {
+      unawaited(_showPicker(locale));
+      return KeyEventResult.handled;
+    } else {
+      return KeyEventResult.ignored;
+    }
+  }
+
+  Future<void> _showPicker(Locale locale) async {
+    DateTime dateTime = DateTime(1970);
+
+    if (widget.pickerType != Time) {
+      final date = await showDatePicker(
+          initialDate: _dateTimeValue?.value ?? DateTime.now(),
+          firstDate: widget.firstDate,
+          lastDate: widget.lastDate,
+          locale: locale,
+          context: context);
+
+      if (date == null) {
+        return; // Cancelled, don't touch anything
+      }
+      dateTime = date.toLocal();
+    }
+
+    if (widget.pickerType == FhirDateTime || widget.pickerType == Time) {
+      final time = await showTimePicker(
+          initialTime:
+              TimeOfDay.fromDateTime(_dateTimeValue?.value ?? DateTime.now()),
+          context: context,
+          builder: (context, child) {
+            return Localizations.override(
+                context: context, locale: locale, child: child);
+          });
+
+      if (time == null) {
+        return; // Cancelled, don't touch anything
+      }
+
+      dateTime = DateTime(
+          dateTime.year, dateTime.month, dateTime.day, time.hour, time.minute);
+    }
+
+    final fhirDateTime = FhirDateTime.fromDateTime(
+        dateTime,
+        (widget.pickerType == Date)
+            ? DateTimePrecision.YYYYMMDD
+            : DateTimePrecision.FULL);
+    setState(() {
+      _dateTimeFieldController.text = (widget.pickerType == Time)
+          ? DateFormat.jm(locale.toString()).format(dateTime)
+          : fhirDateTime.format(locale);
+    });
+    _dateTimeValue = fhirDateTime;
+    widget.onChanged?.call(fhirDateTime);
+  }
+
   @override
   Widget build(BuildContext context) {
     final locale = widget.locale ?? Localizations.localeOf(context);
+
+    widget.focusNode?.onKey = (FocusNode focusNode, RawKeyEvent rawKeyEvent) {
+      return _onKey(locale, focusNode, rawKeyEvent);
+    };
 
     // There is no Locale in initState.
     if (_fieldInitialized == false) {
@@ -72,53 +139,7 @@ class _FhirDateTimePickerState extends State<FhirDateTimePicker> {
           decoration: widget.decoration,
           controller: _dateTimeFieldController,
           onTap: () async {
-            DateTime dateTime = DateTime(1970);
-
-            if (widget.pickerType != Time) {
-              final date = await showDatePicker(
-                  initialDate: _dateTimeValue?.value ?? DateTime.now(),
-                  firstDate: widget.firstDate,
-                  lastDate: widget.lastDate,
-                  locale: locale,
-                  context: context);
-
-              if (date == null) {
-                return; // Cancelled, don't touch anything
-              }
-              dateTime = date.toLocal();
-            }
-
-            if (widget.pickerType == FhirDateTime ||
-                widget.pickerType == Time) {
-              final time = await showTimePicker(
-                  initialTime: TimeOfDay.fromDateTime(
-                      _dateTimeValue?.value ?? DateTime.now()),
-                  context: context,
-                  builder: (context, child) {
-                    return Localizations.override(
-                        context: context, locale: locale, child: child);
-                  });
-
-              if (time == null) {
-                return; // Cancelled, don't touch anything
-              }
-
-              dateTime = DateTime(dateTime.year, dateTime.month, dateTime.day,
-                  time.hour, time.minute);
-            }
-
-            final fhirDateTime = FhirDateTime.fromDateTime(
-                dateTime,
-                (widget.pickerType == Date)
-                    ? DateTimePrecision.YYYYMMDD
-                    : DateTimePrecision.FULL);
-            setState(() {
-              _dateTimeFieldController.text = (widget.pickerType == Time)
-                  ? DateFormat.jm(locale.toString()).format(dateTime)
-                  : fhirDateTime.format(locale);
-            });
-            _dateTimeValue = fhirDateTime;
-            widget.onChanged?.call(fhirDateTime);
+            await _showPicker(locale);
           },
           readOnly: true,
         ),
