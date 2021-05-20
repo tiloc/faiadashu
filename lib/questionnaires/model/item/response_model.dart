@@ -1,7 +1,7 @@
 import 'package:fhir/r4.dart';
 
 import '../../../coding/data_absent_reasons.dart';
-import '../questionnaire_item_model.dart';
+import '../../questionnaires.dart';
 
 /// Model a response item, which might consist of multiple answers.
 class ResponseModel {

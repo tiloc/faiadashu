@@ -26,6 +26,7 @@ class _StaticItemState extends State<StaticItem> {
   void initState() {
     super.initState();
 
+    // TODO: This should go into a model.
     calcResult =
         widget.itemModel.responseItem?.answer?.firstOrNull?.valueDecimal ??
             widget.itemModel.responseItem?.answer?.first.valueQuantity?.value;
