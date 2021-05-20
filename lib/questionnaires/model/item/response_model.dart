@@ -68,9 +68,9 @@ class AnswerLocation {
   final int _answerIndex;
   final OnAnswered _onAnswered;
 
-  const AnswerLocation(List<QuestionnaireResponseAnswer?> answers,
-      int answerIndex, OnAnswered onAnswered)
-      : _answers = answers,
+  AnswerLocation(
+      ResponseModel responseModel, int answerIndex, OnAnswered onAnswered)
+      : _answers = responseModel.answers,
         _answerIndex = answerIndex,
         _onAnswered = onAnswered;
 

@@ -15,6 +15,40 @@ abstract class QuestionnaireAnswerFiller extends StatefulWidget {
       {Key? key})
       : super(key: key);
 
+  static QuestionnaireAnswerFiller fromAnswerModel(AnswerModel answerModel) {
+    _logger.debug(
+        'Creating AnswerFiller for $answerModel from ${answerModel.itemModel}');
+
+    final itemModel = answerModel.itemModel;
+    final answerLocation = answerModel.answerLocation;
+
+    try {
+      if (itemModel.isCalculatedExpression) {
+        // TODO: Should there be a dedicated CalculatedExpression Model and item?
+        return StaticItem(itemModel, answerLocation);
+      } else if (answerModel is NumericalAnswerModel) {
+        return NumericalAnswerFiller(itemModel, answerLocation);
+      } else if (answerModel is StringAnswerModel) {
+        return StringAnswerFiller(itemModel, answerLocation);
+      } else if (answerModel is DateTimeAnswerModel) {
+        return DateTimeAnswerFiller(itemModel, answerLocation);
+      } else if (answerModel is CodingAnswerModel) {
+        return CodingAnswerFiller(itemModel, answerLocation);
+      } else if (answerModel is BooleanAnswerModel) {
+        return BooleanAnswerFiller(itemModel, answerLocation);
+      } else if (answerModel is StaticAnswerModel) {
+        return StaticItem(itemModel, answerLocation);
+      } else {
+        throw QuestionnaireFormatException(
+            'Unsupported AnswerModel: $answerModel');
+      }
+    } catch (exception) {
+      _logger.warn('Cannot create answer filler:', error: exception);
+      return _BrokenItem(itemModel, answerLocation, exception);
+    }
+  }
+
+  // TODO: Make obsolete in favor of fromAnswerModel.
   static QuestionnaireAnswerFiller fromQuestionnaireItem(
       QuestionnaireItemModel itemModel, AnswerLocation answerLocation) {
     _logger.debug('Creating AnswerFiller for $itemModel');

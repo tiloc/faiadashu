@@ -29,7 +29,7 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
   @override
   void initState() {
     super.initState();
-    responseModel = ResponseModel(widget.itemModel);
+    responseModel = widget.itemModel.responseModel;
 
     _skipSwitchFocusNode = FocusNode(
         skipTraversal: true,
@@ -39,8 +39,8 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
     // This assumes that all answers are of the same kind
     // and repeats = true is only supported for choice items
     _answerFillers = [
-      QuestionnaireAnswerFiller.fromQuestionnaireItem(widget.itemModel,
-          AnswerLocation(responseModel.answers, 0, _stashAnswers))
+      QuestionnaireAnswerFiller.fromQuestionnaireItem(
+          widget.itemModel, AnswerLocation(responseModel, 0, _stashAnswers))
     ];
   }
 

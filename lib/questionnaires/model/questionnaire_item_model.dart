@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import '../../fhir_types/fhir_types_extensions.dart';
 import '../../logging/logging.dart';
 import '../../resource_provider/resource_provider.dart';
+import '../questionnaires.dart';
 import '../view/xhtml.dart';
 import 'aggregation/aggregation.dart';
 import 'questionnaire_exceptions.dart';
@@ -176,6 +177,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   bool get hasChildren =>
       (questionnaireItem.item != null) && (questionnaireItem.item!.isNotEmpty);
 
+  /// Sets the associated [QuestionnaireResponseItem].
   set responseItem(QuestionnaireResponseItem? questionnaireResponseItem) {
     _qimLogger.debug('set responseItem $questionnaireResponseItem');
     if (questionnaireResponseItem != _questionnaireResponseItem) {
@@ -188,6 +190,13 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
 
   /// Returns the associated [QuestionnaireResponseItem].
   QuestionnaireResponseItem? get responseItem => _questionnaireResponseItem;
+
+  ResponseModel? _responseModel;
+
+  /// Returns the [ResponseModel].
+  ResponseModel get responseModel {
+    return _responseModel ??= ResponseModel(this);
+  }
 
   /// Is the item unanswered?
   ///
