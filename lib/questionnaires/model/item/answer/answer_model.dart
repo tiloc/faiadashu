@@ -11,7 +11,8 @@ abstract class AnswerModel<I, V> {
   static const nullText = '—';
 
   final QuestionnaireItemModel itemModel;
-  final AnswerLocation answerLocation;
+  final ResponseModel responseModel;
+  final int answerIndex;
   final Locale locale;
   V? value;
 
@@ -26,13 +27,16 @@ abstract class AnswerModel<I, V> {
         ?.valueString;
   }
 
-  AnswerModel(this.itemModel, this.answerLocation)
-      : locale = itemModel.questionnaireModel.locale;
+  AnswerModel(this.responseModel, this.answerIndex)
+      : itemModel = responseModel.itemModel,
+        locale = responseModel.itemModel.questionnaireModel.locale;
 
   /// Returns a human-readable, localized, textual description of the model.
   ///
   /// Returns [nullText] if the question is unanswered.
   String get display;
+
+  QuestionnaireResponseAnswer? get answer => responseModel.answers[answerIndex];
 
   /// Returns null when [inValue] is valid, or a localized message when it is not.
   String? validate(I? inValue);
@@ -45,22 +49,4 @@ abstract class AnswerModel<I, V> {
   }
 
   bool hasCodingAnswers() => false;
-
-  static AnswerModel createModel<T>(
-      QuestionnaireItemModel itemModel, AnswerLocation answerLocation) {
-    switch (T) {
-      case NumericalAnswerModel:
-        return NumericalAnswerModel(itemModel, answerLocation);
-      case CodingAnswerModel:
-        return CodingAnswerModel(itemModel, answerLocation);
-      case StringAnswerModel:
-        return StringAnswerModel(itemModel, answerLocation);
-      case DateTimeAnswerModel:
-        return DateTimeAnswerModel(itemModel, answerLocation);
-      case BooleanAnswerModel:
-        return BooleanAnswerModel(itemModel, answerLocation);
-      default:
-        throw StateError('Cannot create a model for $itemModel');
-    }
-  }
 }

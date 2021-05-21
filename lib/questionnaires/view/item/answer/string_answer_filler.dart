@@ -6,10 +6,10 @@ import '../../../questionnaires.dart';
 import '../questionnaire_answer_filler.dart';
 
 class StringAnswerFiller extends QuestionnaireAnswerFiller {
-  const StringAnswerFiller(
-      QuestionnaireItemModel itemModel, AnswerLocation answerLocation,
+  StringAnswerFiller(
+      QuestionnaireResponseFillerState responseFillerState, int answerIndex,
       {Key? key})
-      : super(itemModel, answerLocation, key: key);
+      : super(responseFillerState, answerIndex, key: key);
   @override
   State<StatefulWidget> createState() => _StringAnswerState();
 }

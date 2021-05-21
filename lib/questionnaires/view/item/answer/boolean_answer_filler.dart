@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import '../../../questionnaires.dart';
 
 class BooleanAnswerFiller extends QuestionnaireAnswerFiller {
-  const BooleanAnswerFiller(
-      QuestionnaireItemModel itemModel, AnswerLocation answerLocation,
+  BooleanAnswerFiller(
+      QuestionnaireResponseFillerState responseFillerState, int answerIndex,
       {Key? key})
-      : super(itemModel, answerLocation, key: key);
+      : super(responseFillerState, answerIndex, key: key);
   @override
   State<StatefulWidget> createState() => _BooleanItemState();
 }

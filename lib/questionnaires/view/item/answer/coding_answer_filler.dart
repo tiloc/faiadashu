@@ -16,10 +16,10 @@ import 'null_dash_text.dart';
 ///
 /// Future R5 releases of the FHIR standard will likely have a `coding` item type.
 class CodingAnswerFiller extends QuestionnaireAnswerFiller {
-  const CodingAnswerFiller(
-      QuestionnaireItemModel itemModel, AnswerLocation answerLocation,
+  CodingAnswerFiller(
+      QuestionnaireResponseFillerState responseFillerState, int answerIndex,
       {Key? key})
-      : super(itemModel, answerLocation, key: key);
+      : super(responseFillerState, answerIndex, key: key);
   @override
   State<StatefulWidget> createState() => _CodingAnswerState();
 }

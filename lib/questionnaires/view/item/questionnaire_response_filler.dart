@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../coding/coding.dart';
 import '../../../coding/data_absent_reasons.dart';
 import '../../../fhir_types/fhir_types_extensions.dart';
+import '../../../logging/logger.dart';
 import '../../model/item/response_model.dart';
 import '../../questionnaires.dart';
 
@@ -15,16 +16,18 @@ class QuestionnaireResponseFiller extends StatefulWidget {
       : super(key: ValueKey<String>(itemModel.linkId));
 
   @override
-  State<StatefulWidget> createState() => QuestionnaireResponseState();
+  State<StatefulWidget> createState() => QuestionnaireResponseFillerState();
 }
 
-class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
+class QuestionnaireResponseFillerState
+    extends State<QuestionnaireResponseFiller> {
+  static final _logger = Logger(QuestionnaireResponseFillerState);
   late final List<QuestionnaireAnswerFiller> _answerFillers;
   late final ResponseModel responseModel;
 
   late final FocusNode _skipSwitchFocusNode;
 
-  QuestionnaireResponseState();
+  QuestionnaireResponseFillerState();
 
   @override
   void initState() {
@@ -38,10 +41,7 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
     // TODO: Enhancement: Allow repeats = true for other kinds of items
     // This assumes that all answers are of the same kind
     // and repeats = true is only supported for choice items
-    _answerFillers = [
-      QuestionnaireAnswerFiller.fromQuestionnaireItem(
-          widget.itemModel, AnswerLocation(responseModel, 0, _stashAnswers))
-    ];
+    _answerFillers = [_createAnswerFiller(0)];
   }
 
   @override
@@ -50,7 +50,7 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
     super.dispose();
   }
 
-  void _stashAnswers(
+  void onAnswered(
       List<QuestionnaireResponseAnswer?>? answers, int answerIndex) {
     if (mounted) {
       setState(() {
@@ -96,5 +96,36 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
           )
         ])
     ]);
+  }
+
+  QuestionnaireAnswerFiller _createAnswerFiller(int answerIndex) {
+    _logger.debug('Creating AnswerFiller for ${responseModel.itemModel}');
+
+    final answerModel = responseModel.answerModel(answerIndex);
+
+    try {
+      if (responseModel.itemModel.isCalculatedExpression) {
+        // TODO: Should there be a dedicated CalculatedExpression Model and item?
+        return StaticItem(this, answerIndex);
+      } else if (answerModel is NumericalAnswerModel) {
+        return NumericalAnswerFiller(this, answerIndex);
+      } else if (answerModel is StringAnswerModel) {
+        return StringAnswerFiller(this, answerIndex);
+      } else if (answerModel is DateTimeAnswerModel) {
+        return DateTimeAnswerFiller(this, answerIndex);
+      } else if (answerModel is CodingAnswerModel) {
+        return CodingAnswerFiller(this, answerIndex);
+      } else if (answerModel is BooleanAnswerModel) {
+        return BooleanAnswerFiller(this, answerIndex);
+      } else if (answerModel is StaticAnswerModel) {
+        return StaticItem(this, answerIndex);
+      } else {
+        throw QuestionnaireFormatException(
+            'Unsupported AnswerModel: $answerModel');
+      }
+    } catch (exception) {
+      _logger.warn('Cannot create answer filler:', error: exception);
+      return BrokenAnswerFiller(this, answerIndex, exception);
+    }
   }
 }

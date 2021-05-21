@@ -1,15 +1,13 @@
 import 'package:fhir/r4.dart';
 
-import '../../questionnaire_item_model.dart';
 import '../item.dart';
 
 /// A pseudo-model for a static questionnaire item.
 ///
 /// Used to represent items of types group, and display.
 class StaticAnswerModel extends AnswerModel<Object, Object> {
-  StaticAnswerModel(
-      QuestionnaireItemModel itemModel, AnswerLocation answerLocation)
-      : super(itemModel, answerLocation);
+  StaticAnswerModel(ResponseModel responseModel, int answerIndex)
+      : super(responseModel, answerIndex);
 
   @override
   QuestionnaireResponseAnswer? fillAnswer() {
