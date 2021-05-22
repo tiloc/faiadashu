@@ -1,7 +1,10 @@
 import 'dart:convert';
 
 import 'package:fhir/r4.dart';
+import 'package:fhir_at_rest/r4.dart';
+import 'package:fhir_auth/r4.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:http/http.dart';
 
 import '../logging/logger.dart';
 
@@ -134,6 +137,43 @@ class InMemoryResourceProvider extends FhirResourceProvider {
   @override
   Future<void> init() async {
     // Do nothing
+    return;
+  }
+
+  @override
+  FhirResourceProvider? providerFor(String uri) {
+    return (this.uri == uri) ? this : null;
+  }
+}
+
+/// Request a Questionnaire from online.
+class RestfulResourceProvider extends FhirResourceProvider {
+  late final Resource? resource;
+  final String uri;
+  final Uri fhirServer;
+  final R4ResourceType resourceType;
+  final Id id;
+  FhirClient? client;
+
+  RestfulResourceProvider.open(
+      this.uri, this.resource, this.fhirServer, this.resourceType, this.id);
+
+  RestfulResourceProvider.secure(this.uri, this.resource, this.fhirServer,
+      this.resourceType, this.id, this.client);
+
+  @override
+  Resource? getResource(String uri) {
+    return (uri == this.uri) ? resource : null;
+  }
+
+  @override
+  Future<void> init() async {
+    final request =
+        FhirRequest.read(base: fhirServer, type: resourceType, id: id);
+    resource = await request.request(
+        headers: client == null
+            ? {'Content-Type': 'application/fhir+json'}
+            : await client!.authHeaders);
     return;
   }
 
