@@ -148,9 +148,13 @@ class _HomePageState extends State<HomePage> {
     resourceBundleProvider = RegistryFhirResourceProvider([
       InMemoryResourceProvider.inMemory(
           subjectResourceUri,
-          Patient(id: Id('example123'), name: [
-            HumanName(given: ['Emma'], family: 'Lee')
-          ])),
+          Patient(
+            // id: Id('example123'),
+            id: Id('114603'), // for use when testing against Logica server
+            name: [
+              HumanName(given: ['Emma'], family: 'Lee')
+            ],
+          )),
       AssetImageAttachmentProvider(
           'http://example.org/images', 'assets/images'),
       valueSetProvider
