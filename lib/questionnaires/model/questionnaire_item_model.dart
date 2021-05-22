@@ -203,7 +203,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   /// Static or read-only items are not unanswered.
   /// Items which are not enabled are not unanswered.
   bool get isUnanswered {
-    _qimLogger.debug('isUnanswered $linkId');
+    _qimLogger.trace('isUnanswered $linkId');
     if (isReadOnly || !isEnabled) {
       return false;
     }
@@ -218,7 +218,13 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     return true;
   }
 
-  /// A [Decimal] value which can be added to a score.
+  /// Is the item invalid?
+  bool get isInvalid {
+    _qimLogger.trace('isInvalid $linkId');
+    return responseModel.isInvalid;
+  }
+
+  /// Returns a [Decimal] value which can be added to a score.
   ///
   /// Returns null if not applicable (either question unanswered, or wrong type)
   Decimal? get ordinalValue {
@@ -241,6 +247,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     return ordinalExtension.valueDecimal;
   }
 
+  /// Is this item a calculated expression?
   bool get isCalculatedExpression {
     if (questionnaireItem.type == QuestionnaireItemType.quantity ||
         questionnaireItem.type == QuestionnaireItemType.decimal) {
@@ -275,7 +282,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
         (questionnaireItem.type == QuestionnaireItemType.display);
   }
 
-  /// Is this itemModel not changeable by end-users?
+  /// Is this item not changeable by end-users?
   ///
   /// Read-only items might still hold a value, such as a calculated value.
   bool get isReadOnly {
@@ -285,6 +292,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
         isCalculatedExpression;
   }
 
+  /// Is this item hidden?
   bool get isHidden {
     return (questionnaireItem.extension_
                 ?.extensionOrNull(

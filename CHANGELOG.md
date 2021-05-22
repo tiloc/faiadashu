@@ -1,3 +1,10 @@
+## 0.4.0
+* Refactorings to have a clean relationship between views and models.
+  * Non-breaking for high-level use. Breaking for low-level use.
+* new model method 'isInvalid'.
+* QuestionnaireScrollerPage will scroll to first invalid or unfilled item
+* Visual improvements to NarrativePage
+
 ## 0.3.2
 * QuestionnaireScrollerPage will focus on first unfilled item
 * Improvements in focus traversal

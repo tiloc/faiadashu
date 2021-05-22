@@ -101,9 +101,9 @@ class QuestionnaireResponseFillerState
   QuestionnaireAnswerFiller _createAnswerFiller(int answerIndex) {
     _logger.debug('Creating AnswerFiller for ${responseModel.itemModel}');
 
-    final answerModel = responseModel.answerModel(answerIndex);
-
     try {
+      final answerModel = responseModel.answerModel(answerIndex);
+
       if (responseModel.itemModel.isCalculatedExpression) {
         // TODO: Should there be a dedicated CalculatedExpression Model and item?
         return StaticItem(this, answerIndex);

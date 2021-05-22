@@ -58,10 +58,18 @@ class ResponseModel {
             answer: filledAnswers.isEmpty ? null : filledAnswers);
   }
 
+  /// Is this response invalid?
+  ///
+  /// This is currently entirely based on the [dataAbsentReason].
+  bool get isInvalid {
+    return dataAbsentReason == dataAbsentReasonAsTextCode;
+  }
+
   /// Returns an [AnswerModel] for the nth answer to an overall response.
   ///
   /// Only [answerIndex] == 0 is currently supported.
   AnswerModel answerModel(int answerIndex) {
+    // TODO: Should this construct a new one every time, or reuse existing ones?
     switch (itemModel.questionnaireItem.type!) {
       case QuestionnaireItemType.choice:
       case QuestionnaireItemType.open_choice:

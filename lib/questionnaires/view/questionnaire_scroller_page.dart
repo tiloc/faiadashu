@@ -186,8 +186,9 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
           return;
         }
 
-        // Locate the first unanswered question
-        _focusIndex = questionnaireModel.indexOf((qim) => qim.isUnanswered)!;
+        // Locate the first unanswered or invalid question
+        _focusIndex = questionnaireModel
+            .indexOf((qim) => qim.isUnanswered || qim.isInvalid)!;
 
         if (_focusIndex == -1) {
           // When all questions are answered then focus on the first field that can be filled by a human.

@@ -39,6 +39,8 @@ abstract class AnswerModel<I, V> {
   QuestionnaireResponseAnswer? get answer => responseModel.answers[answerIndex];
 
   /// Returns null when [inValue] is valid, or a localized message when it is not.
+  ///
+  /// This is used to validate external input (typically coming from a view).
   String? validate(I? inValue);
 
   /// Returns a [QuestionnaireResponseAnswer] based on the current value.
