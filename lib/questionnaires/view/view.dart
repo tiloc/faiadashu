@@ -9,4 +9,5 @@ export 'questionnaire_information_tile.dart';
 export 'questionnaire_loading_indicator.dart';
 export 'questionnaire_scroller_page.dart';
 export 'questionnaire_stepper_page.dart';
+export 'questionnaire_view_factory.dart';
 export 'xhtml.dart';

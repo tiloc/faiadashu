@@ -14,7 +14,7 @@ class QuestionnaireItemFiller extends StatefulWidget {
   final QuestionnaireItemModel itemModel;
   final QuestionnaireResponseFiller _responseFiller;
 
-  factory QuestionnaireItemFiller.fromQuestionnaireItem(
+  factory QuestionnaireItemFiller.fromQuestionnaireItemModel(
       QuestionnaireItemModel itemModel,
       {Key? key}) {
     return QuestionnaireItemFiller._(
@@ -24,7 +24,7 @@ class QuestionnaireItemFiller extends StatefulWidget {
 
   QuestionnaireItemFiller._(this.itemModel, this._responseFiller, {Key? key})
       : _titleWidget =
-            QuestionnaireItemFillerTitle.fromQuestionnaireItem(itemModel),
+            QuestionnaireItemFillerTitle.fromQuestionnaireItemModel(itemModel),
         super(key: key);
 
   @override
@@ -117,7 +117,7 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
       {Key? key})
       : super(key: key);
 
-  static Widget? fromQuestionnaireItem(QuestionnaireItemModel itemModel,
+  static Widget? fromQuestionnaireItemModel(QuestionnaireItemModel itemModel,
       {Key? key}) {
     if (itemModel.titleText == null) {
       return null;
