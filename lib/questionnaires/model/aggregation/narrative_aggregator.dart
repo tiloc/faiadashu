@@ -123,7 +123,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
       generated = generated | _addResponseItemToDiv(div, itemModel);
     }
     div.write('</div>');
-    div.write('<p>&nbsp;</p>');
+    // div.write('<p>&nbsp;</p>');
 
     return Narrative(
         div: div.toString(),
