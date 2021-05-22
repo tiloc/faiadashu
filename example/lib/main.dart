@@ -14,6 +14,7 @@ import 'about_page.dart';
 import 'disclaimer_page.dart';
 import 'observation_page.dart';
 import 'primitive_page.dart';
+import 'upload_to_server.dart';
 
 void main() {
   if (kDebugMode || kIsWeb) {
@@ -82,6 +83,8 @@ class _HomePageState extends State<HomePage> {
     if (response == null) {
       return;
     }
+
+    uploadToServer(response);
 
     _savedResponses[id] = response;
   }
