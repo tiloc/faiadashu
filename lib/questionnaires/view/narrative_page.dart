@@ -12,9 +12,11 @@ class NarrativePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Narrative'),
       ),
-      body: Container(
-          padding: const EdgeInsets.all(8.0),
-          child: NarrativeTile(questionnaireModel: questionnaireModel)),
+      body: SafeArea(
+        child: Container(
+            padding: const EdgeInsets.all(8.0),
+            child: NarrativeTile(questionnaireModel: questionnaireModel)),
+      ),
     );
   }
 }

@@ -11,10 +11,12 @@ abstract class ExhibitPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(title),
       ),
-      body: Card(
-        child: Container(
-          padding: const EdgeInsets.all(16.0),
-          child: buildExhibit(context),
+      body: SafeArea(
+        child: Card(
+          child: Container(
+            padding: const EdgeInsets.all(16.0),
+            child: buildExhibit(context),
+          ),
         ),
       ),
     );

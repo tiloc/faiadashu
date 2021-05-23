@@ -79,24 +79,26 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                       widget.restoreResponseFunction(widget.questionnairePath)),
                   widget.fhirResourceProvider
                 ]),
-                floatingActionButton: Builder(
-                  builder: (context) => FloatingActionButton.extended(
-                    label: const Text('Save'),
-                    icon: const Icon(Icons.thumb_up),
-                    onPressed: () {
-                      // Generate a response and store it in-memory.
-                      // In a real-world scenario one would persist or post the response instead.
-                      widget.saveResponseFunction.call(
-                          widget.questionnairePath,
-                          QuestionnaireFiller.of(context)
-                              .aggregator<QuestionnaireResponseAggregator>()
-                              .aggregate());
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Survey saved.')));
-                      Navigator.pop(context);
-                    },
+                persistentFooterButtons: [
+                  Builder(
+                    builder: (context) => FloatingActionButton.extended(
+                      label: const Text('Save as Draft'),
+                      icon: const Icon(Icons.save_alt),
+                      onPressed: () {
+                        // Generate a response and store it in-memory.
+                        // In a real-world scenario one would persist or post the response instead.
+                        widget.saveResponseFunction.call(
+                            widget.questionnairePath,
+                            QuestionnaireFiller.of(context)
+                                .aggregator<QuestionnaireResponseAggregator>()
+                                .aggregate());
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Survey saved.')));
+                        Navigator.pop(context);
+                      },
+                    ),
                   ),
-                )),
+                ]),
           ),
         );
       },

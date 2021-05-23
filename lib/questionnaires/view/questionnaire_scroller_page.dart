@@ -21,6 +21,7 @@ import '../questionnaires.dart';
 class QuestionnaireScrollerPage extends StatefulWidget {
   final Locale? locale;
   final Widget? floatingActionButton;
+  final List<Widget>? persistentFooterButtons;
   final List<Widget>? frontMatter;
   final List<Widget>? backMatter;
   final FhirResourceProvider fhirResourceProvider;
@@ -31,6 +32,7 @@ class QuestionnaireScrollerPage extends StatefulWidget {
       {this.locale,
       required this.fhirResourceProvider,
       this.floatingActionButton,
+      this.persistentFooterButtons,
       this.frontMatter,
       this.backMatter = const [
         SizedBox(
@@ -139,12 +141,14 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
               ),
               endDrawer: const NarrativeDrawer(),
               floatingActionButton: widget.floatingActionButton,
+              persistentFooterButtons: widget.persistentFooterButtons,
               body: SafeArea(
                 child: ScrollablePositionedList.builder(
                     itemScrollController: _listScrollController,
                     itemPositionsListener: _itemPositionsListener,
                     itemCount: totalLength,
                     padding: const EdgeInsets.all(8),
+                    // TODO: This used to work but seems broken now?
                     minCacheExtent: 200, // Allow tabbing to prev/next items
                     itemBuilder: (BuildContext context, int i) {
                       final frontMatterIndex = (i < frontMatterLength) ? i : -1;

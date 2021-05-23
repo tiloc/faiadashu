@@ -1,8 +1,10 @@
 ## 0.4.0
 * Refactorings to have a clean relationship between views and models.
   * Non-breaking for high-level use. Breaking for low-level use.
+* QuestionnaireViewFactory allows injection of own view classes for overrides of visualizations.  
 * new model method 'isInvalid'.
 * QuestionnaireScrollerPage will scroll to first invalid or unfilled item
+* QuestionnaireScrollerPage supports specification of persistentFooterButtons  
 * Visual improvements to NarrativePage
 
 ## 0.3.2
