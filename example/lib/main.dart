@@ -150,7 +150,8 @@ class _HomePageState extends State<HomePage> {
           subjectResourceUri,
           Patient(
             // id: Id('example123'),
-            id: Id('114603'), // for use when testing against Logica server
+            id: Id('14603'), // for use when testing against Logica server
+            // id: Id('1702623'), // for use when testing against public Hapi server
             name: [
               HumanName(given: ['Emma'], family: 'Lee')
             ],
