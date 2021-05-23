@@ -4,7 +4,8 @@
 * QuestionnaireViewFactory allows injection of own view classes for overrides of visualizations.  
 * new model method 'isInvalid'.
 * QuestionnaireScrollerPage will scroll to first invalid or unfilled item
-* QuestionnaireScrollerPage supports specification of persistentFooterButtons  
+* QuestionnaireScrollerPage will scroll the item more towards the middle of the screen, rather than the very top.
+* QuestionnaireScrollerPage supports specification of persistentFooterButtons
 * Visual improvements to NarrativePage
 
 ## 0.3.2
