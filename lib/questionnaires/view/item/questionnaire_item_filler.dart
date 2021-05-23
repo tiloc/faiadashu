@@ -12,20 +12,25 @@ import '../../questionnaires.dart';
 class QuestionnaireItemFiller extends StatefulWidget {
   final Widget? _titleWidget;
   final QuestionnaireItemModel itemModel;
-  final QuestionnaireResponseFiller _responseFiller;
+  final QuestionnaireFillerData questionnaireFiller;
+  late final QuestionnaireResponseFiller _responseFiller;
 
-  factory QuestionnaireItemFiller.fromQuestionnaireItemModel(
-      QuestionnaireItemModel itemModel,
+  factory QuestionnaireItemFiller.fromQuestionnaireFiller(
+      QuestionnaireFillerData questionnaireFiller, int index,
       {Key? key}) {
-    return QuestionnaireItemFiller._(
-        itemModel, QuestionnaireResponseFiller(itemModel),
+    return QuestionnaireItemFiller._(questionnaireFiller,
+        questionnaireFiller.questionnaireModel.itemModelAt(index),
         key: key);
   }
 
-  QuestionnaireItemFiller._(this.itemModel, this._responseFiller, {Key? key})
+  QuestionnaireItemFiller._(this.questionnaireFiller, this.itemModel,
+      {Key? key})
       : _titleWidget =
             QuestionnaireItemFillerTitle.fromQuestionnaireItemModel(itemModel),
-        super(key: key);
+        super(key: key) {
+    _responseFiller =
+        questionnaireFiller.viewFactory.createQuestionnaireResponseFiller(this);
+  }
 
   @override
   State<StatefulWidget> createState() => QuestionnaireItemFillerState();

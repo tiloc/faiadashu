@@ -221,9 +221,8 @@ class QuestionnaireFillerData extends InheritedWidget {
 
     if (_itemFillers[index] == null) {
       _logger.debug('itemFillerAt $index will be created.');
-      _itemFillers[index] = viewFactory.createQuestionnaireItemFiller(
-          questionnaireItemModels.elementAt(index),
-          key: _globalKeys[index]);
+      _itemFillers[index] = viewFactory
+          .createQuestionnaireItemFiller(this, index, key: _globalKeys[index]);
     } else {
       _logger.debug('itemFillerAt $index already exists.');
     }

@@ -4,16 +4,21 @@ import 'package:flutter/material.dart';
 import '../../../coding/coding.dart';
 import '../../../coding/data_absent_reasons.dart';
 import '../../../fhir_types/fhir_types_extensions.dart';
-import '../../../logging/logger.dart';
 import '../../model/item/response_model.dart';
 import '../../questionnaires.dart';
 
 /// Filler for a [QuestionnaireResponseItem].
 class QuestionnaireResponseFiller extends StatefulWidget {
+  final QuestionnaireItemFiller itemFiller;
   final QuestionnaireItemModel itemModel;
 
-  QuestionnaireResponseFiller(this.itemModel)
+  QuestionnaireResponseFiller._(this.itemFiller, this.itemModel)
       : super(key: ValueKey<String>(itemModel.linkId));
+
+  factory QuestionnaireResponseFiller.fromQuestionnaireItemFiller(
+      QuestionnaireItemFiller itemFiller) {
+    return QuestionnaireResponseFiller._(itemFiller, itemFiller.itemModel);
+  }
 
   @override
   State<StatefulWidget> createState() => QuestionnaireResponseFillerState();
@@ -21,7 +26,6 @@ class QuestionnaireResponseFiller extends StatefulWidget {
 
 class QuestionnaireResponseFillerState
     extends State<QuestionnaireResponseFiller> {
-  static final _logger = Logger(QuestionnaireResponseFillerState);
   late final List<QuestionnaireAnswerFiller> _answerFillers;
   late final ResponseModel responseModel;
 
@@ -41,7 +45,10 @@ class QuestionnaireResponseFillerState
     // TODO: Enhancement: Allow repeats = true for other kinds of items
     // This assumes that all answers are of the same kind
     // and repeats = true is only supported for choice items
-    _answerFillers = [_createAnswerFiller(0)];
+    _answerFillers = [
+      widget.itemFiller.questionnaireFiller.viewFactory
+          .createAnswerFiller(this, 0)
+    ];
   }
 
   @override
@@ -52,6 +59,8 @@ class QuestionnaireResponseFillerState
 
   void onAnswered(
       List<QuestionnaireResponseAnswer?>? answers, int answerIndex) {
+    // TODO: Should the responsemodel be updated in model code and then
+    // setState() be invoked afterwards?
     if (mounted) {
       setState(() {
         responseModel.answers = answers ?? [];
@@ -96,36 +105,5 @@ class QuestionnaireResponseFillerState
           )
         ])
     ]);
-  }
-
-  QuestionnaireAnswerFiller _createAnswerFiller(int answerIndex) {
-    _logger.debug('Creating AnswerFiller for ${responseModel.itemModel}');
-
-    try {
-      final answerModel = responseModel.answerModel(answerIndex);
-
-      if (responseModel.itemModel.isCalculatedExpression) {
-        // TODO: Should there be a dedicated CalculatedExpression Model and item?
-        return StaticItem(this, answerIndex);
-      } else if (answerModel is NumericalAnswerModel) {
-        return NumericalAnswerFiller(this, answerIndex);
-      } else if (answerModel is StringAnswerModel) {
-        return StringAnswerFiller(this, answerIndex);
-      } else if (answerModel is DateTimeAnswerModel) {
-        return DateTimeAnswerFiller(this, answerIndex);
-      } else if (answerModel is CodingAnswerModel) {
-        return CodingAnswerFiller(this, answerIndex);
-      } else if (answerModel is BooleanAnswerModel) {
-        return BooleanAnswerFiller(this, answerIndex);
-      } else if (answerModel is StaticAnswerModel) {
-        return StaticItem(this, answerIndex);
-      } else {
-        throw QuestionnaireFormatException(
-            'Unsupported AnswerModel: $answerModel');
-      }
-    } catch (exception) {
-      _logger.warn('Cannot create answer filler:', error: exception);
-      return BrokenAnswerFiller(this, answerIndex, exception);
-    }
   }
 }
