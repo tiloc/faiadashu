@@ -38,11 +38,18 @@
                 android:name="flutterEmbedding"
                 android:value="2"/>
     </application>
-    <!-- This is required by the url_launch package to locate the browser on Android 11+ -->
     <queries>
+        <!-- This is required by the url_launch package to locate the browser on Android 11+ -->
+        <!-- This is required by the flutter_appauth package to allow the login on Android 11+ -->
         <intent>
             <action android:name="android.intent.action.VIEW"/>
             <category android:name="android.intent.category.BROWSABLE"/>
+            <data android:scheme="https"/>
+        </intent>
+        <!-- This is required by the flutter_appauth package to allow the login on Android 11+ -->
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <category android:name="android.intent.category.APP_BROWSER"/>
             <data android:scheme="https"/>
         </intent>
     </queries>

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:faiadashu/questionnaires/view/questionnaire_stepper_page.dart';
 import 'package:faiadashu/resource_provider/resource_provider.dart';
 import 'package:faiadashu_example/questionnaire_launch_tile.dart';
+import 'package:faiadashu_online/restful/restful.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -55,7 +56,6 @@ class MyApp extends StatelessWidget {
       supportedLocales: const [
         Locale('en', 'US'),
         Locale('de'),
-//        Locale('jp'),  // TODO: Support for Japanese is semi-broken in Flutter
         Locale('es'),
         Locale('ar'),
       ],
@@ -84,6 +84,14 @@ class _HomePageState extends State<HomePage> {
     }
 
     _savedResponses[id] = response;
+  }
+
+  void _uploadResponse(String id, QuestionnaireResponse? response) {
+    if (response == null) {
+      return;
+    }
+
+    uploadQuestionnaireResponse(response);
   }
 
   // Quick-and-dirty in-memory storage for QuestionnaireResponses
@@ -145,7 +153,8 @@ class _HomePageState extends State<HomePage> {
     resourceBundleProvider = RegistryFhirResourceProvider([
       InMemoryResourceProvider.inMemory(
           subjectResourceUri,
-          Patient(id: Id('example123'), name: [
+          // Patient ID matches a patient on Logica Sandbox server.
+          Patient(id: Id('14603'), name: [
             HumanName(given: ['Emma'], family: 'Lee')
           ])),
       AssetImageAttachmentProvider(
@@ -231,6 +240,7 @@ class _HomePageState extends State<HomePage> {
                 questionnairePath: 'assets/instruments/sdc_demo.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
+                uploadResponseFunction: _uploadResponse,
               ),
               QuestionnaireLaunchTile(
                 title: 'FHIR Hot Beverage IG',
@@ -239,6 +249,7 @@ class _HomePageState extends State<HomePage> {
                 questionnairePath: 'assets/instruments/beverage_ig.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
+                uploadResponseFunction: _uploadResponse,
               ),
               QuestionnaireLaunchTile(
                 title: 'SDC Profile Example Render',
@@ -248,6 +259,7 @@ class _HomePageState extends State<HomePage> {
                 questionnairePath: 'assets/instruments/sdc-example-render.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
+                uploadResponseFunction: _uploadResponse,
               ),
               QuestionnaireLaunchTile(
                 title: 'Argonaut Questionnaire Sampler',
@@ -257,6 +269,7 @@ class _HomePageState extends State<HomePage> {
                 questionnairePath: 'assets/instruments/argonaut_sampler.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
+                uploadResponseFunction: _uploadResponse,
               ),
               QuestionnaireLaunchTile(
                 locale: const Locale('de', 'DE'),
@@ -266,6 +279,7 @@ class _HomePageState extends State<HomePage> {
                 questionnairePath: 'assets/instruments/argonaut_sampler.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
+                uploadResponseFunction: _uploadResponse,
               ),
               QuestionnaireLaunchTile(
                 locale: const Locale('ar', 'BH'),
@@ -275,6 +289,7 @@ class _HomePageState extends State<HomePage> {
                 questionnairePath: 'assets/instruments/argonaut_sampler.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
+                uploadResponseFunction: _uploadResponse,
               ),
               QuestionnaireLaunchTile(
                 title: 'PHQ9 Questionnaire Scroller',
@@ -283,6 +298,7 @@ class _HomePageState extends State<HomePage> {
                 questionnairePath: 'assets/instruments/phq9_instrument.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
+                uploadResponseFunction: _uploadResponse,
               ),
               ListTile(
                 title: const Text('PHQ9 Questionnaire Stepper'),
@@ -305,6 +321,7 @@ class _HomePageState extends State<HomePage> {
                 questionnairePath: 'assets/instruments/hf_instrument.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
+                uploadResponseFunction: _uploadResponse,
               ),
               QuestionnaireLaunchTile(
                 title: 'PRAPARE Questionnaire Scroller',
@@ -313,6 +330,7 @@ class _HomePageState extends State<HomePage> {
                 questionnairePath: 'assets/instruments/prapare_instrument.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
+                uploadResponseFunction: _uploadResponse,
               ),
               QuestionnaireLaunchTile(
                 title: 'Bluebook Questionnaire Scroller',
@@ -327,6 +345,7 @@ class _HomePageState extends State<HomePage> {
                 questionnairePath: 'assets/instruments/bluebook.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
+                uploadResponseFunction: _uploadResponse,
               ),
               QuestionnaireLaunchTile(
                 title: 'WHO COVID19 Surveillance',
@@ -336,6 +355,7 @@ class _HomePageState extends State<HomePage> {
                 questionnairePath: 'assets/instruments/who_covid19.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
+                uploadResponseFunction: _uploadResponse,
               ),
             ],
           ),

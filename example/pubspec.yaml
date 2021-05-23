@@ -11,6 +11,9 @@ dependencies:
   faiadashu:
     path: ..
 
+  faiadashu_online:
+    path: ../faiadashu_online
+
   fhir: ^0.4.6
 #  fhir:
 #    path: /Users/tilo/Projects/fhir/fhir

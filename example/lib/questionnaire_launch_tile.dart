@@ -12,6 +12,8 @@ class QuestionnaireLaunchTile extends StatefulWidget {
   final FhirResourceProvider fhirResourceProvider;
   final void Function(String id, QuestionnaireResponse? questionnaireResponse)
       saveResponseFunction;
+  final void Function(String id, QuestionnaireResponse? questionnaireResponse)
+      uploadResponseFunction;
   final QuestionnaireResponse? Function(String id) restoreResponseFunction;
 
   const QuestionnaireLaunchTile(
@@ -21,6 +23,7 @@ class QuestionnaireLaunchTile extends StatefulWidget {
       required this.questionnairePath,
       required this.fhirResourceProvider,
       required this.saveResponseFunction,
+      required this.uploadResponseFunction,
       required this.restoreResponseFunction,
       Key? key})
       : super(key: key);
@@ -81,8 +84,28 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                 ]),
                 persistentFooterButtons: [
                   Builder(
-                    builder: (context) => FloatingActionButton.extended(
-                      label: const Text('Save as Draft'),
+                    builder: (context) => ElevatedButton.icon(
+                      label: const Text('Upload'),
+                      icon: const Icon(Icons.cloud_upload_outlined),
+                      onPressed: () {
+                        // Generate a response and upload it to a FHIR server.
+                        // TODO: In a real-world scenario this should have more state handling.
+                        widget.uploadResponseFunction.call(
+                            widget.questionnairePath,
+                            QuestionnaireFiller.of(context)
+                                .aggregator<QuestionnaireResponseAggregator>()
+                                .aggregate(
+                                    responseStatus:
+                                        QuestionnaireResponseStatus.completed));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Survey uploaded.')));
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ),
+                  Builder(
+                    builder: (context) => ElevatedButton.icon(
+                      label: const Text('Save Locally'),
                       icon: const Icon(Icons.save_alt),
                       onPressed: () {
                         // Generate a response and store it in-memory.
