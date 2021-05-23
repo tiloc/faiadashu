@@ -55,25 +55,4 @@ Future<void> uploadQuestionnaireResponse(QuestionnaireResponse resource) async {
     _logger.warn('Upload failed', error: e);
     rethrow;
   }
-
-  // TODO: What is this???
-  if (newId is! Id) {
-    _logger.warn('$newId is not an Id.');
-  } else {
-    final request2 = FhirRequest.read(
-      base: client.fhirUrl.value!,
-      type: resource.resourceType,
-      id: newId,
-    );
-
-    // TODO: Why is this being re-read? Upload already returns it.
-    try {
-      final response2 =
-          await request2.request(headers: await client.authHeaders);
-      _logger.debug('Response from read:\n${response2?.toJson()}');
-    } catch (e) {
-      _logger.warn('Failed to re-read resource', error: e);
-      rethrow;
-    }
-  }
 }
