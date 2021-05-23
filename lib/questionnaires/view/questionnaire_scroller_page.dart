@@ -223,6 +223,8 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
 
     _isPositioned = true;
 
+    // TODO: Item could be visible, but in an undesirable position, e.g.
+    // at the bottom of the display.
     final isItemVisible = _itemPositionsListener.itemPositions.value
         .any((element) => element.index == _focusIndex);
 
@@ -237,7 +239,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
     //
     // Rationale: Before the data is loaded the QuestionnaireFiller is still
     // showing progress indicator and no scrolling is possible.
-    // During the frame when data is loaded the _listScrollController is not
+    // On the first frame after data is loaded the _listScrollController is not
     // properly attached yet and will throw an exception.
     WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
       final milliseconds =
@@ -245,7 +247,9 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
       _listScrollController.scrollTo(
           index: _focusIndex,
           duration: Duration(milliseconds: milliseconds),
-          curve: Curves.easeInOutCubic);
+          curve: Curves.easeInOutCubic,
+          alignment:
+              0.3); // Scroll the item's top-edge into the top 30% of the screen.
     });
   }
 }
