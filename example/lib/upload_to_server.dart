@@ -1,17 +1,21 @@
-import 'dart:convert';
-
 import 'package:fhir/primitive_types/primitive_types.dart';
 import 'package:fhir/r4.dart';
 import 'package:fhir_at_rest/r4.dart';
 import 'package:fhir_auth/r4.dart';
 
 Future uploadToServer(Resource resource) async {
+
   final client = SmartClient(
     fhirUrl: FhirUri('https://api.logicahealth.org/faiadashu/data'),
     clientId: '9f03822a-e4ca-4ea6-aaa3-107661bd86a4',
     redirectUri: FhirUri('com.example.example://callback'),
     scopes: Scopes(
       clinicalScopes: [
+        ClinicalScope(
+          Role.patient,
+          R4ResourceType.Patient,
+          Interaction.any,
+        ),
         ClinicalScope(
           Role.patient,
           R4ResourceType.QuestionnaireResponse,
@@ -23,15 +27,11 @@ Future uploadToServer(Resource resource) async {
     ),
   );
 
-  print(client.isLoggedIn);
-
   try {
     await client.login();
   } catch (e) {
     print(e);
   }
-
-  print(client.isLoggedIn);
 
   print(
       '${resource.resourceTypeString()} to be uploaded:\n${resource.toJson()}');
@@ -64,6 +64,4 @@ Future uploadToServer(Resource resource) async {
       print(e);
     }
   }
-
-  print(client.isLoggedIn);
 }
