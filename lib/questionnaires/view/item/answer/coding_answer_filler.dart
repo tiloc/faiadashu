@@ -13,12 +13,13 @@ import 'null_dash_text.dart';
 /// Answer questions which require code(s) as a response.
 ///
 /// This class uses [CodeableConcept] to model multiple choice and open choice.
+///
 /// Future R5 releases of the FHIR standard will likely have a `coding` item type.
 class CodingAnswerFiller extends QuestionnaireAnswerFiller {
-  const CodingAnswerFiller(
-      QuestionnaireItemModel itemModel, AnswerLocation answerLocation,
+  CodingAnswerFiller(
+      QuestionnaireResponseFillerState responseFillerState, int answerIndex,
       {Key? key})
-      : super(itemModel, answerLocation, key: key);
+      : super(responseFillerState, answerIndex, key: key);
   @override
   State<StatefulWidget> createState() => _CodingAnswerState();
 }

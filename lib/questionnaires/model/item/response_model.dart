@@ -1,7 +1,7 @@
 import 'package:fhir/r4.dart';
 
 import '../../../coding/data_absent_reasons.dart';
-import '../questionnaire_item_model.dart';
+import '../../questionnaires.dart';
 
 /// Model a response item, which might consist of multiple answers.
 class ResponseModel {
@@ -57,31 +57,45 @@ class ResponseModel {
             // FHIR cannot have empty arrays.
             answer: filledAnswers.isEmpty ? null : filledAnswers);
   }
-}
 
-typedef OnAnswered = void Function(
-    List<QuestionnaireResponseAnswer?>? answers, int answerIndex);
-
-/// Connects responses and individual answers.
-class AnswerLocation {
-  final List<QuestionnaireResponseAnswer?> _answers;
-  final int _answerIndex;
-  final OnAnswered _onAnswered;
-
-  const AnswerLocation(List<QuestionnaireResponseAnswer?> answers,
-      int answerIndex, OnAnswered onAnswered)
-      : _answers = answers,
-        _answerIndex = answerIndex,
-        _onAnswered = onAnswered;
-
-  void updateAnswer(QuestionnaireResponseAnswer? answer) {
-    _onAnswered.call([answer], _answerIndex);
+  /// Is this response invalid?
+  ///
+  /// This is currently entirely based on the [dataAbsentReason].
+  bool get isInvalid {
+    return dataAbsentReason == dataAbsentReasonAsTextCode;
   }
 
-  /// Special functionality to allow choice and open-choice items with "repeats".
-  void updateAnswers(List<QuestionnaireResponseAnswer?>? answers) {
-    _onAnswered.call(answers, _answerIndex);
+  /// Returns an [AnswerModel] for the nth answer to an overall response.
+  ///
+  /// Only [answerIndex] == 0 is currently supported.
+  AnswerModel answerModel(int answerIndex) {
+    // TODO: Should this construct a new one every time, or reuse existing ones?
+    switch (itemModel.questionnaireItem.type!) {
+      case QuestionnaireItemType.choice:
+      case QuestionnaireItemType.open_choice:
+        return CodingAnswerModel(this, answerIndex);
+      case QuestionnaireItemType.quantity:
+      case QuestionnaireItemType.decimal:
+      case QuestionnaireItemType.integer:
+        return NumericalAnswerModel(this, answerIndex);
+      case QuestionnaireItemType.string:
+      case QuestionnaireItemType.text:
+      case QuestionnaireItemType.url:
+        return StringAnswerModel(this, answerIndex);
+      case QuestionnaireItemType.date:
+      case QuestionnaireItemType.datetime:
+      case QuestionnaireItemType.time:
+        return DateTimeAnswerModel(this, answerIndex);
+      case QuestionnaireItemType.boolean:
+        return BooleanAnswerModel(this, answerIndex);
+      case QuestionnaireItemType.display:
+      case QuestionnaireItemType.group:
+        return StaticAnswerModel(this, answerIndex);
+      case QuestionnaireItemType.attachment:
+      case QuestionnaireItemType.unknown:
+      case QuestionnaireItemType.reference:
+        throw QuestionnaireFormatException(
+            'Unsupported item type: ${itemModel.questionnaireItem.type!}');
+    }
   }
-
-  QuestionnaireResponseAnswer? get answer => _answers[_answerIndex];
 }

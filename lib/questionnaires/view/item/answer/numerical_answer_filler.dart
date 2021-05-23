@@ -10,10 +10,10 @@ import 'numerical_input.dart';
 
 /// Filler for answers of type [Integer], [Decimal], and [Quantity].
 class NumericalAnswerFiller extends QuestionnaireAnswerFiller {
-  const NumericalAnswerFiller(
-      QuestionnaireItemModel itemModel, AnswerLocation answerLocation,
+  NumericalAnswerFiller(
+      QuestionnaireResponseFillerState responseFillerState, int answerIndex,
       {Key? key})
-      : super(itemModel, answerLocation, key: key);
+      : super(responseFillerState, answerIndex, key: key);
 
   @override
   State<NumericalAnswerFiller> createState() => _NumericalAnswerState();
@@ -112,6 +112,7 @@ class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
                 },
                 autovalidateMode: AutovalidateMode.always,
                 onChanged: (content) {
+                  // TODO: Much of this could move to the model
                   final valid = answerModel.validate(content) == null;
                   final dataAbsentReasonExtension = !valid
                       ? [

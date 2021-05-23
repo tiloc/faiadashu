@@ -7,10 +7,10 @@ import '../../../logging/logging.dart';
 import '../../questionnaires.dart';
 
 class StaticItem extends QuestionnaireAnswerFiller {
-  const StaticItem(
-      QuestionnaireItemModel itemModel, AnswerLocation answerLocation,
+  StaticItem(
+      QuestionnaireResponseFillerState responseFillerState, int answerIndex,
       {Key? key})
-      : super(itemModel, answerLocation, key: key);
+      : super(responseFillerState, answerIndex, key: key);
   @override
   State<StatefulWidget> createState() => _StaticItemState();
 }
@@ -26,6 +26,7 @@ class _StaticItemState extends State<StaticItem> {
   void initState() {
     super.initState();
 
+    // TODO: This should go into a model.
     calcResult =
         widget.itemModel.responseItem?.answer?.firstOrNull?.valueDecimal ??
             widget.itemModel.responseItem?.answer?.first.valueQuantity?.value;

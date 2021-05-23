@@ -19,6 +19,7 @@ class QuestionnaireFiller extends StatefulWidget {
   final List<Aggregator<dynamic>>? aggregators;
   final void Function(BuildContext context, Uri url)? onLinkTap;
   final void Function(QuestionnaireModel)? onDataAvailable;
+  final QuestionnaireViewFactory viewFactory;
 
   final FhirResourceProvider fhirResourceProvider;
 
@@ -35,7 +36,8 @@ class QuestionnaireFiller extends StatefulWidget {
       required this.fhirResourceProvider,
       this.aggregators,
       this.onDataAvailable,
-      this.onLinkTap})
+      this.onLinkTap,
+      this.viewFactory = const DefaultQuestionnaireViewFactory()})
       : super(key: key);
 
   static QuestionnaireFillerData of(BuildContext context) {
@@ -117,12 +119,12 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
                       _onQuestionnaireModelChangeListenerFunction!);
 
                   _questionnaireFillerData = QuestionnaireFillerData._(
-                    _questionnaireModel!,
-                    locale: widget.locale,
-                    builder: widget.builder,
-                    onLinkTap: widget.onLinkTap,
-                    onDataAvailable: widget.onDataAvailable,
-                  );
+                      _questionnaireModel!,
+                      locale: widget.locale,
+                      builder: widget.builder,
+                      onLinkTap: widget.onLinkTap,
+                      onDataAvailable: widget.onDataAvailable,
+                      viewFactory: widget.viewFactory);
                 }
                 return _questionnaireFillerData;
               }
@@ -141,6 +143,7 @@ class QuestionnaireFillerData extends InheritedWidget {
   final Iterable<QuestionnaireItemModel> questionnaireItemModels;
   final void Function(BuildContext context, Uri url)? onLinkTap;
   final void Function(QuestionnaireModel)? onDataAvailable;
+  final QuestionnaireViewFactory viewFactory;
   late final List<QuestionnaireItemFiller?> _itemFillers;
   late final List<GlobalKey<QuestionnaireItemFillerState>> _globalKeys;
   late final int _revision;
@@ -151,8 +154,9 @@ class QuestionnaireFillerData extends InheritedWidget {
     required this.locale,
     this.onDataAvailable,
     this.onLinkTap,
+    required this.viewFactory,
     required WidgetBuilder builder,
-  })   : _revision = questionnaireModel.revision,
+  })  : _revision = questionnaireModel.revision,
         questionnaireItemModels =
             questionnaireModel.orderedQuestionnaireItemModels(),
         _itemFillers = List<QuestionnaireItemFiller?>.filled(
@@ -217,9 +221,8 @@ class QuestionnaireFillerData extends InheritedWidget {
 
     if (_itemFillers[index] == null) {
       _logger.debug('itemFillerAt $index will be created.');
-      _itemFillers[index] = QuestionnaireItemFiller.fromQuestionnaireItem(
-          questionnaireItemModels.elementAt(index),
-          key: _globalKeys[index]);
+      _itemFillers[index] = viewFactory
+          .createQuestionnaireItemFiller(this, index, key: _globalKeys[index]);
     } else {
       _logger.debug('itemFillerAt $index already exists.');
     }

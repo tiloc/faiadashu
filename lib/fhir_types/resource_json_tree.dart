@@ -267,7 +267,8 @@ class _JsonViewerGenericNode extends StatelessWidget {
               style: TextStyle(color: color),
             )),
           if (nodeValue == null)
-            Text('null', style: TextStyle(color: themeData.colorScheme.secondary)),
+            Text('null',
+                style: TextStyle(color: themeData.colorScheme.secondary)),
         ],
       ),
     );

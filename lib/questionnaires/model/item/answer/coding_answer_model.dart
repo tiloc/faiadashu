@@ -7,7 +7,6 @@ import '../../../../fhir_types/fhir_types_extensions.dart';
 import '../../../../logging/logger.dart';
 import '../../questionnaire_exceptions.dart';
 import '../../questionnaire_extensions.dart';
-import '../../questionnaire_item_model.dart';
 import '../response_model.dart';
 import 'answer_model.dart';
 
@@ -204,9 +203,8 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
   late final int minOccurs;
   late final int? maxOccurs;
 
-  CodingAnswerModel(
-      QuestionnaireItemModel itemModel, AnswerLocation answerLocation)
-      : super(itemModel, answerLocation) {
+  CodingAnswerModel(ResponseModel responseModel, int answerIndex)
+      : super(responseModel, answerIndex) {
     _createAnswerOptions();
 
     minOccurs = qi.extension_

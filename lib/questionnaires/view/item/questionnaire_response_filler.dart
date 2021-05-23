@@ -9,27 +9,34 @@ import '../../questionnaires.dart';
 
 /// Filler for a [QuestionnaireResponseItem].
 class QuestionnaireResponseFiller extends StatefulWidget {
+  final QuestionnaireItemFiller itemFiller;
   final QuestionnaireItemModel itemModel;
 
-  QuestionnaireResponseFiller(this.itemModel)
+  QuestionnaireResponseFiller._(this.itemFiller, this.itemModel)
       : super(key: ValueKey<String>(itemModel.linkId));
 
+  factory QuestionnaireResponseFiller.fromQuestionnaireItemFiller(
+      QuestionnaireItemFiller itemFiller) {
+    return QuestionnaireResponseFiller._(itemFiller, itemFiller.itemModel);
+  }
+
   @override
-  State<StatefulWidget> createState() => QuestionnaireResponseState();
+  State<StatefulWidget> createState() => QuestionnaireResponseFillerState();
 }
 
-class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
+class QuestionnaireResponseFillerState
+    extends State<QuestionnaireResponseFiller> {
   late final List<QuestionnaireAnswerFiller> _answerFillers;
   late final ResponseModel responseModel;
 
   late final FocusNode _skipSwitchFocusNode;
 
-  QuestionnaireResponseState();
+  QuestionnaireResponseFillerState();
 
   @override
   void initState() {
     super.initState();
-    responseModel = ResponseModel(widget.itemModel);
+    responseModel = widget.itemModel.responseModel;
 
     _skipSwitchFocusNode = FocusNode(
         skipTraversal: true,
@@ -39,8 +46,8 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
     // This assumes that all answers are of the same kind
     // and repeats = true is only supported for choice items
     _answerFillers = [
-      QuestionnaireAnswerFiller.fromQuestionnaireItem(widget.itemModel,
-          AnswerLocation(responseModel.answers, 0, _stashAnswers))
+      widget.itemFiller.questionnaireFiller.viewFactory
+          .createAnswerFiller(this, 0)
     ];
   }
 
@@ -50,8 +57,10 @@ class QuestionnaireResponseState extends State<QuestionnaireResponseFiller> {
     super.dispose();
   }
 
-  void _stashAnswers(
+  void onAnswered(
       List<QuestionnaireResponseAnswer?>? answers, int answerIndex) {
+    // TODO: Should the responsemodel be updated in model code and then
+    // setState() be invoked afterwards?
     if (mounted) {
       setState(() {
         responseModel.answers = answers ?? [];

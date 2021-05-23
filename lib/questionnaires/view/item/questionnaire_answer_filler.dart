@@ -7,53 +7,15 @@ import '../broken_questionnaire_item.dart';
 
 /// Filler for an individual [QuestionnaireResponseAnswer].
 abstract class QuestionnaireAnswerFiller extends StatefulWidget {
-  static final _logger = Logger(QuestionnaireAnswerFiller);
+//  static final _logger = Logger(QuestionnaireAnswerFiller);
+  final QuestionnaireResponseFillerState responseFillerState;
+  final int answerIndex;
   final QuestionnaireItemModel itemModel;
-  final AnswerLocation answerLocation;
 
-  const QuestionnaireAnswerFiller(this.itemModel, this.answerLocation,
+  QuestionnaireAnswerFiller(this.responseFillerState, this.answerIndex,
       {Key? key})
-      : super(key: key);
-
-  static QuestionnaireAnswerFiller fromQuestionnaireItem(
-      QuestionnaireItemModel itemModel, AnswerLocation answerLocation) {
-    _logger.debug('Creating AnswerFiller for $itemModel');
-
-    try {
-      switch (itemModel.questionnaireItem.type!) {
-        case QuestionnaireItemType.choice:
-        case QuestionnaireItemType.open_choice:
-          return CodingAnswerFiller(itemModel, answerLocation);
-        case QuestionnaireItemType.quantity:
-        case QuestionnaireItemType.decimal:
-        case QuestionnaireItemType.integer:
-          return (itemModel.isCalculatedExpression)
-              ? StaticItem(itemModel, answerLocation)
-              : NumericalAnswerFiller(itemModel, answerLocation);
-        case QuestionnaireItemType.string:
-        case QuestionnaireItemType.text:
-        case QuestionnaireItemType.url:
-          return StringAnswerFiller(itemModel, answerLocation);
-        case QuestionnaireItemType.display:
-        case QuestionnaireItemType.group:
-          return StaticItem(itemModel, answerLocation);
-        case QuestionnaireItemType.date:
-        case QuestionnaireItemType.datetime:
-        case QuestionnaireItemType.time:
-          return DateTimeAnswerFiller(itemModel, answerLocation);
-        case QuestionnaireItemType.boolean:
-          return BooleanAnswerFiller(itemModel, answerLocation);
-        case QuestionnaireItemType.attachment:
-        case QuestionnaireItemType.unknown:
-        case QuestionnaireItemType.reference:
-          throw QuestionnaireFormatException(
-              'Unsupported item type: ${itemModel.questionnaireItem.type!}');
-      }
-    } catch (exception) {
-      _logger.warn('Cannot create answer filler:', error: exception);
-      return _BrokenItem(itemModel, answerLocation, exception);
-    }
-  }
+      : itemModel = responseFillerState.responseModel.itemModel,
+        super(key: key);
 }
 
 abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller,
@@ -77,8 +39,8 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller,
     super.initState();
 
     try {
-      answerModel =
-          AnswerModel.createModel<M>(itemModel, widget.answerLocation) as M;
+      answerModel = widget.responseFillerState.responseModel
+          .answerModel(widget.answerIndex) as M;
 
       answerModelError = null;
 
@@ -150,9 +112,11 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller,
       });
 
       if (answerModel.hasCodingAnswers()) {
-        widget.answerLocation.updateAnswers(answerModel.fillCodingAnswers());
+        widget.responseFillerState.onAnswered(
+            answerModel.fillCodingAnswers(), answerModel.answerIndex);
       } else {
-        widget.answerLocation.updateAnswer(answerModel.fillAnswer());
+        widget.responseFillerState
+            .onAnswered([answerModel.fillAnswer()], answerModel.answerIndex);
       }
     }
   }
@@ -164,31 +128,5 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller,
     return widget.itemModel.isReadOnly
         ? _guardedBuildReadOnly(context)
         : _guardedBuildEditable(context);
-  }
-}
-
-class _BrokenItem extends QuestionnaireAnswerFiller {
-  final Object exception;
-
-  const _BrokenItem(QuestionnaireItemModel itemModel,
-      AnswerLocation answerLocation, this.exception)
-      : super(itemModel, answerLocation);
-
-  @override
-  State<StatefulWidget> createState() => _BrokenItemState();
-}
-
-class _BrokenItemState extends State<_BrokenItem> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return BrokenQuestionnaireItem(
-        'Could not initialize QuestionnaireAnswerFiller',
-        widget.itemModel.questionnaireItem,
-        widget.exception);
   }
 }

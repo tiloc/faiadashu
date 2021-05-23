@@ -55,9 +55,8 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
     }
   }
 
-  NumericalAnswerModel(
-      QuestionnaireItemModel itemModel, AnswerLocation answerLocation)
-      : super(itemModel, answerLocation) {
+  NumericalAnswerModel(ResponseModel responseModel, int answerIndex)
+      : super(responseModel, answerIndex) {
     _isSliding = itemModel.questionnaireItem.isItemControl('slider');
 
     final minValueExtension = qi.extension_

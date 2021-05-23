@@ -9,7 +9,12 @@ class NarrativePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: NarrativeTile(questionnaireModel: questionnaireModel),
+      appBar: AppBar(
+        title: const Text('Narrative'),
+      ),
+      body: Container(
+          padding: const EdgeInsets.all(8.0),
+          child: NarrativeTile(questionnaireModel: questionnaireModel)),
     );
   }
 }
