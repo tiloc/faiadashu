@@ -209,12 +209,18 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
+  /// Schedules repaint after login / logout.
+  void _onLoginChanged() {
+    _logger.debug('_onLoginChanged: ${smartClient.isLoggedIn}');
+    setState(() {
+      // Rebuild
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final uploadResponseFunction = _uploadResponse;
-    // TODO: For this to work I would probably need to listen to state changes
-    // in SmartLoginButton and then repaint.
-//        smartClient.isLoggedIn ? _uploadResponse : null;
+    final uploadResponseFunction =
+        smartClient.isLoggedIn ? _uploadResponse : null;
 
     return Scaffold(
       appBar: AppBar(
@@ -231,7 +237,9 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
-        actions: [SmartLoginButton(smartClient)],
+        actions: [
+          SmartLoginButton(smartClient, onLoginChanged: _onLoginChanged)
+        ],
       ),
       body: SafeArea(
         child: Scrollbar(
