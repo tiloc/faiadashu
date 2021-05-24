@@ -17,6 +17,7 @@ dependencies:
   fhir: ^0.4.6
 #  fhir:
 #    path: /Users/tilo/Projects/fhir/fhir
+  fhir_auth: ^0.4.0
 
   flutter:
     sdk: flutter
@@ -25,7 +26,9 @@ dependencies:
 
   logging: ^1.0.1
 
-  url_launcher: ^6.0.3
+  pedantic: ^1.11.0
+
+  url_launcher: ^6.0.4
 
 dev_dependencies:
   lint: ^1.0.0

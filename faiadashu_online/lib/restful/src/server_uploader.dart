@@ -5,35 +5,13 @@ import 'package:fhir_at_rest/r4.dart';
 import 'package:fhir_auth/r4.dart';
 
 /// Uploads a [QuestionnaireResponse] to a server.
-Future<void> uploadQuestionnaireResponse(QuestionnaireResponse resource) async {
-  // TODO: Should this return the ID, rather than void?
+Future<Id?> uploadQuestionnaireResponse(
+    SmartClient smartClient, QuestionnaireResponse resource) async {
   final _logger = Logger.tag('server_uploader');
 
-  // TODO: Move hard-coded server info to API and example.
-  final client = SmartClient(
-    fhirUrl: FhirUri('https://api.logicahealth.org/faiadashu/data'),
-    clientId: '9f03822a-e4ca-4ea6-aaa3-107661bd86a4',
-    redirectUri: FhirUri('com.example.example://callback'),
-    scopes: Scopes(
-      clinicalScopes: [
-        ClinicalScope(
-          Role.patient,
-          R4ResourceType.Patient,
-          Interaction.any,
-        ),
-        ClinicalScope(
-          Role.patient,
-          R4ResourceType.QuestionnaireResponse,
-          Interaction.any,
-        ),
-      ],
-      openid: true,
-      offlineAccess: true,
-    ),
-  );
-
   try {
-    await client.login();
+    // TODO: Should login be part of the upload? Or should the client already be logged in?
+    if (!smartClient.isLoggedIn) await smartClient.login();
   } catch (e) {
     _logger.warn('Could not authenticate.', error: e);
     rethrow;
@@ -42,13 +20,16 @@ Future<void> uploadQuestionnaireResponse(QuestionnaireResponse resource) async {
   _logger.debug(
       '${resource.resourceTypeString()} to be uploaded:\n${resource.toJson()}');
   final request1 = FhirRequest.create(
-    base: client.fhirUrl.value!,
+    base: smartClient.fhirUrl.value!,
     resource: resource,
   );
 
   try {
-    final response1 = await request1.request(headers: await client.authHeaders);
+    final response1 =
+        await request1.request(headers: await smartClient.authHeaders);
     _logger.debug('Response from upload:\n${response1?.toJson()}');
+
+    return response1?.id;
   } catch (e) {
     _logger.warn('Upload failed', error: e);
     rethrow;
