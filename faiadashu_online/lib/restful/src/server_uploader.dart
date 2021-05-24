@@ -46,11 +46,9 @@ Future<void> uploadQuestionnaireResponse(QuestionnaireResponse resource) async {
     resource: resource,
   );
 
-  Id? newId;
   try {
     final response1 = await request1.request(headers: await client.authHeaders);
     _logger.debug('Response from upload:\n${response1?.toJson()}');
-    newId = response1?.id;
   } catch (e) {
     _logger.warn('Upload failed', error: e);
     rethrow;

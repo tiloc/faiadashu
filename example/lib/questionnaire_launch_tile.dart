@@ -98,7 +98,7 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                                     responseStatus:
                                         QuestionnaireResponseStatus.completed));
                         ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Survey uploaded.')));
+                            const SnackBar(content: Text('Uploading survey…')));
                         Navigator.pop(context);
                       },
                     ),
