@@ -6,6 +6,8 @@ import 'package:pedantic/pedantic.dart';
 
 import 'fhir_types_extensions.dart';
 
+// TODO: Is it really advantageous to use a TextFormField? Or would a FocusableActionDetector be the better basis?
+
 /// Present a picker for FhirDateTime, Date, or Time.
 ///
 /// The control is displayed as a text field that can be tapped to open

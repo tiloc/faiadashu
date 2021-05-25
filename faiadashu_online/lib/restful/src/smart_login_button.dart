@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:fhir_auth/r4/smart_client/smart_client.dart';
 import 'package:flutter/material.dart';
 
@@ -18,9 +20,16 @@ class SmartLoginButton extends StatefulWidget {
 
 enum LoginStatus { loggedOut, loggedIn, loggingOut, loggingIn, error, unknown }
 
-class _SmartLoginButtonState extends State<SmartLoginButton> {
+class _SmartLoginButtonState extends State<SmartLoginButton>
+    with SingleTickerProviderStateMixin {
   final ValueNotifier<LoginStatus> _loginStatus =
       ValueNotifier(LoginStatus.unknown);
+
+  final _loggedInKey = UniqueKey();
+  final _loggedOutKey = UniqueKey();
+  final _ingKey = UniqueKey();
+
+  late final AnimationController _animationController;
 
   @override
   void initState() {
@@ -28,6 +37,10 @@ class _SmartLoginButtonState extends State<SmartLoginButton> {
     _loginStatus.value = (widget.smartClient.isLoggedIn)
         ? LoginStatus.loggedIn
         : LoginStatus.loggedOut;
+
+    _animationController =
+        AnimationController(vsync: this, duration: const Duration(seconds: 2))
+          ..repeat();
 
     if (widget.onLoginChanged != null) {
       _loginStatus.addListener(widget.onLoginChanged!);
@@ -44,9 +57,12 @@ class _SmartLoginButtonState extends State<SmartLoginButton> {
 
   @override
   Widget build(BuildContext context) {
+    Widget? child;
+
     switch (_loginStatus.value) {
       case LoginStatus.loggedIn:
-        return IconButton(
+        child = IconButton(
+            key: _loggedInKey,
             onPressed: () async {
               setState(() {
                 _loginStatus.value = LoginStatus.loggingOut;
@@ -57,9 +73,11 @@ class _SmartLoginButtonState extends State<SmartLoginButton> {
               });
             },
             icon: const Icon(Icons.logout));
+        break;
       case LoginStatus.loggedOut:
       case LoginStatus.error:
-        return IconButton(
+        child = IconButton(
+            key: _loggedOutKey,
             onPressed: () async {
               setState(() {
                 _loginStatus.value = LoginStatus.loggingIn;
@@ -78,11 +96,31 @@ class _SmartLoginButtonState extends State<SmartLoginButton> {
             icon: (_loginStatus.value == LoginStatus.loggedOut)
                 ? const Icon(Icons.login)
                 : const Icon(Icons.error));
+        break;
       case LoginStatus.loggingIn:
       case LoginStatus.loggingOut:
-        return const Icon(Icons.sync);
+        child = AnimatedBuilder(
+            key: _ingKey,
+            animation: _animationController,
+            builder: (BuildContext context, Widget? _widget) {
+              return Transform.rotate(
+                angle: _animationController.value * 2 * pi,
+                child: _widget,
+              );
+            },
+            child: const Icon(Icons.sync));
+        break;
       case LoginStatus.unknown:
-        return const Icon(Icons.device_unknown);
+        child = const Icon(Icons.device_unknown);
     }
+
+    return SizedBox(
+      width: 40,
+      height: 32,
+      child: Center(
+        child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 1000), child: child),
+      ),
+    );
   }
 }
