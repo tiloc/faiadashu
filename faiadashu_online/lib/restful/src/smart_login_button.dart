@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:fhir_auth/r4/smart_client/smart_client.dart';
 import 'package:flutter/material.dart';
 
-// TODO: Smoother animations, progress indicators, etc.
 // TODO: Should this entire widget be stateless and only use a ValueNotifier?
 
 /// A login/logout button that is tied to the state of a [SmartClient].
