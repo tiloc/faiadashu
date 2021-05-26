@@ -16,6 +16,7 @@ class FhirDateTimePicker extends StatefulWidget {
   final DateTime lastDate;
   final FhirDateTime? initialDateTime;
   final Type pickerType;
+  final InputDecoration? decoration;
   final FocusNode? focusNode;
   final void Function(FhirDateTime?)? onChanged;
 
@@ -24,6 +25,7 @@ class FhirDateTimePicker extends StatefulWidget {
       required this.firstDate,
       required this.lastDate,
       required this.pickerType,
+      this.decoration,
       this.onChanged,
       this.locale,
       this.focusNode,
@@ -35,7 +37,7 @@ class FhirDateTimePicker extends StatefulWidget {
 }
 
 class _FhirDateTimePickerState extends State<FhirDateTimePicker> {
-  String? _dateTimeText;
+  final _dateTimeFieldController = TextEditingController();
   FhirDateTime? _dateTimeValue;
   bool _fieldInitialized = false;
   final _clearFocusNode = FocusNode(skipTraversal: true);
@@ -49,6 +51,7 @@ class _FhirDateTimePickerState extends State<FhirDateTimePicker> {
 
   @override
   void dispose() {
+    _dateTimeFieldController.dispose();
     _clearFocusNode.dispose();
     super.dispose();
   }
@@ -94,7 +97,7 @@ class _FhirDateTimePickerState extends State<FhirDateTimePicker> {
             ? DateTimePrecision.YYYYMMDD
             : DateTimePrecision.FULL);
     setState(() {
-      _dateTimeText = (widget.pickerType == Time)
+      _dateTimeFieldController.text = (widget.pickerType == Time)
           ? DateFormat.jm(locale.toString()).format(dateTime)
           : fhirDateTime.format(locale);
     });
@@ -106,52 +109,34 @@ class _FhirDateTimePickerState extends State<FhirDateTimePicker> {
   Widget build(BuildContext context) {
     final locale = widget.locale ?? Localizations.localeOf(context);
 
-    // There is no context Locale in initState.
+    // There is no Locale in initState.
     if (_fieldInitialized == false) {
-      _dateTimeText = _dateTimeValue?.format(locale);
+      _dateTimeFieldController.text = _dateTimeValue?.format(locale) ?? '';
       _fieldInitialized = true;
     }
 
-    return Row(
+    return Stack(
+      alignment: AlignmentDirectional.centerEnd,
       children: [
-        if (widget.pickerType == Time)
-          const Icon(Icons.access_time_outlined)
-        else
-          const Icon(Icons.calendar_today_outlined),
-        const SizedBox(width: 8.0),
-        Expanded(
-          child: OutlinedButton(
-            focusNode: widget.focusNode,
-            style: OutlinedButton.styleFrom().copyWith(
-              foregroundColor: MaterialStateProperty.resolveWith<Color?>(
-                  (Set<MaterialState> states) {
-                return Theme.of(context).textTheme.bodyText1?.color;
-              }),
-              side: MaterialStateProperty.resolveWith<BorderSide?>(
-                (Set<MaterialState> states) {
-                  if (states.contains(MaterialState.focused)) {
-                    return BorderSide(
-                      color: Theme.of(context).colorScheme.secondary,
-                      width: 2.0,
-                    );
-                  }
-                  // Defer to the widget's default.
-                },
-              ),
-            ),
-            onPressed: () async {
-              widget.focusNode?.requestFocus();
-              await _showPicker(locale);
-            },
-            child: Text(_dateTimeText ?? '—'),
-          ),
+        TextFormField(
+          focusNode: widget.focusNode,
+          textAlignVertical: TextAlignVertical.center,
+          decoration: widget.decoration?.copyWith(
+              prefixIcon: (widget.pickerType == Time)
+                  ? const Icon(Icons.access_time)
+                  : const Icon(Icons.calendar_today_outlined)),
+          controller: _dateTimeFieldController,
+          onTap: () async {
+            await _showPicker(locale);
+          },
+          readOnly: true,
         ),
-        if (_dateTimeText != null && _dateTimeText!.isNotEmpty)
+        if (_dateTimeFieldController.text.isNotEmpty)
           IconButton(
               focusNode: _clearFocusNode,
               onPressed: () {
                 setState(() {
-                  _dateTimeText = null;
+                  _dateTimeFieldController.text = '';
                 });
                 widget.onChanged?.call(null);
               },

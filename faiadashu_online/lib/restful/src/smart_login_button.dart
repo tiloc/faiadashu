@@ -54,6 +54,36 @@ class _SmartLoginButtonState extends State<SmartLoginButton>
     super.dispose();
   }
 
+  void _showStatusSnackBar(BuildContext context) {
+    String message = "Not sure what's going on?";
+    switch (_loginStatus.value) {
+      case LoginStatus.loggingIn:
+        message = 'Signing in…';
+        break;
+      case LoginStatus.loggedIn:
+        message = 'Signed in…';
+        break;
+      case LoginStatus.loggedOut:
+        message = 'Signed out…';
+        break;
+      case LoginStatus.loggingOut:
+        message = 'Signing out…';
+        break;
+      case LoginStatus.error:
+        message = 'Something went wrong.';
+        break;
+      case LoginStatus.unknown:
+        break;
+    }
+
+    ScaffoldMessenger.of(context)
+      ..removeCurrentSnackBar()
+      ..showSnackBar(SnackBar(
+        content: Text(message),
+        duration: const Duration(milliseconds: 1500),
+      ));
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget? child;
@@ -66,10 +96,12 @@ class _SmartLoginButtonState extends State<SmartLoginButton>
               setState(() {
                 _loginStatus.value = LoginStatus.loggingOut;
               });
+              _showStatusSnackBar(context);
               await widget.smartClient.logout();
               setState(() {
                 _loginStatus.value = LoginStatus.loggedOut;
               });
+              _showStatusSnackBar(context);
             },
             icon: const Icon(Icons.logout));
         break;
@@ -81,14 +113,17 @@ class _SmartLoginButtonState extends State<SmartLoginButton>
               setState(() {
                 _loginStatus.value = LoginStatus.loggingIn;
               });
+              _showStatusSnackBar(context);
               try {
                 await widget.smartClient.login();
                 setState(() {
                   _loginStatus.value = LoginStatus.loggedIn;
                 });
+                _showStatusSnackBar(context);
               } catch (e) {
                 setState(() {
                   _loginStatus.value = LoginStatus.error;
+                  _showStatusSnackBar(context);
                 });
               }
             },

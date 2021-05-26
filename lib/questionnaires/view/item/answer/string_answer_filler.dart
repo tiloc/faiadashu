@@ -41,7 +41,7 @@ class _StringAnswerState extends QuestionnaireAnswerState<String,
           controller: _controller,
           maxLines: (qi.type == QuestionnaireItemType.text) ? 4 : 1,
           decoration: InputDecoration(
-            border: const OutlineInputBorder(),
+            filled: true,
             hintText: answerModel.entryFormat,
           ),
           validator: (inputValue) => answerModel.validate(inputValue),
