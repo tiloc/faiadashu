@@ -1,3 +1,7 @@
+## 0.4.1
+* Numerous visual improvements.
+* Introduction of [Faiadashu Online](faiadashu_online/README.md)
+
 ## 0.4.0
 * Refactorings to have a clean relationship between views and models.
   * Non-breaking for high-level use. Breaking for low-level use.

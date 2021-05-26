@@ -9,7 +9,7 @@ facilitate communication with servers that implement the FHIR® standard.
 * Login / Logout button
 * A `ResourceProvider` implementation that fetches resources from a FHIR server
 
-### Feature support
+### Platform support
 This package is relying on native packages which are not available on all platforms where Flutter is available.
 
 Full functionality is currently only supported on Android and iOS.
