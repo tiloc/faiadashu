@@ -123,6 +123,10 @@ class _FhirDateTimePickerState extends State<FhirDateTimePicker> {
           child: OutlinedButton(
             focusNode: widget.focusNode,
             style: OutlinedButton.styleFrom().copyWith(
+              foregroundColor: MaterialStateProperty.resolveWith<Color?>(
+                  (Set<MaterialState> states) {
+                return Theme.of(context).textTheme.bodyText1?.color;
+              }),
               side: MaterialStateProperty.resolveWith<BorderSide?>(
                 (Set<MaterialState> states) {
                   if (states.contains(MaterialState.focused)) {
