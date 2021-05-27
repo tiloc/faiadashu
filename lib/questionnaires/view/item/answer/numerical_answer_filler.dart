@@ -42,8 +42,9 @@ class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
     }
 
     return Container(
-        padding: const EdgeInsets.only(left: 8),
-        width: 96,
+      padding: const EdgeInsets.only(left: 8),
+      width: 96,
+      child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
             value: (answerModel.hasUnit(value))
                 ? answerModel.keyStringFromCoding(Coding(
@@ -76,7 +77,9 @@ class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
                   child: Text(value.localizedDisplay(locale)),
                 );
               }).toList()
-            ]));
+            ]),
+      ),
+    );
   }
 
   @override
@@ -101,10 +104,15 @@ class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
                 initialValue: (value?.value != null)
                     ? value!.value!.format(locale)
                     : null,
-                decoration: InputDecoration(
-                  border: const OutlineInputBorder(),
-                  hintText: answerModel.entryFormat,
-                ),
+                textAlignVertical: TextAlignVertical.center,
+                decoration: viewFactory.createDecoration().copyWith(
+                      hintText: answerModel.entryFormat,
+                      suffixIcon: (answerModel.units.isNotEmpty)
+                          ? SizedBox(
+                              height: 16,
+                              child: _buildDropDownFromUnits(context))
+                          : null,
+                    ),
                 inputFormatters: [_numberInputFormatter],
                 keyboardType: TextInputType.number,
                 validator: (inputValue) {
@@ -139,7 +147,6 @@ class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
                   }
                 },
               )),
-              if (answerModel.units.isNotEmpty) _buildDropDownFromUnits(context)
             ]));
   }
 }

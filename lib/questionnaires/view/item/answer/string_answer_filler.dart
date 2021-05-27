@@ -40,10 +40,9 @@ class _StringAnswerState extends QuestionnaireAnswerState<String,
           keyboardType: TextInputType.text,
           controller: _controller,
           maxLines: (qi.type == QuestionnaireItemType.text) ? 4 : 1,
-          decoration: InputDecoration(
-            border: const OutlineInputBorder(),
-            hintText: answerModel.entryFormat,
-          ),
+          decoration: viewFactory.createDecoration().copyWith(
+                hintText: answerModel.entryFormat,
+              ),
           validator: (inputValue) => answerModel.validate(inputValue),
           autovalidateMode: AutovalidateMode.always,
           onChanged: (content) {

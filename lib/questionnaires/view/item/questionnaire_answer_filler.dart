@@ -11,10 +11,13 @@ abstract class QuestionnaireAnswerFiller extends StatefulWidget {
   final QuestionnaireResponseFillerState responseFillerState;
   final int answerIndex;
   final QuestionnaireItemModel itemModel;
+  final QuestionnaireViewFactory viewFactory;
 
   QuestionnaireAnswerFiller(this.responseFillerState, this.answerIndex,
       {Key? key})
       : itemModel = responseFillerState.responseModel.itemModel,
+        viewFactory = responseFillerState
+            .widget.itemFiller.questionnaireFiller.viewFactory,
         super(key: key);
 }
 
@@ -31,6 +34,9 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller,
   QuestionnaireItem get qi => widget.itemModel.questionnaireItem;
   Locale get locale => widget.itemModel.questionnaireModel.locale;
   QuestionnaireItemModel get itemModel => widget.itemModel;
+
+  QuestionnaireViewFactory get viewFactory => widget
+      .responseFillerState.widget.itemFiller.questionnaireFiller.viewFactory;
 
   QuestionnaireAnswerState();
 

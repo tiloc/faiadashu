@@ -1,14 +1,20 @@
 import 'dart:developer' as developer;
 import 'dart:io';
 
+import 'package:faiadashu/logging/logging.dart' as flogging;
 import 'package:faiadashu/questionnaires/view/questionnaire_stepper_page.dart';
 import 'package:faiadashu/resource_provider/resource_provider.dart';
 import 'package:faiadashu_example/questionnaire_launch_tile.dart';
+import 'package:faiadashu_online/restful/restful.dart';
 import 'package:fhir/r4.dart';
+import 'package:fhir_auth/r4/scopes/clinical_scope.dart';
+import 'package:fhir_auth/r4/scopes/scopes.dart';
+import 'package:fhir_auth/r4/smart_client/smart_client.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:logging/logging.dart';
+import 'package:pedantic/pedantic.dart';
 
 import 'about_page.dart';
 import 'disclaimer_page.dart';
@@ -55,7 +61,6 @@ class MyApp extends StatelessWidget {
       supportedLocales: const [
         Locale('en', 'US'),
         Locale('de'),
-//        Locale('jp'),  // TODO: Support for Japanese is semi-broken in Flutter
         Locale('es'),
         Locale('ar'),
       ],
@@ -72,6 +77,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  static final _logger = flogging.Logger(_HomePageState);
+
   final ScrollController _listScrollController = ScrollController();
 
   final Map<String, QuestionnaireResponse?> _savedResponses = {};
@@ -94,6 +101,18 @@ class _HomePageState extends State<HomePage> {
     } else {
       return null;
     }
+  }
+
+  // Quick-and-dirty upload of QuestionnaireResponse to server
+  // Not suitable for production use (no error-handling)
+  Future<void> _uploadResponse(
+      String id, QuestionnaireResponse? response) async {
+    if (response == null) {
+      return;
+    }
+    // Upload will also save locally.
+    _savedResponses[id] = response;
+    await uploadQuestionnaireResponse(smartClient, response);
   }
 
   // Build up a registry of ValueSets and CodeSystems which are being referenced
@@ -139,23 +158,70 @@ class _HomePageState extends State<HomePage> {
 
   late final FhirResourceProvider resourceBundleProvider;
 
+  late final SmartClient smartClient;
+
   @override
   void initState() {
     super.initState();
     resourceBundleProvider = RegistryFhirResourceProvider([
       InMemoryResourceProvider.inMemory(
           subjectResourceUri,
-          Patient(id: Id('example123'), name: [
+          // Patient ID matches a patient on Logica Sandbox server.
+          Patient(id: Id('14603'), name: [
             HumanName(given: ['Emma'], family: 'Lee')
           ])),
       AssetImageAttachmentProvider(
           'http://example.org/images', 'assets/images'),
       valueSetProvider
     ]);
+
+    // Setup a client for access to a Logica sandbox.
+    smartClient = SmartClient(
+      fhirUrl: FhirUri('https://api.logicahealth.org/faiadashu/data'),
+      clientId: '9f03822a-e4ca-4ea6-aaa3-107661bd86a4',
+      redirectUri: FhirUri('com.example.example://callback'),
+      scopes: Scopes(
+        clinicalScopes: [
+          ClinicalScope(
+            Role.patient,
+            R4ResourceType.Patient,
+            Interaction.any,
+          ),
+          ClinicalScope(
+            Role.patient,
+            R4ResourceType.QuestionnaireResponse,
+            Interaction.any,
+          ),
+        ],
+        openid: true,
+        offlineAccess: true,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    try {
+      unawaited(smartClient.logout());
+    } catch (e) {
+      _logger.warn('Could not log out', error: e);
+    }
+    super.dispose();
+  }
+
+  /// Schedules repaint after login / logout.
+  void _onLoginChanged() {
+    _logger.debug('_onLoginChanged: ${smartClient.isLoggedIn}');
+    setState(() {
+      // Rebuild
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final uploadResponseFunction =
+        smartClient.isLoggedIn ? _uploadResponse : null;
+
     return Scaffold(
       appBar: AppBar(
         title: Builder(
@@ -171,6 +237,9 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
+        actions: [
+          SmartLoginButton(smartClient, onLoginChanged: _onLoginChanged)
+        ],
       ),
       body: SafeArea(
         child: Scrollbar(
@@ -231,6 +300,7 @@ class _HomePageState extends State<HomePage> {
                 questionnairePath: 'assets/instruments/sdc_demo.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
+                uploadResponseFunction: uploadResponseFunction,
               ),
               QuestionnaireLaunchTile(
                 title: 'FHIR Hot Beverage IG',
@@ -239,6 +309,7 @@ class _HomePageState extends State<HomePage> {
                 questionnairePath: 'assets/instruments/beverage_ig.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
+                uploadResponseFunction: uploadResponseFunction,
               ),
               QuestionnaireLaunchTile(
                 title: 'SDC Profile Example Render',
@@ -248,6 +319,7 @@ class _HomePageState extends State<HomePage> {
                 questionnairePath: 'assets/instruments/sdc-example-render.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
+                uploadResponseFunction: uploadResponseFunction,
               ),
               QuestionnaireLaunchTile(
                 title: 'Argonaut Questionnaire Sampler',
@@ -257,6 +329,7 @@ class _HomePageState extends State<HomePage> {
                 questionnairePath: 'assets/instruments/argonaut_sampler.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
+                uploadResponseFunction: uploadResponseFunction,
               ),
               QuestionnaireLaunchTile(
                 locale: const Locale('de', 'DE'),
@@ -266,6 +339,7 @@ class _HomePageState extends State<HomePage> {
                 questionnairePath: 'assets/instruments/argonaut_sampler.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
+                uploadResponseFunction: uploadResponseFunction,
               ),
               QuestionnaireLaunchTile(
                 locale: const Locale('ar', 'BH'),
@@ -275,6 +349,7 @@ class _HomePageState extends State<HomePage> {
                 questionnairePath: 'assets/instruments/argonaut_sampler.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
+                uploadResponseFunction: uploadResponseFunction,
               ),
               QuestionnaireLaunchTile(
                 title: 'PHQ9 Questionnaire Scroller',
@@ -283,6 +358,7 @@ class _HomePageState extends State<HomePage> {
                 questionnairePath: 'assets/instruments/phq9_instrument.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
+                uploadResponseFunction: uploadResponseFunction,
               ),
               ListTile(
                 title: const Text('PHQ9 Questionnaire Stepper'),
@@ -305,6 +381,7 @@ class _HomePageState extends State<HomePage> {
                 questionnairePath: 'assets/instruments/hf_instrument.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
+                uploadResponseFunction: uploadResponseFunction,
               ),
               QuestionnaireLaunchTile(
                 title: 'PRAPARE Questionnaire Scroller',
@@ -313,6 +390,7 @@ class _HomePageState extends State<HomePage> {
                 questionnairePath: 'assets/instruments/prapare_instrument.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
+                uploadResponseFunction: uploadResponseFunction,
               ),
               QuestionnaireLaunchTile(
                 title: 'Bluebook Questionnaire Scroller',
@@ -327,6 +405,7 @@ class _HomePageState extends State<HomePage> {
                 questionnairePath: 'assets/instruments/bluebook.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
+                uploadResponseFunction: uploadResponseFunction,
               ),
               QuestionnaireLaunchTile(
                 title: 'WHO COVID19 Surveillance',
@@ -336,6 +415,7 @@ class _HomePageState extends State<HomePage> {
                 questionnairePath: 'assets/instruments/who_covid19.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
+                uploadResponseFunction: uploadResponseFunction,
               ),
             ],
           ),

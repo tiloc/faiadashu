@@ -245,6 +245,10 @@ class _AutoCompleteFieldState extends State<_AutocompleteField> {
     return TextFormField(
       controller: widget.textEditingController,
       focusNode: widget.focusNode,
+      decoration: const InputDecoration(
+        filled: true,
+        hintText: 'Enter search term',
+      ),
       onFieldSubmitted: (String value) {
         widget.onFieldSubmitted();
       },

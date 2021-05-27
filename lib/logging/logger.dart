@@ -17,6 +17,10 @@ class Logger {
     return Logger._('fdash.$name');
   }
 
+  factory Logger.tag(String tag) {
+    return Logger._('fdash.$tag');
+  }
+
   Logger._(this.name) : loggingLogger = logging.Logger(name);
 
   /// Log. See dart:developer log for meaning of params.

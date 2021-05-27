@@ -1,10 +1,10 @@
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:pedantic/pedantic.dart';
 
 import 'fhir_types_extensions.dart';
+
+// TODO: Is it really advantageous to use a TextFormField? Or would a FocusableActionDetector be the better basis?
 
 /// Present a picker for FhirDateTime, Date, or Time.
 ///
@@ -54,18 +54,6 @@ class _FhirDateTimePickerState extends State<FhirDateTimePicker> {
     _dateTimeFieldController.dispose();
     _clearFocusNode.dispose();
     super.dispose();
-  }
-
-  KeyEventResult _onKey(
-      Locale locale, FocusNode focusNode, RawKeyEvent rawKeyEvent) {
-    if (rawKeyEvent is RawKeyUpEvent &&
-        (rawKeyEvent.logicalKey == LogicalKeyboardKey.enter ||
-            rawKeyEvent.logicalKey == LogicalKeyboardKey.space)) {
-      unawaited(_showPicker(locale));
-      return KeyEventResult.handled;
-    } else {
-      return KeyEventResult.ignored;
-    }
   }
 
   Future<void> _showPicker(Locale locale) async {
@@ -121,10 +109,6 @@ class _FhirDateTimePickerState extends State<FhirDateTimePicker> {
   Widget build(BuildContext context) {
     final locale = widget.locale ?? Localizations.localeOf(context);
 
-    widget.focusNode?.onKey = (FocusNode focusNode, RawKeyEvent rawKeyEvent) {
-      return _onKey(locale, focusNode, rawKeyEvent);
-    };
-
     // There is no Locale in initState.
     if (_fieldInitialized == false) {
       _dateTimeFieldController.text = _dateTimeValue?.format(locale) ?? '';
@@ -136,7 +120,11 @@ class _FhirDateTimePickerState extends State<FhirDateTimePicker> {
       children: [
         TextFormField(
           focusNode: widget.focusNode,
-          decoration: widget.decoration,
+          textAlignVertical: TextAlignVertical.center,
+          decoration: widget.decoration?.copyWith(
+              prefixIcon: (widget.pickerType == Time)
+                  ? const Icon(Icons.access_time)
+                  : const Icon(Icons.calendar_today_outlined)),
           controller: _dateTimeFieldController,
           onTap: () async {
             await _showPicker(locale);

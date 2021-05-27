@@ -41,6 +41,8 @@ Slack channel which is run by some like-minded folks and where I can be frequent
 [![FHIR-FLI Slack Channel](doc/images/Slack_RGB-98x40-335cb2d.png)](https://join.slack.com/t/fhir-fli/shared_invite/zt-ofv2cycm-9yjdMj8a~zXp7nDBeB_sNQ)  
 [Join the FHIR-FLI Slack channel!](https://join.slack.com/t/fhir-fli/shared_invite/zt-ofv2cycm-9yjdMj8a~zXp7nDBeB_sNQ)
 
+> The honor of being Contributor #1 goes to [Grey Faulkenberry](https://github.com/Dokotela), who co-founded the Slack channel. 
+
 ### License
 The library is licensed under the MIT license. The full license text is here [LICENSE](LICENSE).
 

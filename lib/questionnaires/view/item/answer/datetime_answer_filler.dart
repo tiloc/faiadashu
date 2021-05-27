@@ -43,12 +43,11 @@ class _DateTimeAnswerState extends QuestionnaireAnswerState<FhirDateTime,
         focusNode: firstFocusNode,
         locale: locale,
         initialDateTime: initialDate,
+        // TODO: This can be specified through minValue / maxValue
         firstDate: DateTime(1860),
         lastDate: DateTime(2050),
         pickerType: pickerType,
-        decoration: const InputDecoration(
-          border: OutlineInputBorder(),
-        ),
+        decoration: viewFactory.createDecoration(),
         onChanged: (fhirDatetime) => value = fhirDatetime,
       ),
     );

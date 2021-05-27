@@ -122,8 +122,8 @@ class NarrativeAggregator extends Aggregator<Narrative> {
         in questionnaireModel.orderedQuestionnaireItemModels()) {
       generated = generated | _addResponseItemToDiv(div, itemModel);
     }
-    div.write('</div>');
     div.write('<p>&nbsp;</p>');
+    div.write('</div>');
 
     return Narrative(
         div: div.toString(),

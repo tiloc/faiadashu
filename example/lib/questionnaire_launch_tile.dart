@@ -12,6 +12,8 @@ class QuestionnaireLaunchTile extends StatefulWidget {
   final FhirResourceProvider fhirResourceProvider;
   final void Function(String id, QuestionnaireResponse? questionnaireResponse)
       saveResponseFunction;
+  final void Function(String id, QuestionnaireResponse? questionnaireResponse)?
+      uploadResponseFunction;
   final QuestionnaireResponse? Function(String id) restoreResponseFunction;
 
   const QuestionnaireLaunchTile(
@@ -21,6 +23,7 @@ class QuestionnaireLaunchTile extends StatefulWidget {
       required this.questionnairePath,
       required this.fhirResourceProvider,
       required this.saveResponseFunction,
+      this.uploadResponseFunction,
       required this.restoreResponseFunction,
       Key? key})
       : super(key: key);
@@ -47,23 +50,29 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
     return ListTile(
       title: Text(widget.title),
       subtitle: (widget.subtitle != null) ? Text(widget.subtitle!) : null,
-      trailing: IconButton(
-        icon: const Icon(Icons.preview),
-        onPressed: () async {
-          final questionnaireModel =
-              await QuestionnaireModel.fromFhirResourceBundle(
-                  fhirResourceProvider: _questionnaireProvider,
-                  locale: locale,
-                  aggregators: [NarrativeAggregator()]);
-          questionnaireModel.populate(
-              widget.restoreResponseFunction.call(widget.questionnairePath));
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => NarrativePage(
-                        questionnaireModel: questionnaireModel,
-                      )));
-        },
+      trailing: SizedBox(
+        width: 24.0,
+        height: 40.0,
+        child: Center(
+          child: IconButton(
+            icon: const Icon(Icons.preview),
+            onPressed: () async {
+              final questionnaireModel =
+                  await QuestionnaireModel.fromFhirResourceBundle(
+                      fhirResourceProvider: _questionnaireProvider,
+                      locale: locale,
+                      aggregators: [NarrativeAggregator()]);
+              questionnaireModel.populate(widget.restoreResponseFunction
+                  .call(widget.questionnairePath));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => NarrativePage(
+                            questionnaireModel: questionnaireModel,
+                          )));
+            },
+          ),
+        ),
       ),
       onTap: () {
         Navigator.push(
@@ -80,9 +89,32 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                   widget.fhirResourceProvider
                 ]),
                 persistentFooterButtons: [
+                  if (widget.uploadResponseFunction != null)
+                    Builder(
+                      builder: (context) => ElevatedButton.icon(
+                        label: const Text('Upload'),
+                        icon: const Icon(Icons.cloud_upload_outlined),
+                        onPressed: () {
+                          // Generate a response and upload it to a FHIR server.
+                          // TODO: In a real-world scenario this should have more state handling.
+                          widget.uploadResponseFunction?.call(
+                              widget.questionnairePath,
+                              QuestionnaireFiller.of(context)
+                                  .aggregator<QuestionnaireResponseAggregator>()
+                                  .aggregate(
+                                      responseStatus:
+                                          QuestionnaireResponseStatus
+                                              .completed));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Uploading survey…')));
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ),
                   Builder(
-                    builder: (context) => FloatingActionButton.extended(
-                      label: const Text('Save as Draft'),
+                    builder: (context) => ElevatedButton.icon(
+                      label: const Text('Save Locally'),
                       icon: const Icon(Icons.save_alt),
                       onPressed: () {
                         // Generate a response and store it in-memory.

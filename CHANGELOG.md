@@ -1,3 +1,11 @@
+## 0.4.2
+* Numerous visual improvements.
+  * Nicer looking input fields based on Material research
+  * Icons on date/time fields
+  * More options can be controlled through QuestionnaireViewFactory
+* Introduction of [Faiadashu Online](faiadashu_online/README.md)
+  * Example App can upload QuestionnaireResponse to real, protected FHIR(R) server.
+
 ## 0.4.0
 * Refactorings to have a clean relationship between views and models.
   * Non-breaking for high-level use. Breaking for low-level use.
