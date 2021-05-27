@@ -104,6 +104,8 @@ class QuestionnaireResponseAggregator
     }
 
     final profiles = [
+      Canonical(
+          'http://hl7.org/fhir/4.0/StructureDefinition/QuestionnaireResponse'),
       if (isValidSdc)
         Canonical(
             'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaireresponse'),

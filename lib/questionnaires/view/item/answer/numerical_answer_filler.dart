@@ -105,14 +105,14 @@ class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
                     ? value!.value!.format(locale)
                     : null,
                 textAlignVertical: TextAlignVertical.center,
-                decoration: InputDecoration(
-                  filled: true,
-                  hintText: answerModel.entryFormat,
-                  suffixIcon: (answerModel.units.isNotEmpty)
-                      ? SizedBox(
-                          height: 16, child: _buildDropDownFromUnits(context))
-                      : null,
-                ),
+                decoration: viewFactory.createDecoration().copyWith(
+                      hintText: answerModel.entryFormat,
+                      suffixIcon: (answerModel.units.isNotEmpty)
+                          ? SizedBox(
+                              height: 16,
+                              child: _buildDropDownFromUnits(context))
+                          : null,
+                    ),
                 inputFormatters: [_numberInputFormatter],
                 keyboardType: TextInputType.number,
                 validator: (inputValue) {

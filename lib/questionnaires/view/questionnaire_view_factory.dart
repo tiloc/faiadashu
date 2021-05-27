@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../logging/logger.dart';
 import '../questionnaires.dart';
 
-/// Create the views for filling all levels of a questionnaire.
+/// Create the views for all levels of a questionnaire. Provide styling theme.
 abstract class QuestionnaireViewFactory {
   /// Returns a [QuestionnaireItemFiller] for a given [QuestionnaireFiller].
   ///
@@ -20,6 +20,14 @@ abstract class QuestionnaireViewFactory {
 
   QuestionnaireAnswerFiller createAnswerFiller(
       QuestionnaireResponseFillerState responseFiller, int answerIndex);
+
+  /// Returns a decoration for [TextFormField]s.
+  ///
+  /// Used for consistent styling of all text fields in the filler.
+  InputDecoration createDecoration();
+
+  /// Returns whether user will be offered option to skip question.
+  bool showSkipOption();
 }
 
 /// The default implementation of [QuestionnaireViewFactory].
@@ -76,4 +84,12 @@ class DefaultQuestionnaireViewFactory implements QuestionnaireViewFactory {
       return BrokenAnswerFiller(responseFiller, answerIndex, exception);
     }
   }
+
+  @override
+  InputDecoration createDecoration() {
+    return const InputDecoration(filled: true);
+  }
+
+  @override
+  bool showSkipOption() => false;
 }

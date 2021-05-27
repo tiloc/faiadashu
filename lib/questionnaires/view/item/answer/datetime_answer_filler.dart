@@ -47,7 +47,7 @@ class _DateTimeAnswerState extends QuestionnaireAnswerState<FhirDateTime,
         firstDate: DateTime(1860),
         lastDate: DateTime(2050),
         pickerType: pickerType,
-        decoration: const InputDecoration(filled: true),
+        decoration: viewFactory.createDecoration(),
         onChanged: (fhirDatetime) => value = fhirDatetime,
       ),
     );
