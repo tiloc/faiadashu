@@ -3,6 +3,7 @@ export 'item/item.dart';
 export 'narrative_drawer.dart';
 export 'narrative_page.dart';
 export 'narrative_tile.dart';
+export 'questionnaire_complete_button.dart';
 export 'questionnaire_filler.dart';
 export 'questionnaire_information_dialog.dart';
 export 'questionnaire_information_tile.dart';

@@ -3,6 +3,7 @@ import 'package:faiadashu/resource_provider/resource_provider.dart';
 import 'package:faiadashu_online/restful/restful.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Tile that launches a [QuestionnaireScrollerPage] when tapped.
 class QuestionnaireLaunchTile extends StatefulWidget {
@@ -89,12 +90,30 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                       widget.restoreResponseFunction(widget.questionnairePath)),
                   widget.fhirResourceProvider
                 ]),
+                // Callback for supportLink
+                onLinkTap: (context, url) async {
+                  if (await canLaunch(url.toString())) {
+                    if (url.scheme == 'https') {
+                      await launch(url.toString(),
+                          forceWebView: true, enableJavaScript: true);
+                    } else {
+                      await launch(
+                        url.toString(),
+                      );
+                    }
+                  } else {
+                    throw 'Could not launch $url';
+                  }
+                },
                 persistentFooterButtons: [
+                  Builder(
+                      builder: (context) =>
+                          const QuestionnaireCompleteButton()),
                   if (widget.uploadResponseFunction != null)
                     Builder(
                       builder: (context) => ElevatedButton.icon(
                         label: const Text('Upload'),
-                        icon: const Icon(Icons.cloud_upload_outlined),
+                        icon: const Icon(Icons.cloud_upload),
                         onPressed: () {
                           // Generate a response and upload it to a FHIR server.
                           // TODO: In a real-world scenario this should have more state handling.

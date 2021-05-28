@@ -5,6 +5,11 @@ import '../../../logging/logger.dart';
 import '../../../resource_provider/resource_uris.dart';
 import '../../questionnaires.dart';
 
+/// Aggregates the user's responses into a [QuestionnaireResponse].
+///
+/// For status = 'complete' the items which are not enabled SHALL be excluded.
+/// For other status they might be included  (FHIR-31077) - this implementation
+/// does include them.
 class QuestionnaireResponseAggregator
     extends Aggregator<QuestionnaireResponse> {
   static final Logger _logger = Logger(QuestionnaireResponseAggregator);
@@ -18,12 +23,18 @@ class QuestionnaireResponseAggregator
     super.init(questionnaireModel);
   }
 
-  QuestionnaireResponseItem? _fromGroupItem(QuestionnaireItemModel itemModel) {
+  QuestionnaireResponseItem? _fromGroupItem(QuestionnaireItemModel itemModel,
+      QuestionnaireResponseStatus responseStatus) {
+    if (responseStatus == QuestionnaireResponseStatus.completed &&
+        !itemModel.isEnabled) {
+      return null;
+    }
+
     final nestedItems = <QuestionnaireResponseItem>[];
 
     for (final nestedItem in itemModel.children) {
       if (nestedItem.questionnaireItem.type == QuestionnaireItemType.group) {
-        final groupItem = _fromGroupItem(nestedItem);
+        final groupItem = _fromGroupItem(nestedItem, responseStatus);
         if (groupItem != null) {
           nestedItems.add(groupItem);
         }
@@ -54,16 +65,20 @@ class QuestionnaireResponseAggregator
     // Are all minimum fields for SDC profile present?
     bool isValidSdc = true;
 
+    responseStatus ??= questionnaireModel.responseStatus;
+
     final responseItems = <QuestionnaireResponseItem>[];
 
     for (final itemModel in questionnaireModel.siblings) {
       if (itemModel.questionnaireItem.type == QuestionnaireItemType.group) {
-        final groupItem = _fromGroupItem(itemModel);
+        final groupItem = _fromGroupItem(itemModel, responseStatus);
         if (groupItem != null) {
           responseItems.add(groupItem);
         }
       } else {
-        if (itemModel.responseItem != null) {
+        if (itemModel.responseItem != null &&
+            (responseStatus != QuestionnaireResponseStatus.completed ||
+                itemModel.isEnabled)) {
           responseItems.add(itemModel.responseItem!);
         }
       }
@@ -121,9 +136,7 @@ class QuestionnaireResponseAggregator
     final narrative = narrativeAggregator.aggregate();
 
     final questionnaireResponse = QuestionnaireResponse(
-      // TODO: For status = 'complete' the items which are not enabled SHALL be excluded.
-      //  For other status they might be included  (FHIR-31077)
-      status: responseStatus ?? questionnaireModel.responseStatus,
+      status: responseStatus,
       meta: meta,
       contained: (contained.isNotEmpty) ? contained : null,
       questionnaire: questionnaireCanonical,

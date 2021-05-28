@@ -358,6 +358,9 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     // TODO: What is the best notification strategy?
     // Assumption: It would be better to first set all responses in bulk and then recalc.
     _populateItems(questionnaireResponse.item);
+
+    responseStatus =
+        questionnaireResponse.status ?? QuestionnaireResponseStatus.in_progress;
   }
 
   /// Update the current enablement status of all items.
