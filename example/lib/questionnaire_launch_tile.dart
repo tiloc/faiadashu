@@ -1,9 +1,9 @@
 import 'package:faiadashu/questionnaires/questionnaires.dart';
 import 'package:faiadashu/resource_provider/resource_provider.dart';
 import 'package:faiadashu_online/restful/restful.dart';
+import 'package:faiadashu_online/url_launch/src/url_launcher.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 /// Tile that launches a [QuestionnaireScrollerPage] when tapped.
 class QuestionnaireLaunchTile extends StatefulWidget {
@@ -91,20 +91,7 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                   widget.fhirResourceProvider
                 ]),
                 // Callback for supportLink
-                onLinkTap: (context, url) async {
-                  if (await canLaunch(url.toString())) {
-                    if (url.scheme == 'https') {
-                      await launch(url.toString(),
-                          forceWebView: true, enableJavaScript: true);
-                    } else {
-                      await launch(
-                        url.toString(),
-                      );
-                    }
-                  } else {
-                    throw 'Could not launch $url';
-                  }
-                },
+                onLinkTap: launchUrl,
                 persistentFooterButtons: [
                   Builder(
                       builder: (context) =>
