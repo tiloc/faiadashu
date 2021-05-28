@@ -1,5 +1,6 @@
 import 'package:faiadashu/questionnaires/questionnaires.dart';
 import 'package:faiadashu/resource_provider/resource_provider.dart';
+import 'package:faiadashu_online/restful/restful.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
@@ -106,8 +107,19 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                                           QuestionnaireResponseStatus
                                               .completed));
                           ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text('Uploading survey…')));
+                            SnackBar(
+                              content: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text('Uploading survey…'),
+                                    SyncIndicator(
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    )
+                                  ]),
+                            ),
+                          );
                           Navigator.pop(context);
                         },
                       ),

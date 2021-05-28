@@ -1,9 +1,6 @@
-import 'dart:math';
-
+import 'package:faiadashu_online/restful/restful.dart';
 import 'package:fhir_auth/r4/smart_client/smart_client.dart';
 import 'package:flutter/material.dart';
-
-// TODO: Should this entire widget be stateless and only use a ValueNotifier?
 
 /// A login/logout button that is tied to the state of a [SmartClient].
 class SmartLoginButton extends StatefulWidget {
@@ -19,16 +16,12 @@ class SmartLoginButton extends StatefulWidget {
 
 enum LoginStatus { loggedOut, loggedIn, loggingOut, loggingIn, error, unknown }
 
-class _SmartLoginButtonState extends State<SmartLoginButton>
-    with SingleTickerProviderStateMixin {
+class _SmartLoginButtonState extends State<SmartLoginButton> {
   final ValueNotifier<LoginStatus> _loginStatus =
       ValueNotifier(LoginStatus.unknown);
 
   final _loggedInKey = UniqueKey();
   final _loggedOutKey = UniqueKey();
-  final _ingKey = UniqueKey();
-
-  late final AnimationController _animationController;
 
   @override
   void initState() {
@@ -36,10 +29,6 @@ class _SmartLoginButtonState extends State<SmartLoginButton>
     _loginStatus.value = (widget.smartClient.isLoggedIn)
         ? LoginStatus.loggedIn
         : LoginStatus.loggedOut;
-
-    _animationController =
-        AnimationController(vsync: this, duration: const Duration(seconds: 2))
-          ..repeat();
 
     if (widget.onLoginChanged != null) {
       _loginStatus.addListener(widget.onLoginChanged!);
@@ -133,16 +122,7 @@ class _SmartLoginButtonState extends State<SmartLoginButton>
         break;
       case LoginStatus.loggingIn:
       case LoginStatus.loggingOut:
-        child = AnimatedBuilder(
-            key: _ingKey,
-            animation: _animationController,
-            builder: (BuildContext context, Widget? _widget) {
-              return Transform.rotate(
-                angle: _animationController.value * 2 * pi,
-                child: _widget,
-              );
-            },
-            child: const Icon(Icons.sync));
+        child = const SyncIndicator();
         break;
       case LoginStatus.unknown:
         child = const Icon(Icons.device_unknown);
