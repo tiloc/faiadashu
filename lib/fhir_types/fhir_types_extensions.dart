@@ -107,6 +107,11 @@ extension FDashQuantityExtension on Quantity {
       }
     }
   }
+
+  // Returns whether this [Quantity] has a specified unit.
+  bool get hasUnit {
+    return code != null && unit != null;
+  }
 }
 
 extension FDashCodingExtension on Coding {

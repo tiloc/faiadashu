@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:fhir/r4.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../coding/data_absent_reasons.dart' as dar;
 import '../../../../fhir_types/fhir_types_extensions.dart';
 import '../../../../logging/logger.dart';
 import '../../../questionnaires.dart';
@@ -30,20 +31,21 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
   int get maxDecimal => _maxDecimal;
   NumberFormat get numberFormat => _numberFormat;
 
-  late final LinkedHashMap<String, Coding> units;
+  late final LinkedHashMap<String, Coding> _units;
 
-  bool hasUnit(Quantity? quantity) {
-    if (quantity == null) {
-      return false;
-    }
-    if (quantity.code == null && quantity.unit == null) {
-      return false;
-    }
+  bool get hasUnit => value?.hasUnit ?? false;
 
-    return true;
+  bool get hasUnitChoices => _units.isNotEmpty;
+
+  bool get hasSingleUnitChoice => _units.length == 1;
+
+  Iterable<Coding> get unitChoices => _units.values;
+
+  Coding? unitChoiceByKey(String? key) {
+    return (key != null) ? _units[key] : null;
   }
 
-  String keyStringFromCoding(Coding coding) {
+  String keyForUnitChoice(Coding coding) {
     final choiceString =
         (coding.code != null) ? coding.code?.value : coding.display;
 
@@ -53,6 +55,18 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
     } else {
       return choiceString;
     }
+  }
+
+  /// Returns a unique slug for the current unit.
+  String? get keyOfUnit {
+    if (!(value?.hasUnit ?? false)) {
+      return null;
+    }
+
+    final coding =
+        Coding(system: value?.system, code: value?.code, display: value?.unit);
+
+    return keyForUnitChoice(coding);
   }
 
   NumericalAnswerModel(ResponseModel responseModel, int answerIndex)
@@ -117,7 +131,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
 
     final unit = qi.unit;
     // ignore: prefer_collection_literals
-    units = LinkedHashMap<String, Coding>();
+    _units = LinkedHashMap<String, Coding>();
     final unitsUri = qi.extension_
         ?.extensionOrNull(
             'http://hl7.org/fhir/StructureDefinition/questionnaire-unitValueSet')
@@ -125,13 +139,13 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
         .toString();
     if (unitsUri != null) {
       itemModel.questionnaireModel.forEachInValueSet(unitsUri, (coding) {
-        units[keyStringFromCoding(coding)] = coding;
+        _units[keyForUnitChoice(coding)] = coding;
       }, context: qi.linkId);
     } else if (unit != null) {
-      units[keyStringFromCoding(unit)] = unit;
+      _units[keyForUnitChoice(unit)] = unit;
     }
 
-    // TODO: look at initialValue extension
+    // TODO: Evaluate initialValue extension
     Quantity? existingValue;
     final firstAnswer = itemModel.responseItem?.answer?.firstOrNull;
     if (firstAnswer != null) {
@@ -176,6 +190,67 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
     if (number < _minValue) {
       return 'Enter a number ${Decimal(_minValue).format(locale)}, or higher.';
     }
+  }
+
+  /// Returns a modified copy of the current [value].
+  ///
+  /// * Keeps the numerical value
+  /// * Updates the unit based on a key as returned by [keyForUnitChoice]
+  Quantity? copyWithUnit(String? unitChoiceKey) {
+    final unitCoding = unitChoiceByKey(unitChoiceKey);
+
+    return (value != null)
+        ? value!.copyWith(
+            unit: unitCoding?.localizedDisplay(locale),
+            system: unitCoding?.system,
+            code: unitCoding?.code)
+        : Quantity(
+            unit: unitCoding?.localizedDisplay(locale),
+            system: unitCoding?.system,
+            code: unitCoding?.code);
+  }
+
+  /// Returns a modified copy of the current [value].
+  ///
+  /// * Updates the numerical value based on a [Decimal]
+  /// * Keeps the unit
+  Quantity? copyWithValue(Decimal? newValue) {
+    return (value != null)
+        ? value!.copyWith(value: newValue)
+        : Quantity(value: newValue);
+  }
+
+  /// Returns a modified copy of the current [value].
+  ///
+  /// * Updates the numerical value based on text input
+  /// * Keeps the unit
+  Quantity? copyWithTextInput(String textInput) {
+    final valid = validate(textInput) == null;
+    final dataAbsentReasonExtension = !valid
+        ? [
+            FhirExtension(
+                url: dar.dataAbsentReasonExtension,
+                valueCode: dar.dataAbsentReasonAsTextCode)
+          ]
+        : null;
+
+    Quantity? returnValue;
+
+    if (textInput.trim().isEmpty) {
+      returnValue = value?.copyWith(value: null);
+    } else {
+      if (value == null) {
+        returnValue = Quantity(
+            value: Decimal(numberFormat.parse(textInput)),
+            extension_: dataAbsentReasonExtension);
+      } else {
+        returnValue = value!.copyWith(
+            value: Decimal(numberFormat.parse(textInput)),
+            extension_: dataAbsentReasonExtension);
+      }
+    }
+
+    return returnValue;
   }
 
   @override
