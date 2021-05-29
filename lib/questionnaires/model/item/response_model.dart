@@ -65,37 +65,55 @@ class ResponseModel {
     return dataAbsentReason == dataAbsentReasonAsTextCode;
   }
 
+  final _cachedAnswerModels = <int, AnswerModel>{};
+
   /// Returns an [AnswerModel] for the nth answer to an overall response.
   ///
   /// Only [answerIndex] == 0 is currently supported.
   AnswerModel answerModel(int answerIndex) {
+    if (_cachedAnswerModels.containsKey(answerIndex)) {
+      return _cachedAnswerModels[answerIndex]!;
+    }
+
+    final AnswerModel? answerModel;
+
     // TODO: Should this construct a new one every time, or reuse existing ones?
     switch (itemModel.questionnaireItem.type!) {
       case QuestionnaireItemType.choice:
       case QuestionnaireItemType.open_choice:
-        return CodingAnswerModel(this, answerIndex);
+        answerModel = CodingAnswerModel(this, answerIndex);
+        break;
       case QuestionnaireItemType.quantity:
       case QuestionnaireItemType.decimal:
       case QuestionnaireItemType.integer:
-        return NumericalAnswerModel(this, answerIndex);
+        answerModel = NumericalAnswerModel(this, answerIndex);
+        break;
       case QuestionnaireItemType.string:
       case QuestionnaireItemType.text:
       case QuestionnaireItemType.url:
-        return StringAnswerModel(this, answerIndex);
+        answerModel = StringAnswerModel(this, answerIndex);
+        break;
       case QuestionnaireItemType.date:
       case QuestionnaireItemType.datetime:
       case QuestionnaireItemType.time:
-        return DateTimeAnswerModel(this, answerIndex);
+        answerModel = DateTimeAnswerModel(this, answerIndex);
+        break;
       case QuestionnaireItemType.boolean:
-        return BooleanAnswerModel(this, answerIndex);
+        answerModel = BooleanAnswerModel(this, answerIndex);
+        break;
       case QuestionnaireItemType.display:
       case QuestionnaireItemType.group:
-        return StaticAnswerModel(this, answerIndex);
+        answerModel = StaticAnswerModel(this, answerIndex);
+        break;
       case QuestionnaireItemType.attachment:
       case QuestionnaireItemType.unknown:
       case QuestionnaireItemType.reference:
         throw QuestionnaireFormatException(
             'Unsupported item type: ${itemModel.questionnaireItem.type!}');
     }
+
+    _cachedAnswerModels[answerIndex] = answerModel;
+
+    return answerModel;
   }
 }

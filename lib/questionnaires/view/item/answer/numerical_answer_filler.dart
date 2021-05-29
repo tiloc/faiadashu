@@ -75,6 +75,7 @@ class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
             max: answerModel.maxValue,
             divisions: answerModel.sliderDivisions,
             value: value!.value!.value!, // Yay, triple value!
+            label: answerModel.display,
             onChanged: (sliderValue) {
               value = answerModel.copyWithValue(Decimal(sliderValue));
             },

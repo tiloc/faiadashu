@@ -17,7 +17,7 @@ class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
     value = answer?.valueDateTime ??
         ((answer?.valueDate != null)
             ? FhirDateTime(answer?.valueDate
-                .toString()) // TODO: File a PR to allow construction of FhirDateTime directly from Date.
+                .toString()) // OPTIMIZE: File a PR to allow construction of FhirDateTime directly from Date.
             : null) ??
         ((qi.extension_
                     ?.extensionOrNull(
