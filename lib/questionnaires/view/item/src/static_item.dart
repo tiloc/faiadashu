@@ -80,6 +80,7 @@ class _StaticItemState extends State<StaticItem> {
   Widget build(BuildContext context) {
     if (widget.itemModel.isCalculatedExpression) {
       final score = calcResult?.value?.round();
+      final scoreText = score?.toString() ?? AnswerModel.nullText;
       final feedback = findDanishFeedback(score);
       return Center(
           child: Column(children: [
@@ -88,9 +89,13 @@ class _StaticItemState extends State<StaticItem> {
           'Total Score',
           style: Theme.of(context).textTheme.headline3,
         ),
-        Text(
-          score?.toString() ?? '0',
-          style: Theme.of(context).textTheme.headline1,
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 200),
+          child: Text(
+            scoreText,
+            key: ValueKey<String>(scoreText),
+            style: Theme.of(context).textTheme.headline1,
+          ),
         ),
         if (feedback != null) HTML.toRichText(context, feedback),
       ]));

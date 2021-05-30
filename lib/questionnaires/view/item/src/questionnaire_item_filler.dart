@@ -58,6 +58,11 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
     super.dispose();
   }
 
+  // OPTIMIZE: Should rather QuestionnaireFiller become an InheritedNotifier?
+
+  /// Triggers a repaint of the filler.
+  ///
+  /// Required for visual updates on enableWhen changes.
   void _rebuild() {
     _logger.trace('rebuild()');
     setState(() {

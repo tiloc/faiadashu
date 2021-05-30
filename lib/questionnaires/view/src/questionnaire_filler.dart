@@ -135,6 +135,8 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
   }
 }
 
+// OPTIMIZE: Is there any benefit in making this an InheritedNotifier, listening to the QuestionnaireModel?
+
 class QuestionnaireFillerData extends InheritedWidget {
   static final _logger = Logger(QuestionnaireFillerData);
 
