@@ -1,2 +1,2 @@
 export 'answer/answer.dart';
-export 'response_model.dart';
+export 'src/response_model.dart';

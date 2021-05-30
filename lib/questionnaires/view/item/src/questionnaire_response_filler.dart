@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 import '../../../../coding/coding.dart';
 import '../../../../fhir_types/fhir_types_extensions.dart';
-import '../../../model/item/response_model.dart';
 import '../../../questionnaires.dart';
 
 /// Filler for a [QuestionnaireResponseItem].

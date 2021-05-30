@@ -8,7 +8,7 @@ import 'package:fhir/r4.dart'
         Time;
 
 import '../../../../../fhir_types/fhir_types_extensions.dart';
-import '../../response_model.dart';
+import '../../item.dart';
 import 'answer_model.dart';
 
 class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
