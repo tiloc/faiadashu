@@ -73,26 +73,22 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 500),
               child: widget.itemModel.isEnabled
-                  ? (MediaQuery.of(context).size.width > 1000)
-                      ? Table(
-                          columnWidths: {
-                            0: FixedColumnWidth(
-                                MediaQuery.of(context).size.width / 3.2),
-                            1: FixedColumnWidth(
-                                MediaQuery.of(context).size.width / 3.2 * 2)
-                          },
+                  ? (MediaQuery.of(context).size.width >
+                          1000) // TODO: Use LayoutBuilder instead?
+                      // Wide landscape screen: Use horizontal layout
+                      ? Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            TableRow(children: [
                               if (widget._titleWidget != null)
-                                Container(
-                                    padding: const EdgeInsets.only(top: 8),
-                                    child: widget._titleWidget)
+                                Expanded(
+                                    child: Container(
+                                        padding: const EdgeInsets.only(top: 8),
+                                        child: widget._titleWidget))
                               else
-                                Container(),
-                              widget._responseFiller
+                                Expanded(child: Container()),
+                              Expanded(flex: 2, child: widget._responseFiller)
                             ])
-                          ],
-                        )
+                      // Narrow, portrait screen: Use vertical layout
                       : Column(
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
