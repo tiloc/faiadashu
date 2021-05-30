@@ -1,10 +1,13 @@
 ## 0.4.5
 * Moved all implementations into `src/` sub-directories
 * Clean up of numerical model and view
+* Renamed QuestionnaireViewFactory -> QuestionnaireTheme  
+* Bugfix: Changes to enableWhen did not lead to a repaint  
 * Early WIP steps for completion handling
   * Complete button control
   * QuestionnaireResponseAggregator will not emit items which are not enabled, when status is `complete`.
 * Documentation updates
+
 
 ## 0.4.2
 * Numerous visual improvements.

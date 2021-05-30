@@ -4,7 +4,7 @@ import '../../../logging/logging.dart';
 import '../../questionnaires.dart';
 
 /// Create the views for all levels of a questionnaire. Provide styling theme.
-abstract class QuestionnaireViewFactory {
+abstract class QuestionnaireTheme {
   /// Returns a [QuestionnaireItemFiller] for a given [QuestionnaireFiller].
   ///
   /// Used by [QuestionnaireFiller].
@@ -30,11 +30,11 @@ abstract class QuestionnaireViewFactory {
   bool showSkipOption();
 }
 
-/// The default implementation of [QuestionnaireViewFactory].
-class DefaultQuestionnaireViewFactory implements QuestionnaireViewFactory {
-  static final _logger = Logger(DefaultQuestionnaireViewFactory);
+/// The Faiadashu default implementation of [QuestionnaireTheme].
+class FDashQuestionnaireTheme implements QuestionnaireTheme {
+  static final _logger = Logger(FDashQuestionnaireTheme);
 
-  const DefaultQuestionnaireViewFactory();
+  const FDashQuestionnaireTheme();
 
   @override
   QuestionnaireItemFiller createQuestionnaireItemFiller(

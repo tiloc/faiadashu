@@ -19,7 +19,7 @@ class QuestionnaireFiller extends StatefulWidget {
   final List<Aggregator<dynamic>>? aggregators;
   final void Function(BuildContext context, Uri url)? onLinkTap;
   final void Function(QuestionnaireModel)? onDataAvailable;
-  final QuestionnaireViewFactory viewFactory;
+  final QuestionnaireTheme questionnaireTheme;
 
   final FhirResourceProvider fhirResourceProvider;
 
@@ -37,7 +37,7 @@ class QuestionnaireFiller extends StatefulWidget {
       this.aggregators,
       this.onDataAvailable,
       this.onLinkTap,
-      this.viewFactory = const DefaultQuestionnaireViewFactory()})
+      this.questionnaireTheme = const FDashQuestionnaireTheme()})
       : super(key: key);
 
   static QuestionnaireFillerData of(BuildContext context) {
@@ -124,7 +124,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
                       builder: widget.builder,
                       onLinkTap: widget.onLinkTap,
                       onDataAvailable: widget.onDataAvailable,
-                      viewFactory: widget.viewFactory);
+                      questionnaireTheme: widget.questionnaireTheme);
                 }
                 return _questionnaireFillerData;
               }
@@ -143,7 +143,7 @@ class QuestionnaireFillerData extends InheritedWidget {
   final Iterable<QuestionnaireItemModel> questionnaireItemModels;
   final void Function(BuildContext context, Uri url)? onLinkTap;
   final void Function(QuestionnaireModel)? onDataAvailable;
-  final QuestionnaireViewFactory viewFactory;
+  final QuestionnaireTheme questionnaireTheme;
   late final List<QuestionnaireItemFiller?> _itemFillers;
   late final List<GlobalKey<QuestionnaireItemFillerState>> _globalKeys;
   late final int _revision;
@@ -154,7 +154,7 @@ class QuestionnaireFillerData extends InheritedWidget {
     required this.locale,
     this.onDataAvailable,
     this.onLinkTap,
-    required this.viewFactory,
+    required this.questionnaireTheme,
     required WidgetBuilder builder,
   })  : _revision = questionnaireModel.revision,
         questionnaireItemModels =
@@ -221,7 +221,7 @@ class QuestionnaireFillerData extends InheritedWidget {
 
     if (_itemFillers[index] == null) {
       _logger.debug('itemFillerAt $index will be created.');
-      _itemFillers[index] = viewFactory
+      _itemFillers[index] = questionnaireTheme
           .createQuestionnaireItemFiller(this, index, key: _globalKeys[index]);
     } else {
       _logger.debug('itemFillerAt $index already exists.');

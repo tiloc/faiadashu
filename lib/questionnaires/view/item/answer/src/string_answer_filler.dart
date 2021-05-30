@@ -39,7 +39,7 @@ class _StringAnswerState extends QuestionnaireAnswerState<String,
           keyboardType: TextInputType.text,
           controller: _controller,
           maxLines: (qi.type == QuestionnaireItemType.text) ? 4 : 1,
-          decoration: viewFactory.createDecoration().copyWith(
+          decoration: questionnaireTheme.createDecoration().copyWith(
                 hintText: answerModel.entryFormat,
               ),
           validator: (inputValue) => answerModel.validate(inputValue),

@@ -11,5 +11,5 @@ export 'src/questionnaire_information_tile.dart';
 export 'src/questionnaire_loading_indicator.dart';
 export 'src/questionnaire_scroller_page.dart';
 export 'src/questionnaire_stepper_page.dart';
-export 'src/questionnaire_view_factory.dart';
+export 'src/questionnaire_theme.dart';
 export 'src/xhtml.dart';

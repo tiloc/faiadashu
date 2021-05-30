@@ -90,7 +90,7 @@ class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
                     : null,
                 textAlignVertical: TextAlignVertical.center,
                 textAlign: TextAlign.end,
-                decoration: viewFactory.createDecoration().copyWith(
+                decoration: questionnaireTheme.createDecoration().copyWith(
                       hintText: answerModel.entryFormat,
                       suffixIcon: (answerModel.hasUnitChoices)
                           ? SizedBox(

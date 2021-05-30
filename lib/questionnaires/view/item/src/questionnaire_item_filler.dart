@@ -28,8 +28,8 @@ class QuestionnaireItemFiller extends StatefulWidget {
       : _titleWidget =
             QuestionnaireItemFillerTitle.fromQuestionnaireItemModel(itemModel),
         super(key: key) {
-    _responseFiller =
-        questionnaireFiller.viewFactory.createQuestionnaireResponseFiller(this);
+    _responseFiller = questionnaireFiller.questionnaireTheme
+        .createQuestionnaireResponseFiller(this);
   }
 
   @override

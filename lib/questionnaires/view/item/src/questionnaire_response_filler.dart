@@ -29,8 +29,8 @@ class QuestionnaireResponseFillerState
 
   late final FocusNode _skipSwitchFocusNode;
 
-  QuestionnaireViewFactory get viewFactory =>
-      widget.itemFiller.questionnaireFiller.viewFactory;
+  QuestionnaireTheme get questionnaireTheme =>
+      widget.itemFiller.questionnaireFiller.questionnaireTheme;
 
   QuestionnaireResponseFillerState();
 
@@ -46,7 +46,7 @@ class QuestionnaireResponseFillerState
     // TODO: Enhancement: Allow repeats = true for other kinds of items
     // This assumes that all answers are of the same kind
     // and repeats = true is only supported for choice items
-    _answerFillers = [viewFactory.createAnswerFiller(this, 0)];
+    _answerFillers = [questionnaireTheme.createAnswerFiller(this, 0)];
   }
 
   @override
@@ -89,7 +89,7 @@ class QuestionnaireResponseFillerState
     // TODO(tiloc) show a list of answers, and buttons to add/remove if repeat
     return Column(mainAxisSize: MainAxisSize.min, children: [
       if (!responseModel.isAskedButDeclined) ..._answerFillers,
-      if (viewFactory.showSkipOption() &&
+      if (questionnaireTheme.showSkipOption() &&
           !widget.itemModel.isReadOnly &&
           widget.itemModel.questionnaireItem.required_ != Boolean(true))
         Row(children: [
