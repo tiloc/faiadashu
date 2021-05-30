@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:simple_html_css/simple_html_css.dart';
 
-import '../model/aggregation/narrative_aggregator.dart';
-import '../model/questionnaire_item_model.dart';
+import '../model/model.dart';
 import 'questionnaire_filler.dart';
 
 /// Display a narrative

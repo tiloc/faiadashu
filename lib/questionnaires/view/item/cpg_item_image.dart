@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../fhir_types/fhir_types_extensions.dart';
 import '../../../logging/logger.dart';
 import '../../../resource_provider/asset_image_attachment_provider.dart';
-import '../../model/questionnaire_item_model.dart';
+import '../../model/model.dart';
 
 /// Image [Widget] for CPG itemImage extension
 class CpgItemImage extends StatelessWidget {

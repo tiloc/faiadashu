@@ -1,1 +1,1 @@
-export 'observation_widget.dart';
+export 'src/observation_widget.dart';

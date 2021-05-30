@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:faiadashu/faiadashu.dart';
 import 'package:fhir/r4.dart';
 
-import '../../fhir_types/fhir_types_extensions.dart';
+import '../../../fhir_types/fhir_types_extensions.dart';
 
 extension FDashQuestionnaireAnswerOptionExtensions
     on QuestionnaireAnswerOption {

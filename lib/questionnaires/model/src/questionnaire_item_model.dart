@@ -5,12 +5,12 @@ import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/foundation.dart';
 
-import '../../fhir_types/fhir_types_extensions.dart';
-import '../../logging/logging.dart';
-import '../../resource_provider/resource_provider.dart';
-import '../questionnaires.dart';
-import '../view/xhtml.dart';
-import 'aggregation/aggregation.dart';
+import '../../../fhir_types/fhir_types_extensions.dart';
+import '../../../logging/logging.dart';
+import '../../../resource_provider/resource_provider.dart';
+import '../../questionnaires.dart';
+import '../../view/xhtml.dart';
+import '../aggregation/aggregation.dart';
 import 'questionnaire_exceptions.dart';
 import 'questionnaire_extensions.dart';
 

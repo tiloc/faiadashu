@@ -408,4 +408,17 @@ class QuestionnaireModel extends QuestionnaireItemModel {
 
     updateEnableWhen();
   }
+
+  /// Returns whether the questionnaire meets all completeness criteria.
+  ///
+  /// Completeness criteria include:
+  /// * All required fields are filled
+  /// * All filled fields are valid
+  ///
+  /// Returns null, if everything is complete.
+  /// Returns [QuestionnaireCursor]s, if an item is incomplete.
+  /// Each entry will contain
+  Iterable<QuestionnaireCursor>? isComplete() {
+    throw UnimplementedError();
+  }
 }

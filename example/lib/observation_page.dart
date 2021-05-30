@@ -1,4 +1,4 @@
-import 'package:faiadashu/observations/observation_widget.dart';
+import 'package:faiadashu/observations/observations.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
