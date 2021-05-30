@@ -1,6 +1,6 @@
 import 'package:fhir/r4.dart';
 
-import '../../fhir_types/fhir_types_extensions.dart';
+import '../../fhir_types/fhir_types.dart';
 
 final dataAbsentReasonExtensionUrl =
     FhirUri('http://hl7.org/fhir/StructureDefinition/data-absent-reason');

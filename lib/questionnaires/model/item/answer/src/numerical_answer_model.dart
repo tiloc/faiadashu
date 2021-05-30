@@ -4,7 +4,7 @@ import 'package:fhir/r4.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../../coding/coding.dart';
-import '../../../../../fhir_types/fhir_types_extensions.dart';
+import '../../../../../fhir_types/fhir_types.dart';
 import '../../../../../logging/logging.dart';
 import '../../../../questionnaires.dart';
 

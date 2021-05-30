@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:simple_html_css/simple_html_css.dart';
 
-import '../../../../fhir_types/fhir_types_extensions.dart';
+import '../../../../fhir_types/fhir_types.dart';
 import '../../../../logging/logging.dart';
 import '../../../questionnaires.dart';
 

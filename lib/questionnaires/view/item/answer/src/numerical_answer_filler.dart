@@ -2,9 +2,8 @@ import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../../fhir_types/fhir_types_extensions.dart';
+import '../../../../../fhir_types/fhir_types.dart';
 import '../../../../questionnaires.dart';
-import 'null_dash_text.dart';
 import 'numerical_input_formatter.dart';
 
 /// Filler for answers of type [Integer], [Decimal], and [Quantity].

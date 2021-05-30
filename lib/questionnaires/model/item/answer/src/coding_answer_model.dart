@@ -3,7 +3,7 @@ import 'dart:collection';
 import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
 
-import '../../../../../fhir_types/fhir_types_extensions.dart';
+import '../../../../../fhir_types/fhir_types.dart';
 import '../../../../../logging/logging.dart';
 import '../../../../questionnaires.dart';
 

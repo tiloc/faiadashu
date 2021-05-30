@@ -1,7 +1,7 @@
 import 'package:fhir/r4.dart';
 
 import '../../../../../coding/coding.dart';
-import '../../../../../fhir_types/fhir_types_extensions.dart';
+import '../../../../../fhir_types/fhir_types.dart';
 import '../../item.dart';
 import 'answer_model.dart';
 

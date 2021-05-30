@@ -4,7 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
 import 'package:intl/intl.dart';
 
-import '../logging/logging.dart';
+import '../../logging/logging.dart';
 
 extension FDashTimeExtension on Time {
   String format(Locale locale, {String defaultText = ''}) {
