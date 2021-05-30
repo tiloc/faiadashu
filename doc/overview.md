@@ -12,7 +12,7 @@ This library depends on Flutter™ SDK 2.0, or later. It is null-safe. It cannot
 
 ### Support for the FHIR Standard
 Faiadashu FHIRDash focuses on the user interface. The underlying data models and specifications are adopted from the FHIR standard and
-the FHIR-FLI 'fhir' library.
+the FHIR-FLI `fhir` library.
 
 [![Pub Version](https://img.shields.io/pub/v/fhir?label=pub.dev&labelColor=333940&logo=dart)](https://pub.dev/packages/fhir)
 https://pub.dev/packages/fhir
@@ -26,7 +26,12 @@ Discussions and support around Faiadashu and the FHIR-FLI library can be found o
 Support for the FHIR Standard is focussed on the R4 release which is located here: [![FHIR R4](fhir-logo-www.png)](https://hl7.org/fhir/R4/)  https://hl7.org/fhir/R4/
 
 ### Theme
-Theme - including text and colors - is obtained through the Material theme of the app. Both dark and light schemes work.
+## Styles
+Styles - including text and colors - is obtained through the Material theme of the app. Both dark and light schemes work.
+
+## Views and behaviors
+Numerous additional parameters - incl. which Widgets to use for views - can be handed into the `QuestionnaireFiller`
+through the `questionnaireTheme` parameter. 
 
 ### Locale
 Locale is explicitly passed to the library during the initialization of the `QuestionnaireFiller`.
@@ -49,12 +54,20 @@ of the library as you see fit. See the sections on the individual use-cases for 
 The FHIR-FLI `fhir_db` package is compatible with the `fhir` library which is underlying this library: https://pub.dev/packages/fhir_db  
 
 ### Communication
-The library does not communicate to servers. It is up to your app to obtain remoted information and to send the output
+The `faiadashu` library does not contain functionality to communicate with servers. It is up to your app to obtain remoted information and to send the output
 of the library as you see fit. See the sections on the individual use-cases for integration points.
 
-The FHIR-FLI `fhir_at_rest` package is compatible with the `fhir` library which is underlying this library: https://pub.dev/packages/fhir_at_rest
+#### Faiadashu Online
+The `faiadashu_online` package is an add-on to `faiadashu` and is providing basic support for protected and unprotected FHIR communication. 
 
-Communication might require authentication. The FHIR-FLI `fhir_auth` package is compatible with the `fhir` library which is underlying this library: https://pub.dev/packages/fhir_auth
+Faiadashu Online is using two underlying libraries: `fhir_at_rest` and `fhir_auth`.
+
+FHIR-FLI `fhir_at_rest` package: https://pub.dev/packages/fhir_at_rest
+
+Communication with protected servers requires authentication. 
+FHIR-FLI `fhir_auth` package: https://pub.dev/packages/fhir_auth
+
+Setting up `fhir_auth` is non-trivial. *TBD*
 
 ### Use-Case: Display an Observation
 ```
@@ -108,6 +121,8 @@ A ResourceProvider is a very simple, asynchronous mapping-mechanism from URIs to
 a set of reference implementations, but it is very easy to implement your own provider, based on your required
 sources of information (web-server, EMR, file system,...).
 
+> Faiadashu Online is providing an implementation of `ResourceProvider` that can connect to FHIR servers.
+
 ##### Questionnaire
 The library is looking for the Questionnaire through the URI in constant `questionnaireResourceUri`.
 
@@ -126,37 +141,15 @@ final response = QuestionnaireFiller.of(context)
 It is up to the finished application if and how it wants to launch external URLs. The SDK offers an integration point
 through the `onLinkTap` function which is called every time a user taps a link - a `supportLink` for instance.
 
-The example app illustrates how to use the popular [url_launcher](https://pub.dev/packages/url_launcher) package to implement this.
 
 --------------------
+
+Faiadashu Online uses the popular [url_launcher](https://pub.dev/packages/url_launcher) package to implement a launcher
+for supportLinks.
 
 When using `url_launcher` it is important to follow the native setup instructions for iOS and Android 11.
 
 --------------------
-
-```dart
-final widget = QuestionnaireScrollerPage(
-    AssetResourceProvider.singleton(Questionnaire,
-        'assets/instruments/sdc_demo.json'),
-    resourceProvider: resourceProvider,
-    floatingActionButton: fab,
-    onLinkTap: (context, url) async {
-      if (await canLaunch(url.toString())) {
-        if (url.scheme == 'https') {
-          await launch(url.toString(),
-              forceWebView: true,
-              enableJavaScript: true);
-        } else {
-          await launch(
-            url.toString(),
-          );
-        }
-      } else {
-        throw 'Could not launch $url';
-      }
-    }
-);
-```
 
 ##### Error handling
 ###### During initialization
@@ -172,6 +165,8 @@ The filler will display informative error boxes.
 The Questionnaire Filler is based on a bespoke variation of the [Presentation Model - PM](https://martinfowler.com/eaaDev/PresentationModel.html).
 It is focussed on filling an information model with user-input and does not have any true business-logic, storage,
 or communication.
+
+> Presentation Model is known in the Microsoft ecosystem as **_MVVM_**.
 
 | View                |          Presentation Model  |  Domain Model (FHIR) |
 |---------------------|----------------------|---------------------|

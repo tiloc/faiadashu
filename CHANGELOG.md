@@ -1,3 +1,11 @@
+## 0.4.5
+* Moved all implementations into `src/` sub-directories
+* Clean up of numerical model and view
+* Early WIP steps for completion handling
+  * Complete button control
+  * QuestionnaireResponseAggregator will not emit items which are not enabled, when status is `complete`.
+* Documentation updates
+
 ## 0.4.2
 * Numerous visual improvements.
   * Nicer looking input fields based on Material research
