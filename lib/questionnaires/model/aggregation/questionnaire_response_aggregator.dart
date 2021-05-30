@@ -1,7 +1,7 @@
 import 'package:fhir/r4.dart';
 
 import '../../../fhir_types/fhir_types_extensions.dart';
-import '../../../logging/logger.dart';
+import '../../../logging/logging.dart';
 import '../../../resource_provider/resource_uris.dart';
 import '../../questionnaires.dart';
 

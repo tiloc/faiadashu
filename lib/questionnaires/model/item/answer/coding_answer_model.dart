@@ -4,7 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
 
 import '../../../../fhir_types/fhir_types_extensions.dart';
-import '../../../../logging/logger.dart';
+import '../../../../logging/logging.dart';
 import '../../../questionnaires.dart';
 
 /// Model answers which are [Coding]s.

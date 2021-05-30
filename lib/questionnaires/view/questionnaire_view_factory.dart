@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../logging/logger.dart';
+import '../../logging/logging.dart';
 import '../questionnaires.dart';
 
 /// Create the views for all levels of a questionnaire. Provide styling theme.

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart' as logging;
 
-import 'logging.dart';
+import 'log_level.dart';
 
 /// This logger is used consistently throughout the library.
 /// It is designed to map to dart:logger, dart:developer, etc.

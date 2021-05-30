@@ -3,9 +3,9 @@ import 'dart:collection';
 import 'package:fhir/r4.dart';
 import 'package:intl/intl.dart';
 
-import '../../../../coding/coding.dart' as dar;
+import '../../../../coding/coding.dart';
 import '../../../../fhir_types/fhir_types_extensions.dart';
-import '../../../../logging/logger.dart';
+import '../../../../logging/logging.dart';
 import '../../../questionnaires.dart';
 
 /// Models numerical answers.
@@ -229,8 +229,8 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
     final dataAbsentReasonExtension = !valid
         ? [
             FhirExtension(
-                url: dar.dataAbsentReasonExtensionUrl,
-                valueCode: dar.dataAbsentReasonAsTextCode)
+                url: dataAbsentReasonExtensionUrl,
+                valueCode: dataAbsentReasonAsTextCode)
           ]
         : null;
 

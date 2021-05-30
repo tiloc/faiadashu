@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
-import '../../../../logging/logger.dart';
+import '../../../../logging/logging.dart';
 
 /// An input formatter for internationalized input of numbers.
 class NumericalTextInputFormatter extends TextInputFormatter {

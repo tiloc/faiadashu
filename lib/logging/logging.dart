@@ -1,2 +1,2 @@
-export 'log_level.dart';
-export 'logger.dart';
+export 'src/log_level.dart';
+export 'src/logger.dart';
