@@ -1,6 +1,6 @@
 import 'package:fhir/r4.dart';
 
-import '../../../coding/data_absent_reasons.dart';
+import '../../../coding/coding.dart';
 import '../../questionnaires.dart';
 
 /// Model a response item, which might consist of multiple answers.
@@ -50,7 +50,7 @@ class ResponseModel {
             extension_: (dataAbsentReason != null)
                 ? [
                     FhirExtension(
-                        url: dataAbsentReasonExtension,
+                        url: dataAbsentReasonExtensionUrl,
                         valueCode: dataAbsentReason)
                   ]
                 : null,
