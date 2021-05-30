@@ -46,12 +46,23 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
     super.initState();
     _focusNode =
         FocusNode(debugLabel: widget.itemModel.linkId, skipTraversal: true);
+
+    widget.itemModel.questionnaireModel.addListener(_rebuild);
   }
 
   @override
   void dispose() {
+    widget.itemModel.questionnaireModel.removeListener(_rebuild);
+
     _focusNode.dispose();
     super.dispose();
+  }
+
+  void _rebuild() {
+    _logger.trace('rebuild()');
+    setState(() {
+      // Just repaint.
+    });
   }
 
   /// Requests focus on this [QuestionnaireItemFiller].
@@ -68,40 +79,50 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
         ? Focus(
             focusNode: _focusNode,
             onFocusChange: (gainedFocus) {
-              debugDumpFocusTree();
+              // TODO: This is filling up the log.
+//              debugDumpFocusTree();
             },
             child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 500),
-              child: widget.itemModel.isEnabled
-                  ? (MediaQuery.of(context).size.width >
-                          1000) // TODO: Use LayoutBuilder instead?
-                      // Wide landscape screen: Use horizontal layout
-                      ? Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                              if (widget._titleWidget != null)
-                                Expanded(
-                                    child: Container(
-                                        padding: const EdgeInsets.only(top: 8),
-                                        child: widget._titleWidget))
-                              else
-                                Expanded(child: Container()),
-                              Expanded(flex: 2, child: widget._responseFiller)
-                            ])
-                      // Narrow, portrait screen: Use vertical layout
-                      : Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (widget._titleWidget != null)
-                              Container(
-                                  padding: const EdgeInsets.only(top: 8),
-                                  child: widget._titleWidget),
-                            widget._responseFiller,
-                          ],
-                        )
-                  : const SizedBox(),
-            ),
+                duration: const Duration(milliseconds: 500),
+                child: widget.itemModel.isEnabled
+                    ? LayoutBuilder(builder:
+                        (BuildContext context, BoxConstraints constraints) {
+                        // Wide landscape screen: Use horizontal layout
+                        return AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 500),
+                          child: (constraints.maxWidth > 1000)
+                              ? Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                      if (widget._titleWidget != null)
+                                        Expanded(
+                                            child: Container(
+                                                padding: const EdgeInsets.only(
+                                                    top: 8),
+                                                child: widget._titleWidget))
+                                      else
+                                        Expanded(child: Container()),
+                                      Expanded(
+                                          flex: 2,
+                                          child: widget._responseFiller)
+                                    ])
+                              // Narrow, portrait screen: Use vertical layout
+                              : Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (widget._titleWidget != null)
+                                      Container(
+                                          padding:
+                                              const EdgeInsets.only(top: 8),
+                                          child: widget._titleWidget),
+                                    const SizedBox(width: 8),
+                                    widget._responseFiller,
+                                  ],
+                                ),
+                        );
+                      })
+                    : const SizedBox()),
           )
         : const SizedBox();
   }
