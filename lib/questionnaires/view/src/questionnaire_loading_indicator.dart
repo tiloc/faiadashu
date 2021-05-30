@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../model/model.dart';
+import '../../model/model.dart';
 
 /// Loading indicator during retrieval / decoding of a questionnaire.
 class QuestionnaireLoadingIndicator extends StatelessWidget {

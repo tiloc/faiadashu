@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 
 import '../../../../fhir_types/fhir_types_extensions.dart';
 import '../../../questionnaires.dart';
-import '../../xhtml.dart';
 import 'null_dash_text.dart';
 
 /// Answer questions which require code(s) as a response.

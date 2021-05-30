@@ -1,8 +1,8 @@
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
-import '../../resource_provider/resource_provider.dart';
-import '../questionnaires.dart';
+import '../../../resource_provider/resource_provider.dart';
+import '../../questionnaires.dart';
 
 /// Fill a questionnaire through a wizard-style series of individual questions.
 class QuestionnaireStepperPage extends StatefulWidget {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../broken_questionnaire_item.dart';
-import '../questionnaire_answer_filler.dart';
+import '../../view.dart';
 import '../questionnaire_response_filler.dart';
+import 'questionnaire_answer_filler.dart';
 
 /// Visualize a broken [QuestionnaireAnswerFiller].
 class BrokenAnswerFiller extends QuestionnaireAnswerFiller {

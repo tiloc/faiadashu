@@ -1,9 +1,9 @@
 import 'package:fhir/r4/r4.dart';
 import 'package:flutter/material.dart';
 
-import '../../logging/logging.dart';
-import '../../resource_provider/resource_provider.dart';
-import '../questionnaires.dart';
+import '../../../logging/logging.dart';
+import '../../../resource_provider/resource_provider.dart';
+import '../../questionnaires.dart';
 
 /// Fill a [Questionnaire].
 ///

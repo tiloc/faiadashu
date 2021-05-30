@@ -3,10 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../fhir_types/fhir_types.dart';
-import '../model/aggregation/narrative_aggregator.dart';
-import '../model/aggregation/questionnaire_response_aggregator.dart';
-import '../questionnaires.dart';
+import '../../../fhir_types/fhir_types.dart';
+import '../../model/aggregation/narrative_aggregator.dart';
+import '../../model/aggregation/questionnaire_response_aggregator.dart';
+import '../../questionnaires.dart';
 import 'questionnaire_filler.dart';
 
 /// "Drawer" which contains the narrative for a questionnaire.

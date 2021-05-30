@@ -2,7 +2,7 @@ import 'dart:developer' as developer;
 import 'dart:io';
 
 import 'package:faiadashu/logging/logging.dart' as flogging;
-import 'package:faiadashu/questionnaires/view/questionnaire_stepper_page.dart';
+import 'package:faiadashu/questionnaires/view/view.dart';
 import 'package:faiadashu/resource_provider/resource_provider.dart';
 import 'package:faiadashu_example/questionnaire_launch_tile.dart';
 import 'package:faiadashu_online/restful/restful.dart';

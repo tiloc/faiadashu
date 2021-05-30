@@ -3,9 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-import '../../logging/logging.dart';
-import '../../resource_provider/resource_provider.dart';
-import '../questionnaires.dart';
+import '../../../logging/logging.dart';
+import '../../../resource_provider/resource_provider.dart';
+import '../../questionnaires.dart';
 
 /// Fills a [Questionnaire] through a vertically scrolling input form.
 ///

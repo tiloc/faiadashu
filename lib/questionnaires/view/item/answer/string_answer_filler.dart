@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../../model/item/answer/string_answer_model.dart';
 import '../../../questionnaires.dart';
-import '../questionnaire_answer_filler.dart';
+import 'questionnaire_answer_filler.dart';
 
 class StringAnswerFiller extends QuestionnaireAnswerFiller {
   StringAnswerFiller(
