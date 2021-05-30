@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:fhir/r4.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
-import '../logging/logging.dart';
+import '../../logging/logging.dart';
 
 /// Provide [Resource]s based on a Uri.
 ///

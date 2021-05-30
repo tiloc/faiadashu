@@ -1,4 +1,5 @@
-import 'package:faiadashu/resource_provider/fhir_resource_provider.dart';
+import 'package:faiadashu/resource_provider/resource_provider.dart'
+    show FhirResourceProvider;
 import 'package:fhir/r4.dart';
 import 'package:fhir_at_rest/r4.dart';
 import 'package:fhir_auth/r4.dart';
