@@ -1,8 +1,8 @@
 import 'package:fhir/r4.dart';
 
-import '../../../../coding/coding.dart';
-import '../../../../fhir_types/fhir_types_extensions.dart';
-import '../response_model.dart';
+import '../../../../../coding/coding.dart';
+import '../../../../../fhir_types/fhir_types_extensions.dart';
+import '../../response_model.dart';
 import 'answer_model.dart';
 
 /// Models string answers, incl. URLs.

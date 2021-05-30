@@ -2,8 +2,8 @@ import 'dart:ui';
 
 import 'package:fhir/r4.dart';
 
-import '../../../../fhir_types/fhir_types_extensions.dart';
-import '../../../questionnaires.dart';
+import '../../../../../fhir_types/fhir_types_extensions.dart';
+import '../../../../questionnaires.dart';
 
 /// Models an answer within a [QuestionnaireResponseItem].
 abstract class AnswerModel<I, V> {

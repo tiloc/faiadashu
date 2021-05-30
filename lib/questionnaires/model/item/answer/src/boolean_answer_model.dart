@@ -1,6 +1,6 @@
 import 'package:fhir/r4.dart';
 
-import '../item.dart';
+import '../../item.dart';
 
 class BooleanAnswerModel extends AnswerModel<Boolean, Boolean> {
   BooleanAnswerModel(ResponseModel responseModel, int answerIndex)

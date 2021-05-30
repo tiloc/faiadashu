@@ -1,6 +1,6 @@
 import 'package:fhir/r4.dart';
 
-import '../item.dart';
+import '../../item.dart';
 
 /// A pseudo-model for a static questionnaire item.
 ///

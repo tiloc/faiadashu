@@ -1,7 +1,6 @@
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../model/item/answer/string_answer_model.dart';
 import '../../../../questionnaires.dart';
 import 'questionnaire_answer_filler.dart';
 

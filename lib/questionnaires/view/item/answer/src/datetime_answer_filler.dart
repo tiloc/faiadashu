@@ -3,7 +3,6 @@ import 'package:fhir/r4.dart'
 import 'package:flutter/material.dart';
 
 import '../../../../../fhir_types/date_time_picker.dart';
-import '../../../../model/item/answer/datetime_answer_model.dart';
 import '../../../../questionnaires.dart';
 
 class DateTimeAnswerFiller extends QuestionnaireAnswerFiller {
