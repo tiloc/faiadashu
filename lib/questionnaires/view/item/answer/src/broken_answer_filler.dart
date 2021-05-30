@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../view.dart';
-import '../questionnaire_response_filler.dart';
+import '../../../view.dart';
+import '../../questionnaire_response_filler.dart';
 import 'questionnaire_answer_filler.dart';
 
 /// Visualize a broken [QuestionnaireAnswerFiller].
