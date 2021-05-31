@@ -1,8 +1,10 @@
 ## 0.4.5
 * Moved all implementations into `src/` sub-directories
+  * This is breaking if you have previously imported implementation files directly
 * Clean up of numerical model and view
 * Renamed QuestionnaireViewFactory -> QuestionnaireTheme  
-* Bugfix: Changes to enableWhen did not lead to a repaint  
+* Bugfix: Changes to enableWhen did not lead to a repaint
+* Better focus handling: Remove keyboard while not entering text  
 * Early WIP steps for completion handling
   * Complete button control
   * QuestionnaireResponseAggregator will not emit items which are not enabled, when status is `complete`.
