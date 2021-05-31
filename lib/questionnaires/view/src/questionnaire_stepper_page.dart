@@ -76,10 +76,14 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
                   ValueListenableBuilder<Decimal>(
                     builder:
                         (BuildContext context, Decimal value, Widget? child) {
-                      return Text(
-                        'Score: ${value.value!.round().toString()}',
-                        style: Theme.of(context).textTheme.headline4,
-                      );
+                      final scoreString = value.value!.round().toString();
+                      return AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 200),
+                          child: Text(
+                            'Score: $scoreString',
+                            key: ValueKey<String>(scoreString),
+                            style: Theme.of(context).textTheme.headline4,
+                          ));
                     },
                     valueListenable: QuestionnaireFiller.of(context)
                         .aggregator<TotalScoreAggregator>(),
