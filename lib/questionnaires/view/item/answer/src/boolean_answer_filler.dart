@@ -31,6 +31,7 @@ class _BooleanItemState extends QuestionnaireAnswerState<Boolean,
           value: value?.value,
           tristate: true,
           onChanged: (newValue) {
+            firstFocusNode.requestFocus();
             value = (newValue != null) ? Boolean(newValue) : null;
           },
         ));

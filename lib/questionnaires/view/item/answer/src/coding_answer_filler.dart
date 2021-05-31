@@ -83,65 +83,81 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
           width: 100,
           height: 100);
 
-      choices.add(isMultipleChoice
-          ? answerModel.isExclusive(choice.valueCoding!)
-              ? RadioListTile<String>(
-                  title: styledOptionTitle,
-                  groupValue: choice.optionCode,
-                  value: value?.coding
-                          ?.firstWhereOrNull((coding) =>
-                              coding.code?.value == choice.optionCode)
-                          ?.code
-                          ?.value ??
-                      '',
-                  onChanged: (_) {
-                    final newValue =
-                        answerModel.toggleValue(value, choice.optionCode);
-                    _validationText = answerModel.validate(newValue);
-                    value = newValue;
-                  },
-                )
-              : CheckboxListTile(
-                  title: styledOptionTitle,
-                  value: value?.coding?.firstWhereOrNull((coding) =>
-                          coding.code?.value == choice.optionCode) !=
-                      null,
-                  onChanged: (bool? newValue) {
-                    final newValue =
-                        answerModel.toggleValue(value, choice.optionCode);
-                    _validationText = answerModel.validate(newValue);
-                    value = newValue;
-                  })
-          : RadioListTile<String>(
-              title: styledOptionTitle,
-              value: choice.optionCode,
-              groupValue: answerModel.toChoiceString(value),
-              onChanged: (String? newValue) {
-                value = answerModel.fromChoiceString(newValue);
-              }));
+      choices.add(
+        isMultipleChoice
+            ? answerModel.isExclusive(choice.valueCoding!)
+                ? Focus(
+                    child: RadioListTile<String>(
+                      title: styledOptionTitle,
+                      groupValue: choice.optionCode,
+                      value: value?.coding
+                              ?.firstWhereOrNull((coding) =>
+                                  coding.code?.value == choice.optionCode)
+                              ?.code
+                              ?.value ??
+                          '',
+                      onChanged: (_) {
+                        Focus.of(context).requestFocus();
+                        final newValue =
+                            answerModel.toggleValue(value, choice.optionCode);
+                        _validationText = answerModel.validate(newValue);
+                        value = newValue;
+                      },
+                    ),
+                  )
+                : Focus(
+                    child: CheckboxListTile(
+                        title: styledOptionTitle,
+                        value: value?.coding?.firstWhereOrNull((coding) =>
+                                coding.code?.value == choice.optionCode) !=
+                            null,
+                        onChanged: (bool? newValue) {
+                          Focus.of(context).requestFocus();
+                          final newValue =
+                              answerModel.toggleValue(value, choice.optionCode);
+                          _validationText = answerModel.validate(newValue);
+                          value = newValue;
+                        }),
+                  )
+            : Focus(
+                child: RadioListTile<String>(
+                    title: styledOptionTitle,
+                    value: choice.optionCode,
+                    groupValue: answerModel.toChoiceString(value),
+                    onChanged: (String? newValue) {
+                      Focus.of(context).requestFocus();
+                      value = answerModel.fromChoiceString(newValue);
+                    }),
+              ),
+      );
     }
 
     if (qi.type == QuestionnaireItemType.open_choice) {
-      choices.add(RadioListTile<String>(
-        value: CodingAnswerModel.openChoiceOther,
-        groupValue: answerModel.toChoiceString(value),
-        onChanged: (String? newValue) {
-          value = CodeableConcept(
-              coding: [Coding(code: Code(CodingAnswerModel.openChoiceOther))],
-              text: _otherChoiceController!.text);
-        },
-        title: TextFormField(
-          controller: _otherChoiceController,
-          onChanged: (newText) {
-            value = (newText.isEmpty)
-                ? null
-                : CodeableConcept(coding: [
-                    Coding(code: Code(CodingAnswerModel.openChoiceOther))
-                  ], text: _otherChoiceController!.text);
-          },
+      choices.add(
+        Focus(
+          child: RadioListTile<String>(
+            value: CodingAnswerModel.openChoiceOther,
+            groupValue: answerModel.toChoiceString(value),
+            onChanged: (String? newValue) {
+              Focus.of(context).requestFocus();
+              value = CodeableConcept(coding: [
+                Coding(code: Code(CodingAnswerModel.openChoiceOther))
+              ], text: _otherChoiceController!.text);
+            },
+            title: TextFormField(
+              controller: _otherChoiceController,
+              onChanged: (newText) {
+                value = (newText.isEmpty)
+                    ? null
+                    : CodeableConcept(coding: [
+                        Coding(code: Code(CodingAnswerModel.openChoiceOther))
+                      ], text: _otherChoiceController!.text);
+              },
+            ),
+            secondary: const Text('Other'),
+          ),
         ),
-        secondary: const Text('Other'),
-      ));
+      );
     }
 
     if (qi.extension_
@@ -151,6 +167,7 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
                 ?.value ==
             'horizontal' &&
         MediaQuery.of(context).size.width > 750) {
+      // TODO: This should use LayoutBuilder
       return Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -189,7 +206,9 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
                 shape: (firstFocusNode.hasFocus)
                     ? RoundedRectangleBorder(
                         side: BorderSide(
-                            color: Theme.of(context).colorScheme.secondary,
+                            color: (_validationText == null)
+                                ? Theme.of(context).colorScheme.secondary
+                                : Theme.of(context).colorScheme.error,
                             width: 2.0),
                         borderRadius: BorderRadius.circular(4.0))
                     : null,
