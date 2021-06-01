@@ -24,7 +24,7 @@ class _DateTimeAnswerState extends QuestionnaireAnswerState<FhirDateTime,
   }
 
   @override
-  Widget buildEditable(BuildContext context) {
+  Widget buildInputControl(BuildContext context) {
     final itemType = qi.type;
 
     final initialDate = (itemType != QuestionnaireItemType.time) ? value : null;
@@ -39,6 +39,7 @@ class _DateTimeAnswerState extends QuestionnaireAnswerState<FhirDateTime,
       padding: const EdgeInsets.only(top: 8, bottom: 8),
       child: FhirDateTimePicker(
         focusNode: firstFocusNode,
+        enabled: answerModel.isEnabled,
         locale: locale,
         initialDateTime: initialDate,
         // TODO: This can be specified through minValue / maxValue

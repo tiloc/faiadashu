@@ -22,7 +22,7 @@ class _BooleanItemState extends QuestionnaireAnswerState<Boolean,
   }
 
   @override
-  Widget buildEditable(BuildContext context) {
+  Widget buildInputControl(BuildContext context) {
     return Container(
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.only(top: 8, bottom: 8),
@@ -30,10 +30,12 @@ class _BooleanItemState extends QuestionnaireAnswerState<Boolean,
           focusNode: firstFocusNode,
           value: value?.value,
           tristate: true,
-          onChanged: (newValue) {
-            firstFocusNode.requestFocus();
-            value = (newValue != null) ? Boolean(newValue) : null;
-          },
+          onChanged: (answerModel.isEnabled)
+              ? (newValue) {
+                  firstFocusNode.requestFocus();
+                  value = (newValue != null) ? Boolean(newValue) : null;
+                }
+              : null,
         ));
   }
 }

@@ -53,6 +53,8 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller,
           debugLabel:
               'AnswerFiller firstFocusNode: ${widget.itemModel.linkId}');
 
+      widget.itemModel.questionnaireModel.addListener(_rebuild);
+
       postInitState();
     } catch (exception) {
       _abstractLogger.warn('Could not initialize model for ${itemModel.linkId}',
@@ -70,19 +72,26 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller,
 
   @override
   void dispose() {
+    widget.itemModel.questionnaireModel.removeListener(_rebuild);
+
     firstFocusNode.dispose();
     super.dispose();
   }
 
-  Widget _guardedBuildReadOnly(BuildContext context) {
-    if (answerModelError != null) {
-      return BrokenQuestionnaireItem.fromException(answerModelError!);
-    }
+  // OPTIMIZE: Should everything listen to the central model on the top?
+  // Or do something more hierarchical?
 
-    return buildReadOnly(context);
+  /// Triggers a repaint of the filler.
+  ///
+  /// Required for visual updates on enablement changes.
+  void _rebuild() {
+    _abstractLogger.trace('rebuild()');
+    setState(() {
+      // Just repaint.
+    });
   }
 
-  Widget _guardedBuildEditable(BuildContext context) {
+  Widget _guardedBuildInputControl(BuildContext context) {
     if (answerModelError != null) {
       return BrokenQuestionnaireItem.fromException(answerModelError!);
     }
@@ -101,14 +110,10 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller,
       _isFocusHookedUp = true;
     }
 
-    return buildEditable(context);
+    return buildInputControl(context);
   }
 
-  Widget buildReadOnly(BuildContext context) {
-    return Text(answerModel.display);
-  }
-
-  Widget buildEditable(BuildContext context);
+  Widget buildInputControl(BuildContext context);
 
   set value(V? newValue) {
     if (mounted) {
@@ -130,8 +135,6 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller,
 
   @override
   Widget build(BuildContext context) {
-    return widget.itemModel.isReadOnly
-        ? _guardedBuildReadOnly(context)
-        : _guardedBuildEditable(context);
+    return _guardedBuildInputControl(context);
   }
 }

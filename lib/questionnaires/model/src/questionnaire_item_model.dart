@@ -281,6 +281,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   /// Is this item not changeable by end-users?
   ///
   /// Read-only items might still hold a value, such as a calculated value.
+  /// This does not consider the completion status of the questionnaire.
   bool get isReadOnly {
     return isStatic ||
         questionnaireItem.readOnly == Boolean(true) ||

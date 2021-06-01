@@ -18,6 +18,11 @@ abstract class AnswerModel<I, V> {
 
   QuestionnaireItem get qi => itemModel.questionnaireItem;
 
+  bool get isEnabled =>
+      !responseModel.itemModel.isReadOnly &&
+      !(responseModel.itemModel.questionnaireModel.responseStatus ==
+          QuestionnaireResponseStatus.completed);
+
   /// Returns the human-readable entry format.
   ///
   /// See: http://hl7.org/fhir/R4/extension-entryformat.html

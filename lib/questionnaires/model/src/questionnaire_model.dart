@@ -323,8 +323,15 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     }
   }
 
-  QuestionnaireResponseStatus responseStatus =
+  QuestionnaireResponseStatus _responseStatus =
       QuestionnaireResponseStatus.in_progress;
+
+  QuestionnaireResponseStatus get responseStatus => _responseStatus;
+
+  set responseStatus(QuestionnaireResponseStatus newStatus) {
+    _responseStatus = newStatus;
+    bumpRevision();
+  }
 
   void _populateItems(List<QuestionnaireResponseItem>? qris) {
     if (qris == null) {

@@ -18,6 +18,7 @@ class FhirDateTimePicker extends StatefulWidget {
   final Type pickerType;
   final InputDecoration? decoration;
   final FocusNode? focusNode;
+  final bool enabled;
   final void Function(FhirDateTime?)? onChanged;
 
   const FhirDateTimePicker(
@@ -29,6 +30,7 @@ class FhirDateTimePicker extends StatefulWidget {
       this.onChanged,
       this.locale,
       this.focusNode,
+      this.enabled = true,
       Key? key})
       : super(key: key);
 
@@ -120,6 +122,7 @@ class _FhirDateTimePickerState extends State<FhirDateTimePicker> {
       children: [
         TextFormField(
           focusNode: widget.focusNode,
+          enabled: widget.enabled,
           textAlignVertical: TextAlignVertical.center,
           decoration: widget.decoration?.copyWith(
               prefixIcon: (widget.pickerType == Time)
@@ -131,7 +134,7 @@ class _FhirDateTimePickerState extends State<FhirDateTimePicker> {
           },
           readOnly: true,
         ),
-        if (_dateTimeFieldController.text.isNotEmpty)
+        if (widget.enabled && _dateTimeFieldController.text.isNotEmpty)
           IconButton(
               focusNode: _clearFocusNode,
               onPressed: () {

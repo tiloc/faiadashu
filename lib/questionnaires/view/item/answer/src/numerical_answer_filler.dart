@@ -45,9 +45,11 @@ class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
           child: DropdownButton<String>(
               value: answerModel.keyOfUnit,
               hint: const NullDashText(),
-              onChanged: (String? newValue) {
-                value = answerModel.copyWithUnit(newValue);
-              },
+              onChanged: (answerModel.isEnabled)
+                  ? (String? newValue) {
+                      value = answerModel.copyWithUnit(newValue);
+                    }
+                  : null,
               items: [
                 const DropdownMenuItem<String>(
                   child: NullDashText(),
@@ -66,7 +68,7 @@ class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
   }
 
   @override
-  Widget buildEditable(BuildContext context) {
+  Widget buildInputControl(BuildContext context) {
     return answerModel.isSliding
         ? Slider(
             focusNode: firstFocusNode,
@@ -75,9 +77,11 @@ class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
             divisions: answerModel.sliderDivisions,
             value: value!.value!.value!, // Yay, triple value!
             label: answerModel.display,
-            onChanged: (sliderValue) {
-              value = answerModel.copyWithValue(Decimal(sliderValue));
-            },
+            onChanged: answerModel.isEnabled
+                ? (sliderValue) {
+                    value = answerModel.copyWithValue(Decimal(sliderValue));
+                  }
+                : null,
             onChangeStart: (_) {
               firstFocusNode.requestFocus();
             },
@@ -88,6 +92,7 @@ class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
               Expanded(
                   child: TextFormField(
                 focusNode: firstFocusNode,
+                enabled: answerModel.isEnabled,
                 initialValue: (value?.value != null)
                     ? value!.value!.format(locale)
                     : null,

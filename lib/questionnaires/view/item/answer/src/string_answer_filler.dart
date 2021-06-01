@@ -31,11 +31,12 @@ class _StringAnswerState extends QuestionnaireAnswerState<String,
   }
 
   @override
-  Widget buildEditable(BuildContext context) {
+  Widget buildInputControl(BuildContext context) {
     return Container(
         padding: const EdgeInsets.only(top: 8, bottom: 8),
         child: TextFormField(
           focusNode: firstFocusNode,
+          enabled: answerModel.isEnabled,
           keyboardType: TextInputType.text,
           controller: _controller,
           maxLines: (qi.type == QuestionnaireItemType.text) ? 4 : 1,

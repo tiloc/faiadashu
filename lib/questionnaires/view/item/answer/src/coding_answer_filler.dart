@@ -38,7 +38,7 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
   }
 
   @override
-  Widget buildEditable(BuildContext context) {
+  Widget buildInputControl(BuildContext context) {
     try {
       if (answerModel.isAutocomplete) {
         return _buildAutocompleteAnswers(context);
@@ -60,9 +60,11 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
           title: const NullDashText(),
           value: null,
           groupValue: answerModel.toChoiceString(value),
-          onChanged: (String? newValue) {
-            value = answerModel.fromChoiceString(newValue);
-          }));
+          onChanged: (answerModel.isEnabled)
+              ? (String? newValue) {
+                  value = answerModel.fromChoiceString(newValue);
+                }
+              : null));
     }
     for (final choice in answerModel.answerOptions.values) {
       final optionPrefix = choice.extension_
@@ -94,13 +96,15 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
                               ?.code
                               ?.value ??
                           '',
-                      onChanged: (_) {
-                        Focus.of(context).requestFocus();
-                        final newValue =
-                            answerModel.toggleValue(value, choice.optionCode);
-                        _validationText = answerModel.validate(newValue);
-                        value = newValue;
-                      },
+                      onChanged: (answerModel.isEnabled)
+                          ? (_) {
+                              Focus.of(context).requestFocus();
+                              final newValue = answerModel.toggleValue(
+                                  value, choice.optionCode);
+                              _validationText = answerModel.validate(newValue);
+                              value = newValue;
+                            }
+                          : null,
                     ),
                   )
                 : Focus(
@@ -109,23 +113,28 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
                         value: value?.coding?.firstWhereOrNull((coding) =>
                                 coding.code?.value == choice.optionCode) !=
                             null,
-                        onChanged: (bool? newValue) {
-                          Focus.of(context).requestFocus();
-                          final newValue =
-                              answerModel.toggleValue(value, choice.optionCode);
-                          _validationText = answerModel.validate(newValue);
-                          value = newValue;
-                        }),
+                        onChanged: (answerModel.isEnabled)
+                            ? (bool? newValue) {
+                                Focus.of(context).requestFocus();
+                                final newValue = answerModel.toggleValue(
+                                    value, choice.optionCode);
+                                _validationText =
+                                    answerModel.validate(newValue);
+                                value = newValue;
+                              }
+                            : null),
                   )
             : Focus(
                 child: RadioListTile<String>(
                     title: styledOptionTitle,
                     value: choice.optionCode,
                     groupValue: answerModel.toChoiceString(value),
-                    onChanged: (String? newValue) {
-                      Focus.of(context).requestFocus();
-                      value = answerModel.fromChoiceString(newValue);
-                    }),
+                    onChanged: (answerModel.isEnabled)
+                        ? (String? newValue) {
+                            Focus.of(context).requestFocus();
+                            value = answerModel.fromChoiceString(newValue);
+                          }
+                        : null),
               ),
       );
     }
@@ -136,14 +145,17 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
           child: RadioListTile<String>(
             value: CodingAnswerModel.openChoiceOther,
             groupValue: answerModel.toChoiceString(value),
-            onChanged: (String? newValue) {
-              Focus.of(context).requestFocus();
-              value = CodeableConcept(coding: [
-                Coding(code: Code(CodingAnswerModel.openChoiceOther))
-              ], text: _otherChoiceController!.text);
-            },
+            onChanged: (answerModel.isEnabled)
+                ? (String? newValue) {
+                    Focus.of(context).requestFocus();
+                    value = CodeableConcept(coding: [
+                      Coding(code: Code(CodingAnswerModel.openChoiceOther))
+                    ], text: _otherChoiceController!.text);
+                  }
+                : null,
             title: TextFormField(
               controller: _otherChoiceController,
+              enabled: answerModel.isEnabled,
               onChanged: (newText) {
                 value = (newText.isEmpty)
                     ? null
@@ -203,7 +215,7 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
             Focus(
               focusNode: firstFocusNode,
               child: Card(
-                shape: (firstFocusNode.hasFocus)
+                shape: (firstFocusNode.hasFocus && answerModel.isEnabled)
                     ? RoundedRectangleBorder(
                         side: BorderSide(
                             color: (_validationText == null)
