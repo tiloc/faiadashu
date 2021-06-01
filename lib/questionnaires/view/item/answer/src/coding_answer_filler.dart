@@ -169,6 +169,7 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
         MediaQuery.of(context).size.width > 750) {
       // TODO: This should use LayoutBuilder
       return Column(
+          // Horizontal layout
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -196,6 +197,7 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
               )
           ]);
     } else {
+      // Vertical layout
       return Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
