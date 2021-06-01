@@ -78,6 +78,9 @@ class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
             onChanged: (sliderValue) {
               value = answerModel.copyWithValue(Decimal(sliderValue));
             },
+            onChangeStart: (_) {
+              firstFocusNode.requestFocus();
+            },
           )
         : Container(
             padding: const EdgeInsets.only(top: 8, bottom: 8),
