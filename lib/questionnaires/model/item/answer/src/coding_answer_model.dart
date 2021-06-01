@@ -109,6 +109,12 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
         true;
   }
 
+  /// Returns whether the options should be presented as an auto-complete control
+  bool get isAutocomplete {
+    return !(qi.repeats == Boolean(true)) &&
+        (answerOptions.length > 10 || qi.isItemControl('autocomplete'));
+  }
+
   // Take the existing extensions that might contain information about
   // ordinal values and provide them as both ordinalValue and iso21090-CO-value.
   List<FhirExtension>? _createOrdinalExtension(

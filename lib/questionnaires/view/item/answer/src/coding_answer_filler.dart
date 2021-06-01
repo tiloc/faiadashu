@@ -40,10 +40,8 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
   @override
   Widget buildEditable(BuildContext context) {
     try {
-      if (!(qi.repeats == Boolean(true)) &&
-          (answerModel.answerOptions.length > 10 ||
-              qi.isItemControl('autocomplete'))) {
-        return _buildLookupAnswers(context);
+      if (answerModel.isAutocomplete) {
+        return _buildAutocompleteAnswers(context);
       } else {
         return _buildChoiceAnswers(context);
       }
@@ -233,7 +231,7 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
     }
   }
 
-  Widget _buildLookupAnswers(BuildContext context) {
+  Widget _buildAutocompleteAnswers(BuildContext context) {
     return FDashAutocomplete<QuestionnaireAnswerOption>(
       focusNode: firstFocusNode,
       initialValue: value?.localizedDisplay(locale),
