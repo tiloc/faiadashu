@@ -18,8 +18,8 @@ dependencies:
   faiadashu:
     path: ..
 
-  fhir: ^0.4.6
-  fhir_at_rest: ^0.4.2
+  fhir: ^0.4.7
+  fhir_at_rest: ^0.4.4
   fhir_auth: ^0.4.0
 
   flutter:
