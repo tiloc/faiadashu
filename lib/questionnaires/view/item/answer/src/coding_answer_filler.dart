@@ -261,9 +261,11 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
               .contains(textEditingValue.text.toLowerCase());
         });
       },
-      onSelected: (QuestionnaireAnswerOption selectedOption) {
-        value = answerModel.fromChoiceString(selectedOption.optionCode);
-      },
+      onSelected: (answerModel.isEnabled)
+          ? (QuestionnaireAnswerOption selectedOption) {
+              value = answerModel.fromChoiceString(selectedOption.optionCode);
+            }
+          : null,
     );
   }
 }

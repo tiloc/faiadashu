@@ -191,23 +191,30 @@ class FDashAutocompleteState<T extends Object>
 
   @override
   Widget build(BuildContext context) {
-    return RawAutocomplete<T>(
-      focusNode: widget.focusNode,
-      textEditingController: _textEditingController,
-      displayStringForOption: widget.displayStringForOption,
-      fieldViewBuilder: _defaultFieldViewBuilder,
-      optionsBuilder: widget.optionsBuilder,
-      optionsViewBuilder: widget.optionsViewBuilder ??
-          (BuildContext context, AutocompleteOnSelected<T> onSelected,
-              Iterable<T> options) {
-            return _AutocompleteOptions<T>(
-              displayStringForOption: widget.displayStringForOption,
-              onSelected: onSelected,
-              options: options,
-            );
-          },
-      onSelected: widget.onSelected,
-    );
+    return Container(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: (widget.onSelected != null)
+            ? RawAutocomplete<T>(
+                focusNode: widget.focusNode,
+                textEditingController: _textEditingController,
+                displayStringForOption: widget.displayStringForOption,
+                fieldViewBuilder: _defaultFieldViewBuilder,
+                optionsBuilder: widget.optionsBuilder,
+                optionsViewBuilder: widget.optionsViewBuilder ??
+                    (BuildContext context, AutocompleteOnSelected<T> onSelected,
+                        Iterable<T> options) {
+                      return _AutocompleteOptions<T>(
+                        displayStringForOption: widget.displayStringForOption,
+                        onSelected: onSelected,
+                        options: options,
+                      );
+                    },
+                onSelected: widget.onSelected,
+              )
+            : TextFormField(
+                focusNode: widget.focusNode,
+                controller: _textEditingController,
+                enabled: false));
   }
 }
 
