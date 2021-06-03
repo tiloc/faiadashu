@@ -22,11 +22,6 @@ class _BooleanItemState extends QuestionnaireAnswerFillerState<Boolean,
   }
 
   @override
-  bool validate() {
-    return true;
-  }
-
-  @override
   Widget buildInputControl(BuildContext context) {
     return Container(
         alignment: Alignment.centerLeft,

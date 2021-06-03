@@ -23,7 +23,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
     CodingAnswerFiller, CodingAnswerModel> {
   late final TextEditingController? _otherChoiceController;
 
-  String? _validationText;
+  String? _errorText;
 
   _CodingAnswerState();
 
@@ -34,13 +34,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
       _otherChoiceController = TextEditingController();
     }
 
-    _validationText = answerModel.validateInput(value);
-  }
-
-  @override
-  bool validate() {
-    // TODO: implement validate
-    return true;
+    _errorText = answerModel.validateInput(value);
   }
 
   @override
@@ -107,8 +101,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
                               Focus.of(context).requestFocus();
                               final newValue = answerModel.toggleValue(
                                   value, choice.optionCode);
-                              _validationText =
-                                  answerModel.validateInput(newValue);
+                              _errorText = answerModel.validateInput(newValue);
                               value = newValue;
                             }
                           : null,
@@ -125,7 +118,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
                                 Focus.of(context).requestFocus();
                                 final newValue = answerModel.toggleValue(
                                     value, choice.optionCode);
-                                _validationText =
+                                _errorText =
                                     answerModel.validateInput(newValue);
                                 value = newValue;
                               }
@@ -204,9 +197,9 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
                 child: Table(children: [TableRow(children: choices)]),
               ),
             ),
-            if (_validationText != null)
+            if (_errorText != null)
               Text(
-                _validationText!,
+                _errorText!,
                 style: Theme.of(context)
                     .textTheme
                     .caption!
@@ -225,7 +218,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
                 shape: (firstFocusNode.hasFocus && answerModel.isEnabled)
                     ? RoundedRectangleBorder(
                         side: BorderSide(
-                            color: (_validationText == null)
+                            color: (_errorText == null)
                                 ? Theme.of(context).colorScheme.secondary
                                 : Theme.of(context).colorScheme.error,
                             width: 2.0),
@@ -238,9 +231,9 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
                 ),
               ),
             ),
-            if (_validationText != null)
+            if (_errorText != null)
               Text(
-                _validationText!,
+                _errorText!,
                 style: Theme.of(context)
                     .textTheme
                     .caption!

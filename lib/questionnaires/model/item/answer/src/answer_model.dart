@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
 
 import '../../../../../fhir_types/fhir_types.dart';
@@ -65,6 +66,12 @@ abstract class AnswerModel<I, V> {
 
   /// Returns whether this question is unanswered.
   bool get isUnanswered;
+
+  String? get errorText {
+    return itemModel.questionnaireModel.markers.value
+        ?.firstWhereOrNull((qm) => qm.linkId == itemModel.linkId)
+        ?.annotation;
+  }
 
   /// Returns a [QuestionnaireResponseAnswer] based on the current value.
   ///

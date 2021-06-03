@@ -33,7 +33,6 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
   static final _logger = Logger(QuestionnaireItemFillerState);
   late final Widget? _titleWidget;
   late final QuestionnaireResponseFiller _responseFiller;
-  late final GlobalKey<QuestionnaireResponseFillerState> _responseFillerKey;
 
   late final FocusNode _focusNode;
 
@@ -43,21 +42,18 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
     _focusNode =
         FocusNode(debugLabel: widget.itemModel.linkId, skipTraversal: true);
 
-    _responseFillerKey =
-        GlobalKey(debugLabel: 'ResponseFiller ${widget.itemModel.linkId}');
-
     _titleWidget = QuestionnaireItemFillerTitle.fromQuestionnaireItemModel(
         widget.itemModel);
 
     _responseFiller = widget.questionnaireFiller.questionnaireTheme
-        .createQuestionnaireResponseFiller(widget, key: _responseFillerKey);
+        .createQuestionnaireResponseFiller(widget);
 
-    widget.itemModel.questionnaireModel.addListener(_rebuild);
+    widget.itemModel.questionnaireModel.addListener(_forceRebuild);
   }
 
   @override
   void dispose() {
-    widget.itemModel.questionnaireModel.removeListener(_rebuild);
+    widget.itemModel.questionnaireModel.removeListener(_forceRebuild);
 
     _focusNode.dispose();
     super.dispose();
@@ -68,15 +64,11 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
   /// Triggers a repaint of the filler.
   ///
   /// Required for visual updates on enableWhen changes.
-  void _rebuild() {
-    _logger.trace('rebuild()');
+  void _forceRebuild() {
+    _logger.trace('_forceRebuild()');
     setState(() {
       // Just repaint.
     });
-  }
-
-  bool validate() {
-    return _responseFillerKey.currentState!.validate();
   }
 
   /// Requests focus on this [QuestionnaireItemFiller].

@@ -31,12 +31,6 @@ class _StringAnswerState extends QuestionnaireAnswerFillerState<String,
   }
 
   @override
-  bool validate() {
-    // TODO: implement validate
-    return true;
-  }
-
-  @override
   Widget buildInputControl(BuildContext context) {
     return Container(
         padding: const EdgeInsets.only(top: 8, bottom: 8),
@@ -47,6 +41,7 @@ class _StringAnswerState extends QuestionnaireAnswerFillerState<String,
           controller: _controller,
           maxLines: (qi.type == QuestionnaireItemType.text) ? 4 : 1,
           decoration: questionnaireTheme.createDecoration().copyWith(
+                errorText: answerModel.errorText,
                 hintText: answerModel.entryFormat,
               ),
           validator: (inputValue) => answerModel.validateInput(inputValue),

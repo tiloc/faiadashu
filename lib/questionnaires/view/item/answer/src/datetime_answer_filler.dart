@@ -24,12 +24,6 @@ class _DateTimeAnswerState extends QuestionnaireAnswerFillerState<FhirDateTime,
   }
 
   @override
-  bool validate() {
-    // TODO: implement validate
-    return true;
-  }
-
-  @override
   Widget buildInputControl(BuildContext context) {
     final itemType = qi.type;
 
@@ -52,7 +46,9 @@ class _DateTimeAnswerState extends QuestionnaireAnswerFillerState<FhirDateTime,
         firstDate: DateTime(1860),
         lastDate: DateTime(2050),
         pickerType: pickerType,
-        decoration: questionnaireTheme.createDecoration(),
+        decoration: questionnaireTheme
+            .createDecoration()
+            .copyWith(errorText: answerModel.errorText),
         onChanged: (fhirDatetime) => value = fhirDatetime,
       ),
     );

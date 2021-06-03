@@ -68,12 +68,6 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
   }
 
   @override
-  bool validate() {
-    // TODO: implement validate
-    throw UnimplementedError();
-  }
-
-  @override
   Widget buildInputControl(BuildContext context) {
     return answerModel.isSliding
         ? Slider(
@@ -105,6 +99,7 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
                 textAlignVertical: TextAlignVertical.center,
                 textAlign: TextAlign.end,
                 decoration: questionnaireTheme.createDecoration().copyWith(
+                      errorText: answerModel.errorText,
                       hintText: answerModel.entryFormat,
                       suffixIcon: (answerModel.hasUnitChoices)
                           ? SizedBox(

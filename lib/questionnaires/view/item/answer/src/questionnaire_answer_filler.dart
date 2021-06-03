@@ -55,7 +55,7 @@ abstract class QuestionnaireAnswerFillerState<
           debugLabel:
               'AnswerFiller firstFocusNode: ${widget.itemModel.linkId}');
 
-      widget.itemModel.questionnaireModel.addListener(_rebuild);
+      widget.itemModel.questionnaireModel.addListener(_forceRebuild);
 
       postInitState();
     } catch (exception) {
@@ -74,7 +74,7 @@ abstract class QuestionnaireAnswerFillerState<
 
   @override
   void dispose() {
-    widget.itemModel.questionnaireModel.removeListener(_rebuild);
+    widget.itemModel.questionnaireModel.removeListener(_forceRebuild);
 
     firstFocusNode.dispose();
     super.dispose();
@@ -86,8 +86,8 @@ abstract class QuestionnaireAnswerFillerState<
   /// Triggers a repaint of the filler.
   ///
   /// Required for visual updates on enablement changes.
-  void _rebuild() {
-    _abstractLogger.trace('rebuild()');
+  void _forceRebuild() {
+    _abstractLogger.trace('_forceRebuild()');
     setState(() {
       // Just repaint.
     });
@@ -117,14 +117,10 @@ abstract class QuestionnaireAnswerFillerState<
 
   Widget buildInputControl(BuildContext context);
 
-  /// Validates the answer and visualizes the error state accordingly.
-  ///
-  /// Returns true if the answer is valid.
-  bool validate();
-
   set value(V? newValue) {
     if (mounted) {
       setState(() {
+        itemModel.questionnaireModel.resetMarkers();
         answerModel.value = newValue;
       });
 

@@ -66,6 +66,10 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     }
 
     activateEnableWhen();
+
+    markers.addListener(() {
+      nextGeneration();
+    });
   }
 
   /// Create the model for a [Questionnaire].
@@ -439,6 +443,10 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     }
 
     return (markers.isNotEmpty) ? markers : null;
+  }
+
+  void resetMarkers() {
+    markers.value = null;
   }
 
   final markers = ValueNotifier<Iterable<QuestionnaireMarker>?>(null);
