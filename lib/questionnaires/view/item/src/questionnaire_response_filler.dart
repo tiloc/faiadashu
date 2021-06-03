@@ -91,7 +91,7 @@ class QuestionnaireResponseFillerState
       if (!responseModel.isAskedButDeclined) ..._answerFillers,
       if (questionnaireTheme.showSkipOption() &&
           !widget.itemModel.isReadOnly &&
-          widget.itemModel.questionnaireItem.required_ != Boolean(true))
+          !widget.itemModel.isRequired)
         Row(children: [
           const Text('I choose not to answer'),
           Switch(

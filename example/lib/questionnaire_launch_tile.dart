@@ -94,8 +94,8 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                 onLinkTap: launchUrl,
                 persistentFooterButtons: [
                   Builder(
-                      builder: (context) =>
-                          const QuestionnaireCompleteButton()),
+                    builder: (context) => const QuestionnaireCompleteButton(),
+                  ),
                   if (widget.uploadResponseFunction != null)
                     Builder(
                       builder: (context) => ElevatedButton.icon(

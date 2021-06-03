@@ -5,7 +5,7 @@ import 'package:fhir/r4.dart';
 
 import '../../../../../fhir_types/fhir_types.dart';
 import '../../../../../logging/logging.dart';
-import '../../../../questionnaires.dart';
+import '../../../model.dart';
 
 /// Model answers which are [Coding]s.
 class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
@@ -18,29 +18,30 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
 
   static const openChoiceOther = 'open-choice-other';
 
-  /// Turn on/off the checkbox with the provided [toggleValue].
+  /// Toggles the checkbox with the provided [checkboxValue].
+  ///
   /// Used in repeating items.
-  CodeableConcept? toggleValue(CodeableConcept? value, String? toggleValue) {
-    _logger.trace('Enter fillToggledValue $toggleValue');
-    if (toggleValue == null) {
+  CodeableConcept? toggleValue(CodeableConcept? value, String? checkboxValue) {
+    _logger.trace('Enter toggledValue $checkboxValue');
+    if (checkboxValue == null) {
       return null;
     }
     if ((value == null) || (value.coding == null)) {
-      return fromChoiceString(toggleValue);
+      return fromChoiceString(checkboxValue);
     }
 
-    final entryIndex =
-        value.coding!.indexWhere((coding) => coding.code?.value == toggleValue);
+    final entryIndex = value.coding!
+        .indexWhere((coding) => coding.code?.value == checkboxValue);
     if (entryIndex == -1) {
-      _logger.debug('$toggleValue currently not selected.');
-      final enabledCodeableConcept = fromChoiceString(toggleValue)!;
+      _logger.debug('$checkboxValue currently not selected.');
+      final enabledCodeableConcept = fromChoiceString(checkboxValue)!;
       final enabledCoding = enabledCodeableConcept.coding!.first;
       if (isExclusive(enabledCoding)) {
-        _logger.debug('$toggleValue isExclusive');
+        _logger.debug('$checkboxValue isExclusive');
         // The newly enabled checkbox is exclusive, kill all others.
         return enabledCodeableConcept;
       } else {
-        _logger.debug('$toggleValue is not exclusive');
+        _logger.debug('$checkboxValue is not exclusive');
         // Kill all exclusive ones.
         return value.copyWith(coding: [
           ...value.coding!.whereNot((coding) => isExclusive(coding)),
@@ -48,7 +49,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
         ]);
       }
     } else {
-      _logger.debug('$toggleValue currently selected.');
+      _logger.debug('$checkboxValue currently selected.');
       return CodeableConcept(coding: value.coding!..removeAt(entryIndex));
     }
   }
@@ -256,13 +257,13 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
   }
 
   @override
-  QuestionnaireResponseAnswer? fillAnswer() {
+  QuestionnaireResponseAnswer? get filledAnswer {
     throw UnsupportedError(
         'CodingAnswerModel will always return coding answers.');
   }
 
   @override
-  List<QuestionnaireResponseAnswer>? fillCodingAnswers() {
+  List<QuestionnaireResponseAnswer>? get filledCodingAnswers {
     if (value == null) {
       return null;
     }
@@ -288,7 +289,11 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
   }
 
   @override
-  bool hasCodingAnswers() {
-    return true;
+  bool get hasCodingAnswers => true;
+
+  @override
+  QuestionnaireMarker? get isComplete {
+    // TODO: Check the actual value
+    return null;
   }
 }

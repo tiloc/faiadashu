@@ -1,13 +1,17 @@
 import 'package:fhir/r4/resource_types/clinical/diagnostics/diagnostics.dart';
 import 'package:flutter/material.dart';
 
-import 'questionnaire_filler.dart';
+import '../../questionnaires.dart' show QuestionnaireFiller;
 
 /// A button to complete a questionnaire.
 ///
 /// Toggles from Complete / In-Progress
+/// Requires a [QuestionnaireFiller]
 class QuestionnaireCompleteButton extends StatefulWidget {
-  const QuestionnaireCompleteButton({Key? key}) : super(key: key);
+  final VoidCallback? onCompleted;
+
+  const QuestionnaireCompleteButton({this.onCompleted, Key? key})
+      : super(key: key);
 
   @override
   _QuestionnaireCompleteButtonState createState() =>
@@ -20,15 +24,26 @@ class _QuestionnaireCompleteButtonState
   Widget build(BuildContext context) {
     return ElevatedButton.icon(
       onPressed: () {
-        final currentResponseStatus =
-            QuestionnaireFiller.of(context).questionnaireModel.responseStatus;
+        final qf = QuestionnaireFiller.of(context);
+        final qm = qf.questionnaireModel;
+        final currentResponseStatus = qm.responseStatus;
+
+        if (currentResponseStatus != QuestionnaireResponseStatus.completed) {
+          qm.markers.value = qm.isQuestionnaireComplete;
+        }
+
+        final newResponseStatus =
+            (currentResponseStatus == QuestionnaireResponseStatus.completed)
+                ? QuestionnaireResponseStatus.in_progress
+                : QuestionnaireResponseStatus.completed;
 
         setState(() {
-          QuestionnaireFiller.of(context).questionnaireModel.responseStatus =
-              (currentResponseStatus == QuestionnaireResponseStatus.completed)
-                  ? QuestionnaireResponseStatus.in_progress
-                  : QuestionnaireResponseStatus.completed;
+          qm.responseStatus = newResponseStatus;
         });
+
+        if (newResponseStatus == QuestionnaireResponseStatus.completed) {
+          widget.onCompleted?.call();
+        }
       },
       icon:
           (QuestionnaireFiller.of(context).questionnaireModel.responseStatus !=

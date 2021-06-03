@@ -165,8 +165,8 @@ class QuestionnaireFillerData extends InheritedWidget {
             questionnaireModel.orderedQuestionnaireItemModels().length, null),
         super(key: key, child: Builder(builder: builder)) {
     _logger.trace('constructor _');
-    // TODO: This constructor is being invoked from a build() method.
-    // GlobalKeys should not be generated within a build() method.
+    // FIXME: This constructor is being invoked from a build() method.
+    // GlobalKeys cannot be generated inside a build() method.
     _globalKeys = questionnaireModel
         .orderedQuestionnaireItemModels()
         .map<GlobalKey<QuestionnaireItemFillerState>>(

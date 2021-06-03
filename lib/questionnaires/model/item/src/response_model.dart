@@ -65,6 +65,24 @@ class ResponseModel {
     return dataAbsentReason == dataAbsentReasonAsTextCode;
   }
 
+  Iterable<QuestionnaireMarker>? get isComplete {
+    if (_cachedAnswerModels.isEmpty) {
+      return null;
+    }
+
+    final markers = <QuestionnaireMarker>[];
+    for (final am in _cachedAnswerModels.values) {
+      final marker = am.isComplete;
+      if (marker != null) {
+        markers.add(marker);
+      }
+    }
+
+    return (markers.isNotEmpty) ? markers : null;
+  }
+
+  bool get hasAnswers => itemModel.responseItem?.answer != null;
+
   final _cachedAnswerModels = <int, AnswerModel>{};
 
   /// Returns an [AnswerModel] for the nth answer to an overall response.
@@ -77,7 +95,6 @@ class ResponseModel {
 
     final AnswerModel? answerModel;
 
-    // TODO: Should this construct a new one every time, or reuse existing ones?
     switch (itemModel.questionnaireItem.type!) {
       case QuestionnaireItemType.choice:
       case QuestionnaireItemType.open_choice:

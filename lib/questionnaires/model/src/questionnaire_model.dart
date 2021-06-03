@@ -423,9 +423,18 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   /// * All filled fields are valid
   ///
   /// Returns null, if everything is complete.
-  /// Returns [QuestionnaireCursor]s, if an item is incomplete.
-  /// Each entry will contain
-  Iterable<QuestionnaireCursor>? isComplete() {
-    throw UnimplementedError();
+  /// Returns [QuestionnaireMarker]s, if item are incomplete.
+  Iterable<QuestionnaireMarker>? get isQuestionnaireComplete {
+    final markers = <QuestionnaireMarker>[];
+    for (final itemModel in orderedQuestionnaireItemModels()) {
+      final itemMarkers = itemModel.isComplete;
+      if (itemMarkers != null) {
+        markers.addAll(itemMarkers);
+      }
+    }
+
+    return (markers.isNotEmpty) ? markers : null;
   }
+
+  final markers = ValueNotifier<Iterable<QuestionnaireMarker>?>(null);
 }

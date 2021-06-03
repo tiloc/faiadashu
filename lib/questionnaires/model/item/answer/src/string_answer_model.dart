@@ -2,8 +2,7 @@ import 'package:fhir/r4.dart';
 
 import '../../../../../coding/coding.dart';
 import '../../../../../fhir_types/fhir_types.dart';
-import '../../item.dart';
-import 'answer_model.dart';
+import '../../../../model/model.dart';
 
 /// Models string answers, incl. URLs.
 class StringAnswerModel extends AnswerModel<String, String> {
@@ -45,16 +44,16 @@ class StringAnswerModel extends AnswerModel<String, String> {
     }
 
     if (inValue.length < minLength) {
-      return 'Enter $minLength or more characters.';
+      return 'Provide $minLength or more characters.';
     }
 
     if (maxLength != null && inValue.length > maxLength!) {
-      return 'Enter up to $maxLength characters.';
+      return 'Provide up to $maxLength characters.';
     }
 
     if (qi.type == QuestionnaireItemType.url) {
       if (!_urlRegExp.hasMatch(inValue)) {
-        return 'Enter a valid URL.';
+        return 'Provide a valid URL.';
       }
     }
 
@@ -72,7 +71,7 @@ class StringAnswerModel extends AnswerModel<String, String> {
   }
 
   @override
-  QuestionnaireResponseAnswer? fillAnswer() {
+  QuestionnaireResponseAnswer? get filledAnswer {
     final valid = validate(value) == null;
     final dataAbsentReasonExtension = !valid
         ? [
@@ -89,5 +88,16 @@ class StringAnswerModel extends AnswerModel<String, String> {
             : QuestionnaireResponseAnswer(
                 valueUri: FhirUri(value), extension_: dataAbsentReasonExtension)
         : null;
+  }
+
+  @override
+  QuestionnaireMarker? get isComplete {
+    final valid = validate(value);
+    if (valid == null) {
+      return null;
+    } else {
+      return QuestionnaireMarker(responseModel.itemModel.linkId,
+          answerIndex: answerIndex, annotation: valid);
+    }
   }
 }

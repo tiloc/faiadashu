@@ -1,6 +1,6 @@
 import 'package:fhir/r4.dart';
 
-import '../../item.dart';
+import '../../../model.dart';
 
 class BooleanAnswerModel extends AnswerModel<Boolean, Boolean> {
   BooleanAnswerModel(ResponseModel responseModel, int answerIndex)
@@ -9,7 +9,7 @@ class BooleanAnswerModel extends AnswerModel<Boolean, Boolean> {
   }
 
   @override
-  QuestionnaireResponseAnswer? fillAnswer() =>
+  QuestionnaireResponseAnswer? get filledAnswer =>
       (value != null) ? QuestionnaireResponseAnswer(valueBoolean: value) : null;
 
   @override
@@ -23,4 +23,7 @@ class BooleanAnswerModel extends AnswerModel<Boolean, Boolean> {
   String? validate(Boolean? inValue) {
     return null;
   }
+
+  @override
+  QuestionnaireMarker? get isComplete => null;
 }

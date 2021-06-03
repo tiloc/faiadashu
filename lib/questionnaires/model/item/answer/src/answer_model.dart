@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:fhir/r4.dart';
 
 import '../../../../../fhir_types/fhir_types.dart';
-import '../../../../questionnaires.dart';
+import '../../../model.dart';
 
 /// Models an answer within a [QuestionnaireResponseItem].
 abstract class AnswerModel<I, V> {
@@ -46,14 +46,24 @@ abstract class AnswerModel<I, V> {
   /// Returns null when [inValue] is valid, or a localized message when it is not.
   ///
   /// This is used to validate external input (typically coming from a view).
+  ///
   String? validate(I? inValue);
 
-  /// Returns a [QuestionnaireResponseAnswer] based on the current value.
-  QuestionnaireResponseAnswer? fillAnswer();
+  /// Returns whether the answer will pass the completeness check.
+  ///
+  /// Returns null when the answer is complete, or a [QuestionnaireMarker],
+  /// when it is not.
+  ///
+  /// Completeness means that all the criteria (validity, required) are met,
+  /// in order to submit a [QuestionnaireResponse] as complete.
+  QuestionnaireMarker? get isComplete;
 
-  List<QuestionnaireResponseAnswer>? fillCodingAnswers() {
-    throw UnimplementedError('fillCodingAnswers() not implemented.');
+  /// Returns a [QuestionnaireResponseAnswer] based on the current value.
+  QuestionnaireResponseAnswer? get filledAnswer;
+
+  List<QuestionnaireResponseAnswer>? get filledCodingAnswers {
+    throw UnimplementedError('filledCodingAnswers not implemented.');
   }
 
-  bool hasCodingAnswers() => false;
+  bool get hasCodingAnswers => false;
 }

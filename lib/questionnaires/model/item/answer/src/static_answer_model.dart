@@ -1,6 +1,6 @@
 import 'package:fhir/r4.dart';
 
-import '../../item.dart';
+import '../../../../questionnaires.dart';
 
 /// A pseudo-model for a static questionnaire item.
 ///
@@ -10,7 +10,7 @@ class StaticAnswerModel extends AnswerModel<Object, Object> {
       : super(responseModel, answerIndex);
 
   @override
-  QuestionnaireResponseAnswer? fillAnswer() {
+  QuestionnaireResponseAnswer? get filledAnswer {
     throw UnimplementedError('StaticAnswerModel cannot fill an answer.');
   }
 
@@ -21,4 +21,7 @@ class StaticAnswerModel extends AnswerModel<Object, Object> {
   String? validate(Object? inValue) {
     return null;
   }
+
+  @override
+  QuestionnaireMarker? get isComplete => null;
 }

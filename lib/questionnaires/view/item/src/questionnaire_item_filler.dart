@@ -154,8 +154,7 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
       final help =
           _QuestionnaireItemFillerHelpFactory.fromQuestionnaireItem(itemModel);
 
-      final requiredTag =
-          (itemModel.questionnaireItem.required_?.value == true) ? '*' : '';
+      final requiredTag = (itemModel.isRequired) ? '*' : '';
 
       final openStyleTag =
           (itemModel.questionnaireItem.type == QuestionnaireItemType.group)

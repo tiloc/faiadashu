@@ -49,12 +49,15 @@ class QuestionnaireScrollerPage extends StatefulWidget {
 }
 
 class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
+  QuestionnaireModel? _questionnaireModel;
   final ItemScrollController _listScrollController = ItemScrollController();
   final ItemPositionsListener _itemPositionsListener =
       ItemPositionsListener.create();
 
   // What is the desired position to scroll to?
   int _focusIndex = -1;
+
+  bool _isLoaded = false;
 
   // Has the scroller already been scrolled once to the desired position?
   bool _isPositioned = false;
@@ -74,6 +77,40 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  void scrollToMarker(QuestionnaireMarker marker) {
+    if (_questionnaireModel == null) {
+      _logger.info(
+          'Trying to scroll before QuestionnaireModel is loaded. Ignoring.');
+      return;
+    }
+
+    final index =
+        _questionnaireModel!.indexOf((qim) => qim.linkId == marker.linkId);
+
+    if (index == -1) {
+      _logger.warn('Marker with invalid linkId: ${marker.linkId}');
+      return;
+    }
+
+    scrollTo(index!);
+  }
+
+  void scrollTo(int index) {
+    if (!_listScrollController.isAttached) {
+      _logger.info(
+          'Trying to scroll before ListScrollController is attached. Ignoring.');
+      return;
+    }
+
+    final milliseconds = (index < 10) ? 1000 : 1000 + (index - 10) * 100;
+    _listScrollController.scrollTo(
+        index: index,
+        duration: Duration(milliseconds: milliseconds),
+        curve: Curves.easeInOutCubic,
+        alignment:
+            0.3); // Scroll the item's top-edge into the top 30% of the screen.
   }
 
   @override
@@ -190,21 +227,35 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
           return;
         }
 
-        // Locate the first unanswered or invalid question
-        _focusIndex = questionnaireModel
-            .indexOf((qim) => qim.isUnanswered || qim.isInvalid)!;
+        // Upon initial load: Locate the first unanswered or invalid question
+        if (!_isLoaded) {
+          _isLoaded = true;
 
-        if (_focusIndex == -1) {
-          // When all questions are answered then focus on the first field that can be filled by a human.
-          _focusIndex = questionnaireModel.indexOf((qim) => !qim.isReadOnly)!;
+          _questionnaireModel = questionnaireModel;
+
+          // Listen for new markers and then scroll to the first one.
+          questionnaireModel.markers.addListener(() {
+            final markers = questionnaireModel.markers.value;
+            if (markers != null) {
+              scrollToMarker(markers.first);
+            }
+          });
+
+          _focusIndex = questionnaireModel
+              .indexOf((qim) => qim.isUnanswered || qim.isInvalid)!;
+
+          if (_focusIndex == -1) {
+            // When all questions are answered then focus on the first field that can be filled by a human.
+            _focusIndex = questionnaireModel.indexOf((qim) => !qim.isReadOnly)!;
+          }
+        }
+
+        if (_focusIndex <= 0) {
+          return;
         }
 
         _logger.debug(
             'Focussing item# $_focusIndex - ${questionnaireModel.itemModelAt(_focusIndex)}');
-
-        if (_focusIndex == 0) {
-          return;
-        }
 
         _itemPositionsListener.itemPositions
             .addListener(_initialPositionListener);
@@ -223,10 +274,11 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
 
     _isPositioned = true;
 
-    // TODO: Item could be visible, but in an undesirable position, e.g.
-    // at the bottom of the display.
-    final isItemVisible = _itemPositionsListener.itemPositions.value
-        .any((element) => element.index == _focusIndex);
+    // Item could be visible, but in an undesirable position, e.g.
+    // at the bottom of the display. Make sure it is in the top third of screen.
+    final isItemVisible = _itemPositionsListener.itemPositions.value.any(
+        (element) =>
+            element.index == _focusIndex && element.itemLeadingEdge < 0.35);
 
     _logger.debug('Item $_focusIndex already visible: $isItemVisible');
 
@@ -242,14 +294,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
     // On the first frame after data is loaded the _listScrollController is not
     // properly attached yet and will throw an exception.
     WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-      final milliseconds =
-          (_focusIndex < 10) ? 1000 : 1000 + (_focusIndex - 10) * 100;
-      _listScrollController.scrollTo(
-          index: _focusIndex,
-          duration: Duration(milliseconds: milliseconds),
-          curve: Curves.easeInOutCubic,
-          alignment:
-              0.3); // Scroll the item's top-edge into the top 30% of the screen.
+      scrollTo(_focusIndex);
     });
   }
 }

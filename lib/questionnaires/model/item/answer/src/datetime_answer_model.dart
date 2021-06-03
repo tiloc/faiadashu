@@ -8,16 +8,14 @@ import 'package:fhir/r4.dart'
         Time;
 
 import '../../../../../fhir_types/fhir_types.dart';
-import '../../item.dart';
-import 'answer_model.dart';
+import '../../../model.dart';
 
 class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
   DateTimeAnswerModel(ResponseModel responseModel, int answerIndex)
       : super(responseModel, answerIndex) {
     value = answer?.valueDateTime ??
         ((answer?.valueDate != null)
-            ? FhirDateTime(answer?.valueDate
-                .toString()) // OPTIMIZE: File a PR to allow construction of FhirDateTime directly from Date.
+            ? FhirDateTime(answer?.valueDate)
             : null) ??
         ((qi.extension_
                     ?.extensionOrNull(
@@ -34,7 +32,7 @@ class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
   String get display => value?.format(locale) ?? AnswerModel.nullText;
 
   @override
-  QuestionnaireResponseAnswer? fillAnswer() {
+  QuestionnaireResponseAnswer? get filledAnswer {
     final itemType = qi.type;
 
     if (value?.value == null) {
@@ -59,7 +57,13 @@ class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
     if (inValue == null || inValue.isValid) {
       return null;
     } else {
-      return "Enter a valid date/time.";
+      return "Provide a valid date/time.";
     }
+  }
+
+  @override
+  QuestionnaireMarker? get isComplete {
+    // TODO: Look at validity?
+    return null;
   }
 }

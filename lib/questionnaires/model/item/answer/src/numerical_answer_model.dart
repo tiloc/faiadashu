@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 import '../../../../../coding/coding.dart';
 import '../../../../../fhir_types/fhir_types.dart';
 import '../../../../../logging/logging.dart';
-import '../../../../questionnaires.dart';
+import '../../../model.dart';
 
 /// Models numerical answers.
 class NumericalAnswerModel extends AnswerModel<String, Quantity> {
@@ -185,10 +185,10 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
       return '$inputValue is not a valid number.';
     }
     if (number > _maxValue) {
-      return 'Enter a number up to ${Decimal(_maxValue).format(locale)}.';
+      return 'Provide a number up to ${Decimal(_maxValue).format(locale)}.';
     }
     if (number < _minValue) {
-      return 'Enter a number ${Decimal(_minValue).format(locale)}, or higher.';
+      return 'Provide a number ${Decimal(_minValue).format(locale)}, or higher.';
     }
   }
 
@@ -254,8 +254,8 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
   }
 
   @override
-  QuestionnaireResponseAnswer? fillAnswer() {
-    _logger.debug('fillAnswer: $value');
+  QuestionnaireResponseAnswer? get filledAnswer {
+    _logger.debug('filledAnswer: $value');
     if (value == null) {
       return null;
     }
@@ -278,5 +278,11 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
       default:
         throw StateError('item.type cannot be ${qi.type}');
     }
+  }
+
+  @override
+  QuestionnaireMarker? get isComplete {
+    // TODO: Check the actual value
+    return null;
   }
 }

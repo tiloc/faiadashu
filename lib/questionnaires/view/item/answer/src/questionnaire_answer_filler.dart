@@ -121,12 +121,12 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller,
         answerModel.value = newValue;
       });
 
-      if (answerModel.hasCodingAnswers()) {
+      if (answerModel.hasCodingAnswers) {
         widget.responseFillerState.onAnswered(
-            answerModel.fillCodingAnswers(), answerModel.answerIndex);
+            answerModel.filledCodingAnswers, answerModel.answerIndex);
       } else {
         widget.responseFillerState
-            .onAnswered([answerModel.fillAnswer()], answerModel.answerIndex);
+            .onAnswered([answerModel.filledAnswer], answerModel.answerIndex);
       }
     }
   }

@@ -194,6 +194,8 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     return _responseModel ??= ResponseModel(this);
   }
 
+  bool get isRequired => questionnaireItem.required_ == Boolean(true);
+
   /// Is the item unanswered?
   ///
   /// Static or read-only items are not unanswered.
@@ -218,6 +220,15 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   bool get isInvalid {
     _qimLogger.trace('isInvalid $linkId');
     return responseModel.isInvalid;
+  }
+
+  Iterable<QuestionnaireMarker>? get isComplete {
+    if (isRequired && !responseModel.hasAnswers) {
+      return [
+        QuestionnaireMarker(linkId, annotation: 'Provide the required answer.')
+      ];
+    }
+    return responseModel.isComplete;
   }
 
   /// Returns a [Decimal] value which can be added to a score.
