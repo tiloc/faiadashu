@@ -240,7 +240,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
   String get display => value?.localizedDisplay(locale) ?? AnswerModel.nullText;
 
   @override
-  String? validate(CodeableConcept? inValue) {
+  String? validateInput(CodeableConcept? inValue) {
     if (inValue == null) {
       return null;
     }
@@ -296,4 +296,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
     // TODO: Check the actual value
     return null;
   }
+
+  @override
+  bool get isUnanswered => value == null;
 }

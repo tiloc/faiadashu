@@ -19,7 +19,7 @@ class CodingAnswerFiller extends QuestionnaireAnswerFiller {
   State<StatefulWidget> createState() => _CodingAnswerState();
 }
 
-class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
+class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
     CodingAnswerFiller, CodingAnswerModel> {
   late final TextEditingController? _otherChoiceController;
 
@@ -34,7 +34,13 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
       _otherChoiceController = TextEditingController();
     }
 
-    _validationText = answerModel.validate(value);
+    _validationText = answerModel.validateInput(value);
+  }
+
+  @override
+  bool validate() {
+    // TODO: implement validate
+    return true;
   }
 
   @override
@@ -101,7 +107,8 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
                               Focus.of(context).requestFocus();
                               final newValue = answerModel.toggleValue(
                                   value, choice.optionCode);
-                              _validationText = answerModel.validate(newValue);
+                              _validationText =
+                                  answerModel.validateInput(newValue);
                               value = newValue;
                             }
                           : null,
@@ -119,7 +126,7 @@ class _CodingAnswerState extends QuestionnaireAnswerState<CodeableConcept,
                                 final newValue = answerModel.toggleValue(
                                     value, choice.optionCode);
                                 _validationText =
-                                    answerModel.validate(newValue);
+                                    answerModel.validateInput(newValue);
                                 value = newValue;
                               }
                             : null),

@@ -171,7 +171,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
   String get display => value?.format(locale) ?? AnswerModel.nullText;
 
   @override
-  String? validate(String? inputValue) {
+  String? validateInput(String? inputValue) {
     if (inputValue == null || inputValue.isEmpty) {
       return null;
     }
@@ -225,7 +225,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
   /// * Updates the numerical value based on text input
   /// * Keeps the unit
   Quantity? copyWithTextInput(String textInput) {
-    final valid = validate(textInput) == null;
+    final valid = validateInput(textInput) == null;
     final dataAbsentReasonExtension = !valid
         ? [
             FhirExtension(
@@ -285,4 +285,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
     // TODO: Check the actual value
     return null;
   }
+
+  @override
+  bool get isUnanswered => (value == null) || (value!.value == null);
 }

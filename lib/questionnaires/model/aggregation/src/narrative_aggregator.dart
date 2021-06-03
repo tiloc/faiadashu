@@ -9,8 +9,8 @@ import '../../../questionnaires.dart';
 class NarrativeAggregator extends Aggregator<Narrative> {
   static final _logger = Logger(NarrativeAggregator);
 
-  // Revision of questionnaireModel when _narrative was calculated
-  int _revision = -1;
+  // Generation of questionnaireModel when _narrative was calculated
+  int _generation = -1;
   // Cached narrative
   Narrative? _narrative;
 
@@ -25,7 +25,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
   void init(QuestionnaireModel questionnaireModel) {
     super.init(questionnaireModel);
 
-    _revision = -1;
+    _generation = -1;
     _narrative = value;
   }
 
@@ -132,9 +132,9 @@ class NarrativeAggregator extends Aggregator<Narrative> {
   @override
   Narrative? aggregate({bool notifyListeners = false}) {
     _logger.debug(
-        '$this.aggregate (topRev: ${questionnaireModel.revision}, rev: $_revision)');
-    if (questionnaireModel.revision == _revision) {
-      _logger.debug('Regurgitating narrative revision $_revision');
+        '$this.aggregate (Model Generation: ${questionnaireModel.generation}, Narrative Generation: $_generation)');
+    if (questionnaireModel.generation == _generation) {
+      _logger.debug('Regurgitating narrative generation $_generation');
       return _narrative;
     }
     // Manually invoke the update, because the order matters and enableWhen calcs need to come after answer value updates.
@@ -142,7 +142,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
         notifyListeners:
             false); // Setting this to true might result in endless refresh and stack overflow
     _narrative = _generateNarrative(questionnaireModel);
-    _revision = questionnaireModel.revision;
+    _generation = questionnaireModel.generation;
     if (notifyListeners) {
       value = _narrative!;
     }

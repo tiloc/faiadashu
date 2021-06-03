@@ -20,9 +20,11 @@ abstract class QuestionnaireAnswerFiller extends StatefulWidget {
         super(key: key);
 }
 
-abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller,
+abstract class QuestionnaireAnswerFillerState<
+    V,
+    W extends QuestionnaireAnswerFiller,
     M extends AnswerModel<Object, V>> extends State<W> {
-  static final _abstractLogger = Logger(QuestionnaireAnswerState);
+  static final _abstractLogger = Logger(QuestionnaireAnswerFillerState);
   late final M answerModel;
 
   late final Object? answerModelError;
@@ -37,7 +39,7 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller,
   QuestionnaireTheme get questionnaireTheme => widget.responseFillerState.widget
       .itemFiller.questionnaireFiller.questionnaireTheme;
 
-  QuestionnaireAnswerState();
+  QuestionnaireAnswerFillerState();
 
   @override
   void initState() {
@@ -114,6 +116,11 @@ abstract class QuestionnaireAnswerState<V, W extends QuestionnaireAnswerFiller,
   }
 
   Widget buildInputControl(BuildContext context);
+
+  /// Validates the answer and visualizes the error state accordingly.
+  ///
+  /// Returns true if the answer is valid.
+  bool validate();
 
   set value(V? newValue) {
     if (mounted) {

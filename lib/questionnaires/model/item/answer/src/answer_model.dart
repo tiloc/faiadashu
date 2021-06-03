@@ -19,8 +19,8 @@ abstract class AnswerModel<I, V> {
   QuestionnaireItem get qi => itemModel.questionnaireItem;
 
   bool get isEnabled =>
-      !responseModel.itemModel.isReadOnly &&
-      !(responseModel.itemModel.questionnaireModel.responseStatus ==
+      !itemModel.isReadOnly &&
+      !(itemModel.questionnaireModel.responseStatus ==
           QuestionnaireResponseStatus.completed);
 
   /// Returns the human-readable entry format.
@@ -43,22 +43,33 @@ abstract class AnswerModel<I, V> {
 
   QuestionnaireResponseAnswer? get answer => responseModel.answers[answerIndex];
 
-  /// Returns null when [inValue] is valid, or a localized message when it is not.
+  /// Validates a new input value. Does not change the [value].
   ///
-  /// This is used to validate external input (typically coming from a view).
+  /// Returns null when [inputValue] is valid, or a localized message when it is not.
   ///
-  String? validate(I? inValue);
+  /// This is used to validate external input from a view.
+  ///
+  String? validateInput(I? inputValue);
 
   /// Returns whether the answer will pass the completeness check.
   ///
-  /// Returns null when the answer is complete, or a [QuestionnaireMarker],
-  /// when it is not.
-  ///
-  /// Completeness means that all the criteria (validity, required) are met,
+  /// Completeness means that the validity criteria are met,
   /// in order to submit a [QuestionnaireResponse] as complete.
+  ///
+  /// Since an individual answer does not know whether it is required, this
+  /// is not taken into account.
+  ///
+  /// Returns null when the answer is valid, or a [QuestionnaireMarker],
+  /// when it is not.
   QuestionnaireMarker? get isComplete;
 
+  /// Returns whether this question is unanswered.
+  bool get isUnanswered;
+
   /// Returns a [QuestionnaireResponseAnswer] based on the current value.
+  ///
+  /// This is the link between the presentation model and the underlying
+  /// FHIR domain model.
   QuestionnaireResponseAnswer? get filledAnswer;
 
   List<QuestionnaireResponseAnswer>? get filledCodingAnswers {

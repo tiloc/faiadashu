@@ -178,7 +178,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     _qimLogger.debug('set responseItem $questionnaireResponseItem');
     if (questionnaireResponseItem != _questionnaireResponseItem) {
       _questionnaireResponseItem = questionnaireResponseItem;
-      questionnaireModel.bumpRevision();
+      questionnaireModel.nextGeneration();
       // This notifies aggregators on changes to individual items
       notifyListeners();
     }
@@ -223,7 +223,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   }
 
   Iterable<QuestionnaireMarker>? get isComplete {
-    if (isRequired && !responseModel.hasAnswers) {
+    if (isRequired && !responseModel.isUnanswered) {
       return [
         QuestionnaireMarker(linkId, annotation: 'Provide the required answer.')
       ];

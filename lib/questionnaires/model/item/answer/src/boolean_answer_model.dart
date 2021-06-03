@@ -20,10 +20,13 @@ class BooleanAnswerModel extends AnswerModel<Boolean, Boolean> {
           : '[ ]';
 
   @override
-  String? validate(Boolean? inValue) {
+  String? validateInput(Boolean? inValue) {
     return null;
   }
 
   @override
   QuestionnaireMarker? get isComplete => null;
+
+  @override
+  bool get isUnanswered => value == null;
 }

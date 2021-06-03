@@ -81,7 +81,13 @@ class ResponseModel {
     return (markers.isNotEmpty) ? markers : null;
   }
 
-  bool get hasAnswers => itemModel.responseItem?.answer != null;
+  bool get isUnanswered {
+    if (_cachedAnswerModels.isEmpty) {
+      return true;
+    }
+
+    return _cachedAnswerModels.values.any((am) => !am.isUnanswered);
+  }
 
   final _cachedAnswerModels = <int, AnswerModel>{};
 

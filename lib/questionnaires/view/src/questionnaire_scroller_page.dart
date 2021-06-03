@@ -7,6 +7,8 @@ import '../../../logging/logging.dart';
 import '../../../resource_provider/resource_provider.dart';
 import '../../questionnaires.dart';
 
+// TODO: Some calculations regarding focus + front matter maybe currently off.
+
 /// Fills a [Questionnaire] through a vertically scrolling input form.
 ///
 /// Takes the [QuestionnaireItemFiller]s as provided by the [QuestionnaireFiller]
@@ -54,6 +56,8 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
   final ItemPositionsListener _itemPositionsListener =
       ItemPositionsListener.create();
 
+  BuildContext? _belowFillerContext;
+
   // What is the desired position to scroll to?
   int _focusIndex = -1;
 
@@ -79,6 +83,9 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
     super.dispose();
   }
 
+  /// Scrolls to a position as conveyed by a [QuestionnaireMarker].
+  ///
+  /// The item will also be focussed.
   void scrollToMarker(QuestionnaireMarker marker) {
     if (_questionnaireModel == null) {
       _logger.info(
@@ -97,12 +104,21 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
     scrollTo(index!);
   }
 
+  /// Scrolls to a position as conveyed by an [index].
+  ///
+  /// The item will also be focussed.
   void scrollTo(int index) {
     if (!_listScrollController.isAttached) {
       _logger.info(
           'Trying to scroll before ListScrollController is attached. Ignoring.');
       return;
     }
+
+    _isFocussed = false;
+    _focusIndex = index;
+
+    _itemPositionsListener.itemPositions
+        .addListener(_focusWhileScrollingPositionListener);
 
     final milliseconds = (index < 10) ? 1000 : 1000 + (index - 10) * 100;
     _listScrollController.scrollTo(
@@ -121,6 +137,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
       fhirResourceProvider: widget.fhirResourceProvider,
       locale: locale,
       builder: (BuildContext context) {
+        _belowFillerContext = context;
         final questionnaireFiller = QuestionnaireFiller.of(context);
 
         final mainMatterLength =
@@ -185,7 +202,6 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
                     itemPositionsListener: _itemPositionsListener,
                     itemCount: totalLength,
                     padding: const EdgeInsets.all(8),
-                    // TODO: This used to work but seems broken now?
                     minCacheExtent: 200, // Allow tabbing to prev/next items
                     itemBuilder: (BuildContext context, int i) {
                       final frontMatterIndex = (i < frontMatterLength) ? i : -1;
@@ -199,17 +215,8 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
                               ? (i - (frontMatterLength + mainMatterLength))
                               : -1;
                       if (mainMatterIndex != -1) {
-                        final qf = QuestionnaireFiller.of(context);
-                        final qif = qf.itemFillerAt(mainMatterIndex);
-                        if (!_isFocussed && _focusIndex == mainMatterIndex) {
-                          WidgetsBinding.instance
-                              ?.addPostFrameCallback((timeStamp) {
-                            qf.requestFocus(mainMatterIndex);
-                          });
-
-                          _isFocussed = true;
-                        }
-                        return qif;
+                        return QuestionnaireFiller.of(context)
+                            .itemFillerAt(mainMatterIndex);
                       } else if (backMatterIndex != -1) {
                         return widget.backMatter![backMatterIndex];
                       } else if (frontMatterIndex != -1) {
@@ -270,7 +277,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
         .removeListener(_initialPositionListener);
 
     _logger.trace(
-        'Scroll positions changed to: ${_itemPositionsListener.itemPositions.value}');
+        'Scroll positions are: ${_itemPositionsListener.itemPositions.value}');
 
     _isPositioned = true;
 
@@ -283,6 +290,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
     _logger.debug('Item $_focusIndex already visible: $isItemVisible');
 
     if (isItemVisible) {
+      _requestFocus();
       return;
     }
 
@@ -296,5 +304,38 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
     WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
       scrollTo(_focusIndex);
     });
+  }
+
+  /// Listens to item visibility until focus item is visible, then focuses it.
+  void _focusWhileScrollingPositionListener() {
+    _logger.trace(
+        'Focussing - Scroll positions are: ${_itemPositionsListener.itemPositions.value}');
+
+    final isItemVisible = _itemPositionsListener.itemPositions.value
+        .any((element) => element.index == _focusIndex);
+
+    _logger.debug('Item $_focusIndex is visible: $isItemVisible');
+
+    if (!isItemVisible) {
+      return; // Not there yet...
+    } else {
+      _itemPositionsListener.itemPositions
+          .removeListener(_focusWhileScrollingPositionListener);
+      _requestFocus();
+    }
+  }
+
+  void _requestFocus() {
+    if (_belowFillerContext == null) {
+      _logger.warn('Attempt to request focus before first build. Ignoring.');
+    }
+
+    if (!_isFocussed) {
+      WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+        QuestionnaireFiller.of(_belowFillerContext!).requestFocus(_focusIndex);
+      });
+
+      _isFocussed = true;
+    }
   }
 }

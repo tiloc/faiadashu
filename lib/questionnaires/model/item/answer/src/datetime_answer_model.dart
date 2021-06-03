@@ -53,7 +53,7 @@ class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
   }
 
   @override
-  String? validate(FhirDateTime? inValue) {
+  String? validateInput(FhirDateTime? inValue) {
     if (inValue == null || inValue.isValid) {
       return null;
     } else {
@@ -66,4 +66,7 @@ class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
     // TODO: Look at validity?
     return null;
   }
+
+  @override
+  bool get isUnanswered => value == null;
 }

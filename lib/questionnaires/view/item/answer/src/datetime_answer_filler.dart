@@ -14,13 +14,19 @@ class DateTimeAnswerFiller extends QuestionnaireAnswerFiller {
   State<StatefulWidget> createState() => _DateTimeAnswerState();
 }
 
-class _DateTimeAnswerState extends QuestionnaireAnswerState<FhirDateTime,
+class _DateTimeAnswerState extends QuestionnaireAnswerFillerState<FhirDateTime,
     DateTimeAnswerFiller, DateTimeAnswerModel> {
   _DateTimeAnswerState();
 
   @override
   void postInitState() {
     // Intentionally do nothing.
+  }
+
+  @override
+  bool validate() {
+    // TODO: implement validate
+    return true;
   }
 
   @override

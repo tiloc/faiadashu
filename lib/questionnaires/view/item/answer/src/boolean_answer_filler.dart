@@ -12,13 +12,18 @@ class BooleanAnswerFiller extends QuestionnaireAnswerFiller {
   State<StatefulWidget> createState() => _BooleanItemState();
 }
 
-class _BooleanItemState extends QuestionnaireAnswerState<Boolean,
+class _BooleanItemState extends QuestionnaireAnswerFillerState<Boolean,
     BooleanAnswerFiller, BooleanAnswerModel> {
   _BooleanItemState();
 
   @override
   void postInitState() {
     // Intentionally do nothing.
+  }
+
+  @override
+  bool validate() {
+    return true;
   }
 
   @override

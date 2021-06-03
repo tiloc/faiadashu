@@ -17,7 +17,7 @@ class NumericalAnswerFiller extends QuestionnaireAnswerFiller {
   State<NumericalAnswerFiller> createState() => _NumericalAnswerState();
 }
 
-class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
+class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
     NumericalAnswerFiller, NumericalAnswerModel> {
   late final TextInputFormatter _numberInputFormatter;
 
@@ -68,6 +68,12 @@ class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
   }
 
   @override
+  bool validate() {
+    // TODO: implement validate
+    throw UnimplementedError();
+  }
+
+  @override
   Widget buildInputControl(BuildContext context) {
     return answerModel.isSliding
         ? Slider(
@@ -109,7 +115,7 @@ class _NumericalAnswerState extends QuestionnaireAnswerState<Quantity,
                 inputFormatters: [_numberInputFormatter],
                 keyboardType: TextInputType.number,
                 validator: (inputValue) {
-                  return answerModel.validate(inputValue);
+                  return answerModel.validateInput(inputValue);
                 },
                 autovalidateMode: AutovalidateMode.always,
                 onChanged: (content) {

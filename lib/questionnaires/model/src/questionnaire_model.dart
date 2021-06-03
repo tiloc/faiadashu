@@ -20,7 +20,7 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   ///
   /// see: [getResource] for the preferred access method.
   final FhirResourceProvider fhirResourceProvider;
-  int _revision = 1;
+  int _generation = 1;
   final Locale locale;
   static final _logger = Logger(QuestionnaireModel);
 
@@ -125,12 +125,14 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     return (_aggregators?.firstWhere((aggregator) => aggregator is T) as T?)!;
   }
 
-  /// Increases the [revision] and notifies all listeners.
-  void bumpRevision({bool notifyListeners = true}) {
-    final newRevision = _revision + 1;
+  /// Changes the [generation] and notifies all listeners.
+  ///
+  /// Each generation is unique during a run of the application.
+  void nextGeneration({bool notifyListeners = true}) {
+    final newGeneration = _generation + 1;
     _logger.debug(
-        'QuestionnaireModel.bumpRevision $notifyListeners: $_revision -> $newRevision');
-    _revision = newRevision;
+        'nextGeneration $notifyListeners: $_generation -> $newGeneration');
+    _generation = newGeneration;
     if (notifyListeners) {
       this.notifyListeners();
     }
@@ -291,7 +293,10 @@ class QuestionnaireModel extends QuestionnaireItemModel {
         questionnaire.contained);
   }
 
-  int get revision => _revision;
+  /// Returns a number that indicates whether the model has changed.
+  ///
+  ///
+  int get generation => _generation;
 
   /// Returns the index of the first [QuestionnaireItemModel] which matches the predicate function.
   ///
@@ -330,7 +335,7 @@ class QuestionnaireModel extends QuestionnaireItemModel {
 
   set responseStatus(QuestionnaireResponseStatus newStatus) {
     _responseStatus = newStatus;
-    bumpRevision();
+    nextGeneration();
   }
 
   void _populateItems(List<QuestionnaireResponseItem>? qris) {
@@ -399,7 +404,7 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     _logger.trace('afterEnabled: $afterEnabled');
 
     if (!listEquals(previouslyEnabled, afterEnabled)) {
-      bumpRevision(notifyListeners: notifyListeners);
+      nextGeneration(notifyListeners: notifyListeners);
     } else {
       _logger.debug('enableWhen unchanged.');
     }

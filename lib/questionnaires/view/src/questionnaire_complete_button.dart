@@ -29,7 +29,12 @@ class _QuestionnaireCompleteButtonState
         final currentResponseStatus = qm.responseStatus;
 
         if (currentResponseStatus != QuestionnaireResponseStatus.completed) {
-          qm.markers.value = qm.isQuestionnaireComplete;
+          final isComplete = qm.isQuestionnaireComplete;
+          qm.markers.value = isComplete;
+
+          if (isComplete != null) {
+            return;
+          }
         }
 
         final newResponseStatus =

@@ -58,6 +58,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
   QuestionnaireModel? _questionnaireModel;
   VoidCallback? _onQuestionnaireModelChangeListenerFunction;
   late final QuestionnaireFillerData _questionnaireFillerData;
+  late final List<GlobalKey<QuestionnaireItemFillerState>> _itemFillerKeys;
 
   @override
   void initState() {
@@ -118,10 +119,17 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
                   _questionnaireModel!.addListener(
                       _onQuestionnaireModelChangeListenerFunction!);
 
+                  _itemFillerKeys = _questionnaireModel!
+                      .orderedQuestionnaireItemModels()
+                      .map<GlobalKey<QuestionnaireItemFillerState>>(
+                          (qim) => GlobalKey(debugLabel: 'item ${qim.linkId}'))
+                      .toList();
+
                   _questionnaireFillerData = QuestionnaireFillerData._(
                       _questionnaireModel!,
                       locale: widget.locale,
                       builder: widget.builder,
+                      itemFillerKeys: _itemFillerKeys,
                       onLinkTap: widget.onLinkTap,
                       onDataAvailable: widget.onDataAvailable,
                       questionnaireTheme: widget.questionnaireTheme);
@@ -147,8 +155,8 @@ class QuestionnaireFillerData extends InheritedWidget {
   final void Function(QuestionnaireModel)? onDataAvailable;
   final QuestionnaireTheme questionnaireTheme;
   late final List<QuestionnaireItemFiller?> _itemFillers;
-  late final List<GlobalKey<QuestionnaireItemFillerState>> _globalKeys;
-  late final int _revision;
+  late final List<GlobalKey<QuestionnaireItemFillerState>> _itemFillerKeys;
+  late final int _generation;
 
   QuestionnaireFillerData._(
     this.questionnaireModel, {
@@ -156,22 +164,17 @@ class QuestionnaireFillerData extends InheritedWidget {
     required this.locale,
     this.onDataAvailable,
     this.onLinkTap,
+    required List<GlobalKey<QuestionnaireItemFillerState>> itemFillerKeys,
     required this.questionnaireTheme,
     required WidgetBuilder builder,
-  })  : _revision = questionnaireModel.revision,
+  })  : _generation = questionnaireModel.generation,
         questionnaireItemModels =
             questionnaireModel.orderedQuestionnaireItemModels(),
         _itemFillers = List<QuestionnaireItemFiller?>.filled(
             questionnaireModel.orderedQuestionnaireItemModels().length, null),
+        _itemFillerKeys = itemFillerKeys,
         super(key: key, child: Builder(builder: builder)) {
     _logger.trace('constructor _');
-    // FIXME: This constructor is being invoked from a build() method.
-    // GlobalKeys cannot be generated inside a build() method.
-    _globalKeys = questionnaireModel
-        .orderedQuestionnaireItemModels()
-        .map<GlobalKey<QuestionnaireItemFillerState>>(
-            (qim) => GlobalKey(debugLabel: qim.linkId))
-        .toList();
     onDataAvailable?.call(questionnaireModel);
   }
 
@@ -223,8 +226,9 @@ class QuestionnaireFillerData extends InheritedWidget {
 
     if (_itemFillers[index] == null) {
       _logger.debug('itemFillerAt $index will be created.');
-      _itemFillers[index] = questionnaireTheme
-          .createQuestionnaireItemFiller(this, index, key: _globalKeys[index]);
+      _itemFillers[index] = questionnaireTheme.createQuestionnaireItemFiller(
+          this, index,
+          key: _itemFillerKeys[index]);
     } else {
       _logger.debug('itemFillerAt $index already exists.');
     }
@@ -234,7 +238,7 @@ class QuestionnaireFillerData extends InheritedWidget {
 
   @override
   bool updateShouldNotify(QuestionnaireFillerData oldWidget) {
-    final shouldNotify = oldWidget._revision != _revision;
+    final shouldNotify = oldWidget._generation != _generation;
     _logger.debug('updateShouldNotify: $shouldNotify');
     return shouldNotify;
   }

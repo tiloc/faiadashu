@@ -38,7 +38,7 @@ class StringAnswerModel extends AnswerModel<String, String> {
   String get display => value ?? AnswerModel.nullText;
 
   @override
-  String? validate(String? inValue) {
+  String? validateInput(String? inValue) {
     if (inValue == null || inValue.isEmpty) {
       return null;
     }
@@ -70,9 +70,11 @@ class StringAnswerModel extends AnswerModel<String, String> {
     return null;
   }
 
+  // TODO: Should the string get trimmed somewhere?
+
   @override
   QuestionnaireResponseAnswer? get filledAnswer {
-    final valid = validate(value) == null;
+    final valid = validateInput(value) == null;
     final dataAbsentReasonExtension = !valid
         ? [
             FhirExtension(
@@ -92,7 +94,7 @@ class StringAnswerModel extends AnswerModel<String, String> {
 
   @override
   QuestionnaireMarker? get isComplete {
-    final valid = validate(value);
+    final valid = validateInput(value);
     if (valid == null) {
       return null;
     } else {
@@ -100,4 +102,7 @@ class StringAnswerModel extends AnswerModel<String, String> {
           answerIndex: answerIndex, annotation: valid);
     }
   }
+
+  @override
+  bool get isUnanswered => (value == null) || value!.trim().isEmpty;
 }

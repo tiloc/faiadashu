@@ -46,7 +46,21 @@ class QuestionnaireResponseFillerState
     // TODO: Enhancement: Allow repeats = true for other kinds of items
     // This assumes that all answers are of the same kind
     // and repeats = true is only supported for choice items
-    _answerFillers = [questionnaireTheme.createAnswerFiller(this, 0)];
+    _answerFillers = [
+      questionnaireTheme.createAnswerFiller(this, 0,
+          key: GlobalKey<QuestionnaireAnswerFillerState>(
+              debugLabel: 'answerKey ${widget.itemModel.linkId}/0'))
+    ];
+  }
+
+  bool validate() {
+    return _answerFillers.fold<bool>(
+        true,
+        (previousValue, answerFiller) =>
+            previousValue &&
+            (answerFiller.key! as GlobalKey<QuestionnaireAnswerFillerState>)
+                .currentState!
+                .validate());
   }
 
   @override

@@ -13,7 +13,7 @@ class StringAnswerFiller extends QuestionnaireAnswerFiller {
   State<StatefulWidget> createState() => _StringAnswerState();
 }
 
-class _StringAnswerState extends QuestionnaireAnswerState<String,
+class _StringAnswerState extends QuestionnaireAnswerFillerState<String,
     StringAnswerFiller, StringAnswerModel> {
   final _controller = TextEditingController();
 
@@ -31,6 +31,12 @@ class _StringAnswerState extends QuestionnaireAnswerState<String,
   }
 
   @override
+  bool validate() {
+    // TODO: implement validate
+    return true;
+  }
+
+  @override
   Widget buildInputControl(BuildContext context) {
     return Container(
         padding: const EdgeInsets.only(top: 8, bottom: 8),
@@ -43,7 +49,7 @@ class _StringAnswerState extends QuestionnaireAnswerState<String,
           decoration: questionnaireTheme.createDecoration().copyWith(
                 hintText: answerModel.entryFormat,
               ),
-          validator: (inputValue) => answerModel.validate(inputValue),
+          validator: (inputValue) => answerModel.validateInput(inputValue),
           autovalidateMode: AutovalidateMode.always,
           onChanged: (content) {
             value = content;

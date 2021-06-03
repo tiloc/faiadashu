@@ -10,10 +10,8 @@ import '../../../../logging/logging.dart';
 import '../../../questionnaires.dart';
 
 class QuestionnaireItemFiller extends StatefulWidget {
-  final Widget? _titleWidget;
   final QuestionnaireItemModel itemModel;
   final QuestionnaireFillerData questionnaireFiller;
-  late final QuestionnaireResponseFiller _responseFiller;
 
   factory QuestionnaireItemFiller.fromQuestionnaireFiller(
       QuestionnaireFillerData questionnaireFiller, int index,
@@ -23,14 +21,9 @@ class QuestionnaireItemFiller extends StatefulWidget {
         key: key);
   }
 
-  QuestionnaireItemFiller._(this.questionnaireFiller, this.itemModel,
+  const QuestionnaireItemFiller._(this.questionnaireFiller, this.itemModel,
       {Key? key})
-      : _titleWidget =
-            QuestionnaireItemFillerTitle.fromQuestionnaireItemModel(itemModel),
-        super(key: key) {
-    _responseFiller = questionnaireFiller.questionnaireTheme
-        .createQuestionnaireResponseFiller(this);
-  }
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => QuestionnaireItemFillerState();
@@ -38,6 +31,9 @@ class QuestionnaireItemFiller extends StatefulWidget {
 
 class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
   static final _logger = Logger(QuestionnaireItemFillerState);
+  late final Widget? _titleWidget;
+  late final QuestionnaireResponseFiller _responseFiller;
+  late final GlobalKey<QuestionnaireResponseFillerState> _responseFillerKey;
 
   late final FocusNode _focusNode;
 
@@ -46,6 +42,15 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
     super.initState();
     _focusNode =
         FocusNode(debugLabel: widget.itemModel.linkId, skipTraversal: true);
+
+    _responseFillerKey =
+        GlobalKey(debugLabel: 'ResponseFiller ${widget.itemModel.linkId}');
+
+    _titleWidget = QuestionnaireItemFillerTitle.fromQuestionnaireItemModel(
+        widget.itemModel);
+
+    _responseFiller = widget.questionnaireFiller.questionnaireTheme
+        .createQuestionnaireResponseFiller(widget, key: _responseFillerKey);
 
     widget.itemModel.questionnaireModel.addListener(_rebuild);
   }
@@ -68,6 +73,10 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
     setState(() {
       // Just repaint.
     });
+  }
+
+  bool validate() {
+    return _responseFillerKey.currentState!.validate();
   }
 
   /// Requests focus on this [QuestionnaireItemFiller].
@@ -99,30 +108,28 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
                               ? Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                      if (widget._titleWidget != null)
+                                      if (_titleWidget != null)
                                         Expanded(
                                             child: Container(
                                                 padding: const EdgeInsets.only(
                                                     top: 8),
-                                                child: widget._titleWidget))
+                                                child: _titleWidget))
                                       else
                                         Expanded(child: Container()),
-                                      Expanded(
-                                          flex: 2,
-                                          child: widget._responseFiller)
+                                      Expanded(flex: 2, child: _responseFiller)
                                     ])
                               // Narrow, portrait screen: Use vertical layout
                               : Column(
                                   mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    if (widget._titleWidget != null)
+                                    if (_titleWidget != null)
                                       Container(
                                           padding:
                                               const EdgeInsets.only(top: 8),
-                                          child: widget._titleWidget),
+                                          child: _titleWidget),
                                     const SizedBox(width: 8),
-                                    widget._responseFiller,
+                                    _responseFiller,
                                   ],
                                 ),
                         );

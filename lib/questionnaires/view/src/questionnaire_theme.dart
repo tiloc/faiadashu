@@ -16,10 +16,12 @@ abstract class QuestionnaireTheme {
   ///
   /// Used by [QuestionnaireItemFiller].
   QuestionnaireResponseFiller createQuestionnaireResponseFiller(
-      QuestionnaireItemFiller itemFiller);
+      QuestionnaireItemFiller itemFiller,
+      {Key? key});
 
   QuestionnaireAnswerFiller createAnswerFiller(
-      QuestionnaireResponseFillerState responseFiller, int answerIndex);
+      QuestionnaireResponseFillerState responseFiller, int answerIndex,
+      {Key? key});
 
   /// Returns a decoration for [TextFormField]s.
   ///
@@ -47,13 +49,15 @@ class FDashQuestionnaireTheme implements QuestionnaireTheme {
 
   @override
   QuestionnaireResponseFiller createQuestionnaireResponseFiller(
-      QuestionnaireItemFiller itemFiller) {
+      QuestionnaireItemFiller itemFiller,
+      {Key? key}) {
     return QuestionnaireResponseFiller.fromQuestionnaireItemFiller(itemFiller);
   }
 
   @override
   QuestionnaireAnswerFiller createAnswerFiller(
-      QuestionnaireResponseFillerState responseFiller, int answerIndex) {
+      QuestionnaireResponseFillerState responseFiller, int answerIndex,
+      {Key? key}) {
     try {
       final responseModel = responseFiller.responseModel;
 
@@ -62,26 +66,27 @@ class FDashQuestionnaireTheme implements QuestionnaireTheme {
 
       if (responseModel.itemModel.isCalculatedExpression) {
         // TODO: Should there be a dedicated CalculatedExpression Model and item?
-        return StaticItem(responseFiller, answerIndex);
+        return StaticItem(responseFiller, answerIndex, key: key);
       } else if (answerModel is NumericalAnswerModel) {
-        return NumericalAnswerFiller(responseFiller, answerIndex);
+        return NumericalAnswerFiller(responseFiller, answerIndex, key: key);
       } else if (answerModel is StringAnswerModel) {
-        return StringAnswerFiller(responseFiller, answerIndex);
+        return StringAnswerFiller(responseFiller, answerIndex, key: key);
       } else if (answerModel is DateTimeAnswerModel) {
-        return DateTimeAnswerFiller(responseFiller, answerIndex);
+        return DateTimeAnswerFiller(responseFiller, answerIndex, key: key);
       } else if (answerModel is CodingAnswerModel) {
-        return CodingAnswerFiller(responseFiller, answerIndex);
+        return CodingAnswerFiller(responseFiller, answerIndex, key: key);
       } else if (answerModel is BooleanAnswerModel) {
-        return BooleanAnswerFiller(responseFiller, answerIndex);
+        return BooleanAnswerFiller(responseFiller, answerIndex, key: key);
       } else if (answerModel is StaticAnswerModel) {
-        return StaticItem(responseFiller, answerIndex);
+        return StaticItem(responseFiller, answerIndex, key: key);
       } else {
         throw QuestionnaireFormatException(
             'Unsupported AnswerModel: $answerModel');
       }
     } catch (exception) {
       _logger.warn('Cannot create answer filler:', error: exception);
-      return BrokenAnswerFiller(responseFiller, answerIndex, exception);
+      return BrokenAnswerFiller(responseFiller, answerIndex, exception,
+          key: key);
     }
   }
 
