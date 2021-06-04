@@ -155,6 +155,7 @@ class QuestionnaireFillerData extends InheritedWidget {
   final void Function(QuestionnaireModel)? onDataAvailable;
   final QuestionnaireTheme questionnaireTheme;
   late final List<QuestionnaireItemFiller?> _itemFillers;
+  // FIXME: Use a registration mechanism as in Form/FormField in Flutter
   late final List<GlobalKey<QuestionnaireItemFillerState>> _itemFillerKeys;
   late final int _generation;
 
