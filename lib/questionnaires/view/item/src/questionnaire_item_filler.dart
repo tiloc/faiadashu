@@ -33,14 +33,16 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
   static final _logger = Logger(QuestionnaireItemFillerState);
   late final Widget? _titleWidget;
   late final QuestionnaireResponseFiller _responseFiller;
+  late final QuestionnaireFillerData _questionnaireFiller;
 
   late final FocusNode _focusNode;
+
+  String get linkId => widget.itemModel.linkId;
 
   @override
   void initState() {
     super.initState();
-    _focusNode =
-        FocusNode(debugLabel: widget.itemModel.linkId, skipTraversal: true);
+    _focusNode = FocusNode(debugLabel: linkId, skipTraversal: true);
 
     _titleWidget = QuestionnaireItemFillerTitle.fromQuestionnaireItemModel(
         widget.itemModel);
@@ -52,8 +54,17 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _questionnaireFiller = QuestionnaireFiller.of(context);
+    _questionnaireFiller.registerQuestionnaireItemFillerState(this);
+  }
+
+  @override
   void dispose() {
     widget.itemModel.questionnaireModel.removeListener(_forceRebuild);
+
+    _questionnaireFiller.unregisterQuestionnaireItemFillerState(this);
 
     _focusNode.dispose();
     super.dispose();
@@ -79,7 +90,7 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
   @override
   Widget build(BuildContext context) {
     _logger.trace(
-        'build ${widget.itemModel.linkId} hidden: ${widget.itemModel.isHidden}, enabled: ${widget.itemModel.isEnabled}');
+        'build $linkId hidden: ${widget.itemModel.isHidden}, enabled: ${widget.itemModel.isEnabled}');
 
     return (!widget.itemModel.isHidden)
         ? Focus(

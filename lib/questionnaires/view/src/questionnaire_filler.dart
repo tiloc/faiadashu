@@ -118,17 +118,10 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
                   _questionnaireModel!.addListener(
                       _onQuestionnaireModelChangeListenerFunction!);
 
-                  _itemFillerKeys = _questionnaireModel!
-                      .orderedQuestionnaireItemModels()
-                      .map<GlobalKey<QuestionnaireItemFillerState>>(
-                          (qim) => GlobalKey(debugLabel: 'item ${qim.linkId}'))
-                      .toList();
-
                   _questionnaireFillerData = QuestionnaireFillerData._(
                       _questionnaireModel!,
                       locale: widget.locale,
                       builder: widget.builder,
-                      itemFillerKeys: _itemFillerKeys,
                       onLinkTap: widget.onLinkTap,
                       onDataAvailable: widget.onDataAvailable,
                       questionnaireTheme: widget.questionnaireTheme);
@@ -154,8 +147,7 @@ class QuestionnaireFillerData extends InheritedWidget {
   final void Function(QuestionnaireModel)? onDataAvailable;
   final QuestionnaireTheme questionnaireTheme;
   late final List<QuestionnaireItemFiller?> _itemFillers;
-  // FIXME: Use a registration mechanism as in Form/FormField in Flutter
-  late final List<GlobalKey<QuestionnaireItemFillerState>> _itemFillerKeys;
+  final Map<int, QuestionnaireItemFillerState> _itemFillerStates = {};
   late final int _generation;
 
   QuestionnaireFillerData._(
@@ -164,7 +156,6 @@ class QuestionnaireFillerData extends InheritedWidget {
     required this.locale,
     this.onDataAvailable,
     this.onLinkTap,
-    required List<GlobalKey<QuestionnaireItemFillerState>> itemFillerKeys,
     required this.questionnaireTheme,
     required WidgetBuilder builder,
   })  : _generation = questionnaireModel.generation,
@@ -172,10 +163,24 @@ class QuestionnaireFillerData extends InheritedWidget {
             questionnaireModel.orderedQuestionnaireItemModels(),
         _itemFillers = List<QuestionnaireItemFiller?>.filled(
             questionnaireModel.orderedQuestionnaireItemModels().length, null),
-        _itemFillerKeys = itemFillerKeys,
         super(key: key, child: Builder(builder: builder)) {
     _logger.trace('constructor _');
     onDataAvailable?.call(questionnaireModel);
+  }
+
+  /// INTERNAL USE ONLY: Register a [QuestionnaireItemFillerState].
+  void registerQuestionnaireItemFillerState(QuestionnaireItemFillerState qifs) {
+    _itemFillerStates[_indexOfLinkId(qifs.linkId)] = qifs;
+  }
+
+  /// INTERNAL USE ONLY: Unregister a [QuestionnaireItemFillerState].
+  void unregisterQuestionnaireItemFillerState(
+      QuestionnaireItemFillerState qifs) {
+    _itemFillerStates.remove(_indexOfLinkId(qifs.linkId));
+  }
+
+  int _indexOfLinkId(String linkId) {
+    return _itemFillers.indexWhere((qif) => qif?.itemModel.linkId == linkId);
   }
 
   T aggregator<T extends Aggregator>() {
@@ -187,33 +192,12 @@ class QuestionnaireFillerData extends InheritedWidget {
   /// The item filler will be determined as by [itemFillerAt].
   void requestFocus(int index) {
     _logger.trace('requestFocus $index');
-    final currentState =
-        (itemFillerAt(index).key as GlobalKey<QuestionnaireItemFillerState>?)
-            ?.currentState;
-    if (currentState == null) {
-      _logger.warn('requestFocus $index: currentState == null');
+    final itemFillerState = _itemFillerStates[index];
+    if (itemFillerState == null) {
+      _logger.warn('requestFocus $index: itemFillerState == null');
     } else {
-      currentState.requestFocus();
+      itemFillerState.requestFocus();
     }
-  }
-
-  /// Returns a list of all [QuestionnaireItemFiller]s.
-  ///
-  /// The [QuestionnaireItemFiller]s are ordered based on 'pre-order'.
-  ///
-  /// see: https://en.wikipedia.org/wiki/Tree_traversal#Pre-order,_NLR
-  List<QuestionnaireItemFiller> itemFillers() {
-    _logger.trace('itemFillers');
-    for (int i = 0; i < _itemFillers.length; i++) {
-      if (_itemFillers[i] == null) {
-        _itemFillers[i] = itemFillerAt(i);
-      }
-    }
-
-    return _itemFillers
-        .map<QuestionnaireItemFiller>(
-            (itemFiller) => ArgumentError.checkNotNull(itemFiller))
-        .toList();
   }
 
   /// Returns the [QuestionnaireItemFiller] at [index].
@@ -228,7 +212,8 @@ class QuestionnaireFillerData extends InheritedWidget {
       _logger.debug('itemFillerAt $index will be created.');
       _itemFillers[index] = questionnaireTheme.createQuestionnaireItemFiller(
           this, index,
-          key: _itemFillerKeys[index]);
+          key: ValueKey<String>(
+              'item-filler-${questionnaireItemModels.elementAt(index).linkId}'));
     } else {
       _logger.debug('itemFillerAt $index already exists.');
     }
