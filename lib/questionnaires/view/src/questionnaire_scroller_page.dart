@@ -251,7 +251,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
 
           _questionnaireModel = questionnaireModel;
 
-          // Listen for new markers and then scroll to the first one.
+          // Listen for new error flags and then scroll to the first one.
           questionnaireModel.errorFlags.addListener(() {
             final markers = questionnaireModel.errorFlags.value;
             if (markers != null) {
