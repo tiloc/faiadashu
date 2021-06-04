@@ -239,6 +239,16 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
   @override
   String get display => value?.localizedDisplay(locale) ?? AnswerModel.nullText;
 
+  /// Returns whether the choices should be presented horizontally.
+  bool get isHorizontal {
+    return qi.extension_
+            ?.extensionOrNull(
+                'http://hl7.org/fhir/StructureDefinition/questionnaire-choiceOrientation')
+            ?.valueCode
+            ?.value ==
+        'horizontal';
+  }
+
   @override
   String? validateInput(CodeableConcept? inValue) {
     if (inValue == null) {
@@ -293,8 +303,17 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
 
   @override
   QuestionnaireMarker? get isComplete {
-    // TODO: Check the actual value
-    return null;
+    if (value == null && minOccurs > 0) {
+      return QuestionnaireMarker(itemModel.linkId,
+          answerIndex: answerIndex,
+          annotation: 'Select $minOccurs or more options.');
+    }
+
+    final validationText = validateInput(value);
+    return (validationText == null)
+        ? null
+        : QuestionnaireMarker(itemModel.linkId,
+            answerIndex: answerIndex, annotation: validationText);
   }
 
   @override

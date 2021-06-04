@@ -1,7 +1,6 @@
-import 'dart:ui';
-
 import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
+import 'package:flutter/material.dart';
 
 import '../../../../../fhir_types/fhir_types.dart';
 import '../../../model.dart';
@@ -11,17 +10,21 @@ abstract class AnswerModel<I, V> {
   /// Textual depiction of an unanswered question.
   static const nullText = '—';
 
-  final QuestionnaireItemModel itemModel;
   final ResponseModel responseModel;
   final int answerIndex;
-  final Locale locale;
   V? value;
+
+  QuestionnaireItemModel get itemModel => responseModel.itemModel;
+
+  QuestionnaireModel get questionnaireModel => itemModel.questionnaireModel;
+
+  Locale get locale => questionnaireModel.locale;
 
   QuestionnaireItem get qi => itemModel.questionnaireItem;
 
   bool get isEnabled =>
       !itemModel.isReadOnly &&
-      !(itemModel.questionnaireModel.responseStatus ==
+      !(questionnaireModel.responseStatus ==
           QuestionnaireResponseStatus.completed);
 
   /// Returns the human-readable entry format.
@@ -33,9 +36,7 @@ abstract class AnswerModel<I, V> {
         ?.valueString;
   }
 
-  AnswerModel(this.responseModel, this.answerIndex)
-      : itemModel = responseModel.itemModel,
-        locale = responseModel.itemModel.questionnaireModel.locale;
+  AnswerModel(this.responseModel, this.answerIndex);
 
   /// Returns a human-readable, localized, textual description of the model.
   ///
@@ -68,7 +69,7 @@ abstract class AnswerModel<I, V> {
   bool get isUnanswered;
 
   String? get errorText {
-    return itemModel.questionnaireModel.markers.value
+    return questionnaireModel.markers.value
         ?.firstWhereOrNull((qm) => qm.linkId == itemModel.linkId)
         ?.annotation;
   }

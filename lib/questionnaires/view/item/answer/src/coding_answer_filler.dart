@@ -25,6 +25,8 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
 
   String? _errorText;
 
+  String? get errorText => _errorText ?? answerModel.errorText;
+
   _CodingAnswerState();
 
   @override
@@ -77,7 +79,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
           '$optionPrefixDisplay${choice.localizedDisplay(locale)}';
       final styledOptionTitle = Xhtml.toWidget(
           context,
-          itemModel.questionnaireModel,
+          answerModel.questionnaireModel,
           optionTitle,
           choice.valueStringElement?.extension_,
           width: 100,
@@ -170,13 +172,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
       );
     }
 
-    if (qi.extension_
-                ?.extensionOrNull(
-                    'http://hl7.org/fhir/StructureDefinition/questionnaire-choiceOrientation')
-                ?.valueCode
-                ?.value ==
-            'horizontal' &&
-        MediaQuery.of(context).size.width > 750) {
+    if (answerModel.isHorizontal && MediaQuery.of(context).size.width > 750) {
       // TODO: This should use LayoutBuilder
       return Column(
           // Horizontal layout
@@ -197,9 +193,9 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
                 child: Table(children: [TableRow(children: choices)]),
               ),
             ),
-            if (_errorText != null)
+            if (errorText != null)
               Text(
-                _errorText!,
+                errorText!,
                 style: Theme.of(context)
                     .textTheme
                     .caption!
@@ -218,7 +214,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
                 shape: (firstFocusNode.hasFocus && answerModel.isEnabled)
                     ? RoundedRectangleBorder(
                         side: BorderSide(
-                            color: (_errorText == null)
+                            color: (errorText == null)
                                 ? Theme.of(context).colorScheme.secondary
                                 : Theme.of(context).colorScheme.error,
                             width: 2.0),
@@ -231,9 +227,9 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
                 ),
               ),
             ),
-            if (_errorText != null)
+            if (errorText != null)
               Text(
-                _errorText!,
+                errorText!,
                 style: Theme.of(context)
                     .textTheme
                     .caption!
