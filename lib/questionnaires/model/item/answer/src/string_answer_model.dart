@@ -99,7 +99,7 @@ class StringAnswerModel extends AnswerModel<String, String> {
       return null;
     } else {
       return QuestionnaireErrorFlag(responseModel.itemModel.linkId,
-          answerIndex: answerIndex, annotation: valid);
+          answerIndex: answerIndex, errorText: valid);
     }
   }
 

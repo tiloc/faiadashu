@@ -226,7 +226,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     if (isRequired && !responseModel.isUnanswered) {
       return [
         QuestionnaireErrorFlag(linkId,
-            annotation: 'Provide the required answer.')
+            errorText: 'Provide the required answer.')
       ];
     }
     return responseModel.isComplete;

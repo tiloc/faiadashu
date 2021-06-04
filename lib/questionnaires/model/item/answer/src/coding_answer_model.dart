@@ -306,14 +306,14 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
     if (value == null && minOccurs > 0) {
       return QuestionnaireErrorFlag(itemModel.linkId,
           answerIndex: answerIndex,
-          annotation: 'Select $minOccurs or more options.');
+          errorText: 'Select $minOccurs or more options.');
     }
 
     final validationText = validateInput(value);
     return (validationText == null)
         ? null
         : QuestionnaireErrorFlag(itemModel.linkId,
-            answerIndex: answerIndex, annotation: validationText);
+            answerIndex: answerIndex, errorText: validationText);
   }
 
   @override

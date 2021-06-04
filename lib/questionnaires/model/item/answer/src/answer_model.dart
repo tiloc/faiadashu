@@ -71,7 +71,7 @@ abstract class AnswerModel<I, V> {
   String? get errorText {
     return questionnaireModel.errorFlags.value
         ?.firstWhereOrNull((qm) => qm.linkId == itemModel.linkId)
-        ?.annotation;
+        ?.errorText;
   }
 
   /// Returns a [QuestionnaireResponseAnswer] based on the current value.
