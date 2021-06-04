@@ -6,6 +6,7 @@ import 'package:fhir/r4.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../../fhir_types/fhir_types.dart';
+import '../../../l10n/l10n.dart';
 import '../../../logging/logging.dart';
 import '../../../resource_provider/resource_provider.dart';
 import '../../questionnaires.dart';
@@ -226,7 +227,8 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     if (isRequired && !responseModel.isUnanswered) {
       return [
         QuestionnaireErrorFlag(linkId,
-            errorText: 'Provide the required answer.')
+            errorText: lookupFDashLocalizations(questionnaireModel.locale)
+                .validatorRequiredItem)
       ];
     }
     return responseModel.isComplete;

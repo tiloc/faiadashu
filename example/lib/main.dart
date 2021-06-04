@@ -1,7 +1,8 @@
 import 'dart:developer' as developer;
 import 'dart:io';
 
-import 'package:faiadashu/logging/logging.dart' as flogging;
+import 'package:faiadashu/faiadashu.dart';
+import 'package:faiadashu/logging/logging.dart' as fdashlog;
 import 'package:faiadashu/questionnaires/view/view.dart';
 import 'package:faiadashu/resource_provider/resource_provider.dart';
 import 'package:faiadashu_example/questionnaire_launch_tile.dart';
@@ -13,7 +14,7 @@ import 'package:fhir_auth/r4/smart_client/smart_client.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:logging/logging.dart';
+import 'package:logging/logging.dart' as dartlog;
 import 'package:pedantic/pedantic.dart';
 
 import 'about_page.dart';
@@ -23,8 +24,8 @@ import 'primitive_page.dart';
 
 void main() {
   if (kDebugMode || kIsWeb) {
-    Logger.root.level = Level.ALL;
-    Logger.root.onRecord.listen((LogRecord rec) {
+    dartlog.Logger.root.level = dartlog.Level.ALL;
+    dartlog.Logger.root.onRecord.listen((dartlog.LogRecord rec) {
       developer.log(rec.message,
           time: rec.time,
           sequenceNumber: rec.sequenceNumber,
@@ -35,8 +36,8 @@ void main() {
           stackTrace: rec.stackTrace);
     });
   } else {
-    Logger.root.level = Level.ALL; // In real production this might be WARN.
-    Logger.root.onRecord.listen((LogRecord rec) {
+    dartlog.Logger.root.level = dartlog.Level.WARNING;
+    dartlog.Logger.root.onRecord.listen((dartlog.LogRecord rec) {
       stdout.writeln('${rec.level.name}: ${rec.message}');
     });
   }
@@ -55,6 +56,7 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData.dark(),
       title: 'Faiadashu™ FHIRDash Gallery',
       localizationsDelegates: const [
+        FDashLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
@@ -77,7 +79,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  static final _logger = flogging.Logger(_HomePageState);
+  static final _logger = fdashlog.Logger(_HomePageState);
 
   final ScrollController _listScrollController = ScrollController();
 

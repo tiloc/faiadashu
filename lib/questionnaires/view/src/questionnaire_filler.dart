@@ -58,7 +58,6 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
   QuestionnaireModel? _questionnaireModel;
   VoidCallback? _onQuestionnaireModelChangeListenerFunction;
   late final QuestionnaireFillerData _questionnaireFillerData;
-  late final List<GlobalKey<QuestionnaireItemFillerState>> _itemFillerKeys;
 
   @override
   void initState() {

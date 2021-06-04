@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:faiadashu/l10n/l10n.dart';
 import 'package:fhir/r4.dart';
 import 'package:intl/intl.dart';
 
@@ -185,7 +186,8 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
       return '$inputValue is not a valid number.';
     }
     if (number > _maxValue) {
-      return 'Provide a number up to ${Decimal(_maxValue).format(locale)}.';
+      return lookupFDashLocalizations(locale)
+          .validatorMaxValue(Decimal(_maxValue).format(locale));
     }
     if (number < _minValue) {
       return 'Provide a number ${Decimal(_minValue).format(locale)}, or higher.';

@@ -2,6 +2,7 @@ import 'package:fhir/r4.dart';
 
 import '../../../../../coding/coding.dart';
 import '../../../../../fhir_types/fhir_types.dart';
+import '../../../../../l10n/l10n.dart';
 import '../../../../model/model.dart';
 
 /// Models string answers, incl. URLs.
@@ -44,26 +45,25 @@ class StringAnswerModel extends AnswerModel<String, String> {
     }
 
     if (inValue.length < minLength) {
-      return 'Provide $minLength or more characters.';
+      return lookupFDashLocalizations(locale).validatorMinLength(minLength);
     }
 
     if (maxLength != null && inValue.length > maxLength!) {
-      return 'Provide up to $maxLength characters.';
+      return lookupFDashLocalizations(locale).validatorMaxLength(maxLength!);
     }
 
     if (qi.type == QuestionnaireItemType.url) {
       if (!_urlRegExp.hasMatch(inValue)) {
-        return 'Provide a valid URL.';
+        return lookupFDashLocalizations(locale).validatorUrl;
       }
     }
 
     if (regExp != null) {
       if (!regExp!.hasMatch(inValue)) {
-        if (entryFormat != null) {
-          return "Provide as '$entryFormat'";
-        } else {
-          return 'Provide a valid answer.';
-        }
+        return (entryFormat != null)
+            ? lookupFDashLocalizations(locale)
+                .validatorEntryFormat(entryFormat!)
+            : lookupFDashLocalizations(locale).validatorRegExp;
       }
     }
 

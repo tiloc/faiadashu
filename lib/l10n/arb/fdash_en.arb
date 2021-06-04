@@ -1,0 +1,37 @@
+{
+  "@@locale": "en",
+  "validatorRequiredItem": "Provide this required answer.",
+  "validatorMinLength": "{minLength, plural, =1 {Provide at least one character.} other {Provide at least {minLength} characters.}}",
+  "@validatorMinLength": {
+    "placeholders": {
+      "minLength": {
+      }
+    }
+  },
+  "validatorMaxLength": "{maxLength, plural, other{Provide up to {maxLength} characters.}}",
+  "@validatorMaxLength": {
+    "placeholders": {
+      "maxLength": {
+      }
+    }
+  },
+  "validatorUrl": "Provide a valid URL.",
+  "validatorRegExp": "Provide a valid answer.",
+  "validatorEntryFormat": "Provide as {entryFormat}",
+  "@validatorEntryFormat": {
+    "placeholders": {
+      "entryFormat": {
+        "type": "String"
+      }
+    }
+  },
+  "validatorMaxValue": "Provide a number up to {maxValue}.",
+  "@validatorMaxValue": {
+    "placeholders": {
+      "maxValue": {
+        "type": "String"
+      }
+    }
+  }
+}
+

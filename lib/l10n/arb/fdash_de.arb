@@ -1,0 +1,35 @@
+{
+  "@@locale": "de",
+  "validatorRequiredItem": "Füllen sie dieses Pflichtfeld aus.",
+  "validatorMinLength": "{minLength, plural, one{Mind. ein Zeichen eingeben.} other{Mind. {minLength} Zeichen eingeben.}}",
+  "@validatorMinLength": {
+    "placeholders": {
+      "minLength": {}
+    }
+  },
+  "validatorMaxLength": "{maxLength, plural, other{Max. {maxLength} Zeichen eingeben.}}",
+  "@validatorMaxLength": {
+    "placeholders": {
+      "maxLength": {}
+    }
+  },
+  "validatorUrl": "Gültige URL eingeben.",
+  "validatorRegExp": "Gültige Angabe machen.",
+  "validatorEntryFormat": "Eingeben im Format: {entryFormat}",
+  "@validatorEntryFormat": {
+    "placeholders": {
+      "entryFormat": {
+        "type": "String"
+      }
+    }
+  },
+  "validatorMaxValue": "Eine Zahl bis {maxValue} eingeben.",
+  "@validatorMaxValue": {
+    "placeholders": {
+      "maxValue": {
+        "type": "String"
+      }
+    }
+  }
+}
+
