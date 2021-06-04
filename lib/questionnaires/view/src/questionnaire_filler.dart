@@ -111,8 +111,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
               if (snapshot.hasData) {
                 _logger.debug('FutureBuilder hasData');
                 _questionnaireModel = snapshot.data;
-                // TODO: There has got to be a more elegant way! Goal is to register the listener exactly once, after the future has completed.
-                // Dart has abilities to chain Futures.
+                // OPTIMIZE: There has got to be a more elegant way? Goal is to register the listener exactly once, after the future has completed.
                 if (_onQuestionnaireModelChangeListenerFunction == null) {
                   _onQuestionnaireModelChangeListenerFunction =
                       () => _onQuestionnaireModelChange();

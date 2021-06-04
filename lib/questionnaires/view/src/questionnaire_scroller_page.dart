@@ -83,10 +83,10 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
     super.dispose();
   }
 
-  /// Scrolls to a position as conveyed by a [QuestionnaireMarker].
+  /// Scrolls to a position as conveyed by a [QuestionnaireErrorFlag].
   ///
   /// The item will also be focussed.
-  void scrollToMarker(QuestionnaireMarker marker) {
+  void scrollToErrorFlag(QuestionnaireErrorFlag errorFlag) {
     if (_questionnaireModel == null) {
       _logger.info(
           'Trying to scroll before QuestionnaireModel is loaded. Ignoring.');
@@ -94,10 +94,10 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
     }
 
     final index =
-        _questionnaireModel!.indexOf((qim) => qim.linkId == marker.linkId);
+        _questionnaireModel!.indexOf((qim) => qim.linkId == errorFlag.linkId);
 
     if (index == -1) {
-      _logger.warn('Marker with invalid linkId: ${marker.linkId}');
+      _logger.warn('Error Flag with invalid linkId: ${errorFlag.linkId}');
       return;
     }
 
@@ -120,7 +120,18 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
     _itemPositionsListener.itemPositions
         .addListener(_focusWhileScrollingPositionListener);
 
-    final milliseconds = (index < 10) ? 1000 : 1000 + (index - 10) * 100;
+    // Psychology 101: The farther we scroll, the longer we take.
+    int currentPosition = 0;
+    try {
+      currentPosition = _itemPositionsListener.itemPositions.value.first.index;
+    } catch (_) {}
+
+    final distance = (currentPosition < index)
+        ? index - currentPosition
+        : currentPosition - index;
+
+    final milliseconds = (distance < 10) ? 1000 : 1000 + (distance - 10) * 100;
+
     _listScrollController.scrollTo(
         index: index,
         duration: Duration(milliseconds: milliseconds),
@@ -241,10 +252,10 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
           _questionnaireModel = questionnaireModel;
 
           // Listen for new markers and then scroll to the first one.
-          questionnaireModel.markers.addListener(() {
-            final markers = questionnaireModel.markers.value;
+          questionnaireModel.errorFlags.addListener(() {
+            final markers = questionnaireModel.errorFlags.value;
             if (markers != null) {
-              scrollToMarker(markers.first);
+              scrollToErrorFlag(markers.first);
             }
           });
 

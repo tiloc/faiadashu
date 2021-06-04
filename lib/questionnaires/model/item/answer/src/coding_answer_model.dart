@@ -302,9 +302,9 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
   bool get hasCodingAnswers => true;
 
   @override
-  QuestionnaireMarker? get isComplete {
+  QuestionnaireErrorFlag? get isComplete {
     if (value == null && minOccurs > 0) {
-      return QuestionnaireMarker(itemModel.linkId,
+      return QuestionnaireErrorFlag(itemModel.linkId,
           answerIndex: answerIndex,
           annotation: 'Select $minOccurs or more options.');
     }
@@ -312,7 +312,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
     final validationText = validateInput(value);
     return (validationText == null)
         ? null
-        : QuestionnaireMarker(itemModel.linkId,
+        : QuestionnaireErrorFlag(itemModel.linkId,
             answerIndex: answerIndex, annotation: validationText);
   }
 

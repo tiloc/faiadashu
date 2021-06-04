@@ -25,7 +25,7 @@ class BooleanAnswerModel extends AnswerModel<Boolean, Boolean> {
   }
 
   @override
-  QuestionnaireMarker? get isComplete => null;
+  QuestionnaireErrorFlag? get isComplete => null;
 
   @override
   bool get isUnanswered => value == null;

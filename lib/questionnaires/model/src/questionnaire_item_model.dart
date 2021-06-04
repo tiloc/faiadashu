@@ -222,10 +222,11 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     return responseModel.isInvalid;
   }
 
-  Iterable<QuestionnaireMarker>? get isComplete {
+  Iterable<QuestionnaireErrorFlag>? get isComplete {
     if (isRequired && !responseModel.isUnanswered) {
       return [
-        QuestionnaireMarker(linkId, annotation: 'Provide the required answer.')
+        QuestionnaireErrorFlag(linkId,
+            annotation: 'Provide the required answer.')
       ];
     }
     return responseModel.isComplete;

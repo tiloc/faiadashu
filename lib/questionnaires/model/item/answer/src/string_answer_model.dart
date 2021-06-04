@@ -93,12 +93,12 @@ class StringAnswerModel extends AnswerModel<String, String> {
   }
 
   @override
-  QuestionnaireMarker? get isComplete {
+  QuestionnaireErrorFlag? get isComplete {
     final valid = validateInput(value);
     if (valid == null) {
       return null;
     } else {
-      return QuestionnaireMarker(responseModel.itemModel.linkId,
+      return QuestionnaireErrorFlag(responseModel.itemModel.linkId,
           answerIndex: answerIndex, annotation: valid);
     }
   }

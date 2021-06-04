@@ -281,7 +281,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
   }
 
   @override
-  QuestionnaireMarker? get isComplete {
+  QuestionnaireErrorFlag? get isComplete {
     // TODO: Check the actual value
     return null;
   }

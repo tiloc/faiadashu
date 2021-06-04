@@ -61,15 +61,15 @@ abstract class AnswerModel<I, V> {
   /// Since an individual answer does not know whether it is required, this
   /// is not taken into account.
   ///
-  /// Returns null when the answer is valid, or a [QuestionnaireMarker],
+  /// Returns null when the answer is valid, or a [QuestionnaireErrorFlag],
   /// when it is not.
-  QuestionnaireMarker? get isComplete;
+  QuestionnaireErrorFlag? get isComplete;
 
   /// Returns whether this question is unanswered.
   bool get isUnanswered;
 
   String? get errorText {
-    return questionnaireModel.markers.value
+    return questionnaireModel.errorFlags.value
         ?.firstWhereOrNull((qm) => qm.linkId == itemModel.linkId)
         ?.annotation;
   }

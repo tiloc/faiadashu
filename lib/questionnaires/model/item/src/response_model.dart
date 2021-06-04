@@ -65,12 +65,12 @@ class ResponseModel {
     return dataAbsentReason == dataAbsentReasonAsTextCode;
   }
 
-  Iterable<QuestionnaireMarker>? get isComplete {
+  Iterable<QuestionnaireErrorFlag>? get isComplete {
     if (_cachedAnswerModels.isEmpty) {
       return null;
     }
 
-    final markers = <QuestionnaireMarker>[];
+    final markers = <QuestionnaireErrorFlag>[];
     for (final am in _cachedAnswerModels.values) {
       final marker = am.isComplete;
       if (marker != null) {

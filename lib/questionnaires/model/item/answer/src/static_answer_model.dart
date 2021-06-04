@@ -23,7 +23,7 @@ class StaticAnswerModel extends AnswerModel<Object, Object> {
   }
 
   @override
-  QuestionnaireMarker? get isComplete => null;
+  QuestionnaireErrorFlag? get isComplete => null;
 
   @override
   bool get isUnanswered => false;

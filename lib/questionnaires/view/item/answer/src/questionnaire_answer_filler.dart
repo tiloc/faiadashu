@@ -98,7 +98,7 @@ abstract class QuestionnaireAnswerFillerState<
       return BrokenQuestionnaireItem.fromException(answerModelError!);
     }
 
-    // TODO: Is there a more elegant solution? Do I have to unregister the listener?
+    // OPTIMIZE: Is there a more elegant solution? Do I have to unregister the listener?
     // Listen to the parent FocusNode and become focussed when it does.
     if (!_isFocusHookedUp) {
       WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {

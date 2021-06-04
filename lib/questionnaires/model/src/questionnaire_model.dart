@@ -67,7 +67,7 @@ class QuestionnaireModel extends QuestionnaireItemModel {
 
     activateEnableWhen();
 
-    markers.addListener(() {
+    errorFlags.addListener(() {
       nextGeneration();
     });
   }
@@ -432,22 +432,22 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   /// * All filled fields are valid
   ///
   /// Returns null, if everything is complete.
-  /// Returns [QuestionnaireMarker]s, if item are incomplete.
-  Iterable<QuestionnaireMarker>? get isQuestionnaireComplete {
-    final markers = <QuestionnaireMarker>[];
+  /// Returns [QuestionnaireErrorFlag]s, if item are incomplete.
+  Iterable<QuestionnaireErrorFlag>? get isQuestionnaireComplete {
+    final errorFlags = <QuestionnaireErrorFlag>[];
     for (final itemModel in orderedQuestionnaireItemModels()) {
-      final itemMarkers = itemModel.isComplete;
-      if (itemMarkers != null) {
-        markers.addAll(itemMarkers);
+      final itemErrorFlags = itemModel.isComplete;
+      if (itemErrorFlags != null) {
+        errorFlags.addAll(itemErrorFlags);
       }
     }
 
-    return (markers.isNotEmpty) ? markers : null;
+    return (errorFlags.isNotEmpty) ? errorFlags : null;
   }
 
   void resetMarkers() {
-    markers.value = null;
+    errorFlags.value = null;
   }
 
-  final markers = ValueNotifier<Iterable<QuestionnaireMarker>?>(null);
+  final errorFlags = ValueNotifier<Iterable<QuestionnaireErrorFlag>?>(null);
 }
