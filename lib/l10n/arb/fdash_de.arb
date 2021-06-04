@@ -7,15 +7,15 @@
       "minLength": {}
     }
   },
-  "validatorMaxLength": "{maxLength, plural, other{Max. {maxLength} Zeichen eingeben.}}",
+  "validatorMaxLength": "{maxLength, plural, other{Bis zu {maxLength} Zeichen eingeben.}}",
   "@validatorMaxLength": {
     "placeholders": {
       "maxLength": {}
     }
   },
-  "validatorUrl": "Gültige URL eingeben.",
-  "validatorRegExp": "Gültige Angabe machen.",
-  "validatorEntryFormat": "Eingeben im Format: {entryFormat}",
+  "validatorUrl": "URL im Format 'https://...' eingeben.",
+  "validatorRegExp": "Gültigen Wert eingeben.",
+  "validatorEntryFormat": "Im Format '{entryFormat}' eingeben.",
   "@validatorEntryFormat": {
     "placeholders": {
       "entryFormat": {
