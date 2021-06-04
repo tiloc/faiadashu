@@ -15,12 +15,21 @@
       }
     }
   },
-  "validatorUrl": "Enter a valid URL, including 'https://'.",
+  "validatorUrl": "Enter a valid URL in format https://...",
   "validatorRegExp": "Enter a valid response.",
-  "validatorEntryFormat": "Enter in format '{entryFormat}'.",
+  "validatorEntryFormat": "Enter in format {entryFormat}.",
   "@validatorEntryFormat": {
     "placeholders": {
       "entryFormat": {
+        "type": "String"
+      }
+    }
+  },
+  "validatorNan": "Enter a valid number.",
+  "validatorMinValue": "Enter a number of {minValue} or higher.",
+  "@validatorMinValue": {
+    "placeholders": {
+      "minValue": {
         "type": "String"
       }
     }

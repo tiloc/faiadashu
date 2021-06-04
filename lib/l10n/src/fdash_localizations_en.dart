@@ -30,14 +30,22 @@ class FDashLocalizationsEn extends FDashLocalizations {
   }
 
   @override
-  String get validatorUrl => 'Enter a valid URL, including \'https://\'.';
+  String get validatorUrl => 'Enter a valid URL in format https://...';
 
   @override
   String get validatorRegExp => 'Enter a valid response.';
 
   @override
   String validatorEntryFormat(String entryFormat) {
-    return 'Enter in format \'$entryFormat\'.';
+    return 'Enter in format $entryFormat.';
+  }
+
+  @override
+  String get validatorNan => 'Enter a valid number.';
+
+  @override
+  String validatorMinValue(String minValue) {
+    return 'Enter a number of $minValue or higher.';
   }
 
   @override

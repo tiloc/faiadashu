@@ -13,9 +13,9 @@
       "maxLength": {}
     }
   },
-  "validatorUrl": "URL im Format 'https://...' eingeben.",
+  "validatorUrl": "URL im Format https://... eingeben.",
   "validatorRegExp": "Gültigen Wert eingeben.",
-  "validatorEntryFormat": "Im Format '{entryFormat}' eingeben.",
+  "validatorEntryFormat": "Im Format {entryFormat} eingeben.",
   "@validatorEntryFormat": {
     "placeholders": {
       "entryFormat": {

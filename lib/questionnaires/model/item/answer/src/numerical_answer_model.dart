@@ -183,14 +183,15 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
       // Ignore FormatException, number remains nan.
     }
     if (number == double.nan) {
-      return '$inputValue is not a valid number.';
+      return lookupFDashLocalizations(locale).validatorNan;
     }
     if (number > _maxValue) {
       return lookupFDashLocalizations(locale)
           .validatorMaxValue(Decimal(_maxValue).format(locale));
     }
     if (number < _minValue) {
-      return 'Provide a number ${Decimal(_minValue).format(locale)}, or higher.';
+      return lookupFDashLocalizations(locale)
+          .validatorMinValue(Decimal(_minValue).format(locale));
     }
   }
 

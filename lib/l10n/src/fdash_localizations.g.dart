@@ -115,7 +115,7 @@ abstract class FDashLocalizations {
   /// No description provided for @validatorUrl.
   ///
   /// In en, this message translates to:
-  /// **'Enter a valid URL, including \'https://\'.'**
+  /// **'Enter a valid URL in format https://...'**
   String get validatorUrl;
 
   /// No description provided for @validatorRegExp.
@@ -127,8 +127,20 @@ abstract class FDashLocalizations {
   /// No description provided for @validatorEntryFormat.
   ///
   /// In en, this message translates to:
-  /// **'Enter in format \'{entryFormat}\'.'**
+  /// **'Enter in format {entryFormat}.'**
   String validatorEntryFormat(String entryFormat);
+
+  /// No description provided for @validatorNan.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid number.'**
+  String get validatorNan;
+
+  /// No description provided for @validatorMinValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a number of {minValue} or higher.'**
+  String validatorMinValue(String minValue);
 
   /// No description provided for @validatorMaxValue.
   ///

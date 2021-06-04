@@ -24,19 +24,27 @@ class FDashLocalizationsDe extends FDashLocalizations {
     return intl.Intl.pluralLogic(
       maxLength,
       locale: localeName,
-      other: 'Max. $maxLength Zeichen eingeben.',
+      other: 'Bis zu $maxLength Zeichen eingeben.',
     );
   }
 
   @override
-  String get validatorUrl => 'Gültige URL eingeben.';
+  String get validatorUrl => 'URL im Format https://... eingeben.';
 
   @override
-  String get validatorRegExp => 'Gültige Angabe machen.';
+  String get validatorRegExp => 'Gültigen Wert eingeben.';
 
   @override
   String validatorEntryFormat(String entryFormat) {
-    return 'Eingeben im Format: $entryFormat';
+    return 'Im Format $entryFormat eingeben.';
+  }
+
+  @override
+  String get validatorNan => 'Enter a valid number.';
+
+  @override
+  String validatorMinValue(String minValue) {
+    return 'Enter a number of $minValue or higher.';
   }
 
   @override
