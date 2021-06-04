@@ -95,10 +95,10 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
     return (!widget.itemModel.isHidden)
         ? Focus(
             focusNode: _focusNode,
-            onFocusChange: (gainedFocus) {
-              // TODO: This is filling up the log.
-//              debugDumpFocusTree();
-            },
+// Only enable for low-level focus coding
+/*            onFocusChange: (gainedFocus) {
+              debugDumpFocusTree();
+            }, */
             child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 500),
                 child: widget.itemModel.isEnabled
