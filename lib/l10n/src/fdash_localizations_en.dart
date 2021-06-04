@@ -8,15 +8,15 @@ class FDashLocalizationsEn extends FDashLocalizations {
   FDashLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get validatorRequiredItem => 'Provide this required answer.';
+  String get validatorRequiredItem => 'This question needs to be completed.';
 
   @override
   String validatorMinLength(int minLength) {
     return intl.Intl.pluralLogic(
       minLength,
       locale: localeName,
-      one: 'Provide at least one character.',
-      other: 'Provide at least $minLength characters.',
+      one: 'Enter at least one character.',
+      other: 'Enter at least $minLength characters.',
     );
   }
 
@@ -25,23 +25,23 @@ class FDashLocalizationsEn extends FDashLocalizations {
     return intl.Intl.pluralLogic(
       maxLength,
       locale: localeName,
-      other: 'Provide up to $maxLength characters.',
+      other: 'Enter up to $maxLength characters.',
     );
   }
 
   @override
-  String get validatorUrl => 'Provide a valid URL.';
+  String get validatorUrl => 'Enter a valid URL, including \'https://\'.';
 
   @override
-  String get validatorRegExp => 'Provide a valid answer.';
+  String get validatorRegExp => 'Enter a valid response.';
 
   @override
   String validatorEntryFormat(String entryFormat) {
-    return 'Provide as $entryFormat';
+    return 'Enter in format \'$entryFormat\'.';
   }
 
   @override
   String validatorMaxValue(String maxValue) {
-    return 'Provide a number up to $maxValue.';
+    return 'Enter a number up to $maxValue.';
   }
 }

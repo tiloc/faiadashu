@@ -97,43 +97,43 @@ abstract class FDashLocalizations {
   /// No description provided for @validatorRequiredItem.
   ///
   /// In en, this message translates to:
-  /// **'Provide this required answer.'**
+  /// **'This question needs to be completed.'**
   String get validatorRequiredItem;
 
   /// No description provided for @validatorMinLength.
   ///
   /// In en, this message translates to:
-  /// **'{minLength, plural, =1 {Provide at least one character.} other {Provide at least {minLength} characters.}}'**
+  /// **'{minLength, plural, =1 {Enter at least one character.} other {Enter at least {minLength} characters.}}'**
   String validatorMinLength(int minLength);
 
   /// No description provided for @validatorMaxLength.
   ///
   /// In en, this message translates to:
-  /// **'{maxLength, plural, other{Provide up to {maxLength} characters.}}'**
+  /// **'{maxLength, plural, other{Enter up to {maxLength} characters.}}'**
   String validatorMaxLength(int maxLength);
 
   /// No description provided for @validatorUrl.
   ///
   /// In en, this message translates to:
-  /// **'Provide a valid URL.'**
+  /// **'Enter a valid URL, including \'https://\'.'**
   String get validatorUrl;
 
   /// No description provided for @validatorRegExp.
   ///
   /// In en, this message translates to:
-  /// **'Provide a valid answer.'**
+  /// **'Enter a valid response.'**
   String get validatorRegExp;
 
   /// No description provided for @validatorEntryFormat.
   ///
   /// In en, this message translates to:
-  /// **'Provide as {entryFormat}'**
+  /// **'Enter in format \'{entryFormat}\'.'**
   String validatorEntryFormat(String entryFormat);
 
   /// No description provided for @validatorMaxValue.
   ///
   /// In en, this message translates to:
-  /// **'Provide a number up to {maxValue}.'**
+  /// **'Enter a number up to {maxValue}.'**
   String validatorMaxValue(String maxValue);
 }
 

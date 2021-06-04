@@ -23,19 +23,32 @@ class _BooleanItemState extends QuestionnaireAnswerFillerState<Boolean,
 
   @override
   Widget buildInputControl(BuildContext context) {
-    return Container(
-        alignment: Alignment.centerLeft,
-        padding: const EdgeInsets.only(top: 8, bottom: 8),
-        child: Checkbox(
-          focusNode: firstFocusNode,
-          value: value?.value,
-          tristate: true,
-          onChanged: (answerModel.isEnabled)
-              ? (newValue) {
-                  firstFocusNode.requestFocus();
-                  value = (newValue != null) ? Boolean(newValue) : null;
-                }
-              : null,
-        ));
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      const SizedBox(
+        height: 8,
+      ),
+      Checkbox(
+        focusNode: firstFocusNode,
+        value: value?.value,
+        activeColor: (answerModel.errorText != null)
+            ? Theme.of(context).errorColor
+            : null,
+        tristate: true,
+        onChanged: (answerModel.isEnabled)
+            ? (newValue) {
+                firstFocusNode.requestFocus();
+                value = (newValue != null) ? Boolean(newValue) : null;
+              }
+            : null,
+      ),
+      if (answerModel.errorText != null)
+        Text(
+          answerModel.errorText!,
+          style: Theme.of(context)
+              .textTheme
+              .caption!
+              .copyWith(color: Theme.of(context).errorColor),
+        )
+    ]);
   }
 }
