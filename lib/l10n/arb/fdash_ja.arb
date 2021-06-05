@@ -1,0 +1,48 @@
+{
+    "@@locale": "ja",
+    "validatorRequiredItem": "この質問は完了する必要があります。",
+    "validatorMinLength": "{minLength, plural, =1 {最低1文字入力してください} other {最低{minLength}文字入力してください。}}",
+    "@validatorMinLength": {
+        "placeholders": {
+            "minLength": {}
+        }
+    },
+    "validatorMaxLength": "{maxLength, plural, other{最大{maxLength}文字まで入力できます。}}",
+    "@validatorMaxLength": {
+        "placeholders": {
+            "maxLength": {}
+        }
+    },
+    "validatorUrl": "有効なURLをフォーマット https://... で入力してください。",
+    "validatorRegExp": "有効な回答を入力してください。",
+    "validatorEntryFormat": "フォーマット{entryFormat}で入力してください。",
+    "@validatorEntryFormat": {
+        "placeholders": {
+            "entryFormat": {
+                "type": "String"
+            }
+        }
+    },
+    "validatorNan": "有効な数字を入力してください。",
+    "validatorMinValue": "{minValue}以上の数値を入力してください。",
+    "@validatorMinValue": {
+        "placeholders": {
+            "minValue": {
+                "type": "String"
+            }
+        }
+    },
+    "validatorMaxValue": "{maxValue}までの数値を入力してください。",
+    "@validatorMaxValue": {
+        "placeholders": {
+            "maxValue": {
+                "type": "String"
+            }
+        }
+    },
+    "dataAbsentReasonAskedDeclined": "私は答えないことにしている。",
+    "narrativePageTitle": "ナラティブ",
+    "questionnaireGenericTitle": "調査",
+    "questionnaireUnknownTitle": "無題",
+    "questionnaireUnknownPublisher": "出版社不明"
+}
