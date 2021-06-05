@@ -39,5 +39,10 @@
                 "type": "String"
             }
         }
-    }
+    },
+    "dataAbsentReasonAskedDeclined": "Ich möchte nicht antworten.",
+    "narrativePageTitle": "Zusammenfassung",
+    "questionnaireGenericTitle": "Fragebogen",
+    "questionnaireUnknownTitle": "(ohne Titel)",
+    "questionnaireUnknownPublisher": "(unbekannte Quelle)"
 }
