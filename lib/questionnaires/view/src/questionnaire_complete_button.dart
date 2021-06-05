@@ -1,6 +1,7 @@
-import 'package:fhir/r4/resource_types/clinical/diagnostics/diagnostics.dart';
+import 'package:fhir/r4/r4.dart' show QuestionnaireResponseStatus;
 import 'package:flutter/material.dart';
 
+import '../../../l10n/l10n.dart';
 import '../../questionnaires.dart' show QuestionnaireFiller;
 
 /// A button to complete a questionnaire.
@@ -58,8 +59,10 @@ class _QuestionnaireCompleteButtonState
       label:
           (QuestionnaireFiller.of(context).questionnaireModel.responseStatus !=
                   QuestionnaireResponseStatus.completed)
-              ? const Text('Complete')
-              : const Text('Amend'),
+              ? Text(FDashLocalizations.of(context)
+                  .responseStatusToCompleteButtonLabel)
+              : Text(FDashLocalizations.of(context)
+                  .responseStatusToInProgressButtonLabel),
     );
   }
 }

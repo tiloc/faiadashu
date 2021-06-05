@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../l10n/l10n.dart';
 import '../../model/model.dart';
 
 /// Loading indicator during retrieval / decoding of a questionnaire.
@@ -28,11 +29,12 @@ class QuestionnaireLoadingIndicator extends StatelessWidget {
               color: Colors.red,
             )
           else
-            const SizedBox(
+            SizedBox(
                 width: shortAxis,
                 height: shortAxis,
                 child: CircularProgressIndicator(
-                  semanticsLabel: 'The questionnaire is loading.',
+                  semanticsLabel: FDashLocalizations.of(context)
+                      .progressQuestionnaireLoading,
                 )),
           const SizedBox(
             height: 16,

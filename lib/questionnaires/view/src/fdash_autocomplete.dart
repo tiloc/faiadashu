@@ -10,6 +10,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../l10n/l10n.dart';
+
 /// {@macro flutter.widgets.RawAutocomplete.RawAutocomplete}
 ///
 /// {@tool dartpad --template=freeform}
@@ -252,9 +254,9 @@ class _AutoCompleteFieldState extends State<_AutocompleteField> {
     return TextFormField(
       controller: widget.textEditingController,
       focusNode: widget.focusNode,
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         filled: true,
-        hintText: 'Enter search term',
+        hintText: FDashLocalizations.of(context).autoCompleteSearchTermInput,
       ),
       onFieldSubmitted: (String value) {
         widget.onFieldSubmitted();

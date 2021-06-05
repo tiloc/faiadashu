@@ -2,6 +2,7 @@ import 'package:fhir/r4.dart';
 
 import '../../../../coding/coding.dart';
 import '../../../../fhir_types/fhir_types.dart';
+import '../../../../l10n/l10n.dart';
 import '../../../../logging/logging.dart';
 import '../../../questionnaires.dart';
 
@@ -56,7 +57,8 @@ class NarrativeAggregator extends Aggregator<Narrative> {
         item.extension_?.dataAbsentReason == dataAbsentReasonAsTextCode;
 
     if (invalid) {
-      div.write('<span style="color:red">[AS TEXT] ');
+      div.write(
+          '<span style="color:red">${lookupFDashLocalizations(locale).dataAbsentReasonAsTextOutput} ');
     }
 
     final dataAbsentReason = item.extension_?.dataAbsentReason;
@@ -65,7 +67,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
       returnValue = true;
     } else if (dataAbsentReason == dataAbsentReasonAskedButDeclinedCode) {
       div.write(
-          '<p><i><span style="color:red">X </span>Declined to answer</i></p>');
+          '<p><i><span style="color:red">X </span>${lookupFDashLocalizations(locale).dataAbsentReasonAskedDeclinedOutput}</i></p>');
       returnValue = true;
     } else {
       if (item.answer != null) {

@@ -3,8 +3,6 @@ import 'dart:io';
 
 import 'package:faiadashu/faiadashu.dart';
 import 'package:faiadashu/logging/logging.dart' as fdashlog;
-import 'package:faiadashu/questionnaires/view/view.dart';
-import 'package:faiadashu/resource_provider/resource_provider.dart';
 import 'package:faiadashu_example/questionnaire_launch_tile.dart';
 import 'package:faiadashu_online/restful/restful.dart';
 import 'package:fhir/r4.dart';
@@ -60,12 +58,7 @@ class MyApp extends StatelessWidget {
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
-      supportedLocales: const [
-        Locale('en', 'US'),
-        Locale('de'),
-        Locale('es'),
-        Locale('ar'),
-      ],
+      supportedLocales: FDashLocalizations.supportedLocales,
       home: const HomePage(),
     );
   }

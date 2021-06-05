@@ -94,7 +94,8 @@ class QuestionnaireResponseFillerState
           !widget.itemModel.isReadOnly &&
           !widget.itemModel.isRequired)
         Row(children: [
-          Text(FDashLocalizations.of(context).dataAbsentReasonAskedDeclined),
+          Text(FDashLocalizations.of(context)
+              .dataAbsentReasonAskedDeclinedInputLabel),
           Switch(
             focusNode: _skipSwitchFocusNode,
             value: responseModel.isAskedButDeclined,

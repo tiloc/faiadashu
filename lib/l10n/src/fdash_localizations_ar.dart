@@ -3,9 +3,9 @@
 import 'package:intl/intl.dart' as intl;
 import 'fdash_localizations.g.dart';
 
-/// The translations for English (`en`).
-class FDashLocalizationsEn extends FDashLocalizations {
-  FDashLocalizationsEn([String locale = 'en']) : super(locale);
+/// The translations for Arabic (`ar`).
+class FDashLocalizationsAr extends FDashLocalizations {
+  FDashLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
   String get validatorRequiredItem => 'This question needs to be completed.';

@@ -1,11 +1,11 @@
 import 'dart:collection';
 
-import 'package:faiadashu/l10n/l10n.dart';
 import 'package:fhir/r4.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../../coding/coding.dart';
 import '../../../../../fhir_types/fhir_types.dart';
+import '../../../../../l10n/l10n.dart';
 import '../../../../../logging/logging.dart';
 import '../../../model.dart';
 

@@ -40,6 +40,15 @@ class FDashLocalizationsDe extends FDashLocalizations {
   }
 
   @override
+  String get validatorDate => 'Enter a valid date.';
+
+  @override
+  String get validatorTime => 'Enter a valid time.';
+
+  @override
+  String get validatorDateTime => 'Enter a valid date and time.';
+
+  @override
   String get validatorNan => 'Gültige Zahl eingeben.';
 
   @override
@@ -53,17 +62,55 @@ class FDashLocalizationsDe extends FDashLocalizations {
   }
 
   @override
-  String get dataAbsentReasonAskedDeclined => 'I choose not to answer.';
+  String validatorMinOccurs(int minOccurs) {
+    return intl.Intl.pluralLogic(
+      minOccurs,
+      locale: localeName,
+      one: 'Select at least one option.',
+      other: 'Select $minOccurs or more options.',
+    );
+  }
 
   @override
-  String get narrativePageTitle => 'Narrative';
+  String validatorMaxOccurs(int maxOccurs) {
+    return intl.Intl.pluralLogic(
+      maxOccurs,
+      locale: localeName,
+      one: 'Select up to one option.',
+      other: 'Select up to $maxOccurs options.',
+    );
+  }
 
   @override
-  String get questionnaireGenericTitle => 'Survey';
+  String get dataAbsentReasonAskedDeclinedInputLabel => 'I choose not to answer.';
 
   @override
-  String get questionnaireUnknownTitle => 'Untitled';
+  String get dataAbsentReasonAskedDeclinedOutput => 'Declined to answer';
 
   @override
-  String get questionnaireUnknownPublisher => 'Unknown publisher';
+  String get dataAbsentReasonAsTextOutput => '[AS TEXT]';
+
+  @override
+  String get narrativePageTitle => 'Zusammenfassung';
+
+  @override
+  String get questionnaireGenericTitle => 'Fragebogen';
+
+  @override
+  String get questionnaireUnknownTitle => '(ohne Titel)';
+
+  @override
+  String get questionnaireUnknownPublisher => '(unbekannte Quelle)';
+
+  @override
+  String get autoCompleteSearchTermInput => 'Enter search term…';
+
+  @override
+  String get responseStatusToCompleteButtonLabel => 'Complete';
+
+  @override
+  String get responseStatusToInProgressButtonLabel => 'Amend';
+
+  @override
+  String get progressQuestionnaireLoading => 'The survey is loading…';
 }

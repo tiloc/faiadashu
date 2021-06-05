@@ -1,6 +1,7 @@
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
+import '../../../l10n/l10n.dart';
 import '../../../resource_provider/resource_provider.dart';
 import '../../questionnaires.dart';
 
@@ -45,7 +46,7 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
                       .questionnaireModel
                       .questionnaire
                       .title ??
-                  'Untitled'),
+                  FDashLocalizations.of(context).questionnaireGenericTitle),
             ),
             endDrawer: const NarrativeDrawer(),
             body: Column(children: [

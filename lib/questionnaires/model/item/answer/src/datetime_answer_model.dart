@@ -8,6 +8,7 @@ import 'package:fhir/r4.dart'
         Time;
 
 import '../../../../../fhir_types/fhir_types.dart';
+import '../../../../../l10n/l10n.dart';
 import '../../../model.dart';
 
 class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
@@ -57,7 +58,7 @@ class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
     if (inValue == null || inValue.isValid) {
       return null;
     } else {
-      return "Provide a valid date/time.";
+      return lookupFDashLocalizations(locale).validatorDateTime;
     }
   }
 

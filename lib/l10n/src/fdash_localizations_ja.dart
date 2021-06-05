@@ -3,20 +3,20 @@
 import 'package:intl/intl.dart' as intl;
 import 'fdash_localizations.g.dart';
 
-/// The translations for English (`en`).
-class FDashLocalizationsEn extends FDashLocalizations {
-  FDashLocalizationsEn([String locale = 'en']) : super(locale);
+/// The translations for Japanese (`ja`).
+class FDashLocalizationsJa extends FDashLocalizations {
+  FDashLocalizationsJa([String locale = 'ja']) : super(locale);
 
   @override
-  String get validatorRequiredItem => 'This question needs to be completed.';
+  String get validatorRequiredItem => 'この質問は完了する必要があります。';
 
   @override
   String validatorMinLength(int minLength) {
     return intl.Intl.pluralLogic(
       minLength,
       locale: localeName,
-      one: 'Enter at least one character.',
-      other: 'Enter at least $minLength characters.',
+      one: '最低1文字入力してください',
+      other: '最低$minLength文字入力してください。',
     );
   }
 
@@ -25,19 +25,19 @@ class FDashLocalizationsEn extends FDashLocalizations {
     return intl.Intl.pluralLogic(
       maxLength,
       locale: localeName,
-      other: 'Enter up to $maxLength characters.',
+      other: '最大$maxLength文字まで入力できます。',
     );
   }
 
   @override
-  String get validatorUrl => 'Enter a valid URL in format https://...';
+  String get validatorUrl => '有効なURLをフォーマット https://... で入力してください。';
 
   @override
-  String get validatorRegExp => 'Enter a valid response.';
+  String get validatorRegExp => '有効な回答を入力してください。';
 
   @override
   String validatorEntryFormat(String entryFormat) {
-    return 'Enter in format $entryFormat.';
+    return 'フォーマット$entryFormatで入力してください。';
   }
 
   @override
@@ -50,16 +50,16 @@ class FDashLocalizationsEn extends FDashLocalizations {
   String get validatorDateTime => 'Enter a valid date and time.';
 
   @override
-  String get validatorNan => 'Enter a valid number.';
+  String get validatorNan => '有効な数字を入力してください。';
 
   @override
   String validatorMinValue(String minValue) {
-    return 'Enter a number of $minValue or higher.';
+    return '$minValue以上の数値を入力してください。';
   }
 
   @override
   String validatorMaxValue(String maxValue) {
-    return 'Enter a number up to $maxValue.';
+    return '$maxValueまでの数値を入力してください。';
   }
 
   @override
@@ -92,16 +92,16 @@ class FDashLocalizationsEn extends FDashLocalizations {
   String get dataAbsentReasonAsTextOutput => '[AS TEXT]';
 
   @override
-  String get narrativePageTitle => 'Narrative';
+  String get narrativePageTitle => 'ナラティブ';
 
   @override
-  String get questionnaireGenericTitle => 'Survey';
+  String get questionnaireGenericTitle => '調査';
 
   @override
-  String get questionnaireUnknownTitle => 'Untitled';
+  String get questionnaireUnknownTitle => '無題';
 
   @override
-  String get questionnaireUnknownPublisher => 'Unknown publisher';
+  String get questionnaireUnknownPublisher => '出版社不明';
 
   @override
   String get autoCompleteSearchTermInput => 'Enter search term…';

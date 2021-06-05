@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../fhir_types/fhir_types.dart';
+import '../../../l10n/l10n.dart';
 import '../../questionnaires.dart';
 
 /// "Drawer" which contains the narrative for a questionnaire.
@@ -53,7 +54,10 @@ class _NarrativeDrawerState extends State<NarrativeDrawer> {
                       SwitchListTile(
                         key: UniqueKey(),
                         title: Text(
-                          !_drawerMode ? 'Narrative' : 'FHIR R4 JSON',
+                          !_drawerMode
+                              ? FDashLocalizations.of(context)
+                                  .narrativePageTitle
+                              : 'FHIR R4 JSON',
                           style: Theme.of(context).textTheme.headline5,
                         ),
                         secondary: IconButton(

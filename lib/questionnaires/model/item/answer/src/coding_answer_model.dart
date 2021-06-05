@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
 
 import '../../../../../fhir_types/fhir_types.dart';
+import '../../../../../l10n/l10n.dart';
 import '../../../../../logging/logging.dart';
 import '../../../model.dart';
 
@@ -258,11 +259,11 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
     final int length = inValue.coding?.length ?? 0;
 
     if (length < minOccurs) {
-      return 'Select $minOccurs or more options.';
+      return lookupFDashLocalizations(locale).validatorMinOccurs(minOccurs);
     }
 
     if (maxOccurs != null && length > maxOccurs!) {
-      return 'Select $maxOccurs or fewer options.';
+      return lookupFDashLocalizations(locale).validatorMaxOccurs(maxOccurs!);
     }
   }
 
@@ -306,7 +307,8 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
     if (value == null && minOccurs > 0) {
       return QuestionnaireErrorFlag(itemModel.linkId,
           answerIndex: answerIndex,
-          errorText: 'Select $minOccurs or more options.');
+          errorText:
+              lookupFDashLocalizations(locale).validatorMinOccurs(minOccurs));
     }
 
     final validationText = validateInput(value);

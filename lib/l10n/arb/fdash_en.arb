@@ -25,6 +25,9 @@
       }
     }
   },
+  "validatorDate" : "Enter a valid date.",
+  "validatorTime" : "Enter a valid time.",
+  "validatorDateTime" : "Enter a valid date and time.",
   "validatorNan": "Enter a valid number.",
   "validatorMinValue": "Enter a number of {minValue} or higher.",
   "@validatorMinValue": {
@@ -42,9 +45,29 @@
       }
     }
   },
-  "dataAbsentReasonAskedDeclined" : "I choose not to answer.",
+  "validatorMinOccurs": "{minOccurs, plural, =1 {Select at least one option.} other {Select {minOccurs} or more options.}}",
+  "@validatorMinOccurs": {
+    "placeholders": {
+      "minOccurs": {
+      }
+    }
+  },
+  "validatorMaxOccurs": "{maxOccurs, plural, =1 {Select up to one option.} other {Select up to {maxOccurs} options.}}",
+  "@validatorMaxOccurs": {
+    "placeholders": {
+      "maxOccurs": {
+      }
+    }
+  },
+  "dataAbsentReasonAskedDeclinedInputLabel" : "I choose not to answer.",
+  "dataAbsentReasonAskedDeclinedOutput" : "Declined to answer",
+  "dataAbsentReasonAsTextOutput" : "[AS TEXT]",
   "narrativePageTitle" : "Narrative",
   "questionnaireGenericTitle" : "Survey",
   "questionnaireUnknownTitle" : "Untitled",
-  "questionnaireUnknownPublisher" : "Unknown publisher"
+  "questionnaireUnknownPublisher" : "Unknown publisher",
+  "autoCompleteSearchTermInput" : "Enter search term…",
+  "responseStatusToCompleteButtonLabel" : "Complete",
+  "responseStatusToInProgressButtonLabel" : "Amend",
+  "progressQuestionnaireLoading" : "The survey is loading…"
 }

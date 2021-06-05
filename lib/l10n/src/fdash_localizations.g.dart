@@ -6,9 +6,11 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
+import 'fdash_localizations_ar.dart';
 import 'fdash_localizations_de.dart';
 import 'fdash_localizations_en.dart';
 import 'fdash_localizations_es.dart';
+import 'fdash_localizations_ja.dart';
 
 /// Callers can lookup localized strings with an instance of FDashLocalizations returned
 /// by `FDashLocalizations.of(context)`.
@@ -91,9 +93,11 @@ abstract class FDashLocalizations {
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
+    Locale('ar'),
     Locale('de'),
     Locale('en'),
-    Locale('es')
+    Locale('es'),
+    Locale('ja')
   ];
 
   /// No description provided for @validatorRequiredItem.
@@ -132,6 +136,24 @@ abstract class FDashLocalizations {
   /// **'Enter in format {entryFormat}.'**
   String validatorEntryFormat(String entryFormat);
 
+  /// No description provided for @validatorDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid date.'**
+  String get validatorDate;
+
+  /// No description provided for @validatorTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid time.'**
+  String get validatorTime;
+
+  /// No description provided for @validatorDateTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid date and time.'**
+  String get validatorDateTime;
+
   /// No description provided for @validatorNan.
   ///
   /// In en, this message translates to:
@@ -150,11 +172,35 @@ abstract class FDashLocalizations {
   /// **'Enter a number up to {maxValue}.'**
   String validatorMaxValue(String maxValue);
 
-  /// No description provided for @dataAbsentReasonAskedDeclined.
+  /// No description provided for @validatorMinOccurs.
+  ///
+  /// In en, this message translates to:
+  /// **'{minOccurs, plural, =1 {Select at least one option.} other {Select {minOccurs} or more options.}}'**
+  String validatorMinOccurs(int minOccurs);
+
+  /// No description provided for @validatorMaxOccurs.
+  ///
+  /// In en, this message translates to:
+  /// **'{maxOccurs, plural, =1 {Select up to one option.} other {Select up to {maxOccurs} options.}}'**
+  String validatorMaxOccurs(int maxOccurs);
+
+  /// No description provided for @dataAbsentReasonAskedDeclinedInputLabel.
   ///
   /// In en, this message translates to:
   /// **'I choose not to answer.'**
-  String get dataAbsentReasonAskedDeclined;
+  String get dataAbsentReasonAskedDeclinedInputLabel;
+
+  /// No description provided for @dataAbsentReasonAskedDeclinedOutput.
+  ///
+  /// In en, this message translates to:
+  /// **'Declined to answer'**
+  String get dataAbsentReasonAskedDeclinedOutput;
+
+  /// No description provided for @dataAbsentReasonAsTextOutput.
+  ///
+  /// In en, this message translates to:
+  /// **'[AS TEXT]'**
+  String get dataAbsentReasonAsTextOutput;
 
   /// No description provided for @narrativePageTitle.
   ///
@@ -179,6 +225,30 @@ abstract class FDashLocalizations {
   /// In en, this message translates to:
   /// **'Unknown publisher'**
   String get questionnaireUnknownPublisher;
+
+  /// No description provided for @autoCompleteSearchTermInput.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter search term…'**
+  String get autoCompleteSearchTermInput;
+
+  /// No description provided for @responseStatusToCompleteButtonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete'**
+  String get responseStatusToCompleteButtonLabel;
+
+  /// No description provided for @responseStatusToInProgressButtonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Amend'**
+  String get responseStatusToInProgressButtonLabel;
+
+  /// No description provided for @progressQuestionnaireLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'The survey is loading…'**
+  String get progressQuestionnaireLoading;
 }
 
 class _FDashLocalizationsDelegate extends LocalizationsDelegate<FDashLocalizations> {
@@ -190,7 +260,7 @@ class _FDashLocalizationsDelegate extends LocalizationsDelegate<FDashLocalizatio
   }
 
   @override
-  bool isSupported(Locale locale) => <String>['de', 'en', 'es'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>['ar', 'de', 'en', 'es', 'ja'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_FDashLocalizationsDelegate old) => false;
@@ -202,9 +272,11 @@ FDashLocalizations lookupFDashLocalizations(Locale locale) {
 
 // Lookup logic when only language code is specified.
 switch (locale.languageCode) {
-  case 'de': return FDashLocalizationsDe();
+  case 'ar': return FDashLocalizationsAr();
+    case 'de': return FDashLocalizationsDe();
     case 'en': return FDashLocalizationsEn();
     case 'es': return FDashLocalizationsEs();
+    case 'ja': return FDashLocalizationsJa();
 }
 
 
