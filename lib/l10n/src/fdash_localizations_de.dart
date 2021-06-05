@@ -115,29 +115,29 @@ class FDashLocalizationsDe extends FDashLocalizations {
   String get progressQuestionnaireLoading => 'Der Fragebogen lädt…';
 
   @override
-  String get handlingSaveButtonLabel => 'Save';
+  String get handlingSaveButtonLabel => 'Speichern';
 
   @override
-  String get handlingUploadButtonLabel => 'Upload';
+  String get handlingUploadButtonLabel => 'Hochladen';
 
   @override
-  String get handlingUploading => 'Uploading survey…';
+  String get handlingUploading => 'Bogen hochladen…';
 
   @override
-  String get loginStatusLoggingIn => 'Signing in…';
+  String get loginStatusLoggingIn => 'Anmelden…';
 
   @override
-  String get loginStatusLoggedIn => 'Signed in…';
+  String get loginStatusLoggedIn => 'Angemeldet…';
 
   @override
-  String get loginStatusLoggingOut => 'Signing out…';
+  String get loginStatusLoggingOut => 'Ich melde mich ab…';
 
   @override
-  String get loginStatusLoggedOut => 'Signed out…';
+  String get loginStatusLoggedOut => 'Abgemeldet…';
 
   @override
-  String get loginStatusUnknown => 'Not sure what\'s going on?';
+  String get loginStatusUnknown => 'Nicht sicher, was los ist?';
 
   @override
-  String get loginStatusError => 'Something went wrong.';
+  String get loginStatusError => 'Etwas ist schief gelaufen.';
 }

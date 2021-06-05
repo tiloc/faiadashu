@@ -116,29 +116,29 @@ class FDashLocalizationsJa extends FDashLocalizations {
   String get progressQuestionnaireLoading => 'アンケートの読み込み中...';
 
   @override
-  String get handlingSaveButtonLabel => 'Save';
+  String get handlingSaveButtonLabel => '保存';
 
   @override
-  String get handlingUploadButtonLabel => 'Upload';
+  String get handlingUploadButtonLabel => 'アップロード';
 
   @override
-  String get handlingUploading => 'Uploading survey…';
+  String get handlingUploading => 'アンケートのアップロード...';
 
   @override
-  String get loginStatusLoggingIn => 'Signing in…';
+  String get loginStatusLoggingIn => 'サインインすると...';
 
   @override
-  String get loginStatusLoggedIn => 'Signed in…';
+  String get loginStatusLoggedIn => 'サインは...';
 
   @override
-  String get loginStatusLoggingOut => 'Signing out…';
+  String get loginStatusLoggingOut => 'サインアウト...';
 
   @override
-  String get loginStatusLoggedOut => 'Signed out…';
+  String get loginStatusLoggedOut => 'サインアウト...';
 
   @override
-  String get loginStatusUnknown => 'Not sure what\'s going on?';
+  String get loginStatusUnknown => '何が起こっているのかわからない？';
 
   @override
-  String get loginStatusError => 'Something went wrong.';
+  String get loginStatusError => '何かが間違っていた。';
 }
