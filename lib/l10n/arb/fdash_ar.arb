@@ -1,6 +1,12 @@
 {
     "@@locale": "ar",
     "validatorRequiredItem": "هذا السؤال يحتاج إلى أن يكتمل.",
+    "validatorMinLength": "{minLength, plural, =1 {أدخل على الأقل حرفًا واحدًا.} zero {} one {} two {} few {} many {} other {أدخل {minLength} حرفًا على الأقل.}}",
+    "@validatorMinLength": {
+        "placeholders": {
+            "minLength": {}
+        }
+    },
     "validatorMaxLength": "{maxLength, plural, other {أدخل حتى {maxLength} حرفًا.}}",
     "@validatorMaxLength": {
         "placeholders": {
@@ -42,11 +48,34 @@
     "validatorDate": "أدخل تاريخًا صالحًا.",
     "validatorTime": "أدخل وقتًا صالحًا.",
     "validatorDateTime": "أدخل تاريخًا ووقتًا صالحين.",
+    "validatorMinOccurs": "{minOccurs, plural, =1 {Select at least one option.} other {Select {minOccurs} or more options.}}",
+    "@validatorMinOccurs": {
+        "placeholders": {
+            "minOccurs": {}
+        }
+    },
+    "validatorMaxOccurs": "{maxOccurs, plural, =1 {Select up to one option.} other {Select up to {maxOccurs} options.}}",
+    "@validatorMaxOccurs": {
+        "placeholders": {
+            "maxOccurs": {}
+        }
+    },
     "dataAbsentReasonAskedDeclinedInputLabel": "اخترت عدم الرد.",
     "dataAbsentReasonAskedDeclinedOutput": "رفض الإجابة",
     "dataAbsentReasonAsTextOutput": "[نص حر]",
     "autoCompleteSearchTermInput": "أدخل مصطلح البحث…",
     "responseStatusToCompleteButtonLabel": "اكتمال",
     "responseStatusToInProgressButtonLabel": "يعدل",
-    "progressQuestionnaireLoading": "يتم تحميل الاستطلاع…"
+    "progressQuestionnaireLoading": "يتم تحميل الاستطلاع…",
+    "handlingSaveButtonLabel": "",
+    "handlingUploadButtonLabel": "",
+    "handlingUploading": "",
+    "loginStatusLoggingIn": "",
+    "loginStatusLoggedIn": "",
+    "loginStatusLoggingOut": "",
+    "loginStatusLoggedOut": "",
+    "loginStatusUnknown": "",
+    "loginStatusError": "",
+    "handlingSaved": "",
+    "handlingUploaded": ""
 }
