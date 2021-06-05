@@ -1,35 +1,43 @@
 {
-  "@@locale": "de",
-  "validatorRequiredItem": "Füllen sie dieses Pflichtfeld aus.",
-  "validatorMinLength": "{minLength, plural, one{Mind. ein Zeichen eingeben.} other{Mind. {minLength} Zeichen eingeben.}}",
-  "@validatorMinLength": {
-    "placeholders": {
-      "minLength": {}
+    "@@locale": "de",
+    "validatorRequiredItem": "Füllen sie dieses Pflichtfeld aus.",
+    "validatorMinLength": "{minLength, plural, one{Mind. ein Zeichen eingeben.} other{Mind. {minLength} Zeichen eingeben.}}",
+    "@validatorMinLength": {
+        "placeholders": {
+            "minLength": {}
+        }
+    },
+    "validatorMaxLength": "{maxLength, plural, other{Bis zu {maxLength} Zeichen eingeben.}}",
+    "@validatorMaxLength": {
+        "placeholders": {
+            "maxLength": {}
+        }
+    },
+    "validatorUrl": "URL im Format https://... eingeben.",
+    "validatorRegExp": "Gültigen Wert eingeben.",
+    "validatorEntryFormat": "Im Format {entryFormat} eingeben.",
+    "@validatorEntryFormat": {
+        "placeholders": {
+            "entryFormat": {
+                "type": "String"
+            }
+        }
+    },
+    "validatorNan": "Gültige Zahl eingeben.",
+    "validatorMinValue": "Eine Zahl ab {minValue} eingeben.",
+    "@validatorMinValue": {
+        "placeholders": {
+            "minValue": {
+                "type": "String"
+            }
+        }
+    },
+    "validatorMaxValue": "Eine Zahl bis {maxValue} eingeben.",
+    "@validatorMaxValue": {
+        "placeholders": {
+            "maxValue": {
+                "type": "String"
+            }
+        }
     }
-  },
-  "validatorMaxLength": "{maxLength, plural, other{Bis zu {maxLength} Zeichen eingeben.}}",
-  "@validatorMaxLength": {
-    "placeholders": {
-      "maxLength": {}
-    }
-  },
-  "validatorUrl": "URL im Format https://... eingeben.",
-  "validatorRegExp": "Gültigen Wert eingeben.",
-  "validatorEntryFormat": "Im Format {entryFormat} eingeben.",
-  "@validatorEntryFormat": {
-    "placeholders": {
-      "entryFormat": {
-        "type": "String"
-      }
-    }
-  },
-  "validatorMaxValue": "Eine Zahl bis {maxValue} eingeben.",
-  "@validatorMaxValue": {
-    "placeholders": {
-      "maxValue": {
-        "type": "String"
-      }
-    }
-  }
 }
-
