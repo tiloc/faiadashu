@@ -1,3 +1,43 @@
 {
-  "@@locale" : "es"
+    "@@locale": "es",
+    "validatorRequiredItem": "Esta pregunta debe ser completada.",
+    "validatorMinLength": "{longitud mínima, plural, =1 {Introducir al menos un carácter.} other {Introducir al menos {minLength} caracteres.}}",
+    "@validatorMinLength": {
+        "placeholders": {
+            "minLength": {}
+        }
+    },
+    "validatorMaxLength": "{longitudmáxima, plural, other{Ingrese hasta {maxLength} caracteres.}}",
+    "@validatorMaxLength": {
+        "placeholders": {
+            "maxLength": {}
+        }
+    },
+    "validatorUrl": "Introduzca una URL válida con el formato https://...",
+    "validatorRegExp": "Introduzca una respuesta válida.",
+    "validatorEntryFormat": "Introduzca el formato {entryFormat}.",
+    "@validatorEntryFormat": {
+        "placeholders": {
+            "entryFormat": {
+                "type": "String"
+            }
+        }
+    },
+    "validatorNan": "Introduzca un número válido.",
+    "validatorMinValue": "Introduzca un número de {minValue} o superior.",
+    "@validatorMinValue": {
+        "placeholders": {
+            "minValue": {
+                "type": "String"
+            }
+        }
+    },
+    "validatorMaxValue": "Introduzca un número hasta {maxValue}.",
+    "@validatorMaxValue": {
+        "placeholders": {
+            "maxValue": {
+                "type": "String"
+            }
+        }
+    }
 }
