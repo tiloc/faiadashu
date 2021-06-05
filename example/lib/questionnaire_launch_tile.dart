@@ -146,8 +146,9 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                             QuestionnaireFiller.of(context)
                                 .aggregator<QuestionnaireResponseAggregator>()
                                 .aggregate());
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Survey saved.')));
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text(
+                                FDashLocalizations.of(context).handlingSaved)));
                         Navigator.pop(context);
                       },
                     ),

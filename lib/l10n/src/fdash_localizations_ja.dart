@@ -119,10 +119,16 @@ class FDashLocalizationsJa extends FDashLocalizations {
   String get handlingSaveButtonLabel => '保存';
 
   @override
+  String get handlingSaved => 'Survey saved.';
+
+  @override
   String get handlingUploadButtonLabel => 'アップロード';
 
   @override
   String get handlingUploading => 'アンケートのアップロード...';
+
+  @override
+  String get handlingUploaded => 'Survey uploaded.';
 
   @override
   String get loginStatusLoggingIn => 'サインインすると...';

@@ -256,6 +256,12 @@ abstract class FDashLocalizations {
   /// **'Save'**
   String get handlingSaveButtonLabel;
 
+  /// No description provided for @handlingSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Survey saved.'**
+  String get handlingSaved;
+
   /// No description provided for @handlingUploadButtonLabel.
   ///
   /// In en, this message translates to:
@@ -267,6 +273,12 @@ abstract class FDashLocalizations {
   /// In en, this message translates to:
   /// **'Uploading survey…'**
   String get handlingUploading;
+
+  /// No description provided for @handlingUploaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Survey uploaded.'**
+  String get handlingUploaded;
 
   /// No description provided for @loginStatusLoggingIn.
   ///

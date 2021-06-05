@@ -118,10 +118,16 @@ class FDashLocalizationsDe extends FDashLocalizations {
   String get handlingSaveButtonLabel => 'Speichern';
 
   @override
+  String get handlingSaved => 'Survey saved.';
+
+  @override
   String get handlingUploadButtonLabel => 'Hochladen';
 
   @override
   String get handlingUploading => 'Bogen hochladen…';
+
+  @override
+  String get handlingUploaded => 'Survey uploaded.';
 
   @override
   String get loginStatusLoggingIn => 'Anmelden…';
