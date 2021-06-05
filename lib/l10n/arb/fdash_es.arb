@@ -39,5 +39,10 @@
                 "type": "String"
             }
         }
-    }
+    },
+    "dataAbsentReasonAskedDeclined": "He decidido no responder.",
+    "narrativePageTitle": "Narrativa",
+    "questionnaireGenericTitle": "Encuesta",
+    "questionnaireUnknownTitle": "Sin título",
+    "questionnaireUnknownPublisher": "Editor desconocido"
 }
