@@ -1,4 +1,3 @@
-
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -64,7 +63,8 @@ import 'fdash_localizations_ja.dart';
 /// be consistent with the languages listed in the FDashLocalizations.supportedLocales
 /// property.
 abstract class FDashLocalizations {
-  FDashLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  FDashLocalizations(String locale)
+      : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -72,7 +72,8 @@ abstract class FDashLocalizations {
     return Localizations.of<FDashLocalizations>(context, FDashLocalizations)!;
   }
 
-  static const LocalizationsDelegate<FDashLocalizations> delegate = _FDashLocalizationsDelegate();
+  static const LocalizationsDelegate<FDashLocalizations> delegate =
+      _FDashLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -84,7 +85,8 @@ abstract class FDashLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
     delegate,
     GlobalMaterialLocalizations.delegate,
     GlobalCupertinoLocalizations.delegate,
@@ -317,39 +319,42 @@ abstract class FDashLocalizations {
   String get loginStatusError;
 }
 
-class _FDashLocalizationsDelegate extends LocalizationsDelegate<FDashLocalizations> {
+class _FDashLocalizationsDelegate
+    extends LocalizationsDelegate<FDashLocalizations> {
   const _FDashLocalizationsDelegate();
 
   @override
   Future<FDashLocalizations> load(Locale locale) {
-    return SynchronousFuture<FDashLocalizations>(lookupFDashLocalizations(locale));
+    return SynchronousFuture<FDashLocalizations>(
+        lookupFDashLocalizations(locale));
   }
 
   @override
-  bool isSupported(Locale locale) => <String>['ar', 'de', 'en', 'es', 'ja'].contains(locale.languageCode);
+  bool isSupported(Locale locale) =>
+      <String>['ar', 'de', 'en', 'es', 'ja'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_FDashLocalizationsDelegate old) => false;
 }
 
 FDashLocalizations lookupFDashLocalizations(Locale locale) {
-  
-
-
 // Lookup logic when only language code is specified.
-switch (locale.languageCode) {
-  case 'ar': return FDashLocalizationsAr();
-    case 'de': return FDashLocalizationsDe();
-    case 'en': return FDashLocalizationsEn();
-    case 'es': return FDashLocalizationsEs();
-    case 'ja': return FDashLocalizationsJa();
-}
-
+  switch (locale.languageCode) {
+    case 'ar':
+      return FDashLocalizationsAr();
+    case 'de':
+      return FDashLocalizationsDe();
+    case 'en':
+      return FDashLocalizationsEn();
+    case 'es':
+      return FDashLocalizationsEs();
+    case 'ja':
+      return FDashLocalizationsJa();
+  }
 
   throw FlutterError(
-    'FDashLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
-    'an issue with the localizations generation tool. Please file an issue '
-    'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.'
-  );
+      'FDashLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
+      'an issue with the localizations generation tool. Please file an issue '
+      'on GitHub with a reproducible sample app and the gen-l10n configuration '
+      'that was used.');
 }

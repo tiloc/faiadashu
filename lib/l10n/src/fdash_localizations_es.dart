@@ -1,5 +1,3 @@
-
-
 import 'package:intl/intl.dart' as intl;
 import 'fdash_localizations.g.dart';
 
@@ -30,7 +28,8 @@ class FDashLocalizationsEs extends FDashLocalizations {
   }
 
   @override
-  String get validatorUrl => 'Introduzca una URL válida con el formato https://...';
+  String get validatorUrl =>
+      'Introduzca una URL válida con el formato https://...';
 
   @override
   String get validatorRegExp => 'Introduzca una respuesta válida.';
@@ -83,7 +82,8 @@ class FDashLocalizationsEs extends FDashLocalizations {
   }
 
   @override
-  String get dataAbsentReasonAskedDeclinedInputLabel => 'I choose not to answer.';
+  String get dataAbsentReasonAskedDeclinedInputLabel =>
+      'I choose not to answer.';
 
   @override
   String get dataAbsentReasonAskedDeclinedOutput => 'Declined to answer';

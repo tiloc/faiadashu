@@ -1,5 +1,3 @@
-
-
 import 'package:intl/intl.dart' as intl;
 import 'fdash_localizations.g.dart';
 
@@ -82,7 +80,8 @@ class FDashLocalizationsDe extends FDashLocalizations {
   }
 
   @override
-  String get dataAbsentReasonAskedDeclinedInputLabel => 'Ich möchte nicht antworten.';
+  String get dataAbsentReasonAskedDeclinedInputLabel =>
+      'Ich möchte nicht antworten.';
 
   @override
   String get dataAbsentReasonAskedDeclinedOutput => 'Antwort abgelehnt';
