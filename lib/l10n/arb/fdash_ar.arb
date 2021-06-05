@@ -1,3 +1,70 @@
 {
-  "@@locale": "ar"
+    "@@locale": "ar",
+    "validatorRequiredItem": "هذا السؤال يحتاج إلى أن يكتمل.",
+    "validatorMinLength": "",
+    "@validatorMinLength": {
+        "placeholders": {
+            "minLength": {}
+        }
+    },
+    "validatorMaxLength": "{maxLength, plural, other {أدخل حتى {maxLength} حرفًا.}}",
+    "@validatorMaxLength": {
+        "placeholders": {
+            "maxLength": {}
+        }
+    },
+    "validatorUrl": "أدخل عنوان URL صالحًا بتنسيق https: // ...",
+    "validatorRegExp": "أدخل إجابة صالحة.",
+    "validatorEntryFormat": "أدخل بتنسيق {entryFormat}.",
+    "@validatorEntryFormat": {
+        "placeholders": {
+            "entryFormat": {
+                "type": "String"
+            }
+        }
+    },
+    "validatorNan": "أدخل رقمًا صالحًا.",
+    "validatorMinValue": "أدخل رقم {minValue} أو أعلى.",
+    "@validatorMinValue": {
+        "placeholders": {
+            "minValue": {
+                "type": "String"
+            }
+        }
+    },
+    "validatorMaxValue": "أدخل رقمًا يصل إلى {maxValue}.",
+    "@validatorMaxValue": {
+        "placeholders": {
+            "maxValue": {
+                "type": "String"
+            }
+        }
+    },
+    "dataAbsentReasonAskedDeclined": "اخترت عدم الرد.",
+    "narrativePageTitle": "رواية",
+    "questionnaireGenericTitle": "استطلاع",
+    "questionnaireUnknownTitle": "بدون عنوان",
+    "questionnaireUnknownPublisher": "ناشر غير معروف",
+    "validatorDate": "أدخل تاريخًا صالحًا.",
+    "validatorTime": "أدخل وقتًا صالحًا.",
+    "validatorDateTime": "أدخل تاريخًا ووقتًا صالحين.",
+    "validatorMinOccurs": "{minOccurs, plural, =1 {Select at least one option.} other {Select {minOccurs} or more options.}}",
+    "@validatorMinOccurs": {
+        "placeholders": {
+            "minOccurs": {}
+        }
+    },
+    "validatorMaxOccurs": "{maxOccurs, plural, =1 {Select up to one option.} other {Select up to {maxOccurs} options.}}",
+    "@validatorMaxOccurs": {
+        "placeholders": {
+            "maxOccurs": {}
+        }
+    },
+    "dataAbsentReasonAskedDeclinedInputLabel": "اخترت عدم الرد.",
+    "dataAbsentReasonAskedDeclinedOutput": "رفض الإجابة",
+    "dataAbsentReasonAsTextOutput": "[كنص]",
+    "autoCompleteSearchTermInput": "أدخل مصطلح البحث…",
+    "responseStatusToCompleteButtonLabel": "اكتمال",
+    "responseStatusToInProgressButtonLabel": "يعدل",
+    "progressQuestionnaireLoading": "يتم تحميل الاستطلاع ..."
 }
