@@ -1,3 +1,4 @@
+import 'package:faiadashu/l10n/l10n.dart';
 import 'package:faiadashu/questionnaires/questionnaires.dart';
 import 'package:faiadashu/resource_provider/resource_provider.dart';
 import 'package:faiadashu_online/restful/restful.dart';
@@ -99,7 +100,8 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                   if (widget.uploadResponseFunction != null)
                     Builder(
                       builder: (context) => ElevatedButton.icon(
-                        label: const Text('Upload'),
+                        label: Text(FDashLocalizations.of(context)
+                            .handlingUploadButtonLabel),
                         icon: const Icon(Icons.cloud_upload),
                         onPressed: () {
                           // Generate a response and upload it to a FHIR server.
@@ -118,7 +120,8 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    const Text('Uploading survey…'),
+                                    Text(FDashLocalizations.of(context)
+                                        .handlingUploading),
                                     SyncIndicator(
                                       color:
                                           Theme.of(context).colorScheme.primary,
@@ -132,7 +135,8 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                     ),
                   Builder(
                     builder: (context) => ElevatedButton.icon(
-                      label: const Text('Save Locally'),
+                      label: Text(FDashLocalizations.of(context)
+                          .handlingSaveButtonLabel),
                       icon: const Icon(Icons.save_alt),
                       onPressed: () {
                         // Generate a response and store it in-memory.

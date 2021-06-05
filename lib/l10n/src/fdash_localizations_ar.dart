@@ -15,7 +15,8 @@ class FDashLocalizationsAr extends FDashLocalizations {
     return intl.Intl.pluralLogic(
       minLength,
       locale: localeName,
-,
+      one: 'Enter at least one character.',
+      other: 'Enter at least $minLength characters.',
     );
   }
 
@@ -113,4 +114,31 @@ class FDashLocalizationsAr extends FDashLocalizations {
 
   @override
   String get progressQuestionnaireLoading => 'يتم تحميل الاستطلاع…';
+
+  @override
+  String get handlingSaveButtonLabel => 'Save';
+
+  @override
+  String get handlingUploadButtonLabel => 'Upload';
+
+  @override
+  String get handlingUploading => 'Uploading survey…';
+
+  @override
+  String get loginStatusLoggingIn => 'Signing in…';
+
+  @override
+  String get loginStatusLoggedIn => 'Signed in…';
+
+  @override
+  String get loginStatusLoggingOut => 'Signing out…';
+
+  @override
+  String get loginStatusLoggedOut => 'Signed out…';
+
+  @override
+  String get loginStatusUnknown => 'Not sure what\'s going on?';
+
+  @override
+  String get loginStatusError => 'Something went wrong.';
 }

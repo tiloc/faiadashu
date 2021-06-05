@@ -249,6 +249,60 @@ abstract class FDashLocalizations {
   /// In en, this message translates to:
   /// **'The survey is loading…'**
   String get progressQuestionnaireLoading;
+
+  /// No description provided for @handlingSaveButtonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get handlingSaveButtonLabel;
+
+  /// No description provided for @handlingUploadButtonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload'**
+  String get handlingUploadButtonLabel;
+
+  /// No description provided for @handlingUploading.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading survey…'**
+  String get handlingUploading;
+
+  /// No description provided for @loginStatusLoggingIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Signing in…'**
+  String get loginStatusLoggingIn;
+
+  /// No description provided for @loginStatusLoggedIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed in…'**
+  String get loginStatusLoggedIn;
+
+  /// No description provided for @loginStatusLoggingOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Signing out…'**
+  String get loginStatusLoggingOut;
+
+  /// No description provided for @loginStatusLoggedOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed out…'**
+  String get loginStatusLoggedOut;
+
+  /// No description provided for @loginStatusUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Not sure what\'s going on?'**
+  String get loginStatusUnknown;
+
+  /// No description provided for @loginStatusError.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong.'**
+  String get loginStatusError;
 }
 
 class _FDashLocalizationsDelegate extends LocalizationsDelegate<FDashLocalizations> {

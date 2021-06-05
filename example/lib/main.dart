@@ -347,6 +347,16 @@ class _HomePageState extends State<HomePage> {
                 uploadResponseFunction: uploadResponseFunction,
               ),
               QuestionnaireLaunchTile(
+                locale: const Locale('ja', 'JP'),
+                title: 'アルゴノート」のアンケートです。',
+                subtitle: '日本でのアンケートの例です。',
+                fhirResourceProvider: resourceBundleProvider,
+                questionnairePath: 'assets/instruments/argonaut_sampler.json',
+                saveResponseFunction: _saveResponse,
+                restoreResponseFunction: _restoreResponse,
+                uploadResponseFunction: uploadResponseFunction,
+              ),
+              QuestionnaireLaunchTile(
                 title: 'PHQ9 Questionnaire Scroller',
                 subtitle: 'Simple choice-based survey with a total score.',
                 fhirResourceProvider: resourceBundleProvider,

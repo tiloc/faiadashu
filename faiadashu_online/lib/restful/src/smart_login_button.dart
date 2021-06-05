@@ -1,3 +1,4 @@
+import 'package:faiadashu/l10n/l10n.dart';
 import 'package:faiadashu_online/restful/restful.dart';
 import 'package:fhir_auth/r4/smart_client/smart_client.dart';
 import 'package:flutter/material.dart';
@@ -44,22 +45,22 @@ class _SmartLoginButtonState extends State<SmartLoginButton> {
   }
 
   void _showStatusSnackBar(BuildContext context) {
-    String message = "Not sure what's going on?";
+    String message = FDashLocalizations.of(context).loginStatusUnknown;
     switch (_loginStatus.value) {
       case LoginStatus.loggingIn:
-        message = 'Signing in…';
+        message = FDashLocalizations.of(context).loginStatusLoggingIn;
         break;
       case LoginStatus.loggedIn:
-        message = 'Signed in…';
+        message = FDashLocalizations.of(context).loginStatusLoggedIn;
         break;
       case LoginStatus.loggedOut:
-        message = 'Signed out…';
+        message = FDashLocalizations.of(context).loginStatusLoggedOut;
         break;
       case LoginStatus.loggingOut:
-        message = 'Signing out…';
+        message = FDashLocalizations.of(context).loginStatusLoggingOut;
         break;
       case LoginStatus.error:
-        message = 'Something went wrong.';
+        message = FDashLocalizations.of(context).loginStatusError;
         break;
       case LoginStatus.unknown:
         break;

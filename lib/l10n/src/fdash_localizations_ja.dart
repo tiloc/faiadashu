@@ -41,13 +41,13 @@ class FDashLocalizationsJa extends FDashLocalizations {
   }
 
   @override
-  String get validatorDate => 'Enter a valid date.';
+  String get validatorDate => '有効な日付を入力してください。';
 
   @override
-  String get validatorTime => 'Enter a valid time.';
+  String get validatorTime => '有効な時間を入力してください。';
 
   @override
-  String get validatorDateTime => 'Enter a valid date and time.';
+  String get validatorDateTime => '有効な日付と時刻を入力してください。';
 
   @override
   String get validatorNan => '有効な数字を入力してください。';
@@ -67,8 +67,8 @@ class FDashLocalizationsJa extends FDashLocalizations {
     return intl.Intl.pluralLogic(
       minOccurs,
       locale: localeName,
-      one: 'Select at least one option.',
-      other: 'Select $minOccurs or more options.',
+      one: '少なくとも1つの選択肢を選ぶ',
+      other: '$minOccurs以上の選択肢を選ぶ',
     );
   }
 
@@ -77,19 +77,19 @@ class FDashLocalizationsJa extends FDashLocalizations {
     return intl.Intl.pluralLogic(
       maxOccurs,
       locale: localeName,
-      one: 'Select up to one option.',
-      other: 'Select up to $maxOccurs options.',
+      one: '選択肢を1つまで選ぶ',
+      other: '$maxOccurs選択肢を1つまで選ぶ',
     );
   }
 
   @override
-  String get dataAbsentReasonAskedDeclinedInputLabel => 'I choose not to answer.';
+  String get dataAbsentReasonAskedDeclinedInputLabel => '私は答えないことにしている。';
 
   @override
-  String get dataAbsentReasonAskedDeclinedOutput => 'Declined to answer';
+  String get dataAbsentReasonAskedDeclinedOutput => '回答を拒否した';
 
   @override
-  String get dataAbsentReasonAsTextOutput => '[AS TEXT]';
+  String get dataAbsentReasonAsTextOutput => '[フリーテキスト]';
 
   @override
   String get narrativePageTitle => 'ナラティブ';
@@ -104,14 +104,41 @@ class FDashLocalizationsJa extends FDashLocalizations {
   String get questionnaireUnknownPublisher => '出版社不明';
 
   @override
-  String get autoCompleteSearchTermInput => 'Enter search term…';
+  String get autoCompleteSearchTermInput => '検索語を入力...';
 
   @override
-  String get responseStatusToCompleteButtonLabel => 'Complete';
+  String get responseStatusToCompleteButtonLabel => '完成';
 
   @override
-  String get responseStatusToInProgressButtonLabel => 'Amend';
+  String get responseStatusToInProgressButtonLabel => '修正';
 
   @override
-  String get progressQuestionnaireLoading => 'The survey is loading…';
+  String get progressQuestionnaireLoading => 'アンケートの読み込み中...';
+
+  @override
+  String get handlingSaveButtonLabel => 'Save';
+
+  @override
+  String get handlingUploadButtonLabel => 'Upload';
+
+  @override
+  String get handlingUploading => 'Uploading survey…';
+
+  @override
+  String get loginStatusLoggingIn => 'Signing in…';
+
+  @override
+  String get loginStatusLoggedIn => 'Signed in…';
+
+  @override
+  String get loginStatusLoggingOut => 'Signing out…';
+
+  @override
+  String get loginStatusLoggedOut => 'Signed out…';
+
+  @override
+  String get loginStatusUnknown => 'Not sure what\'s going on?';
+
+  @override
+  String get loginStatusError => 'Something went wrong.';
 }

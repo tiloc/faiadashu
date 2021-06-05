@@ -69,5 +69,14 @@
   "autoCompleteSearchTermInput" : "Enter search term…",
   "responseStatusToCompleteButtonLabel" : "Complete",
   "responseStatusToInProgressButtonLabel" : "Amend",
-  "progressQuestionnaireLoading" : "The survey is loading…"
+  "progressQuestionnaireLoading" : "The survey is loading…",
+  "handlingSaveButtonLabel" : "Save",
+  "handlingUploadButtonLabel" : "Upload",
+  "handlingUploading" : "Uploading survey…",
+  "loginStatusLoggingIn" : "Signing in…",
+  "loginStatusLoggedIn" : "Signed in…",
+  "loginStatusLoggingOut" : "Signing out…",
+  "loginStatusLoggedOut" : "Signed out…",
+  "loginStatusUnknown" : "Not sure what's going on?",
+  "loginStatusError" : "Something went wrong."
 }
