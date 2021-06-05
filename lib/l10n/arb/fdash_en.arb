@@ -41,6 +41,10 @@
         "type": "String"
       }
     }
-  }
+  },
+  "dataAbsentReasonAskedDeclined" : "I choose not to answer.",
+  "narrativePageTitle" : "Narrative",
+  "questionnaireGenericTitle" : "Survey",
+  "questionnaireUnknownTitle" : "Untitled",
+  "questionnaireUnknownPublisher" : "Unknown publisher"
 }
-

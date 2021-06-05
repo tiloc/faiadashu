@@ -3,19 +3,20 @@
 import 'package:intl/intl.dart' as intl;
 import 'fdash_localizations.g.dart';
 
-/// The translations for German (`de`).
-class FDashLocalizationsDe extends FDashLocalizations {
-  FDashLocalizationsDe([String locale = 'de']) : super(locale);
+/// The translations for Spanish Castilian (`es`).
+class FDashLocalizationsEs extends FDashLocalizations {
+  FDashLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
-  String get validatorRequiredItem => 'Füllen sie dieses Pflichtfeld aus.';
+  String get validatorRequiredItem => 'Esta pregunta debe ser completada.';
 
   @override
   String validatorMinLength(int minLength) {
     return intl.Intl.pluralLogic(
       minLength,
       locale: localeName,
-      other: 'Mind. $minLength Zeichen eingeben.',
+      one: 'Introducir al menos un carácter.',
+      other: 'Introducir al menos $minLength caracteres.',
     );
   }
 
@@ -24,32 +25,32 @@ class FDashLocalizationsDe extends FDashLocalizations {
     return intl.Intl.pluralLogic(
       maxLength,
       locale: localeName,
-      other: 'Bis zu $maxLength Zeichen eingeben.',
+      other: 'Ingrese hasta $maxLength caracteres.',
     );
   }
 
   @override
-  String get validatorUrl => 'URL im Format https://... eingeben.';
+  String get validatorUrl => 'Introduzca una URL válida con el formato https://...';
 
   @override
-  String get validatorRegExp => 'Gültigen Wert eingeben.';
+  String get validatorRegExp => 'Introduzca una respuesta válida.';
 
   @override
   String validatorEntryFormat(String entryFormat) {
-    return 'Im Format $entryFormat eingeben.';
+    return 'Introduzca el formato $entryFormat.';
   }
 
   @override
-  String get validatorNan => 'Gültige Zahl eingeben.';
+  String get validatorNan => 'Introduzca un número válido.';
 
   @override
   String validatorMinValue(String minValue) {
-    return 'Eine Zahl ab $minValue eingeben.';
+    return 'Introduzca un número de $minValue o superior.';
   }
 
   @override
   String validatorMaxValue(String maxValue) {
-    return 'Eine Zahl bis $maxValue eingeben.';
+    return 'Introduzca un número hasta $maxValue.';
   }
 
   @override

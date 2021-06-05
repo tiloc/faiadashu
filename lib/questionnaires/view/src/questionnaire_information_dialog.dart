@@ -1,6 +1,7 @@
 import 'package:fhir/r4.dart' show Questionnaire;
 import 'package:flutter/material.dart';
 
+import '../../../l10n/l10n.dart';
 import 'questionnaire_information_tile.dart';
 
 /// A dialog containing a [QuestionnaireInformationTile].
@@ -19,7 +20,9 @@ class QuestionnaireInformationDialog {
                 locale: locale,
                 child: Builder(
                     builder: (context) => Text(MaterialLocalizations.of(context)
-                        .aboutListTileTitle(questionnaire.title ?? 'Survey')))),
+                        .aboutListTileTitle(questionnaire.title ??
+                            FDashLocalizations.of(context)
+                                .questionnaireGenericTitle)))),
             content: QuestionnaireInformationTile(questionnaire),
             actions: <Widget>[
               OutlinedButton(

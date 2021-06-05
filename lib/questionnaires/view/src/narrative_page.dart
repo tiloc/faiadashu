@@ -10,7 +10,7 @@ class NarrativePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Narrative'),
+        title: Text(FDashLocalizations.of(context).narrativePageTitle),
       ),
       body: SafeArea(
         child: Container(

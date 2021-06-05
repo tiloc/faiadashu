@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
+import '../../../l10n/l10n.dart';
 import '../../../logging/logging.dart';
 import '../../../resource_provider/resource_provider.dart';
 import '../../questionnaires.dart';
@@ -185,7 +186,9 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
                   SizedBox(
                     width: MediaQuery.of(context).size.width - 200,
                     child: Text(
-                      questionnaire.title ?? 'Survey',
+                      questionnaire.title ??
+                          FDashLocalizations.of(context)
+                              .questionnaireGenericTitle,
                       maxLines: 2,
                       softWrap: true,
                     ),

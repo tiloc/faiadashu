@@ -52,4 +52,19 @@ class FDashLocalizationsEn extends FDashLocalizations {
   String validatorMaxValue(String maxValue) {
     return 'Enter a number up to $maxValue.';
   }
+
+  @override
+  String get dataAbsentReasonAskedDeclined => 'I choose not to answer.';
+
+  @override
+  String get narrativePageTitle => 'Narrative';
+
+  @override
+  String get questionnaireGenericTitle => 'Survey';
+
+  @override
+  String get questionnaireUnknownTitle => 'Untitled';
+
+  @override
+  String get questionnaireUnknownPublisher => 'Unknown publisher';
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../coding/coding.dart';
 import '../../../../fhir_types/fhir_types.dart';
+import '../../../../l10n/l10n.dart';
 import '../../../questionnaires.dart';
 
 /// Filler for a [QuestionnaireResponseItem].
@@ -93,7 +94,7 @@ class QuestionnaireResponseFillerState
           !widget.itemModel.isReadOnly &&
           !widget.itemModel.isRequired)
         Row(children: [
-          const Text('I choose not to answer'),
+          Text(FDashLocalizations.of(context).dataAbsentReasonAskedDeclined),
           Switch(
             focusNode: _skipSwitchFocusNode,
             value: responseModel.isAskedButDeclined,

@@ -8,6 +8,7 @@ import 'package:intl/intl.dart' as intl;
 
 import 'fdash_localizations_de.dart';
 import 'fdash_localizations_en.dart';
+import 'fdash_localizations_es.dart';
 
 /// Callers can lookup localized strings with an instance of FDashLocalizations returned
 /// by `FDashLocalizations.of(context)`.
@@ -65,8 +66,8 @@ abstract class FDashLocalizations {
 
   final String localeName;
 
-  static FDashLocalizations? of(BuildContext context) {
-    return Localizations.of<FDashLocalizations>(context, FDashLocalizations);
+  static FDashLocalizations of(BuildContext context) {
+    return Localizations.of<FDashLocalizations>(context, FDashLocalizations)!;
   }
 
   static const LocalizationsDelegate<FDashLocalizations> delegate = _FDashLocalizationsDelegate();
@@ -91,7 +92,8 @@ abstract class FDashLocalizations {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('de'),
-    Locale('en')
+    Locale('en'),
+    Locale('es')
   ];
 
   /// No description provided for @validatorRequiredItem.
@@ -147,6 +149,36 @@ abstract class FDashLocalizations {
   /// In en, this message translates to:
   /// **'Enter a number up to {maxValue}.'**
   String validatorMaxValue(String maxValue);
+
+  /// No description provided for @dataAbsentReasonAskedDeclined.
+  ///
+  /// In en, this message translates to:
+  /// **'I choose not to answer.'**
+  String get dataAbsentReasonAskedDeclined;
+
+  /// No description provided for @narrativePageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Narrative'**
+  String get narrativePageTitle;
+
+  /// No description provided for @questionnaireGenericTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Survey'**
+  String get questionnaireGenericTitle;
+
+  /// No description provided for @questionnaireUnknownTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Untitled'**
+  String get questionnaireUnknownTitle;
+
+  /// No description provided for @questionnaireUnknownPublisher.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown publisher'**
+  String get questionnaireUnknownPublisher;
 }
 
 class _FDashLocalizationsDelegate extends LocalizationsDelegate<FDashLocalizations> {
@@ -158,7 +190,7 @@ class _FDashLocalizationsDelegate extends LocalizationsDelegate<FDashLocalizatio
   }
 
   @override
-  bool isSupported(Locale locale) => <String>['de', 'en'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>['de', 'en', 'es'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_FDashLocalizationsDelegate old) => false;
@@ -172,6 +204,7 @@ FDashLocalizations lookupFDashLocalizations(Locale locale) {
 switch (locale.languageCode) {
   case 'de': return FDashLocalizationsDe();
     case 'en': return FDashLocalizationsEn();
+    case 'es': return FDashLocalizationsEs();
 }
 
 

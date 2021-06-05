@@ -4,3 +4,5 @@ output-dir: lib/l10n/src
 synthetic-package: false
 output-localization-file: fdash_localizations.g.dart
 output-class: FDashLocalizations
+nullable-getter: false
+
