@@ -38,6 +38,15 @@ Locale is explicitly passed to the library during the initialization of the `Que
 
 Each filling of a questionnaire can use a different locale, but it cannot be changed while a questionnaire is being filled.
 
+#### Translations
+The translation methodology is based on standard Flutter mechanisms, using ARB files.
+
+See [Internationalizing Flutter Apps](https://flutter.dev/docs/development/accessibility-and-localization/internationalization)
+
+> Contributions of translations are welcome! You can either directly provide an ARB file or ask me
+> for access to a web-based translation environment through POEditor.
+
+
 ### Logging
 The library is logging through the 'logging' package: https://pub.dev/packages/logging
 This will not result in any actual logging, unless you register a logger in your app.

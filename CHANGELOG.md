@@ -1,4 +1,25 @@
-## 0.4.6
+## 0.4.8-dev
+* Form completion: Faiadashu will perform numerous steps on completion of a form:
+  * Check for presence of all required items
+  * Check for validity of all answers
+  * Reject completion if not all criteria are met
+    * Scroll to place with faulty answer
+    * Show validation error text
+  * Turn form read-only when it is complete
+
+  
+* Localization:
+  * Most UI strings extracted into ARB files
+  * Methodology developed to make translations accessible in models and views
+  * Tied [github.com](https://www.github.com/tiloc) to [POEditor](https://www.poeditor.com) to enable online contributions
+
+> **CAUTION:** The English and German translations should be decent quality.
+> The other translations are rough, incomplete machine translations to illustrate
+> that support of multiple languages, incl. RTL languages, is possible.
+  
+> **Contributions of translations are welcome!** You can either directly provide an ARB file or ask me
+> for contributor access to a web-based translation environment through POEditor.
+  
 
 ## 0.4.5
 * Moved all implementations into `src/` sub-directories
