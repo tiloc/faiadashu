@@ -1,7 +1,7 @@
 {
     "@@locale": "ar",
     "validatorRequiredItem": "هذا السؤال يحتاج إلى أن يكتمل.",
-    "validatorMinLength": "{minLength, plural, =1 {أدخل على الأقل حرفًا واحدًا.} zero {} one {} two {} few {} many {} other {أدخل {minLength} حرفًا على الأقل.}}",
+    "validatorMinLength": "{minLength, plural, =1 {أدخل على الأقل حرفًا واحدًا.} other {أدخل {minLength} حرفًا على الأقل.}}",
     "@validatorMinLength": {
         "placeholders": {
             "minLength": {}
@@ -66,16 +66,5 @@
     "autoCompleteSearchTermInput": "أدخل مصطلح البحث…",
     "responseStatusToCompleteButtonLabel": "اكتمال",
     "responseStatusToInProgressButtonLabel": "يعدل",
-    "progressQuestionnaireLoading": "يتم تحميل الاستطلاع…",
-    "handlingSaveButtonLabel": "",
-    "handlingUploadButtonLabel": "",
-    "handlingUploading": "",
-    "loginStatusLoggingIn": "",
-    "loginStatusLoggedIn": "",
-    "loginStatusLoggingOut": "",
-    "loginStatusLoggedOut": "",
-    "loginStatusUnknown": "",
-    "loginStatusError": "",
-    "handlingSaved": "",
-    "handlingUploaded": ""
+    "progressQuestionnaireLoading": "يتم تحميل الاستطلاع…"
 }

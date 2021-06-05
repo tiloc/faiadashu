@@ -15,8 +15,8 @@ class FDashLocalizationsAr extends FDashLocalizations {
     return intl.Intl.pluralLogic(
       minLength,
       locale: localeName,
-      one: 'Enter at least one character.',
-      other: 'Enter at least $minLength characters.',
+      one: 'أدخل على الأقل حرفًا واحدًا.',
+      other: 'أدخل $minLength حرفًا على الأقل.',
     );
   }
 

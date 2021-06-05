@@ -119,7 +119,7 @@ class FDashLocalizationsJa extends FDashLocalizations {
   String get handlingSaveButtonLabel => '保存';
 
   @override
-  String get handlingSaved => 'Survey saved.';
+  String get handlingSaved => 'アンケートは保存しました。';
 
   @override
   String get handlingUploadButtonLabel => 'アップロード';
@@ -128,7 +128,7 @@ class FDashLocalizationsJa extends FDashLocalizations {
   String get handlingUploading => 'アンケートのアップロード...';
 
   @override
-  String get handlingUploaded => 'Survey uploaded.';
+  String get handlingUploaded => 'アンケートをアップしました。';
 
   @override
   String get loginStatusLoggingIn => 'サインインすると...';
