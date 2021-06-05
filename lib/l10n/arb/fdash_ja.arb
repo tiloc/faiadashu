@@ -66,5 +66,14 @@
     "autoCompleteSearchTermInput": "検索語を入力...",
     "responseStatusToCompleteButtonLabel": "完成",
     "responseStatusToInProgressButtonLabel": "修正",
-    "progressQuestionnaireLoading": "アンケートの読み込み中..."
+    "progressQuestionnaireLoading": "アンケートの読み込み中...",
+    "handlingSaveButtonLabel": "保存",
+    "handlingUploadButtonLabel": "アップロード",
+    "handlingUploading": "アンケートのアップロード...",
+    "loginStatusLoggingIn": "サインインすると...",
+    "loginStatusLoggedIn": "サインは...",
+    "loginStatusLoggingOut": "サインアウト...",
+    "loginStatusLoggedOut": "サインアウト...",
+    "loginStatusUnknown": "何が起こっているのかわからない？",
+    "loginStatusError": "何かが間違っていた。"
 }
