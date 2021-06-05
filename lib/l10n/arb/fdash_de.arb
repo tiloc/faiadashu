@@ -44,5 +44,27 @@
     "narrativePageTitle": "Zusammenfassung",
     "questionnaireGenericTitle": "Fragebogen",
     "questionnaireUnknownTitle": "(ohne Titel)",
-    "questionnaireUnknownPublisher": "(unbekannte Quelle)"
+    "questionnaireUnknownPublisher": "(unbekannte Quelle)",
+    "validatorDate": "Gültiges Datum eingeben.",
+    "validatorTime": "Gültige Uhrzeit eingeben.",
+    "validatorDateTime": "Gültiges Datum/Zeit eingeben.",
+    "validatorMinOccurs": "{minOccurs, plural, =1 {Mind. eine Auswahl.} other {Mind. {minOccurs} auswählen.}}",
+    "@validatorMinOccurs": {
+        "placeholders": {
+            "minOccurs": {}
+        }
+    },
+    "validatorMaxOccurs": "{maxOccurs, plural, =1 {Höchstens eine Auswahl.} other {Bis zu {maxOccurs} auswählen.}}",
+    "@validatorMaxOccurs": {
+        "placeholders": {
+            "maxOccurs": {}
+        }
+    },
+    "dataAbsentReasonAskedDeclinedInputLabel": "Ich möchte nicht antworten.",
+    "dataAbsentReasonAskedDeclinedOutput": "Antwort abgelehnt",
+    "dataAbsentReasonAsTextOutput": "[ALS TEXT]",
+    "autoCompleteSearchTermInput": "Suchbegriff eingeben…",
+    "responseStatusToCompleteButtonLabel": "Fertig",
+    "responseStatusToInProgressButtonLabel": "Ändern",
+    "progressQuestionnaireLoading": "Der Fragebogen lädt…"
 }
