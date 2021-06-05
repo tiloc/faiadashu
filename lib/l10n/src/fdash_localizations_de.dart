@@ -40,13 +40,13 @@ class FDashLocalizationsDe extends FDashLocalizations {
   }
 
   @override
-  String get validatorDate => 'Enter a valid date.';
+  String get validatorDate => 'Gültiges Datum eingeben.';
 
   @override
-  String get validatorTime => 'Enter a valid time.';
+  String get validatorTime => 'Gültige Uhrzeit eingeben.';
 
   @override
-  String get validatorDateTime => 'Enter a valid date and time.';
+  String get validatorDateTime => 'Gültiges Datum/Zeit eingeben.';
 
   @override
   String get validatorNan => 'Gültige Zahl eingeben.';
@@ -66,8 +66,8 @@ class FDashLocalizationsDe extends FDashLocalizations {
     return intl.Intl.pluralLogic(
       minOccurs,
       locale: localeName,
-      one: 'Select at least one option.',
-      other: 'Select $minOccurs or more options.',
+      one: 'Mind. eine Auswahl.',
+      other: 'Mind. $minOccurs auswählen.',
     );
   }
 
@@ -76,22 +76,22 @@ class FDashLocalizationsDe extends FDashLocalizations {
     return intl.Intl.pluralLogic(
       maxOccurs,
       locale: localeName,
-      one: 'Select up to one option.',
-      other: 'Select up to $maxOccurs options.',
+      one: 'Höchstens eine Auswahl.',
+      other: 'Bis zu $maxOccurs auswählen.',
     );
   }
 
   @override
-  String get dataAbsentReasonAskedDeclinedInputLabel => 'I choose not to answer.';
+  String get dataAbsentReasonAskedDeclinedInputLabel => 'Ich möchte nicht antworten.';
 
   @override
-  String get dataAbsentReasonAskedDeclinedOutput => 'Declined to answer';
+  String get dataAbsentReasonAskedDeclinedOutput => 'Antwort abgelehnt';
 
   @override
-  String get dataAbsentReasonAsTextOutput => '[AS TEXT]';
+  String get dataAbsentReasonAsTextOutput => '[FREITEXT]';
 
   @override
-  String get narrativePageTitle => 'Zusammenfassung';
+  String get narrativePageTitle => 'Freitext';
 
   @override
   String get questionnaireGenericTitle => 'Fragebogen';
@@ -103,14 +103,14 @@ class FDashLocalizationsDe extends FDashLocalizations {
   String get questionnaireUnknownPublisher => '(unbekannte Quelle)';
 
   @override
-  String get autoCompleteSearchTermInput => 'Enter search term…';
+  String get autoCompleteSearchTermInput => 'Suchbegriff eingeben…';
 
   @override
-  String get responseStatusToCompleteButtonLabel => 'Complete';
+  String get responseStatusToCompleteButtonLabel => 'Fertig';
 
   @override
-  String get responseStatusToInProgressButtonLabel => 'Amend';
+  String get responseStatusToInProgressButtonLabel => 'Ändern';
 
   @override
-  String get progressQuestionnaireLoading => 'The survey is loading…';
+  String get progressQuestionnaireLoading => 'Der Fragebogen lädt…';
 }
