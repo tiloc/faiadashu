@@ -1,13 +1,13 @@
 {
     "@@locale": "es",
     "validatorRequiredItem": "Esta pregunta debe ser completada.",
-    "validatorMinLength": "{longitud mínima, plural, =1 {Introducir al menos un carácter.} other {Introducir al menos {minLength} caracteres.}}",
+    "validatorMinLength": "{minLength, plural, =1 {Introducir al menos un carácter.} other {Introducir al menos {minLength} caracteres.}}",
     "@validatorMinLength": {
         "placeholders": {
             "minLength": {}
         }
     },
-    "validatorMaxLength": "{longitudmáxima, plural, other{Ingrese hasta {maxLength} caracteres.}}",
+    "validatorMaxLength": "{maxLength, plural, other{Ingrese hasta {maxLength} caracteres.}}",
     "@validatorMaxLength": {
         "placeholders": {
             "maxLength": {}
