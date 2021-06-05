@@ -41,7 +41,7 @@
         }
     },
     "dataAbsentReasonAskedDeclined": "Ich möchte nicht antworten.",
-    "narrativePageTitle": "Zusammenfassung",
+    "narrativePageTitle": "Freitext",
     "questionnaireGenericTitle": "Fragebogen",
     "questionnaireUnknownTitle": "(ohne Titel)",
     "questionnaireUnknownPublisher": "(unbekannte Quelle)",
