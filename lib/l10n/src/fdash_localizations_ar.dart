@@ -8,15 +8,14 @@ class FDashLocalizationsAr extends FDashLocalizations {
   FDashLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
-  String get validatorRequiredItem => 'This question needs to be completed.';
+  String get validatorRequiredItem => 'هذا السؤال يحتاج إلى أن يكتمل.';
 
   @override
   String validatorMinLength(int minLength) {
     return intl.Intl.pluralLogic(
       minLength,
       locale: localeName,
-      one: 'Enter at least one character.',
-      other: 'Enter at least $minLength characters.',
+,
     );
   }
 
@@ -25,41 +24,41 @@ class FDashLocalizationsAr extends FDashLocalizations {
     return intl.Intl.pluralLogic(
       maxLength,
       locale: localeName,
-      other: 'Enter up to $maxLength characters.',
+      other: 'أدخل حتى $maxLength حرفًا.',
     );
   }
 
   @override
-  String get validatorUrl => 'Enter a valid URL in format https://...';
+  String get validatorUrl => 'أدخل عنوان URL صالحًا بتنسيق // :https';
 
   @override
-  String get validatorRegExp => 'Enter a valid response.';
+  String get validatorRegExp => 'أدخل إجابة صالحة.';
 
   @override
   String validatorEntryFormat(String entryFormat) {
-    return 'Enter in format $entryFormat.';
+    return 'أدخل بتنسيق $entryFormat.';
   }
 
   @override
-  String get validatorDate => 'Enter a valid date.';
+  String get validatorDate => 'أدخل تاريخًا صالحًا.';
 
   @override
-  String get validatorTime => 'Enter a valid time.';
+  String get validatorTime => 'أدخل وقتًا صالحًا.';
 
   @override
-  String get validatorDateTime => 'Enter a valid date and time.';
+  String get validatorDateTime => 'أدخل تاريخًا ووقتًا صالحين.';
 
   @override
-  String get validatorNan => 'Enter a valid number.';
+  String get validatorNan => 'أدخل رقمًا صالحًا.';
 
   @override
   String validatorMinValue(String minValue) {
-    return 'Enter a number of $minValue or higher.';
+    return 'أدخل رقم $minValue أو أعلى.';
   }
 
   @override
   String validatorMaxValue(String maxValue) {
-    return 'Enter a number up to $maxValue.';
+    return 'أدخل رقمًا يصل إلى $maxValue.';
   }
 
   @override
@@ -83,35 +82,35 @@ class FDashLocalizationsAr extends FDashLocalizations {
   }
 
   @override
-  String get dataAbsentReasonAskedDeclinedInputLabel => 'I choose not to answer.';
+  String get dataAbsentReasonAskedDeclinedInputLabel => 'اخترت عدم الرد.';
 
   @override
-  String get dataAbsentReasonAskedDeclinedOutput => 'Declined to answer';
+  String get dataAbsentReasonAskedDeclinedOutput => 'رفض الإجابة';
 
   @override
-  String get dataAbsentReasonAsTextOutput => '[AS TEXT]';
+  String get dataAbsentReasonAsTextOutput => '[نص حر]';
 
   @override
-  String get narrativePageTitle => 'Narrative';
+  String get narrativePageTitle => 'رواية';
 
   @override
-  String get questionnaireGenericTitle => 'Survey';
+  String get questionnaireGenericTitle => 'استطلاع';
 
   @override
-  String get questionnaireUnknownTitle => 'Untitled';
+  String get questionnaireUnknownTitle => 'بدون عنوان';
 
   @override
-  String get questionnaireUnknownPublisher => 'Unknown publisher';
+  String get questionnaireUnknownPublisher => 'ناشر غير معروف';
 
   @override
-  String get autoCompleteSearchTermInput => 'Enter search term…';
+  String get autoCompleteSearchTermInput => 'أدخل مصطلح البحث…';
 
   @override
-  String get responseStatusToCompleteButtonLabel => 'Complete';
+  String get responseStatusToCompleteButtonLabel => 'اكتمال';
 
   @override
-  String get responseStatusToInProgressButtonLabel => 'Amend';
+  String get responseStatusToInProgressButtonLabel => 'يعدل';
 
   @override
-  String get progressQuestionnaireLoading => 'The survey is loading…';
+  String get progressQuestionnaireLoading => 'يتم تحميل الاستطلاع…';
 }

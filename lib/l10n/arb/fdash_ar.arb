@@ -13,7 +13,7 @@
             "maxLength": {}
         }
     },
-    "validatorUrl": "أدخل عنوان URL صالحًا بتنسيق https: // ...",
+    "validatorUrl": "أدخل عنوان URL صالحًا بتنسيق // :https",
     "validatorRegExp": "أدخل إجابة صالحة.",
     "validatorEntryFormat": "أدخل بتنسيق {entryFormat}.",
     "@validatorEntryFormat": {
@@ -48,23 +48,11 @@
     "validatorDate": "أدخل تاريخًا صالحًا.",
     "validatorTime": "أدخل وقتًا صالحًا.",
     "validatorDateTime": "أدخل تاريخًا ووقتًا صالحين.",
-    "validatorMinOccurs": "{minOccurs, plural, =1 {Select at least one option.} other {Select {minOccurs} or more options.}}",
-    "@validatorMinOccurs": {
-        "placeholders": {
-            "minOccurs": {}
-        }
-    },
-    "validatorMaxOccurs": "{maxOccurs, plural, =1 {Select up to one option.} other {Select up to {maxOccurs} options.}}",
-    "@validatorMaxOccurs": {
-        "placeholders": {
-            "maxOccurs": {}
-        }
-    },
     "dataAbsentReasonAskedDeclinedInputLabel": "اخترت عدم الرد.",
     "dataAbsentReasonAskedDeclinedOutput": "رفض الإجابة",
-    "dataAbsentReasonAsTextOutput": "[كنص]",
+    "dataAbsentReasonAsTextOutput": "[نص حر]",
     "autoCompleteSearchTermInput": "أدخل مصطلح البحث…",
     "responseStatusToCompleteButtonLabel": "اكتمال",
     "responseStatusToInProgressButtonLabel": "يعدل",
-    "progressQuestionnaireLoading": "يتم تحميل الاستطلاع ..."
+    "progressQuestionnaireLoading": "يتم تحميل الاستطلاع…"
 }
