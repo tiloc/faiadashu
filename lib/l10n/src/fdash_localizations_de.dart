@@ -40,11 +40,11 @@ class FDashLocalizationsDe extends FDashLocalizations {
   }
 
   @override
-  String get validatorNan => 'Enter a valid number.';
+  String get validatorNan => 'Gültige Zahl eingeben.';
 
   @override
   String validatorMinValue(String minValue) {
-    return 'Enter a number of $minValue or higher.';
+    return 'Eine Zahl ab $minValue eingeben.';
   }
 
   @override
