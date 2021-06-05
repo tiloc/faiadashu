@@ -66,5 +66,14 @@
     "autoCompleteSearchTermInput": "Suchbegriff eingeben…",
     "responseStatusToCompleteButtonLabel": "Fertig",
     "responseStatusToInProgressButtonLabel": "Ändern",
-    "progressQuestionnaireLoading": "Der Fragebogen lädt…"
+    "progressQuestionnaireLoading": "Der Fragebogen lädt…",
+    "handlingSaveButtonLabel": "Speichern",
+    "handlingUploadButtonLabel": "Hochladen",
+    "handlingUploading": "Bogen hochladen…",
+    "loginStatusLoggingIn": "Anmelden…",
+    "loginStatusLoggedIn": "Angemeldet…",
+    "loginStatusLoggingOut": "Ich melde mich ab…",
+    "loginStatusLoggedOut": "Abgemeldet…",
+    "loginStatusUnknown": "Nicht sicher, was los ist?",
+    "loginStatusError": "Etwas ist schief gelaufen."
 }
