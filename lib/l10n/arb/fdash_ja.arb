@@ -75,5 +75,7 @@
     "loginStatusLoggingOut": "サインアウト...",
     "loginStatusLoggedOut": "サインアウト...",
     "loginStatusUnknown": "何が起こっているのかわからない？",
-    "loginStatusError": "何かが間違っていた。"
+    "loginStatusError": "何かが間違っていた。",
+    "handlingSaved": "アンケートは保存しました。",
+    "handlingUploaded": "アンケートをアップしました。"
 }
