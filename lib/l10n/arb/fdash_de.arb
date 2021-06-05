@@ -62,7 +62,7 @@
     },
     "dataAbsentReasonAskedDeclinedInputLabel": "Ich möchte nicht antworten.",
     "dataAbsentReasonAskedDeclinedOutput": "Antwort abgelehnt",
-    "dataAbsentReasonAsTextOutput": "[ALS TEXT]",
+    "dataAbsentReasonAsTextOutput": "[FREITEXT]",
     "autoCompleteSearchTermInput": "Suchbegriff eingeben…",
     "responseStatusToCompleteButtonLabel": "Fertig",
     "responseStatusToInProgressButtonLabel": "Ändern",
