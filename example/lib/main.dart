@@ -379,6 +379,23 @@ class _HomePageState extends State<HomePage> {
                                   'assets/instruments/phq9_instrument.json'))));
                 },
               ),
+              ListTile(
+                title: const Text('Cherry blossom Filler'),
+                subtitle: const Text(
+                    'Illustrates embedding of questionnaire (no Scaffold)'),
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => QuestionnaireScroller(
+                              scaffoldBuilder:
+                                  const _CherryBlossomScaffoldBuilder(),
+                              fhirResourceProvider:
+                                  AssetResourceProvider.singleton(
+                                      questionnaireResourceUri,
+                                      'assets/instruments/sdc_demo.json'))));
+                },
+              ),
               QuestionnaireLaunchTile(
                 title: 'HF Questionnaire Scroller',
                 subtitle: 'A heart failure survey with a total score.',
@@ -425,6 +442,36 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _CherryBlossomScaffoldBuilder extends QuestionnairePageScaffoldBuilder {
+  const _CherryBlossomScaffoldBuilder() : super();
+
+  @override
+  Widget build(BuildContext context,
+      {required void Function(void Function() p1) setStateCallback,
+      required Widget child}) {
+    // This surround Card provides the Material parent that is required by
+    // the QuestionnaireFiller. Other potential Material parents would be
+    // Scaffolds.
+    return Card(
+      child: Column(
+        children: [
+          Text(
+            '🦄🌸🦄🌸🦄🌸🦄',
+            style: Theme.of(context).textTheme.headline3,
+          ),
+          Expanded(child: child),
+          const Divider(),
+          Container(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: OutlinedButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('桜の園からの帰り道'))),
+        ],
       ),
     );
   }
