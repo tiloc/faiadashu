@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-import '../../../l10n/l10n.dart';
 import '../../../logging/logging.dart';
 import '../../../resource_provider/resource_provider.dart';
 import '../../questionnaires.dart';
@@ -15,33 +14,32 @@ import '../../questionnaires.dart';
 /// Takes the [QuestionnaireItemFiller]s as provided by the [QuestionnaireFiller]
 /// and presents them as a scrolling [ListView].
 ///
+/// The [scaffoldBuilder] is used to build a wrapper around the list.
+///
 /// A set of mandatory and optional FHIR resources need to be provided through
 /// the [fhirResourceProvider]:
 /// * (mandatory) [questionnaireResourceUri] - the [Questionnaire]
 /// * (mandatory) [subjectResourceUri] - the [Patient]
 /// * (optional) [questionnaireResponseResourceUri] - the [QuestionnaireResponse].
 /// Will be used to prefill the filler, if present.
-class QuestionnaireScrollerPage extends StatefulWidget {
+///
+/// See: [QuestionnaireScrollerPage] for a [QuestionnaireScroller] which already
+/// wraps the list in a ready-made [Scaffold], incl. some commonly used buttons.
+class QuestionnaireScroller extends StatefulWidget {
   final Locale? locale;
-  final Widget? floatingActionButton;
-  final List<Widget>? persistentFooterButtons;
   final List<Widget>? frontMatter;
   final List<Widget>? backMatter;
   final FhirResourceProvider fhirResourceProvider;
   final List<Aggregator<dynamic>>? aggregators;
   final void Function(BuildContext context, Uri url)? onLinkTap;
+  final QuestionnairePageScaffoldBuilder scaffoldBuilder;
 
-  const QuestionnaireScrollerPage(
+  const QuestionnaireScroller(
       {this.locale,
+      required this.scaffoldBuilder,
       required this.fhirResourceProvider,
-      this.floatingActionButton,
-      this.persistentFooterButtons,
       this.frontMatter,
-      this.backMatter = const [
-        SizedBox(
-          height: 80,
-        )
-      ],
+      this.backMatter,
       this.aggregators,
       this.onLinkTap,
       Key? key})
@@ -51,7 +49,7 @@ class QuestionnaireScrollerPage extends StatefulWidget {
   State<StatefulWidget> createState() => _QuestionnaireScrollerState();
 }
 
-class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
+class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
   QuestionnaireModel? _questionnaireModel;
   final ItemScrollController _listScrollController = ItemScrollController();
   final ItemPositionsListener _itemPositionsListener =
@@ -159,88 +157,47 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
         final totalLength =
             frontMatterLength + mainMatterLength + backMatterLength;
 
-        final questionnaire =
-            questionnaireFiller.questionnaireModel.questionnaire;
-
         _logger.trace(
             'Scroll position: ${_itemPositionsListener.itemPositions.value}');
 
         return Localizations.override(
-            context: context,
-            locale: locale,
-            child: Scaffold(
-              appBar: AppBar(
-                leading: Builder(
-                  builder: (BuildContext context) {
-                    return IconButton(
-                      icon: const Icon(Icons.arrow_back),
-                      tooltip:
-                          MaterialLocalizations.of(context).backButtonTooltip,
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    );
-                  },
-                ),
-                title: Row(children: [
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width - 200,
-                    child: Text(
-                      questionnaire.title ??
-                          FDashLocalizations.of(context)
-                              .questionnaireGenericTitle,
-                      maxLines: 2,
-                      softWrap: true,
-                    ),
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    icon: const Icon(Icons.help_outline),
-                    onPressed: () {
-                      QuestionnaireInformationDialog.showQuestionnaireInfo(
-                          context, locale, questionnaire, (context) {
-                        setState(() {
-                          Navigator.pop(context);
-                        });
-                      });
-                    },
-                  ),
-                ]),
-              ),
-              endDrawer: const NarrativeDrawer(),
-              floatingActionButton: widget.floatingActionButton,
-              persistentFooterButtons: widget.persistentFooterButtons,
-              body: SafeArea(
-                child: ScrollablePositionedList.builder(
-                    itemScrollController: _listScrollController,
-                    itemPositionsListener: _itemPositionsListener,
-                    itemCount: totalLength,
-                    padding: const EdgeInsets.all(8),
-                    minCacheExtent: 200, // Allow tabbing to prev/next items
-                    itemBuilder: (BuildContext context, int i) {
-                      final frontMatterIndex = (i < frontMatterLength) ? i : -1;
-                      final mainMatterIndex = (i >= frontMatterLength &&
-                              i < (frontMatterLength + mainMatterLength))
-                          ? (i - frontMatterLength)
+          context: context,
+          locale: locale,
+          child: widget.scaffoldBuilder.build(
+            context,
+            setStateCallback: (fn) {
+              setState(fn);
+            },
+            child: ScrollablePositionedList.builder(
+                itemScrollController: _listScrollController,
+                itemPositionsListener: _itemPositionsListener,
+                itemCount: totalLength,
+                padding: const EdgeInsets.all(8),
+                minCacheExtent: 200, // Allow tabbing to prev/next items
+                itemBuilder: (BuildContext context, int i) {
+                  final frontMatterIndex = (i < frontMatterLength) ? i : -1;
+                  final mainMatterIndex = (i >= frontMatterLength &&
+                          i < (frontMatterLength + mainMatterLength))
+                      ? (i - frontMatterLength)
+                      : -1;
+                  final backMatterIndex =
+                      (i >= (frontMatterLength + mainMatterLength) &&
+                              i < totalLength)
+                          ? (i - (frontMatterLength + mainMatterLength))
                           : -1;
-                      final backMatterIndex =
-                          (i >= (frontMatterLength + mainMatterLength) &&
-                                  i < totalLength)
-                              ? (i - (frontMatterLength + mainMatterLength))
-                              : -1;
-                      if (mainMatterIndex != -1) {
-                        return QuestionnaireFiller.of(context)
-                            .itemFillerAt(mainMatterIndex);
-                      } else if (backMatterIndex != -1) {
-                        return widget.backMatter![backMatterIndex];
-                      } else if (frontMatterIndex != -1) {
-                        return widget.frontMatter![frontMatterIndex];
-                      } else {
-                        throw StateError('ListView index out of bounds: $i');
-                      }
-                    }),
-              ),
-            ));
+                  if (mainMatterIndex != -1) {
+                    return QuestionnaireFiller.of(context)
+                        .itemFillerAt(mainMatterIndex);
+                  } else if (backMatterIndex != -1) {
+                    return widget.backMatter![backMatterIndex];
+                  } else if (frontMatterIndex != -1) {
+                    return widget.frontMatter![frontMatterIndex];
+                  } else {
+                    throw StateError('ListView index out of bounds: $i');
+                  }
+                }),
+          ),
+        );
       },
       aggregators: widget.aggregators,
       onDataAvailable: (questionnaireModel) {
@@ -352,4 +309,35 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScrollerPage> {
       _isFocussed = true;
     }
   }
+}
+
+/// A [QuestionnaireScroller] with a scaffold.
+///
+/// Fills up the entire page, provides default navigation, help button.
+class QuestionnaireScrollerPage extends QuestionnaireScroller {
+  QuestionnaireScrollerPage(
+      {Locale? locale,
+      required FhirResourceProvider fhirResourceProvider,
+      Widget? floatingActionButton,
+      List<Widget>? persistentFooterButtons,
+      List<Widget>? frontMatter,
+      List<Widget>? backMatter = const [
+        SizedBox(
+          height: 80,
+        )
+      ],
+      List<Aggregator<dynamic>>? aggregators,
+      void Function(BuildContext context, Uri url)? onLinkTap,
+      Key? key})
+      : super(
+            locale: locale,
+            scaffoldBuilder: DefaultQuestionnairePageScaffoldBuilder(
+                floatingActionButton: floatingActionButton,
+                persistentFooterButtons: persistentFooterButtons),
+            fhirResourceProvider: fhirResourceProvider,
+            frontMatter: frontMatter,
+            backMatter: backMatter,
+            aggregators: aggregators,
+            onLinkTap: onLinkTap,
+            key: key);
 }
