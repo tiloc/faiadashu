@@ -447,31 +447,43 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
+// Demonstrate the creation of a scrolling questionnaire with no Scaffold.
 class _CherryBlossomScaffoldBuilder extends QuestionnairePageScaffoldBuilder {
-  const _CherryBlossomScaffoldBuilder() : super();
+  const _CherryBlossomScaffoldBuilder();
 
   @override
   Widget build(BuildContext context,
       {required void Function(void Function() p1) setStateCallback,
       required Widget child}) {
-    // This surround Card provides the Material parent that is required by
-    // the QuestionnaireFiller. Other potential Material parents would be
-    // Scaffolds.
-    return Card(
-      child: Column(
-        children: [
-          Text(
-            '🦄🌸🦄🌸🦄🌸🦄',
-            style: Theme.of(context).textTheme.headline3,
+    return Theme(
+      data: ThemeData.light(), // Make it always light
+      // We have to take care of SafeArea ourselves
+      child: SafeArea(
+        // This surround Card provides the Material parent that is required by
+        // the QuestionnaireFiller. Other potential Material parents would be
+        // Scaffolds.
+        child: Card(
+          // This column surrounds the scroller with whimsical add-ons
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Text(
+                  '🦄🌸🦄🌸🦄🌸🦄',
+                  style: Theme.of(context).textTheme.headline4,
+                ),
+              ),
+              Expanded(child: child), // This child is the actual scroller
+              const Divider(),
+              // We're putting our own exit button in here
+              Container(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('桜の園からの帰り道'))),
+            ],
           ),
-          Expanded(child: child),
-          const Divider(),
-          Container(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: OutlinedButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('桜の園からの帰り道'))),
-        ],
+        ),
       ),
     );
   }
