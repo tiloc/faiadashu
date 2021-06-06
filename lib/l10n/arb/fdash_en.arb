@@ -80,5 +80,12 @@
   "loginStatusLoggingOut" : "Signing out…",
   "loginStatusLoggedOut" : "Signed out…",
   "loginStatusUnknown" : "Not sure what's going on?",
-  "loginStatusError" : "Something went wrong."
+  "loginStatusError" : "Something went wrong.",
+  "aggregationScore" : "Score: {score}",
+  "@aggregationScore" : {
+    "placeholders" : {
+      "score": {}
+    }
+  },
+  "aggregationTotalScoreTitle" : "Total Score"
 }
