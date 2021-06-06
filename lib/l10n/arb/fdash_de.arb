@@ -75,5 +75,7 @@
     "loginStatusLoggingOut": "Ich melde mich ab…",
     "loginStatusLoggedOut": "Abgemeldet…",
     "loginStatusUnknown": "Nicht sicher, was los ist?",
-    "loginStatusError": "Etwas ist schief gelaufen."
+    "loginStatusError": "Etwas ist schief gelaufen.",
+    "handlingSaved": "Bogen gespeichert.",
+    "handlingUploaded": "Bogen hochgeladen."
 }
