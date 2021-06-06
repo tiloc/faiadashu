@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:simple_html_css/simple_html_css.dart';
 
 import '../../../../fhir_types/fhir_types.dart';
+import '../../../../l10n/l10n.dart';
 import '../../../../logging/logging.dart';
 import '../../../questionnaires.dart';
 
@@ -86,7 +87,7 @@ class _StaticItemState extends State<StaticItem> {
           child: Column(children: [
         const SizedBox(height: 32),
         Text(
-          'Total Score',
+          FDashLocalizations.of(context).aggregationTotalScoreTitle,
           style: Theme.of(context).textTheme.headline3,
         ),
         AnimatedSwitcher(

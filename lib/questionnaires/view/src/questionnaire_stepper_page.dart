@@ -81,7 +81,8 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
                       return AnimatedSwitcher(
                           duration: const Duration(milliseconds: 200),
                           child: Text(
-                            'Score: $scoreString',
+                            FDashLocalizations.of(context)
+                                .aggregationScore(scoreString),
                             key: ValueKey<String>(scoreString),
                             style: Theme.of(context).textTheme.headline4,
                           ));

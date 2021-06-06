@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_escaping_inner_quotes
+
 import 'package:intl/intl.dart' as intl;
 import 'fdash_localizations.g.dart';
 
@@ -117,7 +119,7 @@ class FDashLocalizationsDe extends FDashLocalizations {
   String get handlingSaveButtonLabel => 'Speichern';
 
   @override
-  String get handlingSaved => 'Survey saved.';
+  String get handlingSaved => 'Bogen gespeichert.';
 
   @override
   String get handlingUploadButtonLabel => 'Hochladen';
@@ -126,7 +128,7 @@ class FDashLocalizationsDe extends FDashLocalizations {
   String get handlingUploading => 'Bogen hochladen…';
 
   @override
-  String get handlingUploaded => 'Survey uploaded.';
+  String get handlingUploaded => 'Bogen hochgeladen.';
 
   @override
   String get loginStatusLoggingIn => 'Anmelden…';
@@ -145,4 +147,12 @@ class FDashLocalizationsDe extends FDashLocalizations {
 
   @override
   String get loginStatusError => 'Etwas ist schief gelaufen.';
+
+  @override
+  String aggregationScore(Object score) {
+    return 'Punkte: $score';
+  }
+
+  @override
+  String get aggregationTotalScoreTitle => 'Gesamtpunktzahl';
 }

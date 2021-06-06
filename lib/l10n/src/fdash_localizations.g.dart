@@ -1,3 +1,4 @@
+// ignore_for_file: avoid_escaping_inner_quotes
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -95,9 +96,9 @@ abstract class FDashLocalizations {
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
+    Locale('en'),
     Locale('ar'),
     Locale('de'),
-    Locale('en'),
     Locale('es'),
     Locale('ja')
   ];
@@ -317,6 +318,18 @@ abstract class FDashLocalizations {
   /// In en, this message translates to:
   /// **'Something went wrong.'**
   String get loginStatusError;
+
+  /// No description provided for @aggregationScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Score: {score}'**
+  String aggregationScore(Object score);
+
+  /// No description provided for @aggregationTotalScoreTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Score'**
+  String get aggregationTotalScoreTitle;
 }
 
 class _FDashLocalizationsDelegate

@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_escaping_inner_quotes
+
 import 'package:intl/intl.dart' as intl;
 import 'fdash_localizations.g.dart';
 
@@ -145,4 +147,12 @@ class FDashLocalizationsJa extends FDashLocalizations {
 
   @override
   String get loginStatusError => '何かが間違っていた。';
+
+  @override
+  String aggregationScore(Object score) {
+    return 'スコア：$score';
+  }
+
+  @override
+  String get aggregationTotalScoreTitle => 'トータルスコア';
 }
