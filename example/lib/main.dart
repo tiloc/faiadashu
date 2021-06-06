@@ -391,9 +391,12 @@ class _HomePageState extends State<HomePage> {
                               scaffoldBuilder:
                                   const _CherryBlossomScaffoldBuilder(),
                               fhirResourceProvider:
-                                  AssetResourceProvider.singleton(
-                                      questionnaireResourceUri,
-                                      'assets/instruments/sdc_demo.json'))));
+                                  RegistryFhirResourceProvider([
+                                resourceBundleProvider,
+                                AssetResourceProvider.singleton(
+                                    questionnaireResourceUri,
+                                    'assets/instruments/sdc_demo.json')
+                              ]))));
                 },
               ),
               QuestionnaireLaunchTile(
