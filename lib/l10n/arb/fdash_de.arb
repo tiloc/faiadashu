@@ -77,5 +77,12 @@
     "loginStatusUnknown": "Nicht sicher, was los ist?",
     "loginStatusError": "Etwas ist schief gelaufen.",
     "handlingSaved": "Bogen gespeichert.",
-    "handlingUploaded": "Bogen hochgeladen."
+    "handlingUploaded": "Bogen hochgeladen.",
+    "aggregationScore": "Punkte: {score}",
+    "@aggregationScore": {
+        "placeholders": {
+            "score": {}
+        }
+    },
+    "aggregationTotalScoreTitle": "Gesamtpunktzahl"
 }
