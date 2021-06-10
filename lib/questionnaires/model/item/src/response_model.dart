@@ -65,10 +65,14 @@ class ResponseModel {
     return dataAbsentReason == dataAbsentReasonAsTextCode;
   }
 
+  void _ensureAnswerModel() {
+    // TODO: this assumes only a single answer.
+    answerModel(0);
+  }
+
   Iterable<QuestionnaireErrorFlag>? get isComplete {
-    if (_cachedAnswerModels.isEmpty) {
-      return null;
-    }
+    // Non-existent answer models can be incomplete, e.g. if minOccurs is not met.
+    _ensureAnswerModel();
 
     final markers = <QuestionnaireErrorFlag>[];
     for (final am in _cachedAnswerModels.values) {
@@ -82,9 +86,7 @@ class ResponseModel {
   }
 
   bool get isUnanswered {
-    if (_cachedAnswerModels.isEmpty) {
-      return true;
-    }
+    _ensureAnswerModel();
 
     return _cachedAnswerModels.values.any((am) => !am.isUnanswered);
   }
