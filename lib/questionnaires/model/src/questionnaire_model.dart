@@ -445,6 +445,26 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     return (errorFlags.isNotEmpty) ? errorFlags : null;
   }
 
+  /// returns the number of questions that have been answered, does not take
+  /// into account if field is required or not, will check if filled fields
+  /// are valid
+  int get numberItemsAnswered {
+    int numberAnswered = 0;
+    for (final itemModel in orderedQuestionnaireItemModels()) {
+      numberAnswered += itemModel.responseModel.isUnanswered ? 0 : 1;
+    }
+    return numberAnswered;
+  }
+
+  /// returns the percentage of questions that have been answered, does not take
+  /// into account if field is required or not, will check if filled fields
+  /// are valid
+  double get percentageItemsAnswered =>
+      numberItemsAnswered / orderedQuestionnaireItemModels().length;
+
+  /// returns the total number of questionItems in the questionnaire
+  int get totalNumberItems => orderedQuestionnaireItemModels().length;
+
   void resetMarkers() {
     errorFlags.value = null;
   }

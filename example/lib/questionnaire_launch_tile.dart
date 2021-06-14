@@ -38,12 +38,25 @@ class QuestionnaireLaunchTile extends StatefulWidget {
 
 class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
   late final FhirResourceProvider _questionnaireProvider;
+  int _numberCompleted = 0;
+  double _percentageCompleted = 0;
+  int _totalNumber = 0;
 
   @override
   void initState() {
     super.initState();
     _questionnaireProvider = AssetResourceProvider.singleton(
         questionnaireResourceUri, widget.questionnairePath);
+    final locale = widget.locale ?? Locale.fromSubtags(languageCode: 'en');
+    QuestionnaireModel
+        .fromFhirResourceBundle(
+            fhirResourceProvider: _questionnaireProvider,
+            locale: locale,
+            aggregators: [NarrativeAggregator()]).then((value) => setState(() {
+          _numberCompleted = value.numberItemsAnswered;
+          _percentageCompleted = value.percentageItemsAnswered;
+          _totalNumber = value.totalNumberItems;
+        }));
   }
 
   @override
@@ -51,7 +64,9 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
     final locale = widget.locale ?? Localizations.localeOf(context);
 
     return ListTile(
-      title: Text(widget.title),
+      title: Text('${widget.title}\n'
+          'Completed: $_numberCompleted / $_totalNumber '
+          '(${(_percentageCompleted * 100).toStringAsPrecision(2)}%)'),
       subtitle: (widget.subtitle != null) ? Text(widget.subtitle!) : null,
       trailing: SizedBox(
         width: 24.0,
