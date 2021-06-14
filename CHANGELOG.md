@@ -1,3 +1,7 @@
+## 0.4.9
+* Bug fix for completeness checking
+* `count` function for questionnaire items with particular properties
+
 ## 0.4.8
 * Form completion: Faiadashu will perform numerous steps on completion of a form:
   * Check for presence of all required items

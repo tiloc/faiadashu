@@ -302,6 +302,8 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   ///
   int get generation => _generation;
 
+  // TODO: Move this to [QuestionnaireItemModel]?
+
   /// Returns the index of the first [QuestionnaireItemModel] which matches the predicate function.
   ///
   /// The items are examined as returned by [orderedQuestionnaireItemModels].
@@ -318,6 +320,20 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     }
 
     return notFound;
+  }
+
+  // TODO: Move this to [QuestionnaireItemModel]?
+
+  /// Returns the count of [QuestionnaireItemModel]s which match the predicate function.
+  int count(bool Function(QuestionnaireItemModel) predicate) {
+    int count = 0;
+    for (final qim in orderedQuestionnaireItemModels()) {
+      if (predicate.call(qim)) {
+        count++;
+      }
+    }
+
+    return count;
   }
 
   /// Returns the [QuestionnaireItemModel] that corresponds to the linkId.

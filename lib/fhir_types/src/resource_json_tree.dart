@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
 /// A hierarchical viewer for any kind of FHIR resource.
+///
 /// Based on the internal JSON representation of the resource.
 class ResourceJsonTree extends StatefulWidget {
   const ResourceJsonTree(this.resourceRoot,
-      {this.autoExpandLevel = 4, Key? key})
+      {this.autoExpandLevel = 10, Key? key})
       : super(key: key);
 
   final dynamic resourceRoot;
