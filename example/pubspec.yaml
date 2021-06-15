@@ -24,6 +24,8 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
+  intl: ^0.17.0
+
   logging: ^1.0.1
 
   pedantic: ^1.11.0

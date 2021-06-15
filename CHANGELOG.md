@@ -1,6 +1,10 @@
 ## 0.4.9
+* Counting!!! How much of the questionnaire has been answered? Not yet answered? Total counts? We can count it all now!
+  * Thanks [Grey Faulkenberry](https://github.com/Dokotela) for the PR and the discussions about counting requirements!
+  * `count` function for questionnaire items with particular properties
+  * `isAnswerable` and `isAnswered` functions
 * Bug fix for completeness checking
-* `count` function for questionnaire items with particular properties
+
 
 ## 0.4.8
 * Form completion: Faiadashu will perform numerous steps on completion of a form:
@@ -48,6 +52,7 @@
   * Icons on date/time fields
   * More options can be controlled through QuestionnaireViewFactory
 * Introduction of [Faiadashu Online](faiadashu_online/README.md)
+  * Thanks [Grey Faulkenberry](https://github.com/Dokotela) for the PR!
   * Example App can upload QuestionnaireResponse to real, protected FHIR(R) server.
 
 ## 0.4.0

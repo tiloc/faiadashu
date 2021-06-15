@@ -197,13 +197,45 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
 
   bool get isRequired => questionnaireItem.required_ == Boolean(true);
 
+  /// Can the item be answered?
+  ///
+  /// Static or read-only items cannot be answered.
+  /// Items which are not enabled cannot be answered.
+  bool get isAnswerable {
+    _qimLogger.trace('isAnswerable $linkId');
+    if (isReadOnly || !isEnabled) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /// Is the item answered?
+  ///
+  /// Static or read-only items are not answered.
+  /// Items which are not enabled are not answered.
+  bool get isAnswered {
+    _qimLogger.trace('isAnswered $linkId');
+    if (!isAnswerable) {
+      return false;
+    }
+
+    if (responseItem != null) {
+      _qimLogger.debug('responseItem $responseItem');
+      _qimLogger.debug('$linkId is answered.');
+      return true;
+    }
+
+    return false;
+  }
+
   /// Is the item unanswered?
   ///
   /// Static or read-only items are not unanswered.
   /// Items which are not enabled are not unanswered.
   bool get isUnanswered {
     _qimLogger.trace('isUnanswered $linkId');
-    if (isReadOnly || !isEnabled) {
+    if (!isAnswerable) {
       return false;
     }
 
@@ -392,6 +424,38 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   /// The order of the items is the same as with [orderedQuestionnaireItemModels].
   QuestionnaireItemModel itemModelAt(int index) {
     return orderedQuestionnaireItemModels().elementAt(index);
+  }
+
+  /// Returns the index of the first [QuestionnaireItemModel] which matches the predicate function.
+  ///
+  /// The items are examined as returned by [orderedQuestionnaireItemModels].
+  ///
+  /// Returns [notFound] if no matching item exists.
+  int? indexOf(bool Function(QuestionnaireItemModel) predicate,
+      [int? notFound = -1]) {
+    int index = 0;
+    for (final qim in orderedQuestionnaireItemModels()) {
+      if (predicate.call(qim)) {
+        return index;
+      }
+      index++;
+    }
+
+    return notFound;
+  }
+
+  /// Returns the count of [QuestionnaireItemModel]s which match the predicate function.
+  ///
+  /// Considers the item models returned by [orderedQuestionnaireItemModels()].
+  int count(bool Function(QuestionnaireItemModel) predicate) {
+    int count = 0;
+    for (final qim in orderedQuestionnaireItemModels()) {
+      if (predicate.call(qim)) {
+        count++;
+      }
+    }
+
+    return count;
   }
 
   @override
