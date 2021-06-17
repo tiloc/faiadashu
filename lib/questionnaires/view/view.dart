@@ -6,6 +6,7 @@ export 'src/narrative_page.dart';
 export 'src/narrative_tile.dart';
 export 'src/questionnaire_complete_button.dart';
 export 'src/questionnaire_filler.dart';
+export 'src/questionnaire_filler_progress.dart';
 export 'src/questionnaire_information_dialog.dart';
 export 'src/questionnaire_information_tile.dart';
 export 'src/questionnaire_loading_indicator.dart';

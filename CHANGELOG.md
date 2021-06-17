@@ -3,6 +3,7 @@
   * Thanks [Grey Faulkenberry](https://github.com/Dokotela) for the PR and the discussions about counting requirements!
   * `count` function for questionnaire items with particular properties
   * `isAnswerable` and `isAnswered` functions
+  * `QuestionnaireFillerProgress` control to visualize progress
 * Bug fix for completeness checking
 
 

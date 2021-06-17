@@ -61,22 +61,27 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
                           curve: Curves.easeIn,
                           duration: const Duration(milliseconds: 250)),
                     ),
-                    ValueListenableBuilder<Decimal>(
-                      builder:
-                          (BuildContext context, Decimal value, Widget? child) {
-                        final scoreString = value.value!.round().toString();
-                        return AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 200),
-                            child: Text(
-                              FDashLocalizations.of(context)
-                                  .aggregationScore(scoreString),
-                              key: ValueKey<String>(scoreString),
-                              style: Theme.of(context).textTheme.headline4,
-                            ));
-                      },
-                      valueListenable: QuestionnaireFiller.of(context)
-                          .aggregator<TotalScoreAggregator>(),
-                    ),
+                    Expanded(
+                        child: Column(children: [
+                      ValueListenableBuilder<Decimal>(
+                        builder: (BuildContext context, Decimal value,
+                            Widget? child) {
+                          final scoreString = value.value!.round().toString();
+                          return AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 200),
+                              child: Text(
+                                FDashLocalizations.of(context)
+                                    .aggregationScore(scoreString),
+                                key: ValueKey<String>(scoreString),
+                                style: Theme.of(context).textTheme.headline4,
+                              ));
+                        },
+                        valueListenable: QuestionnaireFiller.of(context)
+                            .aggregator<TotalScoreAggregator>(),
+                      ),
+                      QuestionnaireFillerProgress(
+                          questionnaireFiller.questionnaireModel),
+                    ])),
                     IconButton(
                       icon: const Icon(Icons.arrow_forward),
                       onPressed: () => controller.nextPage(
