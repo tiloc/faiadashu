@@ -1,4 +1,4 @@
-## 0.4.9
+## 0.5.0
 * Counting!!! How much of the questionnaire has been answered? Not yet answered? Total counts? We can count it all now!
   * Thanks [Grey Faulkenberry](https://github.com/Dokotela) for the PR and the discussions about counting requirements!
   * `count` function for questionnaire items with particular properties
