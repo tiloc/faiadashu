@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 /// Display a progress bar for the filling of a [QuestionnaireModel].
 class QuestionnaireFillerProgress extends StatefulWidget {
   final QuestionnaireItemModel questionnaireItemModel;
-  final double height;
+  final double? height;
+  final Color? answeredColor;
+  final Color? unansweredColor;
 
   const QuestionnaireFillerProgress(this.questionnaireItemModel,
-      {this.height = 4.0, Key? key})
+      {this.height, this.answeredColor, this.unansweredColor, Key? key})
       : super(key: key);
 
   @override
@@ -45,14 +47,21 @@ class _QuestionnaireFillerProgressState
       children: widget.questionnaireItemModel
           .orderedQuestionnaireItemModels()
           .where((qim) => qim.isAnswerable)
-          .map<Widget>((qim) => Expanded(
-                  child: Container(
-                height: widget.height,
-                color: qim.isAnswered
-                    ? Theme.of(context).accentColor
-                    : Colors.grey,
-              )))
-          .toList(growable: false),
+          .map<Widget>((qim) {
+        final theme = Theme.of(context);
+        final height = widget.height ?? 4.0;
+        final box = (qim.isAnswered)
+            ? Container(
+                height: height,
+                color: widget.answeredColor ?? theme.accentColor)
+            : Container(
+                foregroundDecoration: BoxDecoration(
+                    border: Border.all(color: theme.disabledColor, width: 0.5)),
+                height: height,
+                color: widget.unansweredColor,
+              );
+        return Expanded(child: box);
+      }).toList(growable: false),
     );
   }
 }
