@@ -133,8 +133,8 @@ class ResponseModel {
       case QuestionnaireItemType.attachment:
       case QuestionnaireItemType.unknown:
       case QuestionnaireItemType.reference:
-        throw QuestionnaireFormatException(
-            'Unsupported item type: ${itemModel.questionnaireItem.type!}');
+        // Throwing an exception here would lead to breakage of filler.
+        answerModel = UnsupportedAnswerModel(this, answerIndex);
     }
 
     _cachedAnswerModels[answerIndex] = answerModel;

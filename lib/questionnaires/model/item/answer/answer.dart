@@ -5,3 +5,4 @@ export 'src/datetime_answer_model.dart';
 export 'src/numerical_answer_model.dart';
 export 'src/static_answer_model.dart';
 export 'src/string_answer_model.dart';
+export 'src/unsupported_answer_model.dart';

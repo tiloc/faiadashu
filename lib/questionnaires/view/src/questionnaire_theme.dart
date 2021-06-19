@@ -79,9 +79,12 @@ class FDashQuestionnaireTheme implements QuestionnaireTheme {
         return BooleanAnswerFiller(responseFiller, answerIndex, key: key);
       } else if (answerModel is StaticAnswerModel) {
         return StaticItem(responseFiller, answerIndex, key: key);
-      } else {
+      } else if (answerModel is UnsupportedAnswerModel) {
         throw QuestionnaireFormatException(
-            'Unsupported AnswerModel: $answerModel');
+            'Unsupported item type: ${answerModel.qi.type}',
+            answerModel.itemModel.linkId);
+      } else {
+        throw QuestionnaireFormatException('Unknown AnswerModel: $answerModel');
       }
     } catch (exception) {
       _logger.warn('Cannot create answer filler:', error: exception);
