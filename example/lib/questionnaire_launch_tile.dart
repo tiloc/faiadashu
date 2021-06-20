@@ -120,78 +120,83 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
           context,
           MaterialPageRoute(
             builder: (context) => QuestionnaireScrollerPage(
-                locale: _locale,
-                fhirResourceProvider: RegistryFhirResourceProvider([
-                  AssetResourceProvider.singleton(
-                      questionnaireResourceUri, widget.questionnairePath),
-                  InMemoryResourceProvider.inMemory(
-                      questionnaireResponseResourceUri,
-                      widget.restoreResponseFunction(widget.questionnairePath)),
-                  widget.fhirResourceProvider
-                ]),
-                // Callback for supportLink
-                onLinkTap: launchUrl,
-                persistentFooterButtons: [
-                  Builder(
-                    builder: (context) => const QuestionnaireCompleteButton(),
-                  ),
-                  if (widget.uploadResponseFunction != null)
-                    Builder(
-                      builder: (context) => ElevatedButton.icon(
-                        label: Text(FDashLocalizations.of(context)
-                            .handlingUploadButtonLabel),
-                        icon: const Icon(Icons.cloud_upload),
-                        onPressed: () {
-                          // Generate a response and upload it to a FHIR server.
-                          // TODO: In a real-world scenario this should have more state handling.
-                          widget.uploadResponseFunction?.call(
-                              widget.questionnairePath,
-                              QuestionnaireFiller.of(context)
-                                  .aggregator<QuestionnaireResponseAggregator>()
-                                  .aggregate(
-                                      responseStatus:
-                                          QuestionnaireResponseStatus
-                                              .completed));
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(FDashLocalizations.of(context)
-                                        .handlingUploading),
-                                    SyncIndicator(
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                    )
-                                  ]),
-                            ),
-                          );
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ),
+              locale: _locale,
+              fhirResourceProvider: RegistryFhirResourceProvider([
+                AssetResourceProvider.singleton(
+                    questionnaireResourceUri, widget.questionnairePath),
+                InMemoryResourceProvider.inMemory(
+                    questionnaireResponseResourceUri,
+                    widget.restoreResponseFunction(widget.questionnairePath)),
+                widget.fhirResourceProvider
+              ]),
+              // Callback for supportLink
+              onLinkTap: launchUrl,
+              persistentFooterButtons: [
+                Builder(
+                  builder: (context) => const QuestionnaireCompleteButton(),
+                ),
+                if (widget.uploadResponseFunction != null)
                   Builder(
                     builder: (context) => ElevatedButton.icon(
                       label: Text(FDashLocalizations.of(context)
-                          .handlingSaveButtonLabel),
-                      icon: const Icon(Icons.save_alt),
+                          .handlingUploadButtonLabel),
+                      icon: const Icon(Icons.cloud_upload),
                       onPressed: () {
-                        // Generate a response and store it in-memory.
-                        // In a real-world scenario one would persist or post the response instead.
-                        widget.saveResponseFunction.call(
+                        // Generate a response and upload it to a FHIR server.
+                        // TODO: In a real-world scenario this should have more state handling.
+                        widget.uploadResponseFunction?.call(
                             widget.questionnairePath,
                             QuestionnaireFiller.of(context)
                                 .aggregator<QuestionnaireResponseAggregator>()
-                                .aggregate());
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text(
-                                FDashLocalizations.of(context).handlingSaved)));
+                                .aggregate(
+                                    responseStatus:
+                                        QuestionnaireResponseStatus.completed));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(FDashLocalizations.of(context)
+                                      .handlingUploading),
+                                  SyncIndicator(
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                  )
+                                ]),
+                          ),
+                        );
                         Navigator.pop(context);
                       },
                     ),
                   ),
-                ]),
+                Builder(
+                  builder: (context) => ElevatedButton.icon(
+                    label: Text(
+                        FDashLocalizations.of(context).handlingSaveButtonLabel),
+                    icon: const Icon(Icons.save_alt),
+                    onPressed: () {
+                      // Generate a response and store it in-memory.
+                      // In a real-world scenario one would persist or post the response instead.
+                      widget.saveResponseFunction.call(
+                          widget.questionnairePath,
+                          QuestionnaireFiller.of(context)
+                              .aggregator<QuestionnaireResponseAggregator>()
+                              .aggregate());
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(
+                              FDashLocalizations.of(context).handlingSaved)));
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+              ],
+              // This FAB is really a floating progress indicator
+              floatingActionButton: Builder(
+                builder: (context) => QuestionnaireFillerCircularProgress(
+                    QuestionnaireFiller.of(context).questionnaireModel),
+              ),
+            ),
           ),
         ).then((value) {
           // This triggers after return from questionnaire filler

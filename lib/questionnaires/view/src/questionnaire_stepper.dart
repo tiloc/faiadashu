@@ -79,7 +79,7 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
                         valueListenable: QuestionnaireFiller.of(context)
                             .aggregator<TotalScoreAggregator>(),
                       ),
-                      QuestionnaireFillerProgress(
+                      QuestionnaireFillerProgressBar(
                           questionnaireFiller.questionnaireModel),
                     ])),
                     IconButton(

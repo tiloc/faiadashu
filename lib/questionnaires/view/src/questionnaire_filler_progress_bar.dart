@@ -1,24 +1,24 @@
 import 'package:faiadashu/questionnaires/model/model.dart';
 import 'package:flutter/material.dart';
 
-/// Display a progress bar for the filling of a [QuestionnaireModel].
-class QuestionnaireFillerProgress extends StatefulWidget {
+/// A progress bar for the filling of a [QuestionnaireModel].
+class QuestionnaireFillerProgressBar extends StatefulWidget {
   final QuestionnaireItemModel questionnaireItemModel;
   final double? height;
   final Color? answeredColor;
   final Color? unansweredColor;
 
-  const QuestionnaireFillerProgress(this.questionnaireItemModel,
+  const QuestionnaireFillerProgressBar(this.questionnaireItemModel,
       {this.height, this.answeredColor, this.unansweredColor, Key? key})
       : super(key: key);
 
   @override
-  _QuestionnaireFillerProgressState createState() =>
-      _QuestionnaireFillerProgressState();
+  _QuestionnaireFillerProgressBarState createState() =>
+      _QuestionnaireFillerProgressBarState();
 }
 
-class _QuestionnaireFillerProgressState
-    extends State<QuestionnaireFillerProgress> {
+class _QuestionnaireFillerProgressBarState
+    extends State<QuestionnaireFillerProgressBar> {
   @override
   void initState() {
     super.initState();
