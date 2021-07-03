@@ -353,7 +353,7 @@ class QuestionnaireModel extends QuestionnaireItemModel {
       return;
     }
 
-    // TODO: What is the best notification strategy?
+    // OPTIMIZE: What is the best notification strategy?
     // Assumption: It would be better to first set all responses in bulk and then recalc.
     _populateItems(questionnaireResponse.item);
 

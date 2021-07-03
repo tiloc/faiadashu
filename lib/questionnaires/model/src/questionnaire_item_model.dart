@@ -57,8 +57,8 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
       allCount++;
       switch (qew.operator_) {
         case QuestionnaireEnableWhenOperator.exists:
-          if (questionnaireModel.fromLinkId(qew.question!).responseItem !=
-              null) {
+          if (questionnaireModel.fromLinkId(qew.question!).isAnswered ==
+              qew.answerBoolean!.value) {
             anyTrigger = true;
             allTriggered++;
           }
