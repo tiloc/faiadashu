@@ -20,6 +20,7 @@ class QuestionnaireFiller extends StatefulWidget {
   final void Function(BuildContext context, Uri url)? onLinkTap;
   final void Function(QuestionnaireModel)? onDataAvailable;
   final QuestionnaireTheme questionnaireTheme;
+  final bool showNullCodingOption;
 
   final FhirResourceProvider fhirResourceProvider;
 
@@ -37,8 +38,10 @@ class QuestionnaireFiller extends StatefulWidget {
       this.aggregators,
       this.onDataAvailable,
       this.onLinkTap,
-      this.questionnaireTheme = const FDashQuestionnaireTheme()})
-      : super(key: key);
+      this.questionnaireTheme = const FDashQuestionnaireTheme(),
+      bool? showNullCodingOption})
+      : showNullCodingOption = showNullCodingOption ?? true,
+        super(key: key);
 
   static QuestionnaireFillerData of(BuildContext context) {
     final result =
@@ -118,12 +121,14 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
                       _onQuestionnaireModelChangeListenerFunction!);
 
                   _questionnaireFillerData = QuestionnaireFillerData._(
-                      _questionnaireModel!,
-                      locale: widget.locale,
-                      builder: widget.builder,
-                      onLinkTap: widget.onLinkTap,
-                      onDataAvailable: widget.onDataAvailable,
-                      questionnaireTheme: widget.questionnaireTheme);
+                    _questionnaireModel!,
+                    locale: widget.locale,
+                    builder: widget.builder,
+                    onLinkTap: widget.onLinkTap,
+                    onDataAvailable: widget.onDataAvailable,
+                    questionnaireTheme: widget.questionnaireTheme,
+                    showNullCodingOption: widget.showNullCodingOption,
+                  );
                 }
                 return _questionnaireFillerData;
               }
@@ -148,16 +153,17 @@ class QuestionnaireFillerData extends InheritedWidget {
   late final List<QuestionnaireItemFiller?> _itemFillers;
   final Map<int, QuestionnaireItemFillerState> _itemFillerStates = {};
   late final int _generation;
+  final bool showNullCodingOption;
 
-  QuestionnaireFillerData._(
-    this.questionnaireModel, {
-    Key? key,
-    required this.locale,
-    this.onDataAvailable,
-    this.onLinkTap,
-    required this.questionnaireTheme,
-    required WidgetBuilder builder,
-  })  : _generation = questionnaireModel.generation,
+  QuestionnaireFillerData._(this.questionnaireModel,
+      {Key? key,
+      required this.locale,
+      this.onDataAvailable,
+      this.onLinkTap,
+      required this.questionnaireTheme,
+      required WidgetBuilder builder,
+      required this.showNullCodingOption})
+      : _generation = questionnaireModel.generation,
         questionnaireItemModels =
             questionnaireModel.orderedQuestionnaireItemModels(),
         _itemFillers = List<QuestionnaireItemFiller?>.filled(

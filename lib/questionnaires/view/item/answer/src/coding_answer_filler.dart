@@ -58,15 +58,19 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
 
     final choices = <Widget>[];
     if (!isMultipleChoice) {
-      choices.add(RadioListTile<String?>(
-          title: const NullDashText(),
-          value: null,
-          groupValue: answerModel.toChoiceString(value),
-          onChanged: (answerModel.isEnabled)
-              ? (String? newValue) {
-                  value = answerModel.fromChoiceString(newValue);
-                }
-              : null));
+      if (QuestionnaireFiller.of(context).showNullCodingOption) {
+        choices.add(
+          RadioListTile<String?>(
+              title: const NullDashText(),
+              value: null,
+              groupValue: answerModel.toChoiceString(value),
+              onChanged: (answerModel.isEnabled)
+                  ? (String? newValue) {
+                      value = answerModel.fromChoiceString(newValue);
+                    }
+                  : null),
+        );
+      }
     }
     for (final choice in answerModel.answerOptions.values) {
       final optionPrefix = choice.extension_
@@ -130,6 +134,8 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
                 child: RadioListTile<String>(
                     title: styledOptionTitle,
                     value: choice.optionCode,
+                    // allows value to be set to null on repeat tap
+                    toggleable: true,
                     groupValue: answerModel.toChoiceString(value),
                     onChanged: (answerModel.isEnabled)
                         ? (String? newValue) {
