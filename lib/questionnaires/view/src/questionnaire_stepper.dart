@@ -10,11 +10,13 @@ class QuestionnaireStepper extends StatefulWidget {
   final Locale? locale;
   final FhirResourceProvider fhirResourceProvider;
   final QuestionnairePageScaffoldBuilder scaffoldBuilder;
+  final QuestionnaireTheme? questionnaireTheme;
 
   const QuestionnaireStepper(
       {this.locale,
       required this.scaffoldBuilder,
       required this.fhirResourceProvider,
+      this.questionnaireTheme,
       Key? key})
       : super(key: key);
 
@@ -31,6 +33,7 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
     return QuestionnaireFiller(
         locale: widget.locale ?? Localizations.localeOf(context),
         fhirResourceProvider: widget.fhirResourceProvider,
+        questionnaireTheme: widget.questionnaireTheme,
         builder: (BuildContext context) {
           final questionnaireFiller = QuestionnaireFiller.of(context);
           final itemCount = questionnaireFiller.questionnaireItemModels.length;
@@ -96,14 +99,16 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
 }
 
 class QuestionnaireStepperPage extends QuestionnaireStepper {
-  const QuestionnaireStepperPage(
-      {Locale? locale,
-      required FhirResourceProvider fhirResourceProvider,
-      Key? key})
-      : super(
+  const QuestionnaireStepperPage({
+    Locale? locale,
+    required FhirResourceProvider fhirResourceProvider,
+    QuestionnaireTheme? questionnaireTheme,
+    Key? key,
+  }) : super(
             locale: locale,
             scaffoldBuilder: const DefaultQuestionnairePageScaffoldBuilder(),
             fhirResourceProvider: fhirResourceProvider,
+            questionnaireTheme: questionnaireTheme,
             key: key);
 
   @override

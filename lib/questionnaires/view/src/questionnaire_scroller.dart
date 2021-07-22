@@ -33,6 +33,7 @@ class QuestionnaireScroller extends StatefulWidget {
   final List<Aggregator<dynamic>>? aggregators;
   final void Function(BuildContext context, Uri url)? onLinkTap;
   final QuestionnairePageScaffoldBuilder scaffoldBuilder;
+  final QuestionnaireTheme? questionnaireTheme;
 
   const QuestionnaireScroller(
       {this.locale,
@@ -42,6 +43,7 @@ class QuestionnaireScroller extends StatefulWidget {
       this.backMatter,
       this.aggregators,
       this.onLinkTap,
+      this.questionnaireTheme,
       Key? key})
       : super(key: key);
 
@@ -146,6 +148,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
     return QuestionnaireFiller(
       fhirResourceProvider: widget.fhirResourceProvider,
       locale: locale,
+      questionnaireTheme: widget.questionnaireTheme,
       builder: (BuildContext context) {
         _belowFillerContext = context;
         final questionnaireFiller = QuestionnaireFiller.of(context);
@@ -328,6 +331,7 @@ class QuestionnaireScrollerPage extends QuestionnaireScroller {
       ],
       List<Aggregator<dynamic>>? aggregators,
       void Function(BuildContext context, Uri url)? onLinkTap,
+      QuestionnaireTheme? questionnaireTheme,
       Key? key})
       : super(
             locale: locale,
@@ -339,5 +343,6 @@ class QuestionnaireScrollerPage extends QuestionnaireScroller {
             backMatter: backMatter,
             aggregators: aggregators,
             onLinkTap: onLinkTap,
+            questionnaireTheme: questionnaireTheme,
             key: key);
 }

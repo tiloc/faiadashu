@@ -29,16 +29,18 @@ class QuestionnaireFiller extends StatefulWidget {
           aggregators: aggregators,
           fhirResourceProvider: fhirResourceProvider);
 
-  const QuestionnaireFiller(
-      {Key? key,
-      required this.locale,
-      required this.builder,
-      required this.fhirResourceProvider,
-      this.aggregators,
-      this.onDataAvailable,
-      this.onLinkTap,
-      this.questionnaireTheme = const FDashQuestionnaireTheme()})
-      : super(key: key);
+  const QuestionnaireFiller({
+    Key? key,
+    required this.locale,
+    required this.builder,
+    required this.fhirResourceProvider,
+    this.aggregators,
+    this.onDataAvailable,
+    this.onLinkTap,
+    QuestionnaireTheme? questionnaireTheme,
+  })  : questionnaireTheme =
+            questionnaireTheme ?? const FDashQuestionnaireTheme(),
+        super(key: key);
 
   static QuestionnaireFillerData of(BuildContext context) {
     final result =
@@ -118,12 +120,13 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
                       _onQuestionnaireModelChangeListenerFunction!);
 
                   _questionnaireFillerData = QuestionnaireFillerData._(
-                      _questionnaireModel!,
-                      locale: widget.locale,
-                      builder: widget.builder,
-                      onLinkTap: widget.onLinkTap,
-                      onDataAvailable: widget.onDataAvailable,
-                      questionnaireTheme: widget.questionnaireTheme);
+                    _questionnaireModel!,
+                    locale: widget.locale,
+                    builder: widget.builder,
+                    onLinkTap: widget.onLinkTap,
+                    onDataAvailable: widget.onDataAvailable,
+                    questionnaireTheme: widget.questionnaireTheme,
+                  );
                 }
                 return _questionnaireFillerData;
               }

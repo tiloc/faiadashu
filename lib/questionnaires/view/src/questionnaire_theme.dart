@@ -30,13 +30,27 @@ abstract class QuestionnaireTheme {
 
   /// Returns whether user will be offered option to skip question.
   bool showSkipOption();
+
+  /// Returns whether user will be offered option for a null radio button value.
+  bool showNullCodingOption();
 }
 
 /// The Faiadashu default implementation of [QuestionnaireTheme].
 class FDashQuestionnaireTheme implements QuestionnaireTheme {
   static final _logger = Logger(FDashQuestionnaireTheme);
 
-  const FDashQuestionnaireTheme();
+  /// These options may be set to customize the Faiadashu default theme
+  ///
+  /// To use this, call `questionnaireTheme: FDashQuestionnaireTheme()`
+  /// within [QuestionnaireScroller], [QuestionnaireScrollerPage],
+  /// [QuestionnaireStepper], or [QuestionnaireStepperPage]
+  /// and set the options you want
+
+  final bool? canSkipQuestions;
+  final bool? showNullAnswerChoices;
+
+  const FDashQuestionnaireTheme(
+      {this.canSkipQuestions, this.showNullAnswerChoices});
 
   @override
   QuestionnaireItemFiller createQuestionnaireItemFiller(
@@ -99,5 +113,8 @@ class FDashQuestionnaireTheme implements QuestionnaireTheme {
   }
 
   @override
-  bool showSkipOption() => false;
+  bool showSkipOption() => canSkipQuestions ?? false;
+
+  @override
+  bool showNullCodingOption() => showNullAnswerChoices ?? true;
 }
