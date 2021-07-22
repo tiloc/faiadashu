@@ -55,10 +55,11 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
   Widget _buildChoiceAnswers(BuildContext context) {
     final isCheckBox = qi.isItemControl('check-box');
     final isMultipleChoice = (qi.repeats?.value ?? isCheckBox) == true;
+    final isShowingNull = questionnaireTheme.showNullCodingOption();
 
     final choices = <Widget>[];
     if (!isMultipleChoice) {
-      if (QuestionnaireFiller.of(context).showNullCodingOption) {
+      if (isShowingNull) {
         choices.add(
           RadioListTile<String?>(
               title: const NullDashText(),

@@ -10,16 +10,15 @@ class QuestionnaireStepper extends StatefulWidget {
   final Locale? locale;
   final FhirResourceProvider fhirResourceProvider;
   final QuestionnairePageScaffoldBuilder scaffoldBuilder;
-  final bool showNullCodingOption;
+  final QuestionnaireTheme? questionnaireTheme;
 
   const QuestionnaireStepper(
       {this.locale,
       required this.scaffoldBuilder,
       required this.fhirResourceProvider,
-      bool? showNullCodingOption,
+      this.questionnaireTheme,
       Key? key})
-      : showNullCodingOption = showNullCodingOption ?? true,
-        super(key: key);
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _QuestionnaireStepperState();
@@ -34,7 +33,7 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
     return QuestionnaireFiller(
         locale: widget.locale ?? Localizations.localeOf(context),
         fhirResourceProvider: widget.fhirResourceProvider,
-        showNullCodingOption: widget.showNullCodingOption,
+        questionnaireTheme: widget.questionnaireTheme,
         builder: (BuildContext context) {
           final questionnaireFiller = QuestionnaireFiller.of(context);
           final itemCount = questionnaireFiller.questionnaireItemModels.length;
@@ -100,16 +99,16 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
 }
 
 class QuestionnaireStepperPage extends QuestionnaireStepper {
-  const QuestionnaireStepperPage(
-      {Locale? locale,
-      required FhirResourceProvider fhirResourceProvider,
-      bool? showNullCodingOption,
-      Key? key})
-      : super(
+  const QuestionnaireStepperPage({
+    Locale? locale,
+    required FhirResourceProvider fhirResourceProvider,
+    QuestionnaireTheme? questionnaireTheme,
+    Key? key,
+  }) : super(
             locale: locale,
             scaffoldBuilder: const DefaultQuestionnairePageScaffoldBuilder(),
             fhirResourceProvider: fhirResourceProvider,
-            showNullCodingOption: showNullCodingOption,
+            questionnaireTheme: questionnaireTheme,
             key: key);
 
   @override

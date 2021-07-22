@@ -33,7 +33,7 @@ class QuestionnaireScroller extends StatefulWidget {
   final List<Aggregator<dynamic>>? aggregators;
   final void Function(BuildContext context, Uri url)? onLinkTap;
   final QuestionnairePageScaffoldBuilder scaffoldBuilder;
-  final bool showNullCodingOption;
+  final QuestionnaireTheme? questionnaireTheme;
 
   const QuestionnaireScroller(
       {this.locale,
@@ -43,10 +43,9 @@ class QuestionnaireScroller extends StatefulWidget {
       this.backMatter,
       this.aggregators,
       this.onLinkTap,
-      bool? showNullCodingOption,
+      this.questionnaireTheme,
       Key? key})
-      : showNullCodingOption = showNullCodingOption ?? true,
-        super(key: key);
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _QuestionnaireScrollerState();
@@ -149,7 +148,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
     return QuestionnaireFiller(
       fhirResourceProvider: widget.fhirResourceProvider,
       locale: locale,
-      showNullCodingOption: widget.showNullCodingOption,
+      questionnaireTheme: widget.questionnaireTheme,
       builder: (BuildContext context) {
         _belowFillerContext = context;
         final questionnaireFiller = QuestionnaireFiller.of(context);
@@ -332,7 +331,7 @@ class QuestionnaireScrollerPage extends QuestionnaireScroller {
       ],
       List<Aggregator<dynamic>>? aggregators,
       void Function(BuildContext context, Uri url)? onLinkTap,
-      bool? showNullCodingOption,
+      QuestionnaireTheme? questionnaireTheme,
       Key? key})
       : super(
             locale: locale,
@@ -344,6 +343,6 @@ class QuestionnaireScrollerPage extends QuestionnaireScroller {
             backMatter: backMatter,
             aggregators: aggregators,
             onLinkTap: onLinkTap,
-            showNullCodingOption: showNullCodingOption,
+            questionnaireTheme: questionnaireTheme,
             key: key);
 }
