@@ -1,3 +1,13 @@
+## 0.5.2
+* More solid support for theming Faiadashu, incl. changes to its default behavior.
+  * Another great contribution! This time from [John Manning](https://github.com/FireJuun)
+  * Check out the illustrations at https://github.com/tiloc/faiadashu/pull/6 to learn more.
+  * Both recent contributors - Grey and John - can be found for discussions on the [![FHIR-FLI Slack Channel](doc/images/Slack_RGB-98x40-335cb2d.png)](https://join.slack.com/t/fhir-fli/shared_invite/zt-ofv2cycm-9yjdMj8a~zXp7nDBeB_sNQ)  
+    [Join the FHIR-FLI Slack channel!](https://join.slack.com/t/fhir-fli/shared_invite/zt-ofv2cycm-9yjdMj8a~zXp7nDBeB_sNQ)
+
+
+* WIP progress bars, and a circular progress indicator to visualize which parts of the questionnaire have already been filled.
+
 ## 0.5.1
 * Bugfix for unsupported item types
 

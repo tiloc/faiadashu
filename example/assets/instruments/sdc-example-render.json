@@ -727,7 +727,7 @@
             }
           ],
           "linkId": "6.1",
-          "text": "All the practitioners below can speak the patient's language. Choose all preferred practioners:",
+          "text": "All the practitioners below can speak the patient's language. Choose all preferred practitioners:",
           "type": "reference",
           "repeats": true
         }
