@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:simple_html_css/simple_html_css.dart';
 
 import '../../../../fhir_types/fhir_types.dart';
@@ -12,17 +11,23 @@ import '../../../questionnaires.dart';
 class QuestionnaireItemFiller extends StatefulWidget {
   final QuestionnaireItemModel itemModel;
   final QuestionnaireFillerData questionnaireFiller;
+  final int index;
 
   factory QuestionnaireItemFiller.fromQuestionnaireFiller(
       QuestionnaireFillerData questionnaireFiller, int index,
       {Key? key}) {
-    return QuestionnaireItemFiller._(questionnaireFiller,
-        questionnaireFiller.questionnaireModel.itemModelAt(index),
+    return QuestionnaireItemFiller._(
+        questionnaireFiller: questionnaireFiller,
+        itemModel: questionnaireFiller.questionnaireModel.itemModelAt(index),
+        index: index,
         key: key);
   }
 
-  const QuestionnaireItemFiller._(this.questionnaireFiller, this.itemModel,
-      {Key? key})
+  const QuestionnaireItemFiller._(
+      {required this.questionnaireFiller,
+      required this.itemModel,
+      required this.index,
+      Key? key})
       : super(key: key);
 
   @override
@@ -34,6 +39,7 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
   late final Widget? _titleWidget;
   late final QuestionnaireResponseFiller _responseFiller;
   late final QuestionnaireFillerData _questionnaireFiller;
+  late final QuestionnaireTheme questionnaireTheme;
 
   late final FocusNode _focusNode;
 
@@ -44,8 +50,13 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
     super.initState();
     _focusNode = FocusNode(debugLabel: linkId, skipTraversal: true);
 
+    questionnaireTheme = widget.questionnaireFiller.questionnaireTheme;
+
     _titleWidget = QuestionnaireItemFillerTitle.fromQuestionnaireItemModel(
-        widget.itemModel);
+      itemModel: widget.itemModel,
+      questionnaireTheme: questionnaireTheme,
+      index: widget.index,
+    );
 
     _responseFiller = widget.questionnaireFiller.questionnaireTheme
         .createQuestionnaireResponseFiller(widget);
@@ -147,15 +158,25 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
   final QuestionnaireItemModel itemModel;
   final Widget? leading;
   final Widget? help;
+  final int index;
   final String htmlTitleText;
+  final QuestionnaireTheme questionnaireTheme;
 
-  const QuestionnaireItemFillerTitle._(
-      this.itemModel, this.htmlTitleText, this.leading, this.help,
-      {Key? key})
-      : super(key: key);
+  const QuestionnaireItemFillerTitle._({
+    required this.itemModel,
+    required this.questionnaireTheme,
+    required this.index,
+    required this.htmlTitleText,
+    this.leading,
+    this.help,
+    Key? key,
+  }) : super(key: key);
 
-  static Widget? fromQuestionnaireItemModel(QuestionnaireItemModel itemModel,
-      {Key? key}) {
+  static Widget? fromQuestionnaireItemModel(
+      {required QuestionnaireItemModel itemModel,
+      required QuestionnaireTheme questionnaireTheme,
+      required int index,
+      Key? key}) {
     if (itemModel.titleText == null) {
       return null;
     } else {
@@ -180,7 +201,12 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
           '$openStyleTag${htmlEscape.convert(itemModel.titleText!)}$closeStyleTag';
 
       return QuestionnaireItemFillerTitle._(
-          itemModel, htmlTitleText, leading, help,
+          itemModel: itemModel,
+          index: index,
+          questionnaireTheme: questionnaireTheme,
+          htmlTitleText: htmlTitleText,
+          leading: leading,
+          help: help,
           key: key);
     }
   }
@@ -193,6 +219,16 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
         child: Text.rich(
           TextSpan(
             children: <InlineSpan>[
+              /// Show question numbers (if flag set in the Questionnaire Theme)
+              /// items with an index of 0 are skipped, as they usually
+              /// represent basic information about the questionnaire
+              if (questionnaireTheme.showAnswerIndexOption() && index != 0)
+                WidgetSpan(
+                  alignment: PlaceholderAlignment.middle,
+                  // baseline: TextBaseline.alphabetic,
+                  child: Text('$index:  ',
+                      style: Theme.of(context).textTheme.headline6),
+                ),
               if (leading != null) WidgetSpan(child: leading!),
               if (itemModel.titleText != null)
                 HTML.toTextSpan(context, htmlTitleText,

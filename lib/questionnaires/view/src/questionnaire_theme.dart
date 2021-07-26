@@ -33,6 +33,9 @@ abstract class QuestionnaireTheme {
 
   /// Returns whether user will be offered option for a null radio button value.
   bool showNullCodingOption();
+
+  /// Returns whether each question will be preceded by its own ID.
+  bool showAnswerIndexOption();
 }
 
 /// The Faiadashu default implementation of [QuestionnaireTheme].
@@ -48,9 +51,12 @@ class FDashQuestionnaireTheme implements QuestionnaireTheme {
 
   final bool? canSkipQuestions;
   final bool? showNullAnswerChoices;
+  final bool? showAnswerIndexes;
 
   const FDashQuestionnaireTheme(
-      {this.canSkipQuestions, this.showNullAnswerChoices});
+      {this.canSkipQuestions,
+      this.showNullAnswerChoices,
+      this.showAnswerIndexes});
 
   @override
   QuestionnaireItemFiller createQuestionnaireItemFiller(
@@ -117,4 +123,7 @@ class FDashQuestionnaireTheme implements QuestionnaireTheme {
 
   @override
   bool showNullCodingOption() => showNullAnswerChoices ?? true;
+
+  @override
+  bool showAnswerIndexOption() => showAnswerIndexes ?? false;
 }
