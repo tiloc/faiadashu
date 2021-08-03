@@ -226,8 +226,8 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
                 WidgetSpan(
                   alignment: PlaceholderAlignment.middle,
                   // baseline: TextBaseline.alphabetic,
-                  child: Text('$index:  ',
-                      style: Theme.of(context).textTheme.headline6),
+                  child: Text('$index: ',
+                      style: Theme.of(context).textTheme.bodyText1),
                 ),
               if (leading != null) WidgetSpan(child: leading!),
               if (itemModel.titleText != null)
