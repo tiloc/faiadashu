@@ -35,7 +35,7 @@ abstract class QuestionnaireTheme {
   bool showNullCodingOption();
 
   /// Returns whether each question will be preceded by its own ID.
-  bool showAnswerIndexOption();
+  bool showQuestionIndexOption();
 }
 
 /// The Faiadashu default implementation of [QuestionnaireTheme].
@@ -51,12 +51,12 @@ class FDashQuestionnaireTheme implements QuestionnaireTheme {
 
   final bool? canSkipQuestions;
   final bool? showNullAnswerChoices;
-  final bool? showAnswerIndexes;
+  final bool? showQuestionNumbers;
 
   const FDashQuestionnaireTheme(
       {this.canSkipQuestions,
       this.showNullAnswerChoices,
-      this.showAnswerIndexes});
+      this.showQuestionNumbers});
 
   @override
   QuestionnaireItemFiller createQuestionnaireItemFiller(
@@ -125,5 +125,5 @@ class FDashQuestionnaireTheme implements QuestionnaireTheme {
   bool showNullCodingOption() => showNullAnswerChoices ?? true;
 
   @override
-  bool showAnswerIndexOption() => showAnswerIndexes ?? false;
+  bool showQuestionIndexOption() => showQuestionNumbers ?? false;
 }
