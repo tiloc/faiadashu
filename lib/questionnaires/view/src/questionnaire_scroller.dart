@@ -54,6 +54,7 @@ class QuestionnaireScroller extends StatefulWidget {
 class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
   QuestionnaireModel? _questionnaireModel;
   final ItemScrollController _listScrollController = ItemScrollController();
+  late final ScrollController _scrollController;
   final ItemPositionsListener _itemPositionsListener =
       ItemPositionsListener.create();
 
@@ -77,11 +78,13 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
   }
 
   @override
   void dispose() {
     super.dispose();
+    _scrollController.dispose();
   }
 
   /// Scrolls to a position as conveyed by a [QuestionnaireErrorFlag].
@@ -152,6 +155,8 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
       builder: (BuildContext context) {
         _belowFillerContext = context;
         final questionnaireFiller = QuestionnaireFiller.of(context);
+        final bool showScrollbar = questionnaireFiller.questionnaireTheme
+            .showPersistentScrollbarOption();
 
         final mainMatterLength =
             questionnaireFiller.questionnaireItemModels.length;
@@ -171,34 +176,79 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
             setStateCallback: (fn) {
               setState(fn);
             },
-            child: ScrollablePositionedList.builder(
-                itemScrollController: _listScrollController,
-                itemPositionsListener: _itemPositionsListener,
-                itemCount: totalLength,
-                padding: const EdgeInsets.all(8),
-                minCacheExtent: 200, // Allow tabbing to prev/next items
-                itemBuilder: (BuildContext context, int i) {
-                  final frontMatterIndex = (i < frontMatterLength) ? i : -1;
-                  final mainMatterIndex = (i >= frontMatterLength &&
-                          i < (frontMatterLength + mainMatterLength))
-                      ? (i - frontMatterLength)
-                      : -1;
-                  final backMatterIndex =
-                      (i >= (frontMatterLength + mainMatterLength) &&
-                              i < totalLength)
-                          ? (i - (frontMatterLength + mainMatterLength))
+            child: showScrollbar
+                ? Scrollbar(
+                    controller: _scrollController,
+                    isAlwaysShown: true,
+                    child: ListView.builder(
+                      controller: _scrollController,
+
+                      /// These variables can't be used in a [ListView]
+                      /// And a Scrollbar cannot connect to an [itemScrollController]
+                      ///
+                      /// It may be better overall to separate these two methods
+                      /// so as to avoid having both controllers active in the same class
+                      ///
+                      // itemScrollController: _listScrollController,
+                      // itemPositionsListener: _itemPositionsListener,
+                      // minCacheExtent: 200, // Allow tabbing to prev/next items
+
+                      itemCount: totalLength,
+                      padding: const EdgeInsets.all(8),
+                      itemBuilder: (BuildContext context, int i) {
+                        final frontMatterIndex =
+                            (i < frontMatterLength) ? i : -1;
+                        final mainMatterIndex = (i >= frontMatterLength &&
+                                i < (frontMatterLength + mainMatterLength))
+                            ? (i - frontMatterLength)
+                            : -1;
+                        final backMatterIndex =
+                            (i >= (frontMatterLength + mainMatterLength) &&
+                                    i < totalLength)
+                                ? (i - (frontMatterLength + mainMatterLength))
+                                : -1;
+                        if (mainMatterIndex != -1) {
+                          return QuestionnaireFiller.of(context)
+                              .itemFillerAt(mainMatterIndex);
+                        } else if (backMatterIndex != -1) {
+                          return widget.backMatter![backMatterIndex];
+                        } else if (frontMatterIndex != -1) {
+                          return widget.frontMatter![frontMatterIndex];
+                        } else {
+                          throw StateError('ListView index out of bounds: $i');
+                        }
+                      },
+                    ),
+                  )
+                : ScrollablePositionedList.builder(
+                    itemScrollController: _listScrollController,
+                    itemPositionsListener: _itemPositionsListener,
+                    itemCount: totalLength,
+                    padding: const EdgeInsets.all(8),
+                    minCacheExtent: 200, // Allow tabbing to prev/next items
+                    itemBuilder: (BuildContext context, int i) {
+                      final frontMatterIndex = (i < frontMatterLength) ? i : -1;
+                      final mainMatterIndex = (i >= frontMatterLength &&
+                              i < (frontMatterLength + mainMatterLength))
+                          ? (i - frontMatterLength)
                           : -1;
-                  if (mainMatterIndex != -1) {
-                    return QuestionnaireFiller.of(context)
-                        .itemFillerAt(mainMatterIndex);
-                  } else if (backMatterIndex != -1) {
-                    return widget.backMatter![backMatterIndex];
-                  } else if (frontMatterIndex != -1) {
-                    return widget.frontMatter![frontMatterIndex];
-                  } else {
-                    throw StateError('ListView index out of bounds: $i');
-                  }
-                }),
+                      final backMatterIndex =
+                          (i >= (frontMatterLength + mainMatterLength) &&
+                                  i < totalLength)
+                              ? (i - (frontMatterLength + mainMatterLength))
+                              : -1;
+                      if (mainMatterIndex != -1) {
+                        return QuestionnaireFiller.of(context)
+                            .itemFillerAt(mainMatterIndex);
+                      } else if (backMatterIndex != -1) {
+                        return widget.backMatter![backMatterIndex];
+                      } else if (frontMatterIndex != -1) {
+                        return widget.frontMatter![frontMatterIndex];
+                      } else {
+                        throw StateError('ListView index out of bounds: $i');
+                      }
+                    },
+                  ),
           ),
         );
       },

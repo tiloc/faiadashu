@@ -36,6 +36,10 @@ abstract class QuestionnaireTheme {
 
   /// Returns whether each question will be preceded by its own ID.
   bool showQuestionIndexOption();
+
+  /// Replace default 'scrollable positioned list' with something that allows
+  /// the user to persistently see a scrollbar on the trailing edge
+  bool showPersistentScrollbarOption();
 }
 
 /// The Faiadashu default implementation of [QuestionnaireTheme].
@@ -52,11 +56,13 @@ class FDashQuestionnaireTheme implements QuestionnaireTheme {
   final bool? canSkipQuestions;
   final bool? showNullAnswerChoices;
   final bool? showQuestionNumbers;
+  final bool? showPersistentScrollbar;
 
   const FDashQuestionnaireTheme(
       {this.canSkipQuestions,
       this.showNullAnswerChoices,
-      this.showQuestionNumbers});
+      this.showQuestionNumbers,
+      this.showPersistentScrollbar});
 
   @override
   QuestionnaireItemFiller createQuestionnaireItemFiller(
@@ -126,4 +132,7 @@ class FDashQuestionnaireTheme implements QuestionnaireTheme {
 
   @override
   bool showQuestionIndexOption() => showQuestionNumbers ?? false;
+
+  @override
+  bool showPersistentScrollbarOption() => showPersistentScrollbar ?? false;
 }
