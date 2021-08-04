@@ -213,6 +213,9 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final int questionNumber =
+        itemModel.questionnaireModel.getQuestionNumber(index);
+
     return Container(
         alignment: AlignmentDirectional.centerStart,
         padding: const EdgeInsets.only(top: 8.0),
@@ -222,12 +225,17 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
               /// Show question numbers (if flag set in the Questionnaire Theme)
               /// items with an index of 0 are skipped, as they usually
               /// represent basic information about the questionnaire
-              if (questionnaireTheme.showAnswerIndexOption() && index != 0)
-                WidgetSpan(
-                  alignment: PlaceholderAlignment.middle,
-                  // baseline: TextBaseline.alphabetic,
-                  child: Text('$index: ',
-                      style: Theme.of(context).textTheme.bodyText1),
+              ///
+              if (questionnaireTheme.showAnswerIndexOption() &&
+                  itemModel.isAnswerable)
+                HTML.toTextSpan(
+                  context,
+                  '$questionNumber: ',
+                  defaultTextStyle: Theme.of(context)
+                      .textTheme
+                      .bodyText1!
+                      // default to bold
+                      .apply(fontWeightDelta: 2),
                 ),
               if (leading != null) WidgetSpan(child: leading!),
               if (itemModel.titleText != null)

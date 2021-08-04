@@ -185,6 +185,44 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     }
   }
 
+  /// Returns an integer, starting with 1, that provides the number
+  /// of [QuestionnaireModel]s that have [isAnswerable] flags set to true
+  ///
+  int getQuestionNumber(int answerIndex) {
+    late final int questionNumber;
+
+    /// If [answerIndex] falls within the _cachedAnswerModels data set...
+    /// Check each question in turn until [answerIndex] is reached.
+    /// Create a count of all questions that are labeled as answerable until
+    /// [answerIndexx]
+    ///
+    if (_orderedItems != null) {
+      if (_orderedItems!.length >= answerIndex) {
+        var iterable = 1;
+        for (var idx = 0; idx < answerIndex; idx++) {
+          // Use linked hash map to ensure a key exists at this answer index
+          if (_orderedItems?.keys.elementAt(idx).isNotEmpty ?? false) {
+            // If a key exists, check to see if the isAnswerable flag is true
+            if (_orderedItems?[_orderedItems?.keys.elementAt(idx)]
+                    ?.isAnswerable ??
+                false) {
+              iterable++;
+            }
+          }
+        }
+        questionNumber = iterable;
+      } else {
+        _qimLogger.debug(
+            'error: answerIndex $answerIndex not found in _orderedItems');
+        questionNumber = -1;
+      }
+    } else {
+      _qimLogger.debug('error: _orderedItems not found');
+      questionNumber = -1;
+    }
+    return questionNumber;
+  }
+
   /// Returns the associated [QuestionnaireResponseItem].
   QuestionnaireResponseItem? get responseItem => _questionnaireResponseItem;
 

@@ -75,6 +75,7 @@ class ResponseModel {
     _ensureAnswerModel();
 
     final markers = <QuestionnaireErrorFlag>[];
+
     for (final am in _cachedAnswerModels.values) {
       final marker = am.isComplete;
       if (marker != null) {
@@ -91,7 +92,7 @@ class ResponseModel {
     return _cachedAnswerModels.values.any((am) => !am.isUnanswered);
   }
 
-  final _cachedAnswerModels = <int, AnswerModel>{};
+  final Map<int, AnswerModel> _cachedAnswerModels = <int, AnswerModel>{};
 
   /// Returns an [AnswerModel] for the nth answer to an overall response.
   ///
