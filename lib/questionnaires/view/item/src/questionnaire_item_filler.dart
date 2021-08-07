@@ -226,7 +226,7 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
               /// items with an index of 0 are skipped, as they usually
               /// represent basic information about the questionnaire
               ///
-              if (questionnaireTheme.showAnswerIndexOption() &&
+              if (questionnaireTheme.showQuestionIndexOption() &&
                   itemModel.isAnswerable)
                 HTML.toTextSpan(
                   context,
