@@ -215,6 +215,7 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     final int questionNumber =
         itemModel.questionnaireModel.getQuestionNumber(index);
+    final showQuestionNumbers = questionnaireTheme.showQuestionNumbers ?? false;
 
     return Container(
         alignment: AlignmentDirectional.centerStart,
@@ -226,8 +227,7 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
               /// All items with the isAnswerable boolean as true will be
               /// counted, starting with 1, and regardless of grouping.
               ///
-              if (questionnaireTheme.showQuestionIndexOption() &&
-                  itemModel.isAnswerable)
+              if (showQuestionNumbers && itemModel.isAnswerable)
                 HTML.toTextSpan(
                   context,
                   '$questionNumber: ',

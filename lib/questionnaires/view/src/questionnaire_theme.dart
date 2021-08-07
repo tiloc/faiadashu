@@ -5,6 +5,11 @@ import '../../questionnaires.dart';
 
 /// Create the views for all levels of a questionnaire. Provide styling theme.
 abstract class QuestionnaireTheme {
+  const QuestionnaireTheme(
+      {this.canSkipQuestions,
+      this.showNullAnswerChoices,
+      this.showQuestionNumbers});
+
   /// Returns a [QuestionnaireItemFiller] for a given [QuestionnaireFiller].
   ///
   /// Used by [QuestionnaireFiller].
@@ -29,17 +34,22 @@ abstract class QuestionnaireTheme {
   InputDecoration createDecoration();
 
   /// Returns whether user will be offered option to skip question.
-  bool showSkipOption();
+  final bool? canSkipQuestions;
 
   /// Returns whether user will be offered option for a null radio button value.
-  bool showNullCodingOption();
+  final bool? showNullAnswerChoices;
 
   /// Returns whether each question will be preceded by its own ID.
-  bool showQuestionIndexOption();
+  final bool? showQuestionNumbers;
 }
 
 /// The Faiadashu default implementation of [QuestionnaireTheme].
 class FDashQuestionnaireTheme implements QuestionnaireTheme {
+  const FDashQuestionnaireTheme(
+      {this.canSkipQuestions,
+      this.showNullAnswerChoices,
+      this.showQuestionNumbers});
+
   static final _logger = Logger(FDashQuestionnaireTheme);
 
   /// These options may be set to customize the Faiadashu default theme
@@ -48,15 +58,16 @@ class FDashQuestionnaireTheme implements QuestionnaireTheme {
   /// within [QuestionnaireScroller], [QuestionnaireScrollerPage],
   /// [QuestionnaireStepper], or [QuestionnaireStepperPage]
   /// and set the options you want
+  ///
 
+  @override
   final bool? canSkipQuestions;
-  final bool? showNullAnswerChoices;
-  final bool? showQuestionNumbers;
 
-  const FDashQuestionnaireTheme(
-      {this.canSkipQuestions,
-      this.showNullAnswerChoices,
-      this.showQuestionNumbers});
+  @override
+  final bool? showNullAnswerChoices;
+
+  @override
+  final bool? showQuestionNumbers;
 
   @override
   QuestionnaireItemFiller createQuestionnaireItemFiller(
@@ -117,13 +128,4 @@ class FDashQuestionnaireTheme implements QuestionnaireTheme {
   InputDecoration createDecoration() {
     return const InputDecoration(filled: true);
   }
-
-  @override
-  bool showSkipOption() => canSkipQuestions ?? false;
-
-  @override
-  bool showNullCodingOption() => showNullAnswerChoices ?? true;
-
-  @override
-  bool showQuestionIndexOption() => showQuestionNumbers ?? false;
 }
