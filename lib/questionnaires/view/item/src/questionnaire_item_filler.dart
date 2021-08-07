@@ -223,8 +223,8 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
           TextSpan(
             children: <InlineSpan>[
               /// Show question numbers (if flag set in the Questionnaire Theme)
-              /// items with an index of 0 are skipped, as they usually
-              /// represent basic information about the questionnaire
+              /// All items with the isAnswerable boolean as true will be
+              /// counted, starting with 1, and regardless of grouping.
               ///
               if (questionnaireTheme.showQuestionIndexOption() &&
                   itemModel.isAnswerable)
