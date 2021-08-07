@@ -191,7 +191,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
                       ///
                       // itemScrollController: _listScrollController,
                       // itemPositionsListener: _itemPositionsListener,
-                      cacheExtent: 200, // Allow tabbing to prev/next items
+                      // minCacheExtent: 200, // Allow tabbing to prev/next items
 
                       itemCount: totalLength,
                       padding: const EdgeInsets.all(8),
