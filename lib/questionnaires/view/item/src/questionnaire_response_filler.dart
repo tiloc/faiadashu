@@ -87,10 +87,12 @@ class QuestionnaireResponseFillerState
 
   @override
   Widget build(BuildContext context) {
+    final canSkipQuestions = questionnaireTheme.canSkipQuestions ?? false;
+
     // TODO(tiloc) show a list of answers, and buttons to add/remove if repeat
     return Column(mainAxisSize: MainAxisSize.min, children: [
       if (!responseModel.isAskedButDeclined) ..._answerFillers,
-      if (questionnaireTheme.showSkipOption() &&
+      if (canSkipQuestions &&
           !widget.itemModel.isReadOnly &&
           !widget.itemModel.isRequired)
         Row(children: [
