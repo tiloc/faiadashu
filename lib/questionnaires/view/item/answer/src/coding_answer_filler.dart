@@ -55,7 +55,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
   Widget _buildChoiceAnswers(BuildContext context) {
     final isCheckBox = qi.isItemControl('check-box');
     final isMultipleChoice = (qi.repeats?.value ?? isCheckBox) == true;
-    final isShowingNull = questionnaireTheme.showNullAnswerChoices ?? true;
+    final isShowingNull = questionnaireTheme.showNullAnswerOption;
 
     final choices = <Widget>[];
     if (!isMultipleChoice) {

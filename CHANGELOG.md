@@ -1,3 +1,7 @@
+## 0.5.3
+* Another theming contribution! Again from [John Manning](https://github.com/FireJuun)
+  * This one allows you to prefix the questions in a questionnaire with a running number (1, 2, 3, ...)
+
 ## 0.5.2
 * More solid support for theming Faiadashu, incl. changes to its default behavior.
   * Another great contribution! This time from [John Manning](https://github.com/FireJuun)

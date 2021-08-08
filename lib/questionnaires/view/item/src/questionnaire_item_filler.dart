@@ -215,7 +215,7 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     final int questionNumber =
         itemModel.questionnaireModel.getQuestionNumber(index);
-    final showQuestionNumbers = questionnaireTheme.showQuestionNumbers ?? false;
+    final showQuestionNumbers = questionnaireTheme.showQuestionNumbers;
 
     return Container(
         alignment: AlignmentDirectional.centerStart,
@@ -230,12 +230,7 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
               if (showQuestionNumbers && itemModel.isAnswerable)
                 HTML.toTextSpan(
                   context,
-                  '$questionNumber: ',
-                  defaultTextStyle: Theme.of(context)
-                      .textTheme
-                      .bodyText1!
-                      // default to bold
-                      .apply(fontWeightDelta: 2),
+                  '<b>$questionNumber: <b>',
                 ),
               if (leading != null) WidgetSpan(child: leading!),
               if (itemModel.titleText != null)

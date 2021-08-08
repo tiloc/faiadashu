@@ -30,8 +30,13 @@ Support for the FHIR Standard is focussed on the R4 release which is located her
 Styles - including text and colors - is obtained through the Material theme of the app. Both dark and light schemes work.
 
 ## Views and behaviors
-Numerous additional parameters - incl. which Widgets to use for views - can be handed into the `QuestionnaireFiller`
-through the `questionnaireTheme` parameter. 
+Several behaviors of the questionnaire filler can be influenced by instantiating a `QuestionnaireTheme` and passing it
+into the filler through any constructor which has a `questionnaireTheme` parameter.
+
+**Examples are:**
+* should an option to skip questions be presented?
+* should questions be prefixed with a number?
+* should coded questions offer an option to answer with a `null` = no answer?
 
 ### Locale
 Locale is explicitly passed to the library during the initialization of the `QuestionnaireFiller`.

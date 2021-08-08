@@ -4,72 +4,26 @@ import '../../../logging/logging.dart';
 import '../../questionnaires.dart';
 
 /// Create the views for all levels of a questionnaire. Provide styling theme.
-abstract class QuestionnaireTheme {
+class QuestionnaireTheme {
+  static final _logger = Logger(QuestionnaireTheme);
+
+  /// Returns whether user will be offered option to skip question.
+  final bool canSkipQuestions;
+
+  /// Returns whether user will be offered option for a null radio button value.
+  final bool showNullAnswerOption;
+
+  /// Returns whether each question will be preceded by its own ID.
+  final bool showQuestionNumbers;
+
   const QuestionnaireTheme(
-      {this.canSkipQuestions,
-      this.showNullAnswerChoices,
-      this.showQuestionNumbers});
+      {this.canSkipQuestions = false,
+      this.showNullAnswerOption = true,
+      this.showQuestionNumbers = false});
 
   /// Returns a [QuestionnaireItemFiller] for a given [QuestionnaireFiller].
   ///
   /// Used by [QuestionnaireFiller].
-  QuestionnaireItemFiller createQuestionnaireItemFiller(
-      QuestionnaireFillerData questionnaireFiller, int index,
-      {Key? key});
-
-  /// Returns a [QuestionnaireResponseFiller] for a given [QuestionnaireItemFiller].
-  ///
-  /// Used by [QuestionnaireItemFiller].
-  QuestionnaireResponseFiller createQuestionnaireResponseFiller(
-      QuestionnaireItemFiller itemFiller,
-      {Key? key});
-
-  QuestionnaireAnswerFiller createAnswerFiller(
-      QuestionnaireResponseFillerState responseFiller, int answerIndex,
-      {Key? key});
-
-  /// Returns a decoration for [TextFormField]s.
-  ///
-  /// Used for consistent styling of all text fields in the filler.
-  InputDecoration createDecoration();
-
-  /// Returns whether user will be offered option to skip question.
-  final bool? canSkipQuestions;
-
-  /// Returns whether user will be offered option for a null radio button value.
-  final bool? showNullAnswerChoices;
-
-  /// Returns whether each question will be preceded by its own ID.
-  final bool? showQuestionNumbers;
-}
-
-/// The Faiadashu default implementation of [QuestionnaireTheme].
-class FDashQuestionnaireTheme implements QuestionnaireTheme {
-  const FDashQuestionnaireTheme(
-      {this.canSkipQuestions,
-      this.showNullAnswerChoices,
-      this.showQuestionNumbers});
-
-  static final _logger = Logger(FDashQuestionnaireTheme);
-
-  /// These options may be set to customize the Faiadashu default theme
-  ///
-  /// To use this, call `questionnaireTheme: FDashQuestionnaireTheme()`
-  /// within [QuestionnaireScroller], [QuestionnaireScrollerPage],
-  /// [QuestionnaireStepper], or [QuestionnaireStepperPage]
-  /// and set the options you want
-  ///
-
-  @override
-  final bool? canSkipQuestions;
-
-  @override
-  final bool? showNullAnswerChoices;
-
-  @override
-  final bool? showQuestionNumbers;
-
-  @override
   QuestionnaireItemFiller createQuestionnaireItemFiller(
       QuestionnaireFillerData questionnaireFiller, int index,
       {Key? key}) {
@@ -78,14 +32,18 @@ class FDashQuestionnaireTheme implements QuestionnaireTheme {
         key: key);
   }
 
-  @override
+  /// Returns a [QuestionnaireResponseFiller] for a given [QuestionnaireItemFiller].
+  ///
+  /// Used by [QuestionnaireItemFiller].
   QuestionnaireResponseFiller createQuestionnaireResponseFiller(
       QuestionnaireItemFiller itemFiller,
       {Key? key}) {
     return QuestionnaireResponseFiller.fromQuestionnaireItemFiller(itemFiller);
   }
 
-  @override
+  /// Returns a [QuestionnaireAnswerFiller] for a given [QuestionnaireResponseFiller].
+  ///
+  /// Can be overridden through inheritance of [QuestionnaireTheme].
   QuestionnaireAnswerFiller createAnswerFiller(
       QuestionnaireResponseFillerState responseFiller, int answerIndex,
       {Key? key}) {
@@ -124,7 +82,9 @@ class FDashQuestionnaireTheme implements QuestionnaireTheme {
     }
   }
 
-  @override
+  /// Returns a decoration for [TextFormField]s.
+  ///
+  /// Used for consistent styling of all text fields in the filler.
   InputDecoration createDecoration() {
     return const InputDecoration(filled: true);
   }

@@ -29,17 +29,16 @@ class QuestionnaireFiller extends StatefulWidget {
           aggregators: aggregators,
           fhirResourceProvider: fhirResourceProvider);
 
-  const QuestionnaireFiller({
-    Key? key,
-    required this.locale,
-    required this.builder,
-    required this.fhirResourceProvider,
-    this.aggregators,
-    this.onDataAvailable,
-    this.onLinkTap,
-    QuestionnaireTheme? questionnaireTheme,
-  })  : questionnaireTheme =
-            questionnaireTheme ?? const FDashQuestionnaireTheme(),
+  const QuestionnaireFiller(
+      {Key? key,
+      required this.locale,
+      required this.builder,
+      required this.fhirResourceProvider,
+      this.aggregators,
+      this.onDataAvailable,
+      this.onLinkTap,
+      QuestionnaireTheme? questionnaireTheme})
+      : questionnaireTheme = questionnaireTheme ?? const QuestionnaireTheme(),
         super(key: key);
 
   static QuestionnaireFillerData of(BuildContext context) {

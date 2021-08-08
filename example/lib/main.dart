@@ -388,15 +388,20 @@ class _HomePageState extends State<HomePage> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => QuestionnaireScroller(
-                              scaffoldBuilder:
-                                  const _CherryBlossomScaffoldBuilder(),
-                              fhirResourceProvider:
-                                  RegistryFhirResourceProvider([
-                                resourceBundleProvider,
-                                AssetResourceProvider.singleton(
-                                    questionnaireResourceUri,
-                                    'assets/instruments/sdc_demo.json')
-                              ]))));
+                                scaffoldBuilder:
+                                    const _CherryBlossomScaffoldBuilder(),
+                                fhirResourceProvider:
+                                    RegistryFhirResourceProvider([
+                                  resourceBundleProvider,
+                                  AssetResourceProvider.singleton(
+                                      questionnaireResourceUri,
+                                      'assets/instruments/sdc_demo.json')
+                                ]),
+                                questionnaireTheme: const QuestionnaireTheme(
+                                    canSkipQuestions: true,
+                                    showNullAnswerOption: false,
+                                    showQuestionNumbers: true),
+                              )));
                 },
               ),
               QuestionnaireLaunchTile(

@@ -212,13 +212,11 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
         }
         questionNumber = iterable;
       } else {
-        _qimLogger.error(
-            'error: answerIndex $answerIndex not found in _orderedItems');
-        questionNumber = -1;
+        throw ArgumentError(
+            'answerIndex $answerIndex not found in _orderedItems');
       }
     } else {
-      _qimLogger.error('error: _orderedItems not found');
-      questionNumber = -1;
+      throw StateError('_orderedItems not found');
     }
     return questionNumber;
   }
