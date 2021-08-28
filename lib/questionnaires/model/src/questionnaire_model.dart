@@ -15,6 +15,8 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   final Map<String, QuestionnaireItemModel> _cachedItems = {};
   List<QuestionnaireItemModel>? _itemsWithEnableWhen;
   List<QuestionnaireItemModel>? _itemsWithEnableWhenExpression;
+  // In which generation were the enabled items last determined?
+  int _updateEnabledGeneration = -1;
   final List<Aggregator>? _aggregators;
 
   /// Direct access to [FhirResourceProvider]s for special use-cases.
@@ -32,13 +34,14 @@ class QuestionnaireModel extends QuestionnaireItemModel {
       required List<Aggregator>? aggregators})
       : _aggregators = aggregators,
         super._(
-            questionnaire,
-            null,
-            ArgumentError.checkNotNull(questionnaire.item?.first),
-            ArgumentError.checkNotNull(questionnaire.item?.first.linkId),
-            null,
-            0,
-            0,) {
+          questionnaire,
+          null,
+          ArgumentError.checkNotNull(questionnaire.item?.first),
+          ArgumentError.checkNotNull(questionnaire.item?.first.linkId),
+          null,
+          0,
+          0,
+        ) {
     _questionnaireModel = this;
     // This will set up the traversal order and fill up the cache.
     _ensureOrderedItems();
@@ -68,7 +71,8 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     }
 
     _logger.debug(
-        '_itemsWithEnableWhenExpression: $_itemsWithEnableWhenExpression',);
+      '_itemsWithEnableWhenExpression: $_itemsWithEnableWhenExpression',
+    );
 
     if (aggregators != null) {
       for (final aggregator in aggregators) {
@@ -380,14 +384,24 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   ///
   /// This updates enablement through enableWhen and enableWhenExpression.
   void updateEnabledItems({bool notifyListeners = true}) {
+    _logger.trace('updateEnabledItems()');
+
+    if (_updateEnabledGeneration == _generation) {
+      _logger.debug(
+        'updateEnabledItems: already updated during this generation',
+      );
+      return;
+    }
+
+    _updateEnabledGeneration = _generation;
+
     if (_itemsWithEnableWhen == null &&
         _itemsWithEnableWhenExpression == null) {
-      _logger.trace(
+      _logger.debug(
         'updateEnabledItems: no conditionally enabled items',
       );
       return;
     }
-    _logger.trace('updateEnabledItems()');
 
     final previouslyEnabled = List<bool>.generate(
         orderedQuestionnaireItemModels().length,

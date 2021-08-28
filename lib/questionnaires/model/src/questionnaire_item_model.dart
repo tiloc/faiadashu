@@ -24,7 +24,6 @@ part 'questionnaire_model.dart';
 class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   final Questionnaire questionnaire;
   final QuestionnaireItem questionnaireItem;
-  QuestionnaireResponse? questionnaireResponse;
   QuestionnaireResponseItem? _questionnaireResponseItem;
   final String linkId;
   final QuestionnaireItemModel? parent;
@@ -77,7 +76,6 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   void _updateEnabledByEnableWhenExpression() {
     _qimLogger.trace('Enter _updateEnabledByEnableWhenExpression()');
 
-    // TODO: Implement
     final pathExpression = questionnaireItem.extension_
         ?.extensionOrNull(
             'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression')
@@ -89,9 +87,16 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
           'enableWhenExpression missing expression', questionnaireItem);
     }
 
-    final fhirPathResult = r4WalkFhirPath(
-        questionnaireModel.questionnaireResponse, pathExpression);
+    // OPTIMIZE: Hugely expensive brute-force
+    final questionnaireResponseAggregator = QuestionnaireResponseAggregator()
+      ..init(_questionnaireModel!);
+    final questionnaireResponse = questionnaireResponseAggregator.aggregate();
+
+    final fhirPathResult =
+        r4WalkFhirPath(questionnaireResponse, pathExpression);
     _qimLogger.debug('fhirPathResult: $fhirPathResult');
+
+    // TODO: Evaluate result
   }
 
   /// Updates the current enablement status of this item, based on enabledWhen.

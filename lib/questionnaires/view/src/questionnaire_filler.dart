@@ -105,7 +105,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
               return QuestionnaireLoadingIndicator(snapshot);
             case ConnectionState.done:
               if (snapshot.hasError) {
-                _logger.warn('FutureBuilder hasError');
+                _logger.warn('FutureBuilder hasError', error: snapshot.error);
                 return QuestionnaireLoadingIndicator(snapshot);
               }
               if (snapshot.hasData) {

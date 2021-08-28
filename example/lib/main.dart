@@ -279,20 +279,25 @@ class _HomePageState extends State<HomePage> {
                     'Formatted, internationalized text output of FHIR primitive types.'),
                 onTap: () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const PrimitivePage(),),);
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const PrimitivePage(),
+                    ),
+                  );
                 },
               ),
               ListTile(
                 title: const Text('Observation'),
                 subtitle: const Text(
-                    'Formatted, internationalized text output of observations.',),
+                  'Formatted, internationalized text output of observations.',
+                ),
                 onTap: () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ObservationPage(),),);
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ObservationPage(),
+                    ),
+                  );
                 },
               ),
               QuestionnaireLaunchTile(
@@ -375,40 +380,48 @@ class _HomePageState extends State<HomePage> {
               ListTile(
                 title: const Text('PHQ9 Questionnaire Stepper'),
                 subtitle: const Text(
-                    'Simple choice-based survey with a total score.',),
+                  'Simple choice-based survey with a total score.',
+                ),
                 onTap: () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => QuestionnaireStepperPage(
-                              fhirResourceProvider: AssetResourceProvider.singleton(
-                                  questionnaireResourceUri,
-                                  'assets/instruments/phq9_instrument.json',),),),);
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => QuestionnaireStepperPage(
+                        fhirResourceProvider: AssetResourceProvider.singleton(
+                          questionnaireResourceUri,
+                          'assets/instruments/phq9_instrument.json',
+                        ),
+                      ),
+                    ),
+                  );
                 },
               ),
               ListTile(
                 title: const Text('Cherry blossom Filler'),
                 subtitle: const Text(
-                    'Illustrates embedding of questionnaire (no Scaffold)',),
+                  'Illustrates embedding of questionnaire (no Scaffold)',
+                ),
                 onTap: () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => QuestionnaireScroller(
-                                scaffoldBuilder:
-                                    const _CherryBlossomScaffoldBuilder(),
-                                fhirResourceProvider:
-                                    RegistryFhirResourceProvider([
-                                  resourceBundleProvider,
-                                  AssetResourceProvider.singleton(
-                                      questionnaireResourceUri,
-                                      'assets/instruments/sdc_demo.json',)
-                                ]),
-                                questionnaireTheme: const QuestionnaireTheme(
-                                    canSkipQuestions: true,
-                                    showNullAnswerOption: false,
-                                    showQuestionNumbers: true,),
-                              ),),);
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => QuestionnaireScroller(
+                        scaffoldBuilder: const _CherryBlossomScaffoldBuilder(),
+                        fhirResourceProvider: RegistryFhirResourceProvider([
+                          resourceBundleProvider,
+                          AssetResourceProvider.singleton(
+                            questionnaireResourceUri,
+                            'assets/instruments/sdc_demo.json',
+                          )
+                        ]),
+                        questionnaireTheme: const QuestionnaireTheme(
+                          canSkipQuestions: true,
+                          showNullAnswerOption: false,
+                          showQuestionNumbers: true,
+                        ),
+                      ),
+                    ),
+                  );
                 },
               ),
               QuestionnaireLaunchTile(
@@ -435,8 +448,9 @@ class _HomePageState extends State<HomePage> {
                 // Provide a hard-coded response for initial population
                 fhirResourceProvider: RegistryFhirResourceProvider([
                   AssetResourceProvider.singleton(
-                      questionnaireResponseResourceUri,
-                      'assets/responses/bluebook_response.json',),
+                    questionnaireResponseResourceUri,
+                    'assets/responses/bluebook_response.json',
+                  ),
                   resourceBundleProvider
                 ]),
                 questionnairePath: 'assets/instruments/bluebook.json',
@@ -467,9 +481,11 @@ class _CherryBlossomScaffoldBuilder extends QuestionnairePageScaffoldBuilder {
   const _CherryBlossomScaffoldBuilder();
 
   @override
-  Widget build(BuildContext context,
-      {required void Function(void Function() p1) setStateCallback,
-      required Widget child,}) {
+  Widget build(
+    BuildContext context, {
+    required void Function(void Function() p1) setStateCallback,
+    required Widget child,
+  }) {
     return Theme(
       data: ThemeData.light(), // Make it always light
       // We have to take care of SafeArea ourselves

@@ -452,7 +452,7 @@
               "valueExpression": {
                 "description": "if last 2 questions were answered",
                 "language": "text/fhirpath",
-                "expression": "%resource.repeats(item).where(linkId = '4.2.b.1').answer.valueCoding.code != 'female'"
+                "expression": "%resource.repeat(item).where(linkId = '4.2.b.1').answer.valueCoding.code = 'female' and today().toString().substring(0, 4).toInteger() - %resource.repeat(item).where(linkId='4.2.b.5').answer.toString().substring(0, 4).toInteger() >= 40"
               }
             }
           ],
