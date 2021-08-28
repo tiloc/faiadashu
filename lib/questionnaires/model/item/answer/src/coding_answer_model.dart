@@ -44,10 +44,12 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
       } else {
         _logger.debug('$checkboxValue is not exclusive');
         // Kill all exclusive ones.
-        return value.copyWith(coding: [
-          ...value.coding!.whereNot((coding) => isExclusive(coding)),
-          enabledCoding
-        ]);
+        return value.copyWith(
+          coding: [
+            ...value.coding!.whereNot((coding) => isExclusive(coding)),
+            enabledCoding
+          ],
+        );
       }
     } else {
       _logger.debug('$checkboxValue currently selected.');
@@ -64,7 +66,9 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
 
     if (choiceString == null) {
       throw QuestionnaireFormatException(
-          'Insufficient info for choice string in $coding', coding);
+        'Insufficient info for choice string in $coding',
+        coding,
+      );
     } else {
       return choiceString;
     }
@@ -92,7 +96,8 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
       return null;
     }
     return _choiceStringFromCodings(
-        ArgumentError.checkNotNull(codeableConcept.coding));
+      ArgumentError.checkNotNull(codeableConcept.coding),
+    );
   }
 
   CodeableConcept? fromChoiceString(String? choiceString) {
@@ -105,7 +110,8 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
     return answerOptions[choiceStringFromCoding(coding)]!
             .extension_
             ?.extensionOrNull(
-                'http://hl7.org/fhir/StructureDefinition/questionnaire-optionExclusive')
+              'http://hl7.org/fhir/StructureDefinition/questionnaire-optionExclusive',
+            )
             ?.valueBoolean
             ?.value ==
         true;
@@ -120,23 +126,28 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
   // Take the existing extensions that might contain information about
   // ordinal values and provide them as both ordinalValue and iso21090-CO-value.
   List<FhirExtension>? _createOrdinalExtension(
-      List<FhirExtension>? inExtension) {
+    List<FhirExtension>? inExtension,
+  ) {
     List<FhirExtension>? responseOrdinalExtension;
 
     final FhirExtension? ordinalExtension = inExtension?.extensionOrNull(
-            'http://hl7.org/fhir/StructureDefinition/ordinalValue') ??
+          'http://hl7.org/fhir/StructureDefinition/ordinalValue',
+        ) ??
         inExtension?.extensionOrNull(
-            'http://hl7.org/fhir/StructureDefinition/iso21090-CO-value');
+          'http://hl7.org/fhir/StructureDefinition/iso21090-CO-value',
+        );
     if (ordinalExtension != null) {
       responseOrdinalExtension = <FhirExtension>[
         FhirExtension(
-            url:
-                FhirUri('http://hl7.org/fhir/StructureDefinition/ordinalValue'),
-            valueDecimal: ordinalExtension.valueDecimal),
+          url: FhirUri('http://hl7.org/fhir/StructureDefinition/ordinalValue'),
+          valueDecimal: ordinalExtension.valueDecimal,
+        ),
         FhirExtension(
-            url: FhirUri(
-                'http://hl7.org/fhir/StructureDefinition/iso21090-CO-value'),
-            valueDecimal: ordinalExtension.valueDecimal),
+          url: FhirUri(
+            'http://hl7.org/fhir/StructureDefinition/iso21090-CO-value',
+          ),
+          valueDecimal: ordinalExtension.valueDecimal,
+        ),
       ];
     }
 
@@ -146,29 +157,34 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
   void _addAnswerOption(Coding coding) {
     _answerOptions.addEntries([
       MapEntry<String, QuestionnaireAnswerOption>(
-          coding.code!.toString(),
-          FDashQuestionnaireAnswerOptionExtensions.fromCoding(
-            coding,
-            extensionBuilder: (inCoding) =>
-                _createOptionPrefixExtension(inCoding.extension_),
-            codingExtensionBuilder: (inCoding) =>
-                _createOrdinalExtension(inCoding.extension_),
-          ))
+        coding.code!.toString(),
+        FDashQuestionnaireAnswerOptionExtensions.fromCoding(
+          coding,
+          extensionBuilder: (inCoding) =>
+              _createOptionPrefixExtension(inCoding.extension_),
+          codingExtensionBuilder: (inCoding) =>
+              _createOrdinalExtension(inCoding.extension_),
+        ),
+      )
     ]);
   }
 
   List<FhirExtension>? _createOptionPrefixExtension(
-      List<FhirExtension>? inExtension) {
+    List<FhirExtension>? inExtension,
+  ) {
     List<FhirExtension>? responseOptionPrefixExtension;
 
     final FhirExtension? labelExtension = inExtension?.extensionOrNull(
-        'http://hl7.org/fhir/StructureDefinition/valueset-label');
+      'http://hl7.org/fhir/StructureDefinition/valueset-label',
+    );
     if (labelExtension != null) {
       responseOptionPrefixExtension = <FhirExtension>[
         FhirExtension(
-            url: FhirUri(
-                'http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix'),
-            valueString: labelExtension.valueString),
+          url: FhirUri(
+            'http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix',
+          ),
+          valueString: labelExtension.valueString,
+        ),
       ];
     }
 
@@ -181,26 +197,34 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
       final key = qi.answerValueSet?.value?.toString();
       if (key == null) {
         throw QuestionnaireFormatException(
-            'Questionnaire choice item does not specify a key', qi);
+          'Questionnaire choice item does not specify a key',
+          qi,
+        );
       }
 
       itemModel.questionnaireModel
           .forEachInValueSet(key, _addAnswerOption, context: qi);
     } else {
       if (qi.answerOption != null) {
-        _answerOptions.addEntries(qi.answerOption!.map<
-            MapEntry<String, QuestionnaireAnswerOption>>((qao) => MapEntry<
-                String, QuestionnaireAnswerOption>(
-            qao.optionCode,
-            qao.copyWith(
+        _answerOptions.addEntries(
+          qi.answerOption!.map<MapEntry<String, QuestionnaireAnswerOption>>(
+            (qao) => MapEntry<String, QuestionnaireAnswerOption>(
+              qao.optionCode,
+              qao.copyWith(
                 valueCoding: (qao.valueCoding != null)
                     ? qao.valueCoding!.copyWith(
                         userSelected: Boolean(true),
-                        extension_: _createOrdinalExtension(qao.extension_))
+                        extension_: _createOrdinalExtension(qao.extension_),
+                      )
                     : Coding(
                         // The spec only allows valueCoding, but real-world incl. valueString
                         display: qao.valueString,
-                        userSelected: Boolean(true))))));
+                        userSelected: Boolean(true),
+                      ),
+              ),
+            ),
+          ),
+        );
       }
     }
   }
@@ -214,14 +238,16 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
 
     minOccurs = qi.extension_
             ?.extensionOrNull(
-                'http://hl7.org/fhir/StructureDefinition/questionnaire-minOccurs')
+              'http://hl7.org/fhir/StructureDefinition/questionnaire-minOccurs',
+            )
             ?.valueInteger
             ?.value ??
         0;
 
     maxOccurs = qi.extension_
         ?.extensionOrNull(
-            'http://hl7.org/fhir/StructureDefinition/questionnaire-maxOccurs')
+          'http://hl7.org/fhir/StructureDefinition/questionnaire-maxOccurs',
+        )
         ?.valueInteger
         ?.value;
 
@@ -229,10 +255,12 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
       value = (itemModel.responseItem!.answer != null)
           ? CodeableConcept(
               coding: itemModel.responseItem!.answer
-                  ?.map((answer) =>
-                      answerOptions[choiceStringFromCoding(answer.valueCoding)]!
-                          .valueCoding!)
-                  .toList())
+                  ?.map(
+                    (answer) => answerOptions[
+                            choiceStringFromCoding(answer.valueCoding)]!
+                        .valueCoding!,
+                  )
+                  .toList(),)
           : null;
     }
   }
@@ -244,7 +272,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
   bool get isHorizontal {
     return qi.extension_
             ?.extensionOrNull(
-                'http://hl7.org/fhir/StructureDefinition/questionnaire-choiceOrientation')
+                'http://hl7.org/fhir/StructureDefinition/questionnaire-choiceOrientation',)
             ?.valueCode
             ?.value ==
         'horizontal';
@@ -270,7 +298,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
   @override
   QuestionnaireResponseAnswer? get filledAnswer {
     throw UnsupportedError(
-        'CodingAnswerModel will always return coding answers.');
+        'CodingAnswerModel will always return coding answers.',);
   }
 
   @override
@@ -285,14 +313,14 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
     final result = (value!.coding?.firstOrNull?.code?.value == openChoiceOther)
         ? [
             QuestionnaireResponseAnswer(
-                valueCoding: Coding(display: value!.text))
+                valueCoding: Coding(display: value!.text),)
           ]
         : value!.coding?.map<QuestionnaireResponseAnswer>((coding) {
             // Some answers may only be a display, not have a code
             return coding.code != null
                 ? QuestionnaireResponseAnswer(
                     valueCoding: answerOptions[choiceStringFromCoding(coding)]!
-                        .valueCoding)
+                        .valueCoding,)
                 : QuestionnaireResponseAnswer(valueCoding: coding);
           }).toList();
 
@@ -308,14 +336,14 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
       return QuestionnaireErrorFlag(itemModel.linkId,
           answerIndex: answerIndex,
           errorText:
-              lookupFDashLocalizations(locale).validatorMinOccurs(minOccurs));
+              lookupFDashLocalizations(locale).validatorMinOccurs(minOccurs),);
     }
 
     final validationText = validateInput(value);
     return (validationText == null)
         ? null
         : QuestionnaireErrorFlag(itemModel.linkId,
-            answerIndex: answerIndex, errorText: validationText);
+            answerIndex: answerIndex, errorText: validationText,);
   }
 
   @override

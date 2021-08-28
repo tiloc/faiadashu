@@ -20,17 +20,17 @@ class QuestionnaireLaunchTile extends StatefulWidget {
       uploadResponseFunction;
   final QuestionnaireResponse? Function(String id) restoreResponseFunction;
 
-  const QuestionnaireLaunchTile(
-      {required this.title,
-      this.subtitle,
-      this.locale,
-      required this.questionnairePath,
-      required this.fhirResourceProvider,
-      required this.saveResponseFunction,
-      this.uploadResponseFunction,
-      required this.restoreResponseFunction,
-      Key? key})
-      : super(key: key);
+  const QuestionnaireLaunchTile({
+    required this.title,
+    this.subtitle,
+    this.locale,
+    required this.questionnairePath,
+    required this.fhirResourceProvider,
+    required this.saveResponseFunction,
+    this.uploadResponseFunction,
+    required this.restoreResponseFunction,
+    Key? key,
+  }) : super(key: key);
 
   @override
   _QuestionnaireLaunchTileState createState() =>
@@ -47,15 +47,19 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
   void initState() {
     super.initState();
     _questionnaireProvider = AssetResourceProvider.singleton(
-        questionnaireResourceUri, widget.questionnairePath);
+      questionnaireResourceUri,
+      widget.questionnairePath,
+    );
   }
 
   Future<QuestionnaireModel> _createModelFuture() {
     return QuestionnaireModel.fromFhirResourceBundle(
-            fhirResourceProvider: _questionnaireProvider, locale: _locale)
-        .then<QuestionnaireModel>((qm) {
+      fhirResourceProvider: _questionnaireProvider,
+      locale: _locale,
+    ).then<QuestionnaireModel>((qm) {
       qm.populate(
-          widget.restoreResponseFunction.call(widget.questionnairePath));
+        widget.restoreResponseFunction.call(widget.questionnairePath),
+      );
       return qm;
     });
   }
@@ -102,15 +106,18 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                   await QuestionnaireModel.fromFhirResourceBundle(
                       fhirResourceProvider: _questionnaireProvider,
                       locale: _locale,
-                      aggregators: [NarrativeAggregator()]);
-              questionnaireModel.populate(widget.restoreResponseFunction
-                  .call(widget.questionnairePath));
+                      aggregators: [NarrativeAggregator()],);
+              questionnaireModel.populate(
+                widget.restoreResponseFunction.call(widget.questionnairePath),
+              );
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => NarrativePage(
-                            questionnaireModel: questionnaireModel,
-                          )));
+                context,
+                MaterialPageRoute(
+                  builder: (context) => NarrativePage(
+                    questionnaireModel: questionnaireModel,
+                  ),
+                ),
+              );
             },
           ),
         ),
@@ -123,10 +130,15 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
               locale: _locale,
               fhirResourceProvider: RegistryFhirResourceProvider([
                 AssetResourceProvider.singleton(
-                    questionnaireResourceUri, widget.questionnairePath),
+                  questionnaireResourceUri,
+                  widget.questionnairePath,
+                ),
                 InMemoryResourceProvider.inMemory(
-                    questionnaireResponseResourceUri,
-                    widget.restoreResponseFunction(widget.questionnairePath)),
+                  questionnaireResponseResourceUri,
+                  widget.restoreResponseFunction(
+                    widget.questionnairePath,
+                  ),
+                ),
                 widget.fhirResourceProvider
               ]),
               // Callback for supportLink
@@ -138,32 +150,37 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                 if (widget.uploadResponseFunction != null)
                   Builder(
                     builder: (context) => ElevatedButton.icon(
-                      label: Text(FDashLocalizations.of(context)
-                          .handlingUploadButtonLabel),
+                      label: Text(
+                        FDashLocalizations.of(context)
+                            .handlingUploadButtonLabel,
+                      ),
                       icon: const Icon(Icons.cloud_upload),
                       onPressed: () {
                         // Generate a response and upload it to a FHIR server.
                         // TODO: In a real-world scenario this should have more state handling.
                         widget.uploadResponseFunction?.call(
-                            widget.questionnairePath,
-                            QuestionnaireFiller.of(context)
-                                .aggregator<QuestionnaireResponseAggregator>()
-                                .aggregate(
-                                    responseStatus:
-                                        QuestionnaireResponseStatus.completed));
+                          widget.questionnairePath,
+                          QuestionnaireFiller.of(context)
+                              .aggregator<QuestionnaireResponseAggregator>()
+                              .aggregate(
+                                responseStatus:
+                                    QuestionnaireResponseStatus.completed,
+                              ),
+                        );
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(FDashLocalizations.of(context)
-                                      .handlingUploading),
-                                  SyncIndicator(
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  )
-                                ]),
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  FDashLocalizations.of(context)
+                                      .handlingUploading,
+                                ),
+                                SyncIndicator(
+                                  color: Theme.of(context).colorScheme.primary,
+                                )
+                              ],
+                            ),
                           ),
                         );
                         Navigator.pop(context);
@@ -173,19 +190,25 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                 Builder(
                   builder: (context) => ElevatedButton.icon(
                     label: Text(
-                        FDashLocalizations.of(context).handlingSaveButtonLabel),
+                      FDashLocalizations.of(context).handlingSaveButtonLabel,
+                    ),
                     icon: const Icon(Icons.save_alt),
                     onPressed: () {
                       // Generate a response and store it in-memory.
                       // In a real-world scenario one would persist or post the response instead.
                       widget.saveResponseFunction.call(
-                          widget.questionnairePath,
-                          QuestionnaireFiller.of(context)
-                              .aggregator<QuestionnaireResponseAggregator>()
-                              .aggregate());
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        widget.questionnairePath,
+                        QuestionnaireFiller.of(context)
+                            .aggregator<QuestionnaireResponseAggregator>()
+                            .aggregate(),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
                           content: Text(
-                              FDashLocalizations.of(context).handlingSaved)));
+                            FDashLocalizations.of(context).handlingSaved,
+                          ),
+                        ),
+                      );
                       Navigator.pop(context);
                     },
                   ),

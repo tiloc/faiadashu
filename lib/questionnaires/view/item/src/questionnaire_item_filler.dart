@@ -176,7 +176,7 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
       {required QuestionnaireItemModel itemModel,
       required QuestionnaireTheme questionnaireTheme,
       required int index,
-      Key? key}) {
+      Key? key,}) {
     if (itemModel.titleText == null) {
       return null;
     } else {
@@ -207,7 +207,7 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
           htmlTitleText: htmlTitleText,
           leading: leading,
           help: help,
-          key: key);
+          key: key,);
     }
   }
 
@@ -235,18 +235,20 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
               if (leading != null) WidgetSpan(child: leading!),
               if (itemModel.titleText != null)
                 HTML.toTextSpan(context, htmlTitleText,
-                    defaultTextStyle: Theme.of(context).textTheme.bodyText1),
+                    defaultTextStyle: Theme.of(context).textTheme.bodyText1,),
               if (help != null) WidgetSpan(child: help!),
             ],
           ),
           semanticsLabel: itemModel.titleText,
-        ));
+        ),);
   }
 }
 
 class _QuestionnaireItemFillerHelpFactory {
-  static Widget? fromQuestionnaireItem(QuestionnaireItemModel itemModel,
-      {Key? key}) {
+  static Widget? fromQuestionnaireItem(
+    QuestionnaireItemModel itemModel, {
+    Key? key,
+  }) {
     final helpItem = itemModel.helpItem;
 
     if (helpItem != null) {
@@ -255,7 +257,7 @@ class _QuestionnaireItemFillerHelpFactory {
 
     final supportLink = itemModel.questionnaireItem.extension_
         ?.extensionOrNull(
-            'http://hl7.org/fhir/StructureDefinition/questionnaire-supportLink')
+            'http://hl7.org/fhir/StructureDefinition/questionnaire-supportLink',)
         ?.valueUri
         ?.value;
 

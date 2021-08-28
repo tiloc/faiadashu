@@ -104,7 +104,7 @@ class ResponseModel {
 
     final AnswerModel? answerModel;
 
-    switch (itemModel.questionnaireItem.type!) {
+    switch (itemModel.questionnaireItem.type) {
       case QuestionnaireItemType.choice:
       case QuestionnaireItemType.open_choice:
         answerModel = CodingAnswerModel(this, answerIndex);

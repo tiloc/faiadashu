@@ -102,7 +102,8 @@ class AssetResourceProvider extends FhirResourceProvider {
     for (final assetEntry in assetMap.entries) {
       final resourceJsonString = await rootBundle.loadString(assetEntry.value);
       resources[assetEntry.key] = Resource.fromJson(
-          json.decode(resourceJsonString) as Map<String, dynamic>);
+        json.decode(resourceJsonString) as Map<String, dynamic>,
+      );
     }
   }
 

@@ -13,7 +13,7 @@ class Base64Image extends StatefulWidget {
   final double? height;
 
   const Base64Image(this.base64String,
-      {this.semanticLabel, this.width, this.height, Key? key})
+      {this.semanticLabel, this.width, this.height, Key? key,})
       : super(key: key);
 
   @override

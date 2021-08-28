@@ -53,7 +53,7 @@ class _QuestionnaireFillerProgressBarState
         final box = (qim.isAnswered)
             ? Container(
                 height: height,
-                color: widget.answeredColor ?? theme.accentColor)
+                color: widget.answeredColor ?? theme.colorScheme.secondary)
             : Container(
                 foregroundDecoration: BoxDecoration(
                     border: Border.all(color: theme.disabledColor, width: 0.5)),

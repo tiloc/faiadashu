@@ -7,7 +7,8 @@ class DisclaimerPage extends ExhibitPage {
 
   @override
   Widget buildExhibit(BuildContext context) {
-    return const Text('''
+    return const Text(
+      '''
 Flutter and the related logo are trademarks of Google LLC. We are not endorsed by or affiliated with Google LLC.
 
 HL7, FHIR and the FHIR [FLAME DESIGN] are the registered trademarks of Health Level Seven International and their use does not constitute endorsement by HL7.
@@ -20,7 +21,8 @@ This material contains the following artwork:
 "Sectional Anatomy of the Heart with Path of Blood Flow" - licensed from Blausen Medical Communications, Inc. under the Creative Commons Attribution 3.0 Unported license (https://creativecommons.org/licenses/by/3.0/deed.en)
 
 "small-n-flat icon set" (https://www.iconfinder.com/iconsets/small-n-flat) - licensed from Paomedia under the Creative Commons Attribution 3.0 Unported license (https://creativecommons.org/licenses/by/3.0/deed.en) 
-    ''');
+    ''',
+    );
   }
 
   @override

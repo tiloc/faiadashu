@@ -24,14 +24,16 @@ void main() {
   if (kDebugMode || kIsWeb) {
     dartlog.Logger.root.level = dartlog.Level.ALL;
     dartlog.Logger.root.onRecord.listen((dartlog.LogRecord rec) {
-      developer.log(rec.message,
-          time: rec.time,
-          sequenceNumber: rec.sequenceNumber,
-          level: rec.level.value,
-          name: rec.loggerName,
-          zone: rec.zone,
-          error: rec.error,
-          stackTrace: rec.stackTrace);
+      developer.log(
+        rec.message,
+        time: rec.time,
+        sequenceNumber: rec.sequenceNumber,
+        level: rec.level.value,
+        name: rec.loggerName,
+        zone: rec.zone,
+        error: rec.error,
+        stackTrace: rec.stackTrace,
+      );
     });
   } else {
     dartlog.Logger.root.level = dartlog.Level.WARNING;
@@ -160,11 +162,15 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     resourceBundleProvider = RegistryFhirResourceProvider([
       InMemoryResourceProvider.inMemory(
-          subjectResourceUri,
-          // Patient ID matches a patient on Logica Sandbox server.
-          Patient(id: Id('14603'), name: [
+        subjectResourceUri,
+        // Patient ID matches a patient on Logica Sandbox server.
+        Patient(
+          id: Id('14603'),
+          name: [
             HumanName(given: ['Emma'], family: 'Lee')
-          ])),
+          ],
+        ),
+      ),
       AssetImageAttachmentProvider(
           'http://example.org/images', 'assets/images'),
       valueSetProvider
@@ -226,8 +232,9 @@ class _HomePageState extends State<HomePage> {
               style: DefaultTextStyle.of(context).style,
               children: const <TextSpan>[
                 TextSpan(
-                    text: 'Widgets for Digital Health',
-                    style: TextStyle(fontSize: 12)),
+                  text: 'Widgets for Digital Health',
+                  style: TextStyle(fontSize: 12),
+                ),
               ],
             ),
           ),
@@ -274,18 +281,18 @@ class _HomePageState extends State<HomePage> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const PrimitivePage()));
+                          builder: (context) => const PrimitivePage(),),);
                 },
               ),
               ListTile(
                 title: const Text('Observation'),
                 subtitle: const Text(
-                    'Formatted, internationalized text output of observations.'),
+                    'Formatted, internationalized text output of observations.',),
                 onTap: () {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => ObservationPage()));
+                          builder: (context) => ObservationPage(),),);
                 },
               ),
               QuestionnaireLaunchTile(
@@ -368,7 +375,7 @@ class _HomePageState extends State<HomePage> {
               ListTile(
                 title: const Text('PHQ9 Questionnaire Stepper'),
                 subtitle: const Text(
-                    'Simple choice-based survey with a total score.'),
+                    'Simple choice-based survey with a total score.',),
                 onTap: () {
                   Navigator.push(
                       context,
@@ -376,13 +383,13 @@ class _HomePageState extends State<HomePage> {
                           builder: (context) => QuestionnaireStepperPage(
                               fhirResourceProvider: AssetResourceProvider.singleton(
                                   questionnaireResourceUri,
-                                  'assets/instruments/phq9_instrument.json'))));
+                                  'assets/instruments/phq9_instrument.json',),),),);
                 },
               ),
               ListTile(
                 title: const Text('Cherry blossom Filler'),
                 subtitle: const Text(
-                    'Illustrates embedding of questionnaire (no Scaffold)'),
+                    'Illustrates embedding of questionnaire (no Scaffold)',),
                 onTap: () {
                   Navigator.push(
                       context,
@@ -395,13 +402,13 @@ class _HomePageState extends State<HomePage> {
                                   resourceBundleProvider,
                                   AssetResourceProvider.singleton(
                                       questionnaireResourceUri,
-                                      'assets/instruments/sdc_demo.json')
+                                      'assets/instruments/sdc_demo.json',)
                                 ]),
                                 questionnaireTheme: const QuestionnaireTheme(
                                     canSkipQuestions: true,
                                     showNullAnswerOption: false,
-                                    showQuestionNumbers: true),
-                              )));
+                                    showQuestionNumbers: true,),
+                              ),),);
                 },
               ),
               QuestionnaireLaunchTile(
@@ -429,7 +436,7 @@ class _HomePageState extends State<HomePage> {
                 fhirResourceProvider: RegistryFhirResourceProvider([
                   AssetResourceProvider.singleton(
                       questionnaireResponseResourceUri,
-                      'assets/responses/bluebook_response.json'),
+                      'assets/responses/bluebook_response.json',),
                   resourceBundleProvider
                 ]),
                 questionnairePath: 'assets/instruments/bluebook.json',
@@ -462,7 +469,7 @@ class _CherryBlossomScaffoldBuilder extends QuestionnairePageScaffoldBuilder {
   @override
   Widget build(BuildContext context,
       {required void Function(void Function() p1) setStateCallback,
-      required Widget child}) {
+      required Widget child,}) {
     return Theme(
       data: ThemeData.light(), // Make it always light
       // We have to take care of SafeArea ourselves
@@ -485,10 +492,12 @@ class _CherryBlossomScaffoldBuilder extends QuestionnairePageScaffoldBuilder {
               const Divider(),
               // We're putting our own exit button in here
               Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: OutlinedButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('桜の園からの帰り道'))),
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: OutlinedButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('桜の園からの帰り道'),
+                ),
+              ),
             ],
           ),
         ),

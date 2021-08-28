@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 ///
 /// Based on the internal JSON representation of the resource.
 class ResourceJsonTree extends StatefulWidget {
-  const ResourceJsonTree(this.resourceRoot,
-      {this.autoExpandLevel = 10, Key? key})
-      : super(key: key);
+  const ResourceJsonTree(
+    this.resourceRoot, {
+    this.autoExpandLevel = 10,
+    Key? key,
+  }) : super(key: key);
 
   final dynamic resourceRoot;
   final int autoExpandLevel;
@@ -25,11 +27,23 @@ class ResourceJsonTree extends StatefulWidget {
     if (nodeValue == null) {
       node = _JsonViewerGenericNode(nodeName, nodeValue);
     } else if (nodeValue is Map) {
-      node = _JsonViewerMapNode(nodeRoot, parent, nodeName,
-          nodeValue as Map<String, dynamic>, 8, nodeExpandedDepth);
+      node = _JsonViewerMapNode(
+        nodeRoot,
+        parent,
+        nodeName,
+        nodeValue as Map<String, dynamic>,
+        8,
+        nodeExpandedDepth,
+      );
     } else if (nodeValue is List) {
       node = _JsonViewerListNode(
-          nodeRoot, parent, nodeName, nodeValue, 8, nodeExpandedDepth);
+        nodeRoot,
+        parent,
+        nodeName,
+        nodeValue,
+        8,
+        nodeExpandedDepth,
+      );
     } else {
       node = _JsonViewerGenericNode(nodeName, nodeValue);
     }
@@ -55,10 +69,15 @@ class _ResourceJsonTreeState extends State<ResourceJsonTree> {
 }
 
 abstract class _JsonNode<T> extends StatefulWidget {
-  const _JsonNode(this.root, this.parent, this.nodeName, this.nodeValue,
-      this.leftOffset, this.expandedDepth,
-      {Key? key})
-      : super(key: key);
+  const _JsonNode(
+    this.root,
+    this.parent,
+    this.nodeName,
+    this.nodeValue,
+    this.leftOffset,
+    this.expandedDepth, {
+    Key? key,
+  }) : super(key: key);
 
   final ResourceJsonTree root;
   final _JsonNode? parent;
@@ -88,15 +107,22 @@ abstract class _JsonNodeState<T extends _JsonNode> extends State<T> {
 
 class _JsonViewerMapNode extends _JsonNode<Map<String, dynamic>> {
   const _JsonViewerMapNode(
-      ResourceJsonTree root,
-      _JsonNode<dynamic>? parent,
-      String nodeName,
-      Map<String, dynamic> nodeValue,
-      double leftOffset,
-      int expandedDepth,
-      {Key? key})
-      : super(root, parent, nodeName, nodeValue, leftOffset, expandedDepth,
-            key: key);
+    ResourceJsonTree root,
+    _JsonNode<dynamic>? parent,
+    String nodeName,
+    Map<String, dynamic> nodeValue,
+    double leftOffset,
+    int expandedDepth, {
+    Key? key,
+  }) : super(
+          root,
+          parent,
+          nodeName,
+          nodeValue,
+          leftOffset,
+          expandedDepth,
+          key: key,
+        );
 
   @override
   State<StatefulWidget> createState() => _MapNodeState();
@@ -116,19 +142,20 @@ class _MapNodeState extends _JsonNodeState<_JsonViewerMapNode> {
   @override
   Widget build(BuildContext context) {
     Widget result = GestureDetector(
-        onTap: () => toggleOpen(),
-        child: Row(
-          children: <Widget>[
-            Icon(
-              isOpen ? Icons.arrow_drop_down : Icons.arrow_right,
-              color: Theme.of(context).colorScheme.secondary,
-            ),
-            Text(
-              widget.nodeName,
-              style: Theme.of(context).textTheme.bodyText1,
-            )
-          ],
-        ));
+      onTap: () => toggleOpen(),
+      child: Row(
+        children: <Widget>[
+          Icon(
+            isOpen ? Icons.arrow_drop_down : Icons.arrow_right,
+            color: Theme.of(context).colorScheme.secondary,
+          ),
+          Text(
+            widget.nodeName,
+            style: Theme.of(context).textTheme.bodyText1,
+          )
+        ],
+      ),
+    );
     if (isOpen) {
       result = Column(
         children: <Widget>[
@@ -150,15 +177,22 @@ class _MapNodeState extends _JsonNodeState<_JsonViewerMapNode> {
 /// Display a list of JSON entries
 class _JsonViewerListNode extends _JsonNode<List<dynamic>> {
   const _JsonViewerListNode(
-      ResourceJsonTree root,
-      _JsonNode<dynamic>? parent,
-      String nodeName,
-      List<dynamic> nodeValue,
-      double leftOffset,
-      int expandedDepth,
-      {Key? key})
-      : super(root, parent, nodeName, nodeValue, leftOffset, expandedDepth,
-            key: key);
+    ResourceJsonTree root,
+    _JsonNode<dynamic>? parent,
+    String nodeName,
+    List<dynamic> nodeValue,
+    double leftOffset,
+    int expandedDepth, {
+    Key? key,
+  }) : super(
+          root,
+          parent,
+          nodeName,
+          nodeValue,
+          leftOffset,
+          expandedDepth,
+          key: key,
+        );
 
   @override
   State<StatefulWidget> createState() => _JsonViewerListNodeState();
@@ -182,28 +216,30 @@ class _JsonViewerListNodeState extends _JsonNodeState<_JsonViewerListNode> {
     final themeData = Theme.of(context);
 
     Widget result = GestureDetector(
-        onTap: () => toggleOpen(),
-        child: Row(
-          children: <Widget>[
-            if (count > 0)
-              Icon(
-                isOpen ? Icons.arrow_drop_down : Icons.arrow_right,
-                color: Theme.of(context).colorScheme.secondary,
-              ),
-            Text(
-              widget.nodeName,
-              style: Theme.of(context).textTheme.bodyText1,
+      onTap: () => toggleOpen(),
+      child: Row(
+        children: <Widget>[
+          if (count > 0)
+            Icon(
+              isOpen ? Icons.arrow_drop_down : Icons.arrow_right,
+              color: Theme.of(context).colorScheme.secondary,
             ),
-            Text(
-              " ($count)",
-              style: (count > 0)
-                  ? TextStyle(
-                      color: themeData.textTheme.bodyText1!.color!
-                          .withOpacity(0.54))
-                  : TextStyle(color: themeData.errorColor),
-            ),
-          ],
-        ));
+          Text(
+            widget.nodeName,
+            style: Theme.of(context).textTheme.bodyText1,
+          ),
+          Text(
+            " ($count)",
+            style: (count > 0)
+                ? TextStyle(
+                    color:
+                        themeData.textTheme.bodyText1!.color!.withOpacity(0.54),
+                  )
+                : TextStyle(color: themeData.errorColor),
+          ),
+        ],
+      ),
+    );
     if (isOpen) {
       result = Column(
         children: <Widget>[
@@ -256,20 +292,24 @@ class _JsonViewerGenericNode extends StatelessWidget {
           Text(
             nodeName,
             style: TextStyle(
-                color: themeData.textTheme.bodyText1!.color!.withOpacity(0.54)),
+              color: themeData.textTheme.bodyText1!.color!.withOpacity(0.54),
+            ),
           ),
           const Text(' : '),
           if (nodeValue != null)
             Expanded(
-                child: Text(
-              nodeValue.toString(),
-              softWrap: true,
-              maxLines: 999,
-              style: TextStyle(color: color),
-            )),
+              child: Text(
+                nodeValue.toString(),
+                softWrap: true,
+                maxLines: 999,
+                style: TextStyle(color: color),
+              ),
+            ),
           if (nodeValue == null)
-            Text('null',
-                style: TextStyle(color: themeData.colorScheme.secondary)),
+            Text(
+              'null',
+              style: TextStyle(color: themeData.colorScheme.secondary),
+            ),
         ],
       ),
     );

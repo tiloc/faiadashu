@@ -19,17 +19,17 @@ class QuestionnaireTheme {
   const QuestionnaireTheme(
       {this.canSkipQuestions = false,
       this.showNullAnswerOption = true,
-      this.showQuestionNumbers = false});
+      this.showQuestionNumbers = false,});
 
   /// Returns a [QuestionnaireItemFiller] for a given [QuestionnaireFiller].
   ///
   /// Used by [QuestionnaireFiller].
   QuestionnaireItemFiller createQuestionnaireItemFiller(
       QuestionnaireFillerData questionnaireFiller, int index,
-      {Key? key}) {
+      {Key? key,}) {
     return QuestionnaireItemFiller.fromQuestionnaireFiller(
         questionnaireFiller, index,
-        key: key);
+        key: key,);
   }
 
   /// Returns a [QuestionnaireResponseFiller] for a given [QuestionnaireItemFiller].
@@ -37,7 +37,7 @@ class QuestionnaireTheme {
   /// Used by [QuestionnaireItemFiller].
   QuestionnaireResponseFiller createQuestionnaireResponseFiller(
       QuestionnaireItemFiller itemFiller,
-      {Key? key}) {
+      {Key? key,}) {
     return QuestionnaireResponseFiller.fromQuestionnaireItemFiller(itemFiller);
   }
 
@@ -46,7 +46,7 @@ class QuestionnaireTheme {
   /// Can be overridden through inheritance of [QuestionnaireTheme].
   QuestionnaireAnswerFiller createAnswerFiller(
       QuestionnaireResponseFillerState responseFiller, int answerIndex,
-      {Key? key}) {
+      {Key? key,}) {
     try {
       final responseModel = responseFiller.responseModel;
 
@@ -71,14 +71,18 @@ class QuestionnaireTheme {
       } else if (answerModel is UnsupportedAnswerModel) {
         throw QuestionnaireFormatException(
             'Unsupported item type: ${answerModel.qi.type}',
-            answerModel.itemModel.linkId);
+            answerModel.itemModel.linkId,);
       } else {
         throw QuestionnaireFormatException('Unknown AnswerModel: $answerModel');
       }
     } catch (exception) {
       _logger.warn('Cannot create answer filler:', error: exception);
-      return BrokenAnswerFiller(responseFiller, answerIndex, exception,
-          key: key);
+      return BrokenAnswerFiller(
+        responseFiller,
+        answerIndex,
+        exception,
+        key: key,
+      );
     }
   }
 

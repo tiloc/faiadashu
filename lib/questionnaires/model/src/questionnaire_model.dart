@@ -13,7 +13,8 @@ part of 'questionnaire_item_model.dart';
 /// [QuestionnaireModel] provides direct access to any [QuestionnaireItemModel] through linkId.
 class QuestionnaireModel extends QuestionnaireItemModel {
   final Map<String, QuestionnaireItemModel> _cachedItems = {};
-  List<QuestionnaireItemModel>? _enabledWhens;
+  List<QuestionnaireItemModel>? _itemsWithEnableWhen;
+  List<QuestionnaireItemModel>? _itemsWithEnableWhenExpression;
   final List<Aggregator>? _aggregators;
 
   /// Direct access to [FhirResourceProvider]s for special use-cases.
@@ -37,23 +38,37 @@ class QuestionnaireModel extends QuestionnaireItemModel {
             ArgumentError.checkNotNull(questionnaire.item?.first.linkId),
             null,
             0,
-            0) {
+            0,) {
     _questionnaireModel = this;
     // This will set up the traversal order and fill up the cache.
     _ensureOrderedItems();
 
+    // Set up conventional enableWhen feature
     for (final itemModel in orderedQuestionnaireItemModels()) {
-      final enableWhens = itemModel.questionnaireItem.enableWhen;
-      if ((enableWhens != null) && enableWhens.isNotEmpty) {
-        if (_enabledWhens == null) {
-          _enabledWhens = [itemModel];
+      if (itemModel.isEnabledWhen) {
+        if (_itemsWithEnableWhen == null) {
+          _itemsWithEnableWhen = [itemModel];
         } else {
-          _enabledWhens!.add(itemModel);
+          _itemsWithEnableWhen!.add(itemModel);
         }
       }
     }
 
-    _logger.debug('_enabledWhens: $_enabledWhens');
+    _logger.debug('_itemsWithEnableWhen: $_itemsWithEnableWhen');
+
+    // Set up FHIR Path based enableWhenExpression feature
+    for (final itemModel in orderedQuestionnaireItemModels()) {
+      if (itemModel.isEnabledWhenExpression) {
+        if (_itemsWithEnableWhenExpression == null) {
+          _itemsWithEnableWhenExpression = [itemModel];
+        } else {
+          _itemsWithEnableWhenExpression!.add(itemModel);
+        }
+      }
+    }
+
+    _logger.debug(
+        '_itemsWithEnableWhenExpression: $_itemsWithEnableWhenExpression',);
 
     if (aggregators != null) {
       for (final aggregator in aggregators) {
@@ -65,7 +80,7 @@ class QuestionnaireModel extends QuestionnaireItemModel {
       }
     }
 
-    activateEnableWhen();
+    activateEnableBehavior();
 
     errorFlags.addListener(() {
       nextGeneration();
@@ -362,14 +377,17 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   }
 
   /// Update the current enablement status of all items.
-  void updateEnableWhen({bool notifyListeners = true}) {
-    if (_enabledWhens == null) {
+  ///
+  /// This updates enablement through enableWhen and enableWhenExpression.
+  void updateEnabledItems({bool notifyListeners = true}) {
+    if (_itemsWithEnableWhen == null &&
+        _itemsWithEnableWhenExpression == null) {
       _logger.trace(
-        'updateEnableWhen: no conditional items',
+        'updateEnabledItems: no conditionally enabled items',
       );
       return;
     }
-    _logger.trace('updateEnableWhen()');
+    _logger.trace('updateEnabledItems()');
 
     final previouslyEnabled = List<bool>.generate(
         orderedQuestionnaireItemModels().length,
@@ -380,31 +398,50 @@ class QuestionnaireModel extends QuestionnaireItemModel {
       itemModel._isEnabled = true;
     }
 
-    for (final itemModel in _enabledWhens!) {
-      itemModel._calculateEnabled();
+    if (_itemsWithEnableWhen != null) {
+      for (final itemModel in _itemsWithEnableWhen!) {
+        itemModel._updateEnabled();
+      }
     }
-    final afterEnabled = List<bool>.generate(
+
+    if (_itemsWithEnableWhenExpression != null) {
+      for (final itemModel in _itemsWithEnableWhenExpression!) {
+        itemModel._updateEnabled();
+      }
+    }
+
+    final nowEnabled = List<bool>.generate(
         orderedQuestionnaireItemModels().length,
         (index) => orderedQuestionnaireItemModels().elementAt(index).isEnabled,
         growable: false);
-    _logger.trace('afterEnabled: $afterEnabled');
+    _logger.trace('nowEnabled: $nowEnabled');
 
-    if (!listEquals(previouslyEnabled, afterEnabled)) {
+    if (!listEquals(previouslyEnabled, nowEnabled)) {
       nextGeneration(notifyListeners: notifyListeners);
     } else {
-      _logger.debug('enableWhen unchanged.');
+      _logger.debug('Enabled items unchanged.');
     }
   }
 
-  /// Activate the "enableWhen" behaviors.
-  void activateEnableWhen() {
-    for (final itemModel in orderedQuestionnaireItemModels()) {
-      itemModel.forEnableWhens((qew) {
-        fromLinkId(qew.question!).addListener(() => updateEnableWhen());
-      });
+  /// Activate the enable behavior.
+  ///
+  /// Adds the required listeners to evaluate enableWhen and
+  /// enableWhenExpression as items are changed.
+  void activateEnableBehavior() {
+    if (_itemsWithEnableWhenExpression != null) {
+      // When enableWhenExpression is involved we need to add listeners to every
+      // non-static item, as we have no way to find out which items are referenced
+      // by the FHIR Path expression.
+      addListener(() => updateEnabledItems());
+    } else {
+      for (final itemModel in orderedQuestionnaireItemModels()) {
+        itemModel.forEnableWhens((qew) {
+          fromLinkId(qew.question!).addListener(() => updateEnabledItems());
+        });
+      }
     }
 
-    updateEnableWhen();
+    updateEnabledItems();
   }
 
   /// Returns whether the questionnaire meets all completeness criteria.

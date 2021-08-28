@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
+import 'package:fhir_path/fhir_path.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../../fhir_types/fhir_types.dart';
@@ -43,11 +44,61 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     }
   }
 
-  /// Calculates the current enablement status of this item.
+  /// Returns whether the item is enabled/disabled through an enabledWhen condition.
+  bool get isEnabledWhen {
+    return questionnaireItem.enableWhen?.isNotEmpty ?? false;
+  }
+
+  /// Returns whether the item is enabled/disabled through an enabledWhenExpression condition.
+  bool get isEnabledWhenExpression {
+    return questionnaireItem.extension_?.extensionOrNull(
+            'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression') !=
+        null;
+  }
+
+  /// Updates the current enablement status of this item.
+  ///
+  /// Determines the applicable method (enableWhen / enableWhenExpression).
   ///
   /// Sets the [isEnabled] property
-  void _calculateEnabled() {
-    _qimLogger.trace('Enter _calculateEnabled()');
+  void _updateEnabled() {
+    _qimLogger.trace('Enter _updateEnabled()');
+
+    if (isEnabledWhen) {
+      _updateEnabledByEnableWhen();
+    } else if (isEnabledWhenExpression) {
+      _updateEnabledByEnableWhenExpression();
+    }
+  }
+
+  /// Updates the current enablement status of this item, based on enabledWhenExpression.
+  ///
+  /// Sets the [isEnabled] property
+  void _updateEnabledByEnableWhenExpression() {
+    _qimLogger.trace('Enter _updateEnabledByEnableWhenExpression()');
+
+    // TODO: Implement
+    final pathExpression = questionnaireItem.extension_
+        ?.extensionOrNull(
+            'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression')
+        ?.valueExpression
+        ?.expression;
+
+    if (pathExpression == null) {
+      throw QuestionnaireFormatException(
+          'enableWhenExpression missing expression', questionnaireItem);
+    }
+
+    final fhirPathResult = r4WalkFhirPath(
+        questionnaireModel.questionnaireResponse, pathExpression);
+    _qimLogger.debug('fhirPathResult: $fhirPathResult');
+  }
+
+  /// Updates the current enablement status of this item, based on enabledWhen.
+  ///
+  /// Sets the [isEnabled] property
+  void _updateEnabledByEnableWhen() {
+    _qimLogger.trace('Enter _updateEnabledByEnableWhen()');
 
     bool anyTrigger = false;
     int allTriggered = 0;
@@ -317,7 +368,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
                 'http://hl7.org/fhir/StructureDefinition/iso21090-CO-value') ??
         responseItem?.answer?.firstOrNull?.valueCoding?.extension_
             ?.extensionOrNull(
-                'http://hl7.org/fhir/StructureDefinition/ordinalValue');
+                'http://hl7.org/fhir/StructureDefinition/ordinalValue',);
     if (ordinalExtension == null) {
       return null;
     }
@@ -548,7 +599,7 @@ class _LocationListBuilder {
           _questionnaire,
           questionnaireModel,
           item,
-          item.linkId!,
+          item.linkId,
           _parent,
           siblingIndex,
           _level));

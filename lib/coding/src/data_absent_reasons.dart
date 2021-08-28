@@ -10,25 +10,28 @@ final dataAbsentReasonSystem =
 
 /// There is information on this item available but it has not been provided by the sender due to security, privacy or other reasons.
 final dataAbsentReasonMasked = Coding(
-    code: dataAbsentReasonMaskedCode,
-    display: 'Masked',
-    system: dataAbsentReasonSystem);
+  code: dataAbsentReasonMaskedCode,
+  display: 'Masked',
+  system: dataAbsentReasonSystem,
+);
 
 const dataAbsentReasonMaskedCode = Code.asConst('masked');
 
 /// This information has not been sought (e.g., patient was not asked)
 final dataAbsentReasonNotAsked = Coding(
-    code: dataAbsentReasonNotAskedCode,
-    display: 'Not Asked',
-    system: dataAbsentReasonSystem);
+  code: dataAbsentReasonNotAskedCode,
+  display: 'Not Asked',
+  system: dataAbsentReasonSystem,
+);
 
 const dataAbsentReasonNotAskedCode = Code.asConst('not-asked');
 
 /// Information was sought but not found (e.g., patient was asked but didn't know)
 final dataAbsentReasonAskedButUnknown = Coding(
-    code: dataAbsentReasonAskedButUnknownCode,
-    display: 'Asked But Unknown',
-    system: dataAbsentReasonSystem);
+  code: dataAbsentReasonAskedButUnknownCode,
+  display: 'Asked But Unknown',
+  system: dataAbsentReasonSystem,
+);
 
 const dataAbsentReasonAskedButUnknownCode = Code.asConst('asked-unknown');
 
@@ -36,7 +39,7 @@ const dataAbsentReasonAskedButUnknownCode = Code.asConst('asked-unknown');
 final dataAbsentReasonAskedButDeclined = Coding(
     code: dataAbsentReasonAskedButDeclinedCode,
     display: 'Asked But Declined',
-    system: dataAbsentReasonSystem);
+    system: dataAbsentReasonSystem,);
 
 const dataAbsentReasonAskedButDeclinedCode = Code.asConst('asked-declined');
 
@@ -44,7 +47,7 @@ const dataAbsentReasonAskedButDeclinedCode = Code.asConst('asked-declined');
 final dataAbsentReasonTemporarilyUnknown = Coding(
     code: dataAbsentReasonTempUnknownCode,
     display: 'Temporarily Unknown',
-    system: dataAbsentReasonSystem);
+    system: dataAbsentReasonSystem,);
 
 const dataAbsentReasonTempUnknownCode = Code.asConst('temp-unknown');
 
@@ -58,7 +61,7 @@ const dataAbsentReasonAsTextCode = Code.asConst('as-text');
 final dataAbsentReasonAsText = Coding(
     code: dataAbsentReasonAsTextCode,
     display: 'As Text',
-    system: dataAbsentReasonSystem);
+    system: dataAbsentReasonSystem,);
 
 extension DataAbsentReasonExtension on List<FhirExtension> {
   Code? get dataAbsentReason {

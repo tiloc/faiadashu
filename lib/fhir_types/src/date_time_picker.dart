@@ -21,18 +21,18 @@ class FhirDateTimePicker extends StatefulWidget {
   final bool enabled;
   final void Function(FhirDateTime?)? onChanged;
 
-  const FhirDateTimePicker(
-      {required this.initialDateTime,
-      required this.firstDate,
-      required this.lastDate,
-      required this.pickerType,
-      this.decoration,
-      this.onChanged,
-      this.locale,
-      this.focusNode,
-      this.enabled = true,
-      Key? key})
-      : super(key: key);
+  const FhirDateTimePicker({
+    required this.initialDateTime,
+    required this.firstDate,
+    required this.lastDate,
+    required this.pickerType,
+    this.decoration,
+    this.onChanged,
+    this.locale,
+    this.focusNode,
+    this.enabled = true,
+    Key? key,
+  }) : super(key: key);
 
   @override
   _FhirDateTimePickerState createState() => _FhirDateTimePickerState();
@@ -63,11 +63,12 @@ class _FhirDateTimePickerState extends State<FhirDateTimePicker> {
 
     if (widget.pickerType != Time) {
       final date = await showDatePicker(
-          initialDate: _dateTimeValue?.value ?? DateTime.now(),
-          firstDate: widget.firstDate,
-          lastDate: widget.lastDate,
-          locale: locale,
-          context: context);
+        initialDate: _dateTimeValue?.value ?? DateTime.now(),
+        firstDate: widget.firstDate,
+        lastDate: widget.lastDate,
+        locale: locale,
+        context: context,
+      );
 
       if (date == null) {
         return; // Cancelled, don't touch anything
@@ -77,27 +78,37 @@ class _FhirDateTimePickerState extends State<FhirDateTimePicker> {
 
     if (widget.pickerType == FhirDateTime || widget.pickerType == Time) {
       final time = await showTimePicker(
-          initialTime:
-              TimeOfDay.fromDateTime(_dateTimeValue?.value ?? DateTime.now()),
-          context: context,
-          builder: (context, child) {
-            return Localizations.override(
-                context: context, locale: locale, child: child);
-          });
+        initialTime:
+            TimeOfDay.fromDateTime(_dateTimeValue?.value ?? DateTime.now()),
+        context: context,
+        builder: (context, child) {
+          return Localizations.override(
+            context: context,
+            locale: locale,
+            child: child,
+          );
+        },
+      );
 
       if (time == null) {
         return; // Cancelled, don't touch anything
       }
 
       dateTime = DateTime(
-          dateTime.year, dateTime.month, dateTime.day, time.hour, time.minute);
+        dateTime.year,
+        dateTime.month,
+        dateTime.day,
+        time.hour,
+        time.minute,
+      );
     }
 
     final fhirDateTime = FhirDateTime.fromDateTime(
-        dateTime,
-        (widget.pickerType == Date)
-            ? DateTimePrecision.YYYYMMDD
-            : DateTimePrecision.FULL);
+      dateTime,
+      (widget.pickerType == Date)
+          ? DateTimePrecision.YYYYMMDD
+          : DateTimePrecision.FULL,
+    );
     setState(() {
       _dateTimeFieldController.text = (widget.pickerType == Time)
           ? DateFormat.jm(locale.toString()).format(dateTime)
@@ -125,9 +136,10 @@ class _FhirDateTimePickerState extends State<FhirDateTimePicker> {
           enabled: widget.enabled,
           textAlignVertical: TextAlignVertical.center,
           decoration: widget.decoration?.copyWith(
-              prefixIcon: (widget.pickerType == Time)
-                  ? const Icon(Icons.access_time)
-                  : const Icon(Icons.calendar_today_outlined)),
+            prefixIcon: (widget.pickerType == Time)
+                ? const Icon(Icons.access_time)
+                : const Icon(Icons.calendar_today_outlined),
+          ),
           controller: _dateTimeFieldController,
           onTap: () async {
             await _showPicker(locale);
@@ -136,14 +148,15 @@ class _FhirDateTimePickerState extends State<FhirDateTimePicker> {
         ),
         if (widget.enabled && _dateTimeFieldController.text.isNotEmpty)
           IconButton(
-              focusNode: _clearFocusNode,
-              onPressed: () {
-                setState(() {
-                  _dateTimeFieldController.text = '';
-                });
-                widget.onChanged?.call(null);
-              },
-              icon: const Icon(Icons.clear))
+            focusNode: _clearFocusNode,
+            onPressed: () {
+              setState(() {
+                _dateTimeFieldController.text = '';
+              });
+              widget.onChanged?.call(null);
+            },
+            icon: const Icon(Icons.clear),
+          )
       ],
     );
   }

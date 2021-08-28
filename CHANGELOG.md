@@ -1,3 +1,6 @@
+## 0.5.4
+* WIP attempt to use [Grey Faulkenberry's](https://github.com/Dokotela) implementation of FHIR Path for `enableWhenExpression`.
+
 ## 0.5.3
 * Another theming contribution! Again from [John Manning](https://github.com/FireJuun)
   * This one allows you to prefix the questions in a questionnaire with a running number (1, 2, 3, ...)

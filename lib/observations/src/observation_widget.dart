@@ -15,23 +15,24 @@ class ObservationWidget extends StatelessWidget {
   final Widget _dateTimeWidget;
   final Locale? locale;
 
-  ObservationWidget(Observation observation,
-      {Key? key,
-      this.locale,
-      TextStyle? valueStyle,
-      TextStyle? unitStyle,
-      TextStyle? codeStyle,
-      TextStyle? dateTimeStyle,
-      String componentSeparator = ' | ',
-      String unknownUnitText = '',
-      String unknownValueText = '?'})
-      : _valueWidget = ObservationValueWidget(observation,
+  ObservationWidget(
+    Observation observation, {
+    Key? key,
+    this.locale,
+    TextStyle? valueStyle,
+    TextStyle? unitStyle,
+    TextStyle? codeStyle,
+    TextStyle? dateTimeStyle,
+    String componentSeparator = ' | ',
+    String unknownUnitText = '',
+    String unknownValueText = '?',
+  })  : _valueWidget = ObservationValueWidget(observation,
             valueStyle: valueStyle,
             unitStyle: unitStyle,
             locale: locale,
             componentSeparator: componentSeparator,
             unknownUnitText: unknownUnitText,
-            unknownValueText: unknownValueText),
+            unknownValueText: unknownValueText,),
         _codeWidget =
             CodeableConceptText(observation.code, style: codeStyle, key: key),
         _dateTimeWidget = FhirDateTimeText(
@@ -73,7 +74,7 @@ class ObservationValueWidget extends StatelessWidget {
       this.unitStyle,
       this.componentSeparator = ' | ',
       this.unknownUnitText = '',
-      this.unknownValueText = '?'})
+      this.unknownValueText = '?',})
       : super(key: key);
 
   @override
@@ -81,7 +82,7 @@ class ObservationValueWidget extends StatelessWidget {
     final Widget valueWidget;
 
     final decimalFormat = NumberFormat.decimalPattern(
-        (locale ?? Localizations.localeOf(context)).toString());
+        (locale ?? Localizations.localeOf(context)).toString(),);
 
     if (_observation.valueQuantity != null) {
       final valueString =
@@ -125,10 +126,13 @@ class ObservationValueWidget extends StatelessWidget {
         style: valueStyle,
       );
     } else {
-      valueWidget = Text(unknownValueText,
-          style: valueStyle?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).errorColor));
+      valueWidget = Text(
+        unknownValueText,
+        style: valueStyle?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: Theme.of(context).errorColor,
+        ),
+      );
     }
 
     return valueWidget;

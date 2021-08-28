@@ -9,7 +9,7 @@ class CodeableConceptText extends StatelessWidget {
   final Locale? locale;
 
   const CodeableConceptText(this.codeableConcept,
-      {this.style, this.locale, Key? key})
+      {this.style, this.locale, Key? key,})
       : super(key: key);
 
   @override

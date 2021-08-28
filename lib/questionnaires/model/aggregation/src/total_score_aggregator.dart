@@ -26,10 +26,11 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
   void init(QuestionnaireModel questionnaireModel) {
     super.init(questionnaireModel);
 
-    totalScoreItem = questionnaireModel
-        .orderedQuestionnaireItemModels()
-        .firstWhereOrNull((itemModel) =>
-            TotalScoreAggregator.isTotalScoreExpression(itemModel));
+    totalScoreItem =
+        questionnaireModel.orderedQuestionnaireItemModels().firstWhereOrNull(
+              (itemModel) =>
+                  TotalScoreAggregator.isTotalScoreExpression(itemModel),
+            );
     // if there is no total score itemModel then leave value at 0 indefinitely
     if (autoAggregate) {
       if (totalScoreItem != null) {
@@ -50,12 +51,12 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
     }
 
     _logger.trace('totalScore.aggregate');
-    final sum = questionnaireModel
-        .orderedQuestionnaireItemModels()
-        .fold<double>(
-            0.0,
-            (previousValue, element) =>
-                previousValue + (element.ordinalValue?.value ?? 0.0));
+    final sum =
+        questionnaireModel.orderedQuestionnaireItemModels().fold<double>(
+              0.0,
+              (previousValue, element) =>
+                  previousValue + (element.ordinalValue?.value ?? 0.0),
+            );
 
     _logger.debug('sum: $sum');
     final result = Decimal(sum);
@@ -65,23 +66,25 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
 
     final unit = totalScoreItem!.questionnaireItem.extension_
         ?.extensionOrNull(
-            'http://hl7.org/fhir/StructureDefinition/questionnaire-unit')
+            'http://hl7.org/fhir/StructureDefinition/questionnaire-unit',)
         ?.valueCoding
         ?.display;
 
     if (unit != null) {
       totalScoreItem!.responseItem = QuestionnaireResponseItem(
-          linkId: totalScoreItem!.linkId,
-          text: totalScoreItem!.questionnaireItem.text,
-          answer: [
-            QuestionnaireResponseAnswer(
-                valueQuantity: Quantity(value: value, unit: unit))
-          ]);
+        linkId: totalScoreItem!.linkId,
+        text: totalScoreItem!.questionnaireItem.text,
+        answer: [
+          QuestionnaireResponseAnswer(
+            valueQuantity: Quantity(value: value, unit: unit),
+          )
+        ],
+      );
     } else {
       totalScoreItem!.responseItem = QuestionnaireResponseItem(
           linkId: totalScoreItem!.linkId,
           text: totalScoreItem!.questionnaireItem.text,
-          answer: [QuestionnaireResponseAnswer(valueDecimal: value)]);
+          answer: [QuestionnaireResponseAnswer(valueDecimal: value)],);
     }
 
     return result;

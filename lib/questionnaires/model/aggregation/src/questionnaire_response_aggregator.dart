@@ -23,8 +23,10 @@ class QuestionnaireResponseAggregator
     super.init(questionnaireModel);
   }
 
-  QuestionnaireResponseItem? _fromGroupItem(QuestionnaireItemModel itemModel,
-      QuestionnaireResponseStatus responseStatus) {
+  QuestionnaireResponseItem? _fromGroupItem(
+    QuestionnaireItemModel itemModel,
+    QuestionnaireResponseStatus responseStatus,
+  ) {
     if (responseStatus == QuestionnaireResponseStatus.completed &&
         !itemModel.isEnabled) {
       return null;
@@ -47,19 +49,21 @@ class QuestionnaireResponseAggregator
 
     if (nestedItems.isNotEmpty) {
       return QuestionnaireResponseItem(
-          linkId: itemModel.linkId,
-          text: itemModel.titleText,
-          item: nestedItems);
+        linkId: itemModel.linkId,
+        text: itemModel.titleText,
+        item: nestedItems,
+      );
     } else {
       return null;
     }
   }
 
   @override
-  QuestionnaireResponse? aggregate(
-      {QuestionnaireResponseStatus? responseStatus,
-      bool notifyListeners = false,
-      bool containPatient = false}) {
+  QuestionnaireResponse? aggregate({
+    QuestionnaireResponseStatus? responseStatus,
+    bool notifyListeners = false,
+    bool containPatient = false,
+  }) {
     _logger.trace('QuestionnaireResponse.aggregate');
 
     // Are all minimum fields for SDC profile present?
@@ -91,7 +95,8 @@ class QuestionnaireResponseAggregator
     final questionnaireVersion = questionnaireModel.questionnaire.version;
     final questionnaireCanonical = (questionnaireUrl != null)
         ? Canonical(
-            "$questionnaireUrl${(questionnaireVersion != null) ? '|$questionnaireVersion' : ''}")
+            "$questionnaireUrl${(questionnaireVersion != null) ? '|$questionnaireVersion' : ''}",
+          )
         : null;
 
     final questionnaireTitle = questionnaireModel.questionnaire.title;
@@ -120,13 +125,16 @@ class QuestionnaireResponseAggregator
 
     final profiles = [
       Canonical(
-          'http://hl7.org/fhir/4.0/StructureDefinition/QuestionnaireResponse'),
+        'http://hl7.org/fhir/4.0/StructureDefinition/QuestionnaireResponse',
+      ),
       if (isValidSdc)
         Canonical(
-            'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaireresponse'),
+          'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaireresponse',
+        ),
       if (isValidSdc)
         Canonical(
-            'http://fhir.org/guides/argonaut/questionnaire/StructureDefinition/argo-questionnaireresponse'),
+          'http://fhir.org/guides/argonaut/questionnaire/StructureDefinition/argo-questionnaireresponse',
+        ),
     ];
 
     final meta = (profiles.isNotEmpty)
@@ -149,9 +157,9 @@ class QuestionnaireResponseAggregator
           ? Element(extension_: [
               FhirExtension(
                   url: FhirUri(
-                      'http://hl7.org/fhir/StructureDefinition/display'),
-                  valueString: questionnaireModel.questionnaire.title)
-            ])
+                      'http://hl7.org/fhir/StructureDefinition/display',),
+                  valueString: questionnaireModel.questionnaire.title,)
+            ],)
           : null,
     );
 

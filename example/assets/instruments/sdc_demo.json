@@ -722,6 +722,22 @@
           }
         }
       ]
+    },
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+          "valueExpression": {
+            "description": "deadline for submission",
+            "language": "text/fhirpath",
+            "expression": "today() + 7 days"
+          }
+        }
+      ],
+      "linkId": "3.1.b-initialExpression",
+      "text": "Deadline for submission (7 days from now)",
+      "type": "date",
+      "readOnly": true
     }
   ]
 }
