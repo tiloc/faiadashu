@@ -110,6 +110,7 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
               questionnaireModel.populate(
                 widget.restoreResponseFunction.call(widget.questionnairePath),
               );
+              if(!mounted) {return;}
               Navigator.push(
                 context,
                 MaterialPageRoute(
