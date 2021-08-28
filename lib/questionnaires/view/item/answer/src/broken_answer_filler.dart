@@ -9,7 +9,7 @@ class BrokenAnswerFiller extends QuestionnaireAnswerFiller {
 
   BrokenAnswerFiller(QuestionnaireResponseFillerState responseFillerState,
       int answerIndex, this.exception,
-      {Key? key})
+      {Key? key,})
       : super(responseFillerState, answerIndex, key: key);
 
   @override
@@ -27,6 +27,6 @@ class _BrokenItemState extends State<BrokenAnswerFiller> {
     return BrokenQuestionnaireItem(
         'Could not initialize QuestionnaireAnswerFiller',
         widget.itemModel.questionnaireItem,
-        widget.exception);
+        widget.exception,);
   }
 }

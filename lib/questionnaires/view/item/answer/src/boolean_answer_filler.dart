@@ -6,7 +6,7 @@ import '../../../../questionnaires.dart';
 class BooleanAnswerFiller extends QuestionnaireAnswerFiller {
   BooleanAnswerFiller(
       QuestionnaireResponseFillerState responseFillerState, int answerIndex,
-      {Key? key})
+      {Key? key,})
       : super(responseFillerState, answerIndex, key: key);
   @override
   State<StatefulWidget> createState() => _BooleanItemState();
@@ -49,6 +49,6 @@ class _BooleanItemState extends QuestionnaireAnswerFillerState<Boolean,
               .caption!
               .copyWith(color: Theme.of(context).errorColor),
         )
-    ]);
+    ],);
   }
 }

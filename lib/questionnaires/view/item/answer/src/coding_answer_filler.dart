@@ -13,7 +13,7 @@ import '../../../../questionnaires.dart';
 class CodingAnswerFiller extends QuestionnaireAnswerFiller {
   CodingAnswerFiller(
       QuestionnaireResponseFillerState responseFillerState, int answerIndex,
-      {Key? key})
+      {Key? key,})
       : super(responseFillerState, answerIndex, key: key);
   @override
   State<StatefulWidget> createState() => _CodingAnswerState();
@@ -69,14 +69,14 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
                   ? (String? newValue) {
                       value = answerModel.fromChoiceString(newValue);
                     }
-                  : null),
+                  : null,),
         );
       }
     }
     for (final choice in answerModel.answerOptions.values) {
       final optionPrefix = choice.extension_
           ?.extensionOrNull(
-              'http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix')
+              'http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix',)
           ?.valueString;
       final optionPrefixDisplay =
           (optionPrefix != null) ? '$optionPrefix ' : '';

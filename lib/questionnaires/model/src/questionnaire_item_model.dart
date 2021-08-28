@@ -202,13 +202,13 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   }
 
   List<QuestionnaireItemModel> get siblings {
-    return _LocationListBuilder._buildLocationList(questionnaire,
-        questionnaireModel, siblingQuestionnaireItems, parent, level);
+    return _buildLocationList(questionnaire, questionnaireModel,
+        siblingQuestionnaireItems, parent, level);
   }
 
   List<QuestionnaireItemModel> get children {
-    return _LocationListBuilder._buildLocationList(questionnaire,
-        questionnaireModel, childQuestionnaireItems, this, level + 1);
+    return _buildLocationList(questionnaire, questionnaireModel,
+        childQuestionnaireItems, this, level + 1);
   }
 
   bool get hasNextSibling {
@@ -368,7 +368,8 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
                 'http://hl7.org/fhir/StructureDefinition/iso21090-CO-value') ??
         responseItem?.answer?.firstOrNull?.valueCoding?.extension_
             ?.extensionOrNull(
-                'http://hl7.org/fhir/StructureDefinition/ordinalValue',);
+          'http://hl7.org/fhir/StructureDefinition/ordinalValue',
+        );
     if (ordinalExtension == null) {
       return null;
     }
@@ -584,28 +585,20 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
 }
 
 /// Build list of [QuestionnaireItemModel] from [QuestionnaireItem] and meta-data.
-class _LocationListBuilder {
-  static List<QuestionnaireItemModel> _buildLocationList(
-      Questionnaire _questionnaire,
-      QuestionnaireModel questionnaireModel,
-      List<QuestionnaireItem> _items,
-      QuestionnaireItemModel? _parent,
-      int _level) {
-    int siblingIndex = 0;
-    final itemModelList = <QuestionnaireItemModel>[];
+List<QuestionnaireItemModel> _buildLocationList(
+    Questionnaire _questionnaire,
+    QuestionnaireModel questionnaireModel,
+    List<QuestionnaireItem> _items,
+    QuestionnaireItemModel? _parent,
+    int _level) {
+  int siblingIndex = 0;
+  final itemModelList = <QuestionnaireItemModel>[];
 
-    for (final item in _items) {
-      itemModelList.add(QuestionnaireItemModel._cached(
-          _questionnaire,
-          questionnaireModel,
-          item,
-          item.linkId,
-          _parent,
-          siblingIndex,
-          _level));
-      siblingIndex++;
-    }
-
-    return itemModelList;
+  for (final item in _items) {
+    itemModelList.add(QuestionnaireItemModel._cached(_questionnaire,
+        questionnaireModel, item, item.linkId, _parent, siblingIndex, _level));
+    siblingIndex++;
   }
+
+  return itemModelList;
 }

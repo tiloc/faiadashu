@@ -64,8 +64,8 @@ class DefaultQuestionnairePageScaffoldBuilder
           IconButton(
               icon: const Icon(Icons.help_outline),
               onPressed: () {
-                QuestionnaireInformationDialog.showQuestionnaireInfo(
-                    context, theLocale, questionnaire, (context) {
+                showQuestionnaireInfo(context, theLocale, questionnaire,
+                    (context) {
                   setStateCallback.call(() {
                     Navigator.pop(context);
                   });
