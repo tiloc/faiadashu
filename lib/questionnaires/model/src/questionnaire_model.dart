@@ -380,6 +380,12 @@ class QuestionnaireModel extends QuestionnaireItemModel {
         questionnaireResponse.status ?? QuestionnaireResponseStatus.in_progress;
   }
 
+  /// Returns a bitfield of the items with `isEnabled` == true.
+  List<bool> get _currentlyEnabledItems => List<bool>.generate(
+      orderedQuestionnaireItemModels().length,
+      (index) => orderedQuestionnaireItemModels().elementAt(index).isEnabled,
+      growable: false);
+
   /// Update the current enablement status of all items.
   ///
   /// This updates enablement through enableWhen and enableWhenExpression.
@@ -403,10 +409,7 @@ class QuestionnaireModel extends QuestionnaireItemModel {
       return;
     }
 
-    final previouslyEnabled = List<bool>.generate(
-        orderedQuestionnaireItemModels().length,
-        (index) => orderedQuestionnaireItemModels().elementAt(index).isEnabled,
-        growable: false);
+    final previouslyEnabled = _currentlyEnabledItems;
     _logger.trace('prevEnabled: $previouslyEnabled');
     for (final itemModel in orderedQuestionnaireItemModels()) {
       itemModel._isEnabled = true;
@@ -424,10 +427,7 @@ class QuestionnaireModel extends QuestionnaireItemModel {
       }
     }
 
-    final nowEnabled = List<bool>.generate(
-        orderedQuestionnaireItemModels().length,
-        (index) => orderedQuestionnaireItemModels().elementAt(index).isEnabled,
-        growable: false);
+    final nowEnabled = _currentlyEnabledItems;
     _logger.trace('nowEnabled: $nowEnabled');
 
     if (!listEquals(previouslyEnabled, nowEnabled)) {
