@@ -87,12 +87,11 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
           'enableWhenExpression missing expression', questionnaireItem);
     }
 
-    // TODO: Remove hard-coded expression
+    // WIP: Remove hard-coded expression
     pathExpression =
-//        "%resource.repeat(item).where(linkId='4.2.b.5').answer.toString().substring(0, 4).toInteger() >= 40";
-        "%resource.repeat(item).where(linkId='4.2.b.5').answer";
+        "%resource.repeat(item).where(linkId='4.2.b.5').answer.valueDate.toString().substring(0, 4).toInteger() <= 1980";
 
-    // OPTIMIZE: Hugely expensive brute-force
+    // OPTIMIZE: Hugely expensive
     final questionnaireResponseAggregator =
         _questionnaireModel!.aggregator<QuestionnaireResponseAggregator>();
     final questionnaireResponse = questionnaireResponseAggregator.aggregate();
@@ -101,7 +100,16 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
         r4WalkFhirPath(questionnaireResponse, pathExpression);
     _qimLogger.debug('fhirPathResult: $fhirPathResult');
 
-    // TODO: Evaluate result
+    // Evaluate result
+    if (fhirPathResult.isEmpty) {
+      // Empty is a typical result of missing inputs. Same as false.
+      _disableWithChildren();
+    } else if (fhirPathResult.first is! bool) {
+      throw QuestionnaireFormatException(
+          'FHIRPath expression does not return a bool: $pathExpression', this);
+    } else if ((fhirPathResult.first as bool) == false) {
+      _disableWithChildren();
+    } // true == do nothing (is already enabled)
   }
 
   /// Updates the current enablement status of this item, based on enabledWhen.

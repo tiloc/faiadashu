@@ -105,6 +105,10 @@ Quantity requires the declaration of units. It does not support free-text entry 
 - sliderStepValue
 - unitValueSet
 - unit
+- [sdc-questionnaire-enableWhenExpression](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-enableWhenExpression.html): uses [fhir_path](https://pub.dev/packages/fhir_path) as its underlying 
+implementation. See the [fhir_path documentation](https://pub.dev/packages/fhir_path) for capabilities and limitations.
+
+
 
 #### decimal
 Comprehensive support.
