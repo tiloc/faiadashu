@@ -76,7 +76,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   void _updateEnabledByEnableWhenExpression() {
     _qimLogger.trace('Enter _updateEnabledByEnableWhenExpression()');
 
-    var pathExpression = questionnaireItem.extension_
+    final pathExpression = questionnaireItem.extension_
         ?.extensionOrNull(
             'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression')
         ?.valueExpression
@@ -86,10 +86,6 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
       throw QuestionnaireFormatException(
           'enableWhenExpression missing expression', questionnaireItem);
     }
-
-    // WIP: Remove hard-coded expression
-    pathExpression =
-        "%resource.repeat(item).where(linkId='4.2.b.5').answer.valueDate.toString().substring(0, 4).toInteger() <= 1980";
 
     // OPTIMIZE: Hugely expensive
     final questionnaireResponseAggregator =

@@ -26,7 +26,9 @@ environment:
 dependencies:
   collection: ^1.15.0
   fhir: ^0.5.0-1
-  fhir_path: ^0.5.0-1
+  fhir_path: ^0.5.0-2
+#  fhir_path:
+#    path: /Users/tilo/Projects/fhir/fhir_path
 #  fhir:
 #    path: /Users/tilo/Projects/fhir/fhir
   flutter:
