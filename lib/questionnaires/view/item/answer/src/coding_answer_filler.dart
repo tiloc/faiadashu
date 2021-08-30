@@ -12,9 +12,10 @@ import '../../../../questionnaires.dart';
 /// Future R5 releases of the FHIR standard will likely have a `coding` item type.
 class CodingAnswerFiller extends QuestionnaireAnswerFiller {
   CodingAnswerFiller(
-      QuestionnaireResponseFillerState responseFillerState, int answerIndex,
-      {Key? key,})
-      : super(responseFillerState, answerIndex, key: key);
+    QuestionnaireResponseFillerState responseFillerState,
+    int answerIndex, {
+    Key? key,
+  }) : super(responseFillerState, answerIndex, key: key);
   @override
   State<StatefulWidget> createState() => _CodingAnswerState();
 }
@@ -62,21 +63,23 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
       if (isShowingNull) {
         choices.add(
           RadioListTile<String?>(
-              title: const NullDashText(),
-              value: null,
-              groupValue: answerModel.toChoiceString(value),
-              onChanged: (answerModel.isEnabled)
-                  ? (String? newValue) {
-                      value = answerModel.fromChoiceString(newValue);
-                    }
-                  : null,),
+            title: const NullDashText(),
+            value: null,
+            groupValue: answerModel.toChoiceString(value),
+            onChanged: (answerModel.isEnabled)
+                ? (String? newValue) {
+                    value = answerModel.fromChoiceString(newValue);
+                  }
+                : null,
+          ),
         );
       }
     }
     for (final choice in answerModel.answerOptions.values) {
       final optionPrefix = choice.extension_
           ?.extensionOrNull(
-              'http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix',)
+            'http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix',
+          )
           ?.valueString;
       final optionPrefixDisplay =
           (optionPrefix != null) ? '$optionPrefix ' : '';

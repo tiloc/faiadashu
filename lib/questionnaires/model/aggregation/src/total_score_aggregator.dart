@@ -66,7 +66,8 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
 
     final unit = totalScoreItem!.questionnaireItem.extension_
         ?.extensionOrNull(
-            'http://hl7.org/fhir/StructureDefinition/questionnaire-unit',)
+          'http://hl7.org/fhir/StructureDefinition/questionnaire-unit',
+        )
         ?.valueCoding
         ?.display;
 
@@ -82,9 +83,10 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
       );
     } else {
       totalScoreItem!.responseItem = QuestionnaireResponseItem(
-          linkId: totalScoreItem!.linkId,
-          text: totalScoreItem!.questionnaireItem.text,
-          answer: [QuestionnaireResponseAnswer(valueDecimal: value)],);
+        linkId: totalScoreItem!.linkId,
+        text: totalScoreItem!.questionnaireItem.text,
+        answer: [QuestionnaireResponseAnswer(valueDecimal: value)],
+      );
     }
 
     return result;

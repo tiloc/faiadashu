@@ -8,7 +8,8 @@ import '../../../../model/model.dart';
 /// Models string answers, incl. URLs.
 class StringAnswerModel extends AnswerModel<String, String> {
   static final _urlRegExp = RegExp(
-      r'^(http|https|ftp|sftp)://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',);
+    r'^(http|https|ftp|sftp)://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',
+  );
 
   late final RegExp? regExp;
   late final int minLength;

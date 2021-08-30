@@ -240,8 +240,11 @@ extension FDashListFhirExtensionExtension on List<FhirExtension> {
       });
       return (index != -1) ? removeAt(index) : null;
     } else {
-      throw ArgumentError.value(key, 'key',
-          'Only FhirExtension, String and FhirUri are supported as key.',);
+      throw ArgumentError.value(
+        key,
+        'key',
+        'Only FhirExtension, String and FhirUri are supported as key.',
+      );
     }
   }
 
@@ -276,7 +279,10 @@ extension FDashListFhirExtensionExtension on List<FhirExtension> {
       });
     } else {
       throw ArgumentError.value(
-          key, 'key', 'Only String and FhirUri are supported as key.',);
+        key,
+        'key',
+        'Only String and FhirUri are supported as key.',
+      );
     }
   }
 }

@@ -16,28 +16,34 @@ class QuestionnaireTheme {
   /// Returns whether each question will be preceded by its own ID.
   final bool showQuestionNumbers;
 
-  const QuestionnaireTheme(
-      {this.canSkipQuestions = false,
-      this.showNullAnswerOption = true,
-      this.showQuestionNumbers = false,});
+  const QuestionnaireTheme({
+    this.canSkipQuestions = false,
+    this.showNullAnswerOption = true,
+    this.showQuestionNumbers = false,
+  });
 
   /// Returns a [QuestionnaireItemFiller] for a given [QuestionnaireFiller].
   ///
   /// Used by [QuestionnaireFiller].
   QuestionnaireItemFiller createQuestionnaireItemFiller(
-      QuestionnaireFillerData questionnaireFiller, int index,
-      {Key? key,}) {
+    QuestionnaireFillerData questionnaireFiller,
+    int index, {
+    Key? key,
+  }) {
     return QuestionnaireItemFiller.fromQuestionnaireFiller(
-        questionnaireFiller, index,
-        key: key,);
+      questionnaireFiller,
+      index,
+      key: key,
+    );
   }
 
   /// Returns a [QuestionnaireResponseFiller] for a given [QuestionnaireItemFiller].
   ///
   /// Used by [QuestionnaireItemFiller].
   QuestionnaireResponseFiller createQuestionnaireResponseFiller(
-      QuestionnaireItemFiller itemFiller,
-      {Key? key,}) {
+    QuestionnaireItemFiller itemFiller, {
+    Key? key,
+  }) {
     return QuestionnaireResponseFiller.fromQuestionnaireItemFiller(itemFiller);
   }
 
@@ -45,8 +51,10 @@ class QuestionnaireTheme {
   ///
   /// Can be overridden through inheritance of [QuestionnaireTheme].
   QuestionnaireAnswerFiller createAnswerFiller(
-      QuestionnaireResponseFillerState responseFiller, int answerIndex,
-      {Key? key,}) {
+    QuestionnaireResponseFillerState responseFiller,
+    int answerIndex, {
+    Key? key,
+  }) {
     try {
       final responseModel = responseFiller.responseModel;
 
@@ -70,8 +78,9 @@ class QuestionnaireTheme {
         return StaticItem(responseFiller, answerIndex, key: key);
       } else if (answerModel is UnsupportedAnswerModel) {
         throw QuestionnaireFormatException(
-            'Unsupported item type: ${answerModel.qi.type}',
-            answerModel.itemModel.linkId,);
+          'Unsupported item type: ${answerModel.qi.type}',
+          answerModel.itemModel.linkId,
+        );
       } else {
         throw QuestionnaireFormatException('Unknown AnswerModel: $answerModel');
       }

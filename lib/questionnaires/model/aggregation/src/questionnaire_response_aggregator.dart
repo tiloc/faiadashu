@@ -154,12 +154,16 @@ class QuestionnaireResponseAggregator
       language: Code(locale.toLanguageTag()),
       subject: subjectReference,
       questionnaireElement: (questionnaireTitle != null)
-          ? Element(extension_: [
-              FhirExtension(
+          ? Element(
+              extension_: [
+                FhirExtension(
                   url: FhirUri(
-                      'http://hl7.org/fhir/StructureDefinition/display',),
-                  valueString: questionnaireModel.questionnaire.title,)
-            ],)
+                    'http://hl7.org/fhir/StructureDefinition/display',
+                  ),
+                  valueString: questionnaireModel.questionnaire.title,
+                )
+              ],
+            )
           : null,
     );
 

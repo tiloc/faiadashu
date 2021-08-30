@@ -34,7 +34,8 @@ class _StaticItemState extends State<StaticItem> {
 
     if (widget.itemModel.isCalculatedExpression) {
       _logger.debug(
-          'Adding listener to ${widget.itemModel} for calculated expression',);
+        'Adding listener to ${widget.itemModel} for calculated expression',
+      );
       widget.itemModel.questionnaireModel
           .addListener(() => _questionnaireChanged());
     }
@@ -61,14 +62,17 @@ class _StaticItemState extends State<StaticItem> {
       return null;
     }
     final matchExtension =
-        widget.itemModel.questionnaireItem.extension_?.firstWhere((ext) {
-      return (ext.url?.value.toString() ==
-              'http://ehealth.sundhed.dk/fhir/StructureDefinition/ehealth-questionnaire-feedback') &&
-          (ext.extension_!.extensionOrNull('min')!.valueInteger!.value! <=
-              score) &&
-          (ext.extension_!.extensionOrNull('max')!.valueInteger!.value! >=
-              score);
-    }, orElse: () => _nullExtension,);
+        widget.itemModel.questionnaireItem.extension_?.firstWhere(
+      (ext) {
+        return (ext.url?.value.toString() ==
+                'http://ehealth.sundhed.dk/fhir/StructureDefinition/ehealth-questionnaire-feedback') &&
+            (ext.extension_!.extensionOrNull('min')!.valueInteger!.value! <=
+                score) &&
+            (ext.extension_!.extensionOrNull('max')!.valueInteger!.value! >=
+                score);
+      },
+      orElse: () => _nullExtension,
+    );
 
     if (matchExtension == _nullExtension) {
       return null;
@@ -84,24 +88,25 @@ class _StaticItemState extends State<StaticItem> {
       final scoreText = score?.toString() ?? AnswerModel.nullText;
       final feedback = findDanishFeedback(score);
       return Center(
-          child: Column(
-        children: [
-          const SizedBox(height: 32),
-          Text(
-            FDashLocalizations.of(context).aggregationTotalScoreTitle,
-            style: Theme.of(context).textTheme.headline3,
-          ),
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 200),
-            child: Text(
-              scoreText,
-              key: ValueKey<String>(scoreText),
-              style: Theme.of(context).textTheme.headline1,
+        child: Column(
+          children: [
+            const SizedBox(height: 32),
+            Text(
+              FDashLocalizations.of(context).aggregationTotalScoreTitle,
+              style: Theme.of(context).textTheme.headline3,
             ),
-          ),
-          if (feedback != null) HTML.toRichText(context, feedback),
-        ],
-      ),);
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              child: Text(
+                scoreText,
+                key: ValueKey<String>(scoreText),
+                style: Theme.of(context).textTheme.headline1,
+              ),
+            ),
+            if (feedback != null) HTML.toRichText(context, feedback),
+          ],
+        ),
+      );
     }
 
     return const SizedBox(

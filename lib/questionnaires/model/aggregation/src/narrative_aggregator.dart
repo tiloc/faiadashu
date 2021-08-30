@@ -16,8 +16,9 @@ class NarrativeAggregator extends Aggregator<Narrative> {
   Narrative? _narrative;
 
   static final emptyNarrative = Narrative(
-      div: '<div xmlns="http://www.w3.org/1999/xhtml"></div>',
-      status: NarrativeStatus.empty,);
+    div: '<div xmlns="http://www.w3.org/1999/xhtml"></div>',
+    status: NarrativeStatus.empty,
+  );
 
   NarrativeAggregator()
       : super(NarrativeAggregator.emptyNarrative, autoAggregate: false);
@@ -31,7 +32,9 @@ class NarrativeAggregator extends Aggregator<Narrative> {
   }
 
   bool _addResponseItemToDiv(
-      StringBuffer div, QuestionnaireItemModel itemModel,) {
+    StringBuffer div,
+    QuestionnaireItemModel itemModel,
+  ) {
     final item = itemModel.responseItem;
 
     if (item == null) {
@@ -58,7 +61,8 @@ class NarrativeAggregator extends Aggregator<Narrative> {
 
     if (invalid) {
       div.write(
-          '<span style="color:red">${lookupFDashLocalizations(locale).dataAbsentReasonAsTextOutput} ',);
+        '<span style="color:red">${lookupFDashLocalizations(locale).dataAbsentReasonAsTextOutput} ',
+      );
     }
 
     final dataAbsentReason = item.extension_?.dataAbsentReason;
@@ -67,7 +71,8 @@ class NarrativeAggregator extends Aggregator<Narrative> {
       returnValue = true;
     } else if (dataAbsentReason == dataAbsentReasonAskedButDeclinedCode) {
       div.write(
-          '<p><i><span style="color:red">X </span>${lookupFDashLocalizations(locale).dataAbsentReasonAskedDeclinedOutput}</i></p>',);
+        '<p><i><span style="color:red">X </span>${lookupFDashLocalizations(locale).dataAbsentReasonAskedDeclinedOutput}</i></p>',
+      );
       returnValue = true;
     } else {
       if (item.answer != null) {
@@ -86,7 +91,8 @@ class NarrativeAggregator extends Aggregator<Narrative> {
             div.write('<p>${answer.valueInteger!.value}</p>');
           } else if (answer.valueCoding != null) {
             div.write(
-                '<p>- ${answer.valueCoding!.localizedDisplay(locale)}</p>',);
+              '<p>- ${answer.valueCoding!.localizedDisplay(locale)}</p>',
+            );
           } else if (answer.valueDateTime != null) {
             div.write('<p>${answer.valueDateTime!.format(locale)}</p>');
           } else if (answer.valueDate != null) {
@@ -95,7 +101,8 @@ class NarrativeAggregator extends Aggregator<Narrative> {
             div.write('<p>${answer.valueTime!.format(locale)}</p>');
           } else if (answer.valueBoolean != null) {
             div.write(
-                '<p>${(answer.valueBoolean!.value!) ? '[X]' : '[ ]'}</p>',);
+              '<p>${(answer.valueBoolean!.value!) ? '[X]' : '[ ]'}</p>',
+            );
           } else if (answer.valueUri != null) {
             div.write('<p>${answer.valueUri.toString()}</p>');
           } else {
@@ -115,7 +122,8 @@ class NarrativeAggregator extends Aggregator<Narrative> {
   Narrative _generateNarrative(QuestionnaireItemModel questionnaireModel) {
     final languageTag = locale.toLanguageTag();
     final div = StringBuffer(
-        '<div xmlns="http://www.w3.org/1999/xhtml" lang="$languageTag" xml:lang="$languageTag">',);
+      '<div xmlns="http://www.w3.org/1999/xhtml" lang="$languageTag" xml:lang="$languageTag">',
+    );
 
     bool generated = false;
 
@@ -127,22 +135,24 @@ class NarrativeAggregator extends Aggregator<Narrative> {
     div.write('</div>');
 
     return Narrative(
-        div: div.toString(),
-        status: generated ? NarrativeStatus.generated : NarrativeStatus.empty,);
+      div: div.toString(),
+      status: generated ? NarrativeStatus.generated : NarrativeStatus.empty,
+    );
   }
 
   @override
   Narrative? aggregate({bool notifyListeners = false}) {
     _logger.debug(
-        '$this.aggregate (Model Generation: ${questionnaireModel.generation}, Narrative Generation: $_generation)',);
+      '$this.aggregate (Model Generation: ${questionnaireModel.generation}, Narrative Generation: $_generation)',
+    );
     if (questionnaireModel.generation == _generation) {
       _logger.debug('Regurgitating narrative generation $_generation');
       return _narrative;
     }
     // Manually invoke the update, because the order matters and enableWhen calcs need to come after answer value updates.
     questionnaireModel.updateEnabledItems(
-        notifyListeners:
-            false,); // Setting this to true might result in endless refresh and stack overflow
+      notifyListeners: false,
+    ); // Setting this to true might result in endless refresh and stack overflow
     _narrative = _generateNarrative(questionnaireModel);
     _generation = questionnaireModel.generation;
     if (notifyListeners) {

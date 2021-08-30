@@ -260,7 +260,8 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
                             choiceStringFromCoding(answer.valueCoding)]!
                         .valueCoding!,
                   )
-                  .toList(),)
+                  .toList(),
+            )
           : null;
     }
   }
@@ -272,7 +273,8 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
   bool get isHorizontal {
     return qi.extension_
             ?.extensionOrNull(
-                'http://hl7.org/fhir/StructureDefinition/questionnaire-choiceOrientation',)
+              'http://hl7.org/fhir/StructureDefinition/questionnaire-choiceOrientation',
+            )
             ?.valueCode
             ?.value ==
         'horizontal';
@@ -298,7 +300,8 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
   @override
   QuestionnaireResponseAnswer? get filledAnswer {
     throw UnsupportedError(
-        'CodingAnswerModel will always return coding answers.',);
+      'CodingAnswerModel will always return coding answers.',
+    );
   }
 
   @override
@@ -313,14 +316,16 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
     final result = (value!.coding?.firstOrNull?.code?.value == openChoiceOther)
         ? [
             QuestionnaireResponseAnswer(
-                valueCoding: Coding(display: value!.text),)
+              valueCoding: Coding(display: value!.text),
+            )
           ]
         : value!.coding?.map<QuestionnaireResponseAnswer>((coding) {
             // Some answers may only be a display, not have a code
             return coding.code != null
                 ? QuestionnaireResponseAnswer(
                     valueCoding: answerOptions[choiceStringFromCoding(coding)]!
-                        .valueCoding,)
+                        .valueCoding,
+                  )
                 : QuestionnaireResponseAnswer(valueCoding: coding);
           }).toList();
 
@@ -333,17 +338,22 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
   @override
   QuestionnaireErrorFlag? get isComplete {
     if (value == null && minOccurs > 0) {
-      return QuestionnaireErrorFlag(itemModel.linkId,
-          answerIndex: answerIndex,
-          errorText:
-              lookupFDashLocalizations(locale).validatorMinOccurs(minOccurs),);
+      return QuestionnaireErrorFlag(
+        itemModel.linkId,
+        answerIndex: answerIndex,
+        errorText:
+            lookupFDashLocalizations(locale).validatorMinOccurs(minOccurs),
+      );
     }
 
     final validationText = validateInput(value);
     return (validationText == null)
         ? null
-        : QuestionnaireErrorFlag(itemModel.linkId,
-            answerIndex: answerIndex, errorText: validationText,);
+        : QuestionnaireErrorFlag(
+            itemModel.linkId,
+            answerIndex: answerIndex,
+            errorText: validationText,
+          );
   }
 
   @override
