@@ -1,5 +1,6 @@
-## 0.5.4
+## 0.5.4-dev.1
 * WIP attempt to use [Grey Faulkenberry's](https://github.com/Dokotela) implementation of FHIR Path for `enableWhenExpression`.
+* General cleanup based on new linter rules
 
 ## 0.5.3
 * Another theming contribution! Again from [John Manning](https://github.com/FireJuun)
