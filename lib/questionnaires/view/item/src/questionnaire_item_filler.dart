@@ -172,18 +172,18 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
     Key? key,
   }) : super(key: key);
 
-  static Widget? fromQuestionnaireItemModel(
-      {required QuestionnaireItemModel itemModel,
-      required QuestionnaireTheme questionnaireTheme,
-      required int index,
-      Key? key,}) {
+  static Widget? fromQuestionnaireItemModel({
+    required QuestionnaireItemModel itemModel,
+    required QuestionnaireTheme questionnaireTheme,
+    required int index,
+    Key? key,
+  }) {
     if (itemModel.titleText == null) {
       return null;
     } else {
       final leading =
           QuestionnaireItemFillerTitleLeading.fromQuestionnaireItem(itemModel);
-      final help =
-          _QuestionnaireItemFillerHelpFactory.fromQuestionnaireItem(itemModel);
+      final help = _createHelp(itemModel);
 
       final requiredTag = (itemModel.isRequired) ? '*' : '';
 
@@ -201,13 +201,14 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
           '$openStyleTag${htmlEscape.convert(itemModel.titleText!)}$closeStyleTag';
 
       return QuestionnaireItemFillerTitle._(
-          itemModel: itemModel,
-          index: index,
-          questionnaireTheme: questionnaireTheme,
-          htmlTitleText: htmlTitleText,
-          leading: leading,
-          help: help,
-          key: key,);
+        itemModel: itemModel,
+        index: index,
+        questionnaireTheme: questionnaireTheme,
+        htmlTitleText: htmlTitleText,
+        leading: leading,
+        help: help,
+        key: key,
+      );
     }
   }
 
@@ -218,34 +219,36 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
     final showQuestionNumbers = questionnaireTheme.showQuestionNumbers;
 
     return Container(
-        alignment: AlignmentDirectional.centerStart,
-        padding: const EdgeInsets.only(top: 8.0),
-        child: Text.rich(
-          TextSpan(
-            children: <InlineSpan>[
-              /// Show question numbers (if flag set in the Questionnaire Theme)
-              /// All items with the isAnswerable boolean as true will be
-              /// counted, starting with 1, and regardless of grouping.
-              ///
-              if (showQuestionNumbers && itemModel.isAnswerable)
-                HTML.toTextSpan(
-                  context,
-                  '<b>$questionNumber: <b>',
-                ),
-              if (leading != null) WidgetSpan(child: leading!),
-              if (itemModel.titleText != null)
-                HTML.toTextSpan(context, htmlTitleText,
-                    defaultTextStyle: Theme.of(context).textTheme.bodyText1,),
-              if (help != null) WidgetSpan(child: help!),
-            ],
-          ),
-          semanticsLabel: itemModel.titleText,
-        ),);
+      alignment: AlignmentDirectional.centerStart,
+      padding: const EdgeInsets.only(top: 8.0),
+      child: Text.rich(
+        TextSpan(
+          children: <InlineSpan>[
+            /// Show question numbers (if flag set in the Questionnaire Theme)
+            /// All items with the isAnswerable boolean as true will be
+            /// counted, starting with 1, and regardless of grouping.
+            ///
+            if (showQuestionNumbers && itemModel.isAnswerable)
+              HTML.toTextSpan(
+                context,
+                '<b>$questionNumber: <b>',
+              ),
+            if (leading != null) WidgetSpan(child: leading!),
+            if (itemModel.titleText != null)
+              HTML.toTextSpan(
+                context,
+                htmlTitleText,
+                defaultTextStyle: Theme.of(context).textTheme.bodyText1,
+              ),
+            if (help != null) WidgetSpan(child: help!),
+          ],
+        ),
+        semanticsLabel: itemModel.titleText,
+      ),
+    );
   }
-}
 
-class _QuestionnaireItemFillerHelpFactory {
-  static Widget? fromQuestionnaireItem(
+  static Widget? _createHelp(
     QuestionnaireItemModel itemModel, {
     Key? key,
   }) {
@@ -257,7 +260,8 @@ class _QuestionnaireItemFillerHelpFactory {
 
     final supportLink = itemModel.questionnaireItem.extension_
         ?.extensionOrNull(
-            'http://hl7.org/fhir/StructureDefinition/questionnaire-supportLink',)
+          'http://hl7.org/fhir/StructureDefinition/questionnaire-supportLink',
+        )
         ?.valueUri
         ?.value;
 
