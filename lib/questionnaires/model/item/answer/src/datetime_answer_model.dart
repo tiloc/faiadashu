@@ -15,18 +15,7 @@ class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
   DateTimeAnswerModel(ResponseModel responseModel, int answerIndex)
       : super(responseModel, answerIndex) {
     value = answer?.valueDateTime ??
-        ((answer?.valueDate != null)
-            ? FhirDateTime(answer?.valueDate)
-            : null) ??
-        ((qi.extension_
-                    ?.extensionOrNull(
-                        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression')
-                    ?.valueExpression
-                    ?.expression ==
-                'today()')
-            ? FhirDateTime.fromDateTime(
-                DateTime.now(), DateTimePrecision.YYYYMMDD)
-            : null);
+        ((answer?.valueDate != null) ? FhirDateTime(answer?.valueDate) : null);
   }
 
   @override
@@ -46,8 +35,10 @@ class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
       return QuestionnaireResponseAnswer(valueDateTime: value);
     } else if (itemType == QuestionnaireItemType.time) {
       return QuestionnaireResponseAnswer(
-          valueTime: Time(
-              value!.value!.toIso8601String().substring('yyyy-MM-ddT'.length)));
+        valueTime: Time(
+          value!.value!.toIso8601String().substring('yyyy-MM-ddT'.length),
+        ),
+      );
     } else {
       throw StateError('Unexpected itemType: $itemType');
     }

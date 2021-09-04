@@ -135,6 +135,9 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     final response =
         fhirResourceProvider.getResource(questionnaireResponseResourceUri)
             as QuestionnaireResponse?;
+
+    // TODO: populate initial values if response == null
+    // make sure this interacts properly with enableWhen evaluation
     questionnaireModel.populate(response);
 
     return questionnaireModel;
@@ -343,11 +346,12 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     nextGeneration();
   }
 
-  void _populateItems(List<QuestionnaireResponseItem>? qris) {
-    if (qris == null) {
+  void _populateItems(
+      List<QuestionnaireResponseItem>? questionnaireResponseItems) {
+    if (questionnaireResponseItems == null) {
       return;
     }
-    for (final item in qris) {
+    for (final item in questionnaireResponseItems) {
       fromLinkId(item.linkId!).responseItem = item;
       _populateItems(item.item);
       if (item.answer != null) {
@@ -456,6 +460,28 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     }
 
     updateEnabledItems();
+  }
+
+  /// Returns the evaluation result of a FHIRPath expression
+  ///
+  /// CAUTION: This method is very expensive!
+  List<dynamic> evaluateFhirPathExpression(
+    String pathExpression, {
+    bool requiresQuestionnaireResponse = true,
+  }) {
+    // OPTIMIZE: Hugely expensive (maybe cache response during same generation?)
+    final questionnaireResponse = requiresQuestionnaireResponse
+        ? aggregator<QuestionnaireResponseAggregator>().aggregate()
+        : null;
+
+    // Pass in variables, especially "%patient".
+    final patient = fhirResourceProvider.getResource(subjectResourceUri);
+
+    final fhirPathResult = r4WalkFhirPath(
+        questionnaireResponse, pathExpression, {'%patient': patient});
+    _logger.debug('fhirPathResult: $fhirPathResult');
+
+    return fhirPathResult;
   }
 
   /// Returns whether the questionnaire meets all completeness criteria.

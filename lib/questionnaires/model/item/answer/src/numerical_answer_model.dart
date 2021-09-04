@@ -52,7 +52,9 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
 
     if (choiceString == null) {
       throw QuestionnaireFormatException(
-          'Insufficient info for key string in $coding', coding);
+        'Insufficient info for key string in $coding',
+        coding,
+      );
     } else {
       return choiceString;
     }
@@ -87,7 +89,8 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
 
     if (_isSliding) {
       final sliderStepValueExtension = qi.extension_?.extensionOrNull(
-          'http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue');
+        'http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue',
+      );
       _sliderStepValue = sliderStepValueExtension?.valueDecimal?.value ??
           sliderStepValueExtension?.valueInteger?.value?.toDouble();
       _sliderDivisions = (_sliderStepValue != null)
@@ -105,7 +108,8 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
         // TODO: Evaluate special extensions for quantities
         _maxDecimal = qi.extension_
                 ?.extensionOrNull(
-                    'http://hl7.org/fhir/StructureDefinition/maxDecimalPlaces')
+                  'http://hl7.org/fhir/StructureDefinition/maxDecimalPlaces',
+                )
                 ?.valueInteger
                 ?.value ??
             3; // this is just an assumption what makes sense to your average human...
@@ -127,26 +131,32 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
       'input format for ${itemModel.linkId}: "$_numberPattern"',
     );
 
-    _numberFormat = NumberFormat(_numberPattern,
-        locale.toLanguageTag()); // TODO: toString or toLanguageTag?
+    _numberFormat = NumberFormat(
+      _numberPattern,
+      locale.toLanguageTag(),
+    ); // TODO: toString or toLanguageTag?
 
     final unit = qi.unit;
     // ignore: prefer_collection_literals
     _units = LinkedHashMap<String, Coding>();
     final unitsUri = qi.extension_
         ?.extensionOrNull(
-            'http://hl7.org/fhir/StructureDefinition/questionnaire-unitValueSet')
+          'http://hl7.org/fhir/StructureDefinition/questionnaire-unitValueSet',
+        )
         ?.valueCanonical
         .toString();
     if (unitsUri != null) {
-      itemModel.questionnaireModel.forEachInValueSet(unitsUri, (coding) {
-        _units[keyForUnitChoice(coding)] = coding;
-      }, context: qi.linkId);
+      itemModel.questionnaireModel.forEachInValueSet(
+        unitsUri,
+        (coding) {
+          _units[keyForUnitChoice(coding)] = coding;
+        },
+        context: qi.linkId,
+      );
     } else if (unit != null) {
       _units[keyForUnitChoice(unit)] = unit;
     }
 
-    // TODO: Evaluate initialValue extension
     Quantity? existingValue;
     final firstAnswer = itemModel.responseItem?.answer?.firstOrNull;
     if (firstAnswer != null) {
@@ -158,13 +168,14 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
                       firstAnswer.valueInteger!.isValid)
                   ? Quantity(
                       value:
-                          Decimal(firstAnswer.valueInteger!.value!.toDouble()))
+                          Decimal(firstAnswer.valueInteger!.value!.toDouble()),
+                    )
                   : null);
     }
     value = (existingValue == null && isSliding)
         ? Quantity(
-            value: Decimal(
-                (maxValue - minValue) / 2.0)) // Slider needs a guaranteed value
+            value: Decimal((maxValue - minValue) / 2.0),
+          ) // Slider needs a guaranteed value
         : existingValue;
   }
 

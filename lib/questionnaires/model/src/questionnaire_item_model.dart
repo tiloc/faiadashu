@@ -36,6 +36,48 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
 
   LinkedHashMap<String, QuestionnaireItemModel>? _orderedItems;
 
+  /// Returns whether the item has an initial value.
+  ///
+  /// True if either initial.value[x] or initialExpression are present.
+  bool get hasInitialValue {
+    return (questionnaireItem.initial != null &&
+            questionnaireItem.initial!.isNotEmpty) ||
+        questionnaireItem.extension_
+                ?.extensionOrNull(
+                  'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression',
+                )
+                ?.valueExpression
+                ?.expression !=
+            null;
+  }
+
+  /// Returns the value of the initialExpression.
+  ///
+  /// Returns null if the item does not have an initialExpression,
+  /// or it evaluates to an empty list.
+  dynamic evaluateInitialExpression() {
+    final pathExpression = questionnaireItem.extension_
+        ?.extensionOrNull(
+          'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression',
+        )
+        ?.valueExpression
+        ?.expression;
+
+    if (pathExpression == null) {
+      return null;
+    }
+
+    final fhirPathResult = questionnaireModel.evaluateFhirPathExpression(
+        pathExpression,
+        requiresQuestionnaireResponse: false);
+
+    if (fhirPathResult.isEmpty) {
+      return null;
+    }
+
+    return fhirPathResult.first;
+  }
+
   void _disableWithChildren() {
     _isEnabled = false;
     for (final child in children) {
@@ -87,15 +129,10 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
           'enableWhenExpression missing expression', questionnaireItem);
     }
 
-    // OPTIMIZE: Hugely expensive
-    final questionnaireResponseAggregator =
-        _questionnaireModel!.aggregator<QuestionnaireResponseAggregator>();
-    final questionnaireResponse = questionnaireResponseAggregator.aggregate();
-
     final fhirPathResult =
-        r4WalkFhirPath(questionnaireResponse, pathExpression);
-    _qimLogger.debug('fhirPathResult: $fhirPathResult');
+        questionnaireModel.evaluateFhirPathExpression(pathExpression);
 
+    // TODO: Final specification of proper behavior pending: http://jira.hl7.org/browse/FHIR-33295
     // Evaluate result
     if (fhirPathResult.isEmpty) {
       // Empty is a typical result of missing inputs. Same as false.

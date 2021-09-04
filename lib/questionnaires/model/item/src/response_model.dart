@@ -50,12 +50,14 @@ class ResponseModel {
             extension_: (dataAbsentReason != null)
                 ? [
                     FhirExtension(
-                        url: dataAbsentReasonExtensionUrl,
-                        valueCode: dataAbsentReason)
+                      url: dataAbsentReasonExtensionUrl,
+                      valueCode: dataAbsentReason,
+                    )
                   ]
                 : null,
             // FHIR cannot have empty arrays.
-            answer: filledAnswers.isEmpty ? null : filledAnswers);
+            answer: filledAnswers.isEmpty ? null : filledAnswers,
+          );
   }
 
   /// Is this response invalid?
