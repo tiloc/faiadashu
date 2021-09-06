@@ -1,7 +1,6 @@
 import 'package:fhir/r4.dart'
     show
         Date,
-        DateTimePrecision,
         FhirDateTime,
         QuestionnaireItemType,
         QuestionnaireResponseAnswer,
@@ -61,4 +60,14 @@ class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
 
   @override
   bool get isUnanswered => value == null;
+
+  @override
+  void populateFromExpression(dynamic expressionResult) {
+    if (expressionResult == null) {
+      value = null;
+      return;
+    }
+
+    value = expressionResult as FhirDateTime;
+  }
 }

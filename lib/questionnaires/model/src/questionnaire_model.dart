@@ -136,9 +136,20 @@ class QuestionnaireModel extends QuestionnaireItemModel {
         fhirResourceProvider.getResource(questionnaireResponseResourceUri)
             as QuestionnaireResponse?;
 
-    // TODO: populate initial values if response == null
-    // make sure this interacts properly with enableWhen evaluation
-    questionnaireModel.populate(response);
+    // Populate initial values if response == null
+    // This cannot happen in the constructor, as only this method has the
+    // extra information to populate variables.
+    // WIP: make sure this interacts properly with enableWhen evaluation
+    if (response == null) {
+      questionnaireModel
+          .orderedQuestionnaireItemModels()
+          .where((qim) => qim.hasInitialValue)
+          .forEach((qim) {
+        qim._populateInitialValue();
+      });
+    } else {
+      questionnaireModel.populate(response);
+    }
 
     return questionnaireModel;
   }

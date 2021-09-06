@@ -169,6 +169,7 @@ class _HomePageState extends State<HomePage> {
           name: [
             HumanName(given: ['Emma'], family: 'Lee')
           ],
+          birthDate: Date('1940-08-12'),
         ),
       ),
       AssetImageAttachmentProvider(

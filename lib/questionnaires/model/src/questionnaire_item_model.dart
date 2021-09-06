@@ -42,20 +42,38 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   bool get hasInitialValue {
     return (questionnaireItem.initial != null &&
             questionnaireItem.initial!.isNotEmpty) ||
-        questionnaireItem.extension_
-                ?.extensionOrNull(
-                  'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression',
-                )
-                ?.valueExpression
-                ?.expression !=
-            null;
+        hasInitialExpression;
+  }
+
+  bool get hasInitialExpression {
+    return questionnaireItem.extension_
+            ?.extensionOrNull(
+              'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression',
+            )
+            ?.valueExpression
+            ?.expression !=
+        null;
+  }
+
+  void _populateInitialValue() {
+    // WIP: Implement
+    _qimLogger.debug('_populateInitialValue: $linkId');
+    if (hasInitialExpression) {
+      final initialExpressionResult = _evaluateInitialExpression();
+      responseModel
+          .answerModel(0)
+          .populateFromExpression(initialExpressionResult);
+    } else {
+      // initial.value[x]
+      // TODO: Implement
+    }
   }
 
   /// Returns the value of the initialExpression.
   ///
   /// Returns null if the item does not have an initialExpression,
   /// or it evaluates to an empty list.
-  dynamic evaluateInitialExpression() {
+  dynamic _evaluateInitialExpression() {
     final pathExpression = questionnaireItem.extension_
         ?.extensionOrNull(
           'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression',

@@ -26,6 +26,11 @@ An image to display as a visual accompaniment to the question being asked.
 
 This extension can be applied to question items.
 
+### FHIRPath expressions
+> FHIRPath support in Faiadashu is *highly experimental* and uses [fhir_path](https://pub.dev/packages/fhir_path) as its
+> underlying implementation. See the [fhir_path documentation](https://pub.dev/packages/fhir_path) for capabilities and
+> limitations.
+
 ### Advanced Rendering
 #### rendering-style
 Support for colors. Usable in many places (title, text, option) as permitted by the specification.
@@ -105,8 +110,7 @@ Quantity requires the declaration of units. It does not support free-text entry 
 - sliderStepValue
 - unitValueSet
 - unit
-- [sdc-questionnaire-enableWhenExpression](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-enableWhenExpression.html): uses [fhir_path](https://pub.dev/packages/fhir_path) as its underlying 
-implementation. See the [fhir_path documentation](https://pub.dev/packages/fhir_path) for capabilities and limitations.
+- [sdc-questionnaire-enableWhenExpression](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-enableWhenExpression.html)
 
 
 
@@ -142,12 +146,12 @@ Special support for 🇩🇰 Danish specification on patient feedback.
 #### date
 Comprehensive support. Date picker with localized format.
 ##### Extensions
-- sdc-questionnaire-initialExpression: only recognizes literally `today()`
+- (none)
 
 #### dateTime
 Comprehensive support. Date/Time picker with localized format.
 ##### Extensions
-- sdc-questionnaire-initialExpression: only recognizes literally `today()`
+- sdc-questionnaire-initialExpression
 
 #### time
 Comprehensive support. Time picker with localized format.
@@ -210,7 +214,7 @@ Total score will be entered into any field which meets one of the following:
 > to `{score}`, but will not set the item to `readOnly`. Setting this manually to `true` will result in a questionnaire
 > with fully functioning scoring.
 
-**No true support for FHIRPath is provided.**
+> Scoring is hard-coded and does not offer actual support for a `valueExpression` based on FHIRPath.
 
 ### Response creation
 

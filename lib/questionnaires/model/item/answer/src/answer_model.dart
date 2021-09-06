@@ -85,4 +85,12 @@ abstract class AnswerModel<I, V> {
   }
 
   bool get hasCodingAnswers => false;
+
+  /// Populates the answer from the result of a FHIRPath expression.
+  ///
+  /// This function is designed for a very specific internal purpose and should
+  /// not be invoked by application code.
+  void populateFromExpression(dynamic expressionResult) {
+    throw UnimplementedError('populateFromExpression not implemented.');
+  }
 }
