@@ -68,6 +68,6 @@ class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
       return;
     }
 
-    value = expressionResult as FhirDateTime;
+    value = FhirDateTime(expressionResult);
   }
 }
