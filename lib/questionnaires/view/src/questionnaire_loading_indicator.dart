@@ -21,8 +21,10 @@ class QuestionnaireLoadingIndicator extends StatelessWidget {
     const shortAxis = 50.0;
 
     return Card(
-        color: hasError ? Colors.amber : null,
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      color: hasError ? Colors.amber : null,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
           if (hasError)
             const Icon(
               Icons.error,
@@ -44,6 +46,8 @@ class QuestionnaireLoadingIndicator extends StatelessWidget {
               detail.toString(),
               style: Theme.of(context).textTheme.subtitle1,
             ),
-        ]));
+        ],
+      ),
+    );
   }
 }

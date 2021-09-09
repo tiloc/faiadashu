@@ -217,11 +217,13 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
         ? value!.copyWith(
             unit: unitCoding?.localizedDisplay(locale),
             system: unitCoding?.system,
-            code: unitCoding?.code)
+            code: unitCoding?.code,
+          )
         : Quantity(
             unit: unitCoding?.localizedDisplay(locale),
             system: unitCoding?.system,
-            code: unitCoding?.code);
+            code: unitCoding?.code,
+          );
   }
 
   /// Returns a modified copy of the current [value].

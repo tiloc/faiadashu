@@ -103,7 +103,9 @@ class _HomePageState extends State<HomePage> {
   // Quick-and-dirty upload of QuestionnaireResponse to server
   // Not suitable for production use (no error-handling)
   Future<void> _uploadResponse(
-      String id, QuestionnaireResponse? response) async {
+    String id,
+    QuestionnaireResponse? response,
+  ) async {
     if (response == null) {
       return;
     }
@@ -173,7 +175,9 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       AssetImageAttachmentProvider(
-          'http://example.org/images', 'assets/images'),
+        'http://example.org/images',
+        'assets/images',
+      ),
       valueSetProvider
     ]);
 
@@ -259,9 +263,11 @@ class _HomePageState extends State<HomePage> {
                 ),
                 onTap: () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const AboutPage()));
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AboutPage(),
+                    ),
+                  );
                 },
               ),
               ListTile(
@@ -269,15 +275,18 @@ class _HomePageState extends State<HomePage> {
                 subtitle: const Text('Legalese'),
                 onTap: () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const DisclaimerPage()));
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const DisclaimerPage(),
+                    ),
+                  );
                 },
               ),
               ListTile(
                 title: const Text('Primitive Types'),
                 subtitle: const Text(
-                    'Formatted, internationalized text output of FHIR primitive types.'),
+                  'Formatted, internationalized text output of FHIR primitive types.',
+                ),
                 onTap: () {
                   Navigator.push(
                     context,

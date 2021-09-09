@@ -12,13 +12,13 @@ class QuestionnaireStepper extends StatefulWidget {
   final QuestionnairePageScaffoldBuilder scaffoldBuilder;
   final QuestionnaireTheme? questionnaireTheme;
 
-  const QuestionnaireStepper(
-      {this.locale,
-      required this.scaffoldBuilder,
-      required this.fhirResourceProvider,
-      this.questionnaireTheme,
-      Key? key})
-      : super(key: key);
+  const QuestionnaireStepper({
+    this.locale,
+    required this.scaffoldBuilder,
+    required this.fhirResourceProvider,
+    this.questionnaireTheme,
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _QuestionnaireStepperState();
@@ -120,11 +120,12 @@ class QuestionnaireStepperPage extends QuestionnaireStepper {
     QuestionnaireTheme? questionnaireTheme,
     Key? key,
   }) : super(
-            locale: locale,
-            scaffoldBuilder: const DefaultQuestionnairePageScaffoldBuilder(),
-            fhirResourceProvider: fhirResourceProvider,
-            questionnaireTheme: questionnaireTheme,
-            key: key);
+          locale: locale,
+          scaffoldBuilder: const DefaultQuestionnairePageScaffoldBuilder(),
+          fhirResourceProvider: fhirResourceProvider,
+          questionnaireTheme: questionnaireTheme,
+          key: key,
+        );
 
   @override
   State<StatefulWidget> createState() => _QuestionnaireStepperState();

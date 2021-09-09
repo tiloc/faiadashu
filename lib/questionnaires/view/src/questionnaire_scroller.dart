@@ -35,17 +35,17 @@ class QuestionnaireScroller extends StatefulWidget {
   final QuestionnairePageScaffoldBuilder scaffoldBuilder;
   final QuestionnaireTheme? questionnaireTheme;
 
-  const QuestionnaireScroller(
-      {this.locale,
-      required this.scaffoldBuilder,
-      required this.fhirResourceProvider,
-      this.frontMatter,
-      this.backMatter,
-      this.aggregators,
-      this.onLinkTap,
-      this.questionnaireTheme,
-      Key? key})
-      : super(key: key);
+  const QuestionnaireScroller({
+    this.locale,
+    required this.scaffoldBuilder,
+    required this.fhirResourceProvider,
+    this.frontMatter,
+    this.backMatter,
+    this.aggregators,
+    this.onLinkTap,
+    this.questionnaireTheme,
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _QuestionnaireScrollerState();

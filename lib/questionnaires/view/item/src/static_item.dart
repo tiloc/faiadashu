@@ -9,9 +9,10 @@ import '../../../questionnaires.dart';
 
 class StaticItem extends QuestionnaireAnswerFiller {
   StaticItem(
-      QuestionnaireResponseFillerState responseFillerState, int answerIndex,
-      {Key? key})
-      : super(responseFillerState, answerIndex, key: key);
+    QuestionnaireResponseFillerState responseFillerState,
+    int answerIndex, {
+    Key? key,
+  }) : super(responseFillerState, answerIndex, key: key);
   @override
   State<StatefulWidget> createState() => _StaticItemState();
 }
