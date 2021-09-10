@@ -483,7 +483,7 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     // OPTIMIZE: Hugely expensive (maybe cache response during same generation?)
     final questionnaireResponse = requiresQuestionnaireResponse
         ? aggregator<QuestionnaireResponseAggregator>().aggregate()
-        : QuestionnaireResponse(); // TODO: Remove this hack
+        : null;
 
     // Pass in variables, especially "%patient".
     final patient = fhirResourceProvider.getResource(subjectResourceUri);
