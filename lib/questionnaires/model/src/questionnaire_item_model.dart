@@ -27,7 +27,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   QuestionnaireResponseItem? _questionnaireResponseItem;
   final String linkId;
   final QuestionnaireItemModel? parent;
-  late final QuestionnaireModel? _questionnaireModel;
+  late QuestionnaireModel? _questionnaireModel;
   final int siblingIndex;
   final int level;
   static final _qimLogger = Logger(QuestionnaireItemModel);
@@ -280,7 +280,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   }
 
   List<QuestionnaireItemModel> get siblings {
-    return _buildLocationList(
+    return _buildModelsFromItems(
       questionnaire,
       questionnaireModel,
       siblingQuestionnaireItems,
@@ -290,7 +290,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   }
 
   List<QuestionnaireItemModel> get children {
-    return _buildLocationList(
+    return _buildModelsFromItems(
       questionnaire,
       questionnaireModel,
       childQuestionnaireItems,
@@ -492,6 +492,18 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     return false;
   }
 
+  String? get calculatedExpression {
+    return questionnaireItem.extension_
+        ?.firstWhereOrNull(
+          (ext) =>
+              ext.url?.value.toString() ==
+              // TODO: Move to constant
+              'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression',
+        )
+        ?.valueExpression
+        ?.expression;
+  }
+
   /// Is this item a calculated expression?
   bool get isCalculatedExpression {
     if (questionnaireItem.extension_?.firstWhereOrNull((ext) {
@@ -506,11 +518,39 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     return false;
   }
 
-  /// Is this itemModel unable to hold a value?
-  bool get isStatic {
-    return (questionnaireItem.type == QuestionnaireItemType.group) ||
-        (questionnaireItem.type == QuestionnaireItemType.display);
+  void _updateCalculatedExpression(
+    Resource? responseResource,
+    Map<String, dynamic>? passedVariables,
+  ) {
+    final fhirPathExpression = calculatedExpression;
+    if (fhirPathExpression == null) {
+      return;
+    }
+
+    final expressionResult =
+        r4WalkFhirPath(responseResource, fhirPathExpression, passedVariables);
+
+    _qimLogger.debug(
+      'updateCalculatedExpression on $linkId: $fhirPathExpression = $expressionResult',
+    );
+
+    // Write the value back to the answer model
+    responseModel.answerModel(0).populateFromExpression(expressionResult);
   }
+
+  void _updateVariables() {
+    final responseResource = questionnaireModel.questionnaireResponse;
+    _variables?.forEach((variableModel) {
+      variableModel.updateValue(responseResource);
+    });
+  }
+
+  /// Is this itemModel unable to hold a value?
+  bool get isStatic => isGroup || isDisplay;
+
+  bool get isGroup => questionnaireItem.type == QuestionnaireItemType.group;
+
+  bool get isDisplay => questionnaireItem.type == QuestionnaireItemType.display;
 
   /// Is this item not changeable by end-users?
   ///
@@ -695,21 +735,23 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   ) {
     return questionnaireModel._cachedItems.putIfAbsent(
       linkId,
-      () => QuestionnaireItemModel._(
-        questionnaire,
-        questionnaireModel,
-        questionnaireItem,
-        linkId,
-        parent,
-        siblingIndex,
-        level,
-      ),
+      () => (linkId != questionnaireModel.linkId)
+          ? QuestionnaireItemModel._(
+              questionnaire,
+              questionnaireModel,
+              questionnaireItem,
+              linkId,
+              parent,
+              siblingIndex,
+              level,
+            )
+          : questionnaireModel,
     );
   }
 }
 
 /// Build list of [QuestionnaireItemModel] from [QuestionnaireItem] and meta-data.
-List<QuestionnaireItemModel> _buildLocationList(
+List<QuestionnaireItemModel> _buildModelsFromItems(
   Questionnaire _questionnaire,
   QuestionnaireModel questionnaireModel,
   List<QuestionnaireItem> _items,

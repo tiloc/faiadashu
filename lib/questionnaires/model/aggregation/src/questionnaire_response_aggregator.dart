@@ -35,7 +35,7 @@ class QuestionnaireResponseAggregator
     final nestedItems = <QuestionnaireResponseItem>[];
 
     for (final nestedItem in itemModel.children) {
-      if (nestedItem.questionnaireItem.type == QuestionnaireItemType.group) {
+      if (nestedItem.isGroup) {
         final groupItem = _fromGroupItem(nestedItem, responseStatus);
         if (groupItem != null) {
           nestedItems.add(groupItem);
@@ -74,7 +74,7 @@ class QuestionnaireResponseAggregator
     final responseItems = <QuestionnaireResponseItem>[];
 
     for (final itemModel in questionnaireModel.siblings) {
-      if (itemModel.questionnaireItem.type == QuestionnaireItemType.group) {
+      if (itemModel.isGroup) {
         final groupItem = _fromGroupItem(itemModel, responseStatus);
         if (groupItem != null) {
           responseItems.add(groupItem);

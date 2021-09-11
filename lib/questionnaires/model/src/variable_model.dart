@@ -32,18 +32,18 @@ class VariableModel {
   ///
   /// The other variables will not be updated by this method.
   void updateValue(Resource? resource) {
-    _value = r4WalkFhirPath(
-      resource,
-      expression,
-      (_visibleOtherVariables != null)
-          ? Map.fromEntries(
-              _visibleOtherVariables!.map<MapEntry<String, dynamic>>(
-                (otherVariable) =>
-                    MapEntry(otherVariable.name, otherVariable.value),
-              ),
-            )
-          : null,
-    );
+    final passedVariables = (_visibleOtherVariables != null)
+        ? Map.fromEntries(
+            _visibleOtherVariables!.map<MapEntry<String, dynamic>>(
+              (otherVariable) =>
+                  MapEntry(otherVariable.name, otherVariable.value),
+            ),
+          )
+        : null;
+
+    final newValue = r4WalkFhirPath(resource, expression, passedVariables);
+
+    _value = newValue;
   }
 
   /// Returns the variables associated with a [Resource].

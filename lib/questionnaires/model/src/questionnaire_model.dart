@@ -140,8 +140,14 @@ class QuestionnaireModel extends QuestionnaireItemModel {
         fhirResourceProvider.getResource(questionnaireResponseResourceUri)
             as QuestionnaireResponse?;
 
-    // WIP: What is the proper order for expressions during setup?
-    // WIP: initialValue, then variables, then calculated, then enableWhen?
+    // ================================================================
+    // Behaviors require a defined sequence during setup:
+    // * initialValue
+    // * variables
+    // * calculated
+    // * enableWhen
+    // * error flagging
+    // ================================================================
 
     // Populate initial values if response == null
     // This cannot happen in the constructor, as only this method has the
@@ -157,10 +163,18 @@ class QuestionnaireModel extends QuestionnaireItemModel {
       questionnaireModel.populate(response);
     }
 
-    // WIP: Set up updates for variable values
+    // Set up updates for values of questionnaire-level variables
+    questionnaireModel._updateVariables();
+    questionnaireModel.addListener(questionnaireModel._updateVariables);
 
     // WIP: Set up calculatedExpressions on items
+    questionnaireModel._updateCalculations();
+    questionnaireModel.addListener(questionnaireModel._updateCalculations);
 
+    // WIP: Set up enableWhen behavior on items
+    // TODO: Move this here from the constructor
+
+    // TODO: Move error flagging here from constructor
 
     return questionnaireModel;
   }
@@ -185,6 +199,14 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     if (notifyListeners) {
       this.notifyListeners();
     }
+  }
+
+  /// Returns a [QuestionnaireResponse].
+  ///
+  /// The response matches the model as of the current generation.
+  QuestionnaireResponse? get questionnaireResponse {
+    // OPTIMIZE: Hugely expensive (maybe cache response during same generation?)
+    return aggregator<QuestionnaireResponseAggregator>().aggregate();
   }
 
   /// Returns a [Resource] which is referenced in the [Questionnaire].
@@ -424,6 +446,23 @@ class QuestionnaireModel extends QuestionnaireItemModel {
         questionnaireResponse.status ?? QuestionnaireResponseStatus.in_progress;
   }
 
+  void _updateCalculations() {
+    final responseResource = questionnaireModel.questionnaireResponse;
+    final passedVariables = (_variables != null)
+        ? Map.fromEntries(
+            _variables!.map<MapEntry<String, dynamic>>(
+              (variable) => MapEntry('%${variable.name}', variable.value),
+            ),
+          )
+        : null;
+
+    orderedQuestionnaireItemModels()
+        .where((qim) => qim.isCalculatedExpression)
+        .forEach((qim) {
+      qim._updateCalculatedExpression(responseResource, passedVariables);
+    });
+  }
+
   /// Returns a bitfield of the items with `isEnabled` == true.
   List<bool> get _currentlyEnabledItems => List<bool>.generate(
         orderedQuestionnaireItemModels().length,
@@ -504,24 +543,20 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   }
 
   /// Returns the evaluation result of a FHIRPath expression
-  ///
-  /// CAUTION: This method is very expensive!
   List<dynamic> evaluateFhirPathExpression(
     String pathExpression, {
     bool requiresQuestionnaireResponse = true,
   }) {
-    // OPTIMIZE: Hugely expensive (maybe cache response during same generation?)
-    final questionnaireResponse = requiresQuestionnaireResponse
-        ? aggregator<QuestionnaireResponseAggregator>().aggregate()
-        : null;
+    final responseResource =
+        requiresQuestionnaireResponse ? questionnaireResponse : null;
 
     // Pass in variables, especially "%patient".
     final patient = fhirResourceProvider.getResource(subjectResourceUri);
 
     final fhirPathResult = r4WalkFhirPath(
-      questionnaireResponse,
+      responseResource,
       pathExpression,
-      {'%patient': patient},
+      {'%patient': patient}, // FIXME: Not properly set?
     );
     _logger.debug('fhirPathResult: $fhirPathResult');
 
