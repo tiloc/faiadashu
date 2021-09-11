@@ -27,7 +27,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   QuestionnaireResponseItem? _questionnaireResponseItem;
   final String linkId;
   final QuestionnaireItemModel? parent;
-  late QuestionnaireModel? _questionnaireModel;
+  late final QuestionnaireModel? _questionnaireModel;
   final int siblingIndex;
   final int level;
   static final _qimLogger = Logger(QuestionnaireItemModel);
@@ -35,6 +35,8 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   QuestionnaireModel get questionnaireModel => _questionnaireModel!;
 
   LinkedHashMap<String, QuestionnaireItemModel>? _orderedItems;
+
+  late final List<VariableModel>? _variables;
 
   /// Returns whether the item has an initial value.
   ///
@@ -56,7 +58,6 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   }
 
   void _populateInitialValue() {
-    // WIP: Implement
     _qimLogger.debug('_populateInitialValue: $linkId');
     if (hasInitialExpression) {
       final initialExpressionResult = _evaluateInitialExpression();
@@ -86,8 +87,9 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     }
 
     final fhirPathResult = questionnaireModel.evaluateFhirPathExpression(
-        pathExpression,
-        requiresQuestionnaireResponse: false);
+      pathExpression,
+      requiresQuestionnaireResponse: false,
+    );
 
     if (fhirPathResult.isEmpty) {
       return null;
@@ -111,7 +113,8 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   /// Returns whether the item is enabled/disabled through an enabledWhenExpression condition.
   bool get isEnabledWhenExpression {
     return questionnaireItem.extension_?.extensionOrNull(
-            'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression') !=
+          'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression',
+        ) !=
         null;
   }
 
@@ -138,13 +141,16 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
 
     final pathExpression = questionnaireItem.extension_
         ?.extensionOrNull(
-            'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression')
+          'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression',
+        )
         ?.valueExpression
         ?.expression;
 
     if (pathExpression == null) {
       throw QuestionnaireFormatException(
-          'enableWhenExpression missing expression', questionnaireItem);
+        'enableWhenExpression missing expression',
+        questionnaireItem,
+      );
     }
 
     final fhirPathResult =
@@ -157,7 +163,9 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
       _disableWithChildren();
     } else if (fhirPathResult.first is! bool) {
       throw QuestionnaireFormatException(
-          'FHIRPath expression does not return a bool: $pathExpression', this);
+        'FHIRPath expression does not return a bool: $pathExpression',
+        this,
+      );
     } else if ((fhirPathResult.first as bool) == false) {
       _disableWithChildren();
     } // true == do nothing (is already enabled)
@@ -232,8 +240,9 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
         break;
       case QuestionnaireItemEnableBehavior.unknown:
         throw QuestionnaireFormatException(
-            'enableWhen with unknown enableBehavior: ${questionnaireItem.enableBehavior}',
-            questionnaireItem);
+          'enableWhen with unknown enableBehavior: ${questionnaireItem.enableBehavior}',
+          questionnaireItem,
+        );
     }
   }
 
@@ -271,13 +280,23 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   }
 
   List<QuestionnaireItemModel> get siblings {
-    return _buildLocationList(questionnaire, questionnaireModel,
-        siblingQuestionnaireItems, parent, level);
+    return _buildLocationList(
+      questionnaire,
+      questionnaireModel,
+      siblingQuestionnaireItems,
+      parent,
+      level,
+    );
   }
 
   List<QuestionnaireItemModel> get children {
-    return _buildLocationList(questionnaire, questionnaireModel,
-        childQuestionnaireItems, this, level + 1);
+    return _buildLocationList(
+      questionnaire,
+      questionnaireModel,
+      childQuestionnaireItems,
+      this,
+      level + 1,
+    );
   }
 
   bool get hasNextSibling {
@@ -333,7 +352,8 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
         questionNumber = iterable;
       } else {
         throw ArgumentError(
-            'answerIndex $answerIndex not found in _orderedItems');
+          'answerIndex $answerIndex not found in _orderedItems',
+        );
       }
     } else {
       throw StateError('_orderedItems not found');
@@ -414,9 +434,11 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   Iterable<QuestionnaireErrorFlag>? get isComplete {
     if (isRequired && !responseModel.isUnanswered) {
       return [
-        QuestionnaireErrorFlag(linkId,
-            errorText: lookupFDashLocalizations(questionnaireModel.locale)
-                .validatorRequiredItem)
+        QuestionnaireErrorFlag(
+          linkId,
+          errorText: lookupFDashLocalizations(questionnaireModel.locale)
+              .validatorRequiredItem,
+        )
       ];
     }
     return responseModel.isComplete;
@@ -434,7 +456,8 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     final ordinalExtension = responseItem
             ?.answer?.firstOrNull?.valueCoding?.extension_
             ?.extensionOrNull(
-                'http://hl7.org/fhir/StructureDefinition/iso21090-CO-value') ??
+          'http://hl7.org/fhir/StructureDefinition/iso21090-CO-value',
+        ) ??
         responseItem?.answer?.firstOrNull?.valueCoding?.extension_
             ?.extensionOrNull(
           'http://hl7.org/fhir/StructureDefinition/ordinalValue',
@@ -446,32 +469,40 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     return ordinalExtension.valueDecimal;
   }
 
-  /// Is this item a calculated expression?
-  bool get isCalculatedExpression {
+  /// Is this item's value calculated?
+  bool get isCalculated {
+    return isCalculatedExpression || isScored;
+  }
+
+  /// Is this item a total score calculation?
+  bool get isScored {
+    // From the description of the extension it is not entirely clear
+    // whether the unit should be in display or code.
+    // NLM Forms Builder puts it into display.
+    //
+    // Checking for read-only is relevant,
+    // as there are also input fields (e.g. pain score) with unit {score}.
     if (questionnaireItem.type == QuestionnaireItemType.quantity ||
         questionnaireItem.type == QuestionnaireItemType.decimal) {
-      if (questionnaireItem.extension_?.firstWhereOrNull((ext) {
-            return {
-              'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression',
-              'http://hl7.org/fhir/StructureDefinition/cqf-expression'
-            }.contains(ext.url?.value.toString());
-          }) !=
-          null) {
-        return true;
-      }
-
-      // From the description of the extension it is not entirely clear
-      // whether the unit should be in display or code.
-      // NLM Forms Builder puts it into display.
-      //
-      // Checking for read-only is relevant,
-      // as there are also input fields (e.g. pain score) with unit {score}.
       if (questionnaireItem.readOnly == Boolean(true) &&
           questionnaireItem.unit?.display == '{score}') {
         return true;
       }
     }
+    return false;
+  }
 
+  /// Is this item a calculated expression?
+  bool get isCalculatedExpression {
+    if (questionnaireItem.extension_?.firstWhereOrNull((ext) {
+          return {
+            'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression',
+            'http://hl7.org/fhir/StructureDefinition/cqf-expression'
+          }.contains(ext.url?.value.toString());
+        }) !=
+        null) {
+      return true;
+    }
     return false;
   }
 
@@ -489,14 +520,15 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     return isStatic ||
         questionnaireItem.readOnly == Boolean(true) ||
         isHidden ||
-        isCalculatedExpression;
+        isCalculated;
   }
 
   /// Is this item hidden?
   bool get isHidden {
     return (questionnaireItem.extension_
                 ?.extensionOrNull(
-                    'http://hl7.org/fhir/StructureDefinition/questionnaire-hidden')
+                  'http://hl7.org/fhir/StructureDefinition/questionnaire-hidden',
+                )
                 ?.valueBoolean
                 ?.value ==
             true) ||
@@ -513,7 +545,8 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     return questionnaireItem.isItemControl('help') ||
         (questionnaireItem.extension_
                 ?.extensionOrNull(
-                    'http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory')
+                  'http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory',
+                )
                 ?.valueCodeableConcept
                 ?.coding
                 ?.firstOrNull
@@ -524,10 +557,14 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
 
   String? get titleText {
     final title = Xhtml.toXhtml(
-        questionnaireItem.text, questionnaireItem.textElement?.extension_);
+      questionnaireItem.text,
+      questionnaireItem.textElement?.extension_,
+    );
 
     final prefix = Xhtml.toXhtml(
-        questionnaireItem.prefix, questionnaireItem.prefixElement?.extension_);
+      questionnaireItem.prefix,
+      questionnaireItem.prefixElement?.extension_,
+    );
 
     return (prefix != null) ? '$prefix $title' : title;
   }
@@ -559,7 +596,9 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
         currentSibling = currentSibling.nextSibling;
         if (itemModelMap.containsKey(currentSibling.linkId)) {
           throw QuestionnaireFormatException(
-              'Duplicate linkId $linkId', currentSibling);
+            'Duplicate linkId $linkId',
+            currentSibling,
+          );
         } else {
           itemModelMap.addAll(currentSibling._addChildren());
         }
@@ -588,8 +627,10 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   /// The items are examined as returned by [orderedQuestionnaireItemModels].
   ///
   /// Returns [notFound] if no matching item exists.
-  int? indexOf(bool Function(QuestionnaireItemModel) predicate,
-      [int? notFound = -1]) {
+  int? indexOf(
+    bool Function(QuestionnaireItemModel) predicate, [
+    int? notFound = -1,
+  ]) {
     int index = 0;
     for (final qim in orderedQuestionnaireItemModels()) {
       if (predicate.call(qim)) {
@@ -628,44 +669,68 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   }
 
   QuestionnaireItemModel._(
-      this.questionnaire,
-      QuestionnaireModel? questionnaireModel,
-      this.questionnaireItem,
-      this.linkId,
-      this.parent,
-      this.siblingIndex,
-      this.level) {
+    this.questionnaire,
+    QuestionnaireModel? questionnaireModel,
+    this.questionnaireItem,
+    this.linkId,
+    this.parent,
+    this.siblingIndex,
+    this.level,
+  ) {
     _questionnaireModel = questionnaireModel;
+    // WIP: Implement support for item-level variables.
+    _variables = (questionnaireModel == null)
+        ? VariableModel.variables(questionnaire, null)
+        : null;
   }
 
   factory QuestionnaireItemModel._cached(
-      Questionnaire questionnaire,
-      QuestionnaireModel questionnaireModel,
-      QuestionnaireItem questionnaireItem,
-      String linkId,
-      QuestionnaireItemModel? parent,
-      int siblingIndex,
-      int level) {
+    Questionnaire questionnaire,
+    QuestionnaireModel questionnaireModel,
+    QuestionnaireItem questionnaireItem,
+    String linkId,
+    QuestionnaireItemModel? parent,
+    int siblingIndex,
+    int level,
+  ) {
     return questionnaireModel._cachedItems.putIfAbsent(
+      linkId,
+      () => QuestionnaireItemModel._(
+        questionnaire,
+        questionnaireModel,
+        questionnaireItem,
         linkId,
-        () => QuestionnaireItemModel._(questionnaire, questionnaireModel,
-            questionnaireItem, linkId, parent, siblingIndex, level));
+        parent,
+        siblingIndex,
+        level,
+      ),
+    );
   }
 }
 
 /// Build list of [QuestionnaireItemModel] from [QuestionnaireItem] and meta-data.
 List<QuestionnaireItemModel> _buildLocationList(
-    Questionnaire _questionnaire,
-    QuestionnaireModel questionnaireModel,
-    List<QuestionnaireItem> _items,
-    QuestionnaireItemModel? _parent,
-    int _level) {
+  Questionnaire _questionnaire,
+  QuestionnaireModel questionnaireModel,
+  List<QuestionnaireItem> _items,
+  QuestionnaireItemModel? _parent,
+  int _level,
+) {
   int siblingIndex = 0;
   final itemModelList = <QuestionnaireItemModel>[];
 
   for (final item in _items) {
-    itemModelList.add(QuestionnaireItemModel._cached(_questionnaire,
-        questionnaireModel, item, item.linkId, _parent, siblingIndex, _level));
+    itemModelList.add(
+      QuestionnaireItemModel._cached(
+        _questionnaire,
+        questionnaireModel,
+        item,
+        item.linkId,
+        _parent,
+        siblingIndex,
+        _level,
+      ),
+    );
     siblingIndex++;
   }
 

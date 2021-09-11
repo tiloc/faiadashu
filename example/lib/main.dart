@@ -339,6 +339,16 @@ class _HomePageState extends State<HomePage> {
                 uploadResponseFunction: uploadResponseFunction,
               ),
               QuestionnaireLaunchTile(
+                title: 'Weight/Height Tracking',
+                subtitle: 'Example for BMI calculation with FHIRPath',
+                fhirResourceProvider: resourceBundleProvider,
+                questionnairePath:
+                    'assets/instruments/weight-height-tracking.json',
+                saveResponseFunction: _saveResponse,
+                restoreResponseFunction: _restoreResponse,
+                uploadResponseFunction: uploadResponseFunction,
+              ),
+              QuestionnaireLaunchTile(
                 title: 'Argonaut Questionnaire Sampler',
                 subtitle:
                     'Reference sample from the Argonaut Questionnaire Implementation Guide.',

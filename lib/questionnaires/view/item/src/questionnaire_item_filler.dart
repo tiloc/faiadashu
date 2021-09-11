@@ -14,21 +14,24 @@ class QuestionnaireItemFiller extends StatefulWidget {
   final int index;
 
   factory QuestionnaireItemFiller.fromQuestionnaireFiller(
-      QuestionnaireFillerData questionnaireFiller, int index,
-      {Key? key}) {
+    QuestionnaireFillerData questionnaireFiller,
+    int index, {
+    Key? key,
+  }) {
     return QuestionnaireItemFiller._(
-        questionnaireFiller: questionnaireFiller,
-        itemModel: questionnaireFiller.questionnaireModel.itemModelAt(index),
-        index: index,
-        key: key);
+      questionnaireFiller: questionnaireFiller,
+      itemModel: questionnaireFiller.questionnaireModel.itemModelAt(index),
+      index: index,
+      key: key,
+    );
   }
 
-  const QuestionnaireItemFiller._(
-      {required this.questionnaireFiller,
-      required this.itemModel,
-      required this.index,
-      Key? key})
-      : super(key: key);
+  const QuestionnaireItemFiller._({
+    required this.questionnaireFiller,
+    required this.itemModel,
+    required this.index,
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => QuestionnaireItemFillerState();
@@ -101,7 +104,8 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
   @override
   Widget build(BuildContext context) {
     _logger.trace(
-        'build $linkId hidden: ${widget.itemModel.isHidden}, enabled: ${widget.itemModel.isEnabled}');
+      'build $linkId hidden: ${widget.itemModel.isHidden}, enabled: ${widget.itemModel.isEnabled}',
+    );
 
     return (!widget.itemModel.isHidden)
         ? Focus(
@@ -111,10 +115,11 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
               debugDumpFocusTree();
             }, */
             child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 500),
-                child: widget.itemModel.isEnabled
-                    ? LayoutBuilder(builder:
-                        (BuildContext context, BoxConstraints constraints) {
+              duration: const Duration(milliseconds: 500),
+              child: widget.itemModel.isEnabled
+                  ? LayoutBuilder(
+                      builder:
+                          (BuildContext context, BoxConstraints constraints) {
                         // Wide landscape screen: Use horizontal layout
                         return AnimatedSwitcher(
                           duration: const Duration(milliseconds: 500),
@@ -122,16 +127,20 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
                               ? Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                      if (_titleWidget != null)
-                                        Expanded(
-                                            child: Container(
-                                                padding: const EdgeInsets.only(
-                                                    top: 8),
-                                                child: _titleWidget))
-                                      else
-                                        Expanded(child: Container()),
-                                      Expanded(flex: 2, child: _responseFiller)
-                                    ])
+                                    if (_titleWidget != null)
+                                      Expanded(
+                                        child: Container(
+                                          padding: const EdgeInsets.only(
+                                            top: 8,
+                                          ),
+                                          child: _titleWidget,
+                                        ),
+                                      )
+                                    else
+                                      Expanded(child: Container()),
+                                    Expanded(flex: 2, child: _responseFiller)
+                                  ],
+                                )
                               // Narrow, portrait screen: Use vertical layout
                               : Column(
                                   mainAxisSize: MainAxisSize.min,
@@ -139,16 +148,18 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
                                   children: [
                                     if (_titleWidget != null)
                                       Container(
-                                          padding:
-                                              const EdgeInsets.only(top: 8),
-                                          child: _titleWidget),
+                                        padding: const EdgeInsets.only(top: 8),
+                                        child: _titleWidget,
+                                      ),
                                     const SizedBox(width: 8),
                                     _responseFiller,
                                   ],
                                 ),
                         );
-                      })
-                    : const SizedBox()),
+                      },
+                    )
+                  : const SizedBox(),
+            ),
           )
         : const SizedBox();
   }
@@ -296,28 +307,33 @@ class _QuestionnaireItemFillerHelpState
     );
   }
 
-  Future<void> _showHelp(BuildContext context,
-      QuestionnaireItemModel questionnaireItemModel) async {
+  Future<void> _showHelp(
+    BuildContext context,
+    QuestionnaireItemModel questionnaireItemModel,
+  ) async {
     return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text('Help'),
-            content: HTML.toRichText(
-                context, questionnaireItemModel.titleText ?? '',
-                defaultTextStyle: Theme.of(context).textTheme.bodyText1),
-            actions: <Widget>[
-              OutlinedButton(
-                onPressed: () {
-                  setState(() {
-                    Navigator.pop(context);
-                  });
-                },
-                child: const Text('Dismiss'),
-              ),
-            ],
-          );
-        });
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Help'),
+          content: HTML.toRichText(
+            context,
+            questionnaireItemModel.titleText ?? '',
+            defaultTextStyle: Theme.of(context).textTheme.bodyText1,
+          ),
+          actions: <Widget>[
+            OutlinedButton(
+              onPressed: () {
+                setState(() {
+                  Navigator.pop(context);
+                });
+              },
+              child: const Text('Dismiss'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
 
@@ -350,11 +366,14 @@ class QuestionnaireItemFillerTitleLeading extends StatelessWidget {
       : _leadingWidget = leadingWidget,
         super(key: key);
 
-  static Widget? fromQuestionnaireItem(QuestionnaireItemModel itemModel,
-      {Key? key}) {
+  static Widget? fromQuestionnaireItem(
+    QuestionnaireItemModel itemModel, {
+    Key? key,
+  }) {
     final displayCategory = itemModel.questionnaireItem.extension_
         ?.extensionOrNull(
-            'http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory')
+          'http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory',
+        )
         ?.valueCodeableConcept
         ?.coding
         ?.firstOrNull

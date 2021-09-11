@@ -5,6 +5,8 @@ import '../../../../fhir_types/fhir_types.dart';
 import '../../../../logging/logging.dart';
 import '../../model.dart';
 
+// TODO: Reduce code with calculatedExpression code
+
 /// Aggregate answers into a total score.
 ///
 /// The score is the sum of the ordinalValue of all answers.
@@ -18,7 +20,6 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
   static final _logger = Logger(TotalScoreAggregator);
 
   late final QuestionnaireItemModel? totalScoreItem;
-  late final String logTag;
   TotalScoreAggregator({bool autoAggregate = true})
       : super(Decimal(0), autoAggregate: autoAggregate);
 

@@ -27,12 +27,12 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   final Locale locale;
   static final _logger = Logger(QuestionnaireModel);
 
-  QuestionnaireModel._(
-      {required this.locale,
-      required Questionnaire questionnaire,
-      required this.fhirResourceProvider,
-      required List<Aggregator>? aggregators})
-      : _aggregators = aggregators,
+  QuestionnaireModel._({
+    required this.locale,
+    required Questionnaire questionnaire,
+    required this.fhirResourceProvider,
+    required List<Aggregator>? aggregators,
+  })  : _aggregators = aggregators,
         super._(
           questionnaire,
           null,
@@ -59,7 +59,7 @@ class QuestionnaireModel extends QuestionnaireItemModel {
 
     _logger.debug('_itemsWithEnableWhen: $_itemsWithEnableWhen');
 
-    // Set up FHIR Path based enableWhenExpression feature
+    // Set up FHIRPath based enableWhenExpression feature
     for (final itemModel in orderedQuestionnaireItemModels()) {
       if (itemModel.isEnabledWhenExpression) {
         if (_itemsWithEnableWhenExpression == null) {
@@ -84,8 +84,10 @@ class QuestionnaireModel extends QuestionnaireItemModel {
       }
     }
 
+    // TODO: Should the constructor activate any kind of dynamic behavior?
     activateEnableBehavior();
 
+    // This ensures screen updates in case of invalid responses.
     errorFlags.addListener(() {
       nextGeneration();
     });
@@ -106,10 +108,11 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   ///
   /// If no [QuestionnaireResponse] has been provided here, it can still later
   /// be provided through the [populate] function.
-  static Future<QuestionnaireModel> fromFhirResourceBundle(
-      {required Locale locale,
-      List<Aggregator>? aggregators,
-      required FhirResourceProvider fhirResourceProvider}) async {
+  static Future<QuestionnaireModel> fromFhirResourceBundle({
+    required Locale locale,
+    List<Aggregator>? aggregators,
+    required FhirResourceProvider fhirResourceProvider,
+  }) async {
     _logger.debug('QuestionnaireModel.fromFhirResourceBundle');
 
     final questionnaire = await fhirResourceProvider
@@ -120,15 +123,16 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     }
 
     final questionnaireModel = QuestionnaireModel._(
-        questionnaire: questionnaire,
-        locale: locale,
-        aggregators: aggregators ??
-            [
-              TotalScoreAggregator(),
-              NarrativeAggregator(),
-              QuestionnaireResponseAggregator()
-            ],
-        fhirResourceProvider: fhirResourceProvider);
+      questionnaire: questionnaire,
+      locale: locale,
+      aggregators: aggregators ??
+          [
+            TotalScoreAggregator(),
+            NarrativeAggregator(),
+            QuestionnaireResponseAggregator()
+          ],
+      fhirResourceProvider: fhirResourceProvider,
+    );
 
     await questionnaireModel.fhirResourceProvider.init();
 
@@ -136,10 +140,12 @@ class QuestionnaireModel extends QuestionnaireItemModel {
         fhirResourceProvider.getResource(questionnaireResponseResourceUri)
             as QuestionnaireResponse?;
 
+    // WIP: What is the proper order for expressions during setup?
+    // WIP: initialValue, then variables, then calculated, then enableWhen?
+
     // Populate initial values if response == null
     // This cannot happen in the constructor, as only this method has the
     // extra information to populate variables.
-    // WIP: make sure this interacts properly with enableWhen evaluation
     if (response == null) {
       questionnaireModel
           .orderedQuestionnaireItemModels()
@@ -150,6 +156,11 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     } else {
       questionnaireModel.populate(response);
     }
+
+    // WIP: Set up updates for variable values
+
+    // WIP: Set up calculatedExpressions on items
+
 
     return questionnaireModel;
   }
@@ -168,7 +179,8 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   void nextGeneration({bool notifyListeners = true}) {
     final newGeneration = _generation + 1;
     _logger.debug(
-        'nextGeneration $notifyListeners: $_generation -> $newGeneration');
+      'nextGeneration $notifyListeners: $_generation -> $newGeneration',
+    );
     _generation = newGeneration;
     if (notifyListeners) {
       this.notifyListeners();
@@ -189,16 +201,20 @@ class QuestionnaireModel extends QuestionnaireItemModel {
         ? findContainedByElementId(uri)
         : RegistryFhirResourceProvider(
             // Certain Value Sets need to be made available to questionnaires, even if they are not explicitly provided.
-            [FhirValueSetProvider(), fhirResourceProvider]).getResource(uri);
+            [FhirValueSetProvider(), fhirResourceProvider],
+          ).getResource(uri);
 
     if (resource == null) {
       if (isResourceContained) {
         throw QuestionnaireFormatException(
-            'Questionnaire does not contain referenced Resource $uri',
-            questionnaire.contained);
+          'Questionnaire does not contain referenced Resource $uri',
+          questionnaire.contained,
+        );
       } else {
         throw QuestionnaireFormatException(
-            'External Resource $uri cannot be located.', context);
+          'External Resource $uri cannot be located.',
+          context,
+        );
       }
     }
 
@@ -210,8 +226,11 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   /// The ValueSet is identified through the [uri].
   ///
   /// Includes all the contained, included, etc. elements.
-  void forEachInValueSet(String uri, void Function(Coding coding) f,
-      {Object? context}) {
+  void forEachInValueSet(
+    String uri,
+    void Function(Coding coding) f, {
+    Object? context,
+  }) {
     final valueSet = getResource(uri, context: context) as ValueSet;
 
     final List<ValueSetContains>? valueSetContains =
@@ -221,10 +240,11 @@ class QuestionnaireModel extends QuestionnaireItemModel {
       // Expansion has preference over includes. They are not additive.
       for (final contains in valueSetContains) {
         final coding = Coding(
-            system: contains.system,
-            code: contains.code,
-            display: contains.display,
-            extension_: contains.extension_);
+          system: contains.system,
+          code: contains.code,
+          display: contains.display,
+          extension_: contains.extension_,
+        );
 
         f.call(coding);
       }
@@ -233,7 +253,9 @@ class QuestionnaireModel extends QuestionnaireItemModel {
 
       if (valueSetIncludes == null) {
         throw QuestionnaireFormatException(
-            'Include in ValueSet $uri does not exist.', context);
+          'Include in ValueSet $uri does not exist.',
+          context,
+        );
       }
 
       for (final valueSetInclude in valueSetIncludes) {
@@ -261,14 +283,16 @@ class QuestionnaireModel extends QuestionnaireItemModel {
             final codeSystem =
                 getResource(valueSetInclude.system.toString()) as CodeSystem;
             _logger.debug(
-                'Processing included CodeSystem ${codeSystem.url.toString()}');
+              'Processing included CodeSystem ${codeSystem.url.toString()}',
+            );
             if (codeSystem.concept != null) {
               for (final concept in codeSystem.concept!) {
                 final coding = Coding(
-                    system: valueSetInclude.system,
-                    code: concept.code,
-                    display: concept.display,
-                    extension_: concept.extension_);
+                  system: valueSetInclude.system,
+                  code: concept.code,
+                  display: concept.display,
+                  extension_: concept.extension_,
+                );
                 f.call(coding);
               }
             }
@@ -277,10 +301,11 @@ class QuestionnaireModel extends QuestionnaireItemModel {
 
         for (final concept in valueSetConcepts) {
           final coding = Coding(
-              system: valueSetInclude.system,
-              code: concept.code,
-              display: concept.display,
-              extension_: concept.extension_);
+            system: valueSetInclude.system,
+            code: concept.code,
+            display: concept.display,
+            extension_: concept.extension_,
+          );
 
           f.call(coding);
         }
@@ -300,7 +325,9 @@ class QuestionnaireModel extends QuestionnaireItemModel {
 
     if (questionnaire.contained == null) {
       throw QuestionnaireFormatException(
-          'Questionnaire does not have contained elements.', questionnaire);
+        'Questionnaire does not have contained elements.',
+        questionnaire,
+      );
     }
 
     final key = elementId.startsWith('#')
@@ -326,8 +353,9 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     }
 
     throw QuestionnaireFormatException(
-        'Questionnaire does not contain element with id #$elementId',
-        questionnaire.contained);
+      'Questionnaire does not contain element with id #$elementId',
+      questionnaire.contained,
+    );
   }
 
   /// Returns a number that indicates whether the model has changed.
@@ -358,7 +386,8 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   }
 
   void _populateItems(
-      List<QuestionnaireResponseItem>? questionnaireResponseItems) {
+    List<QuestionnaireResponseItem>? questionnaireResponseItems,
+  ) {
     if (questionnaireResponseItems == null) {
       return;
     }
@@ -397,9 +426,10 @@ class QuestionnaireModel extends QuestionnaireItemModel {
 
   /// Returns a bitfield of the items with `isEnabled` == true.
   List<bool> get _currentlyEnabledItems => List<bool>.generate(
-      orderedQuestionnaireItemModels().length,
-      (index) => orderedQuestionnaireItemModels().elementAt(index).isEnabled,
-      growable: false);
+        orderedQuestionnaireItemModels().length,
+        (index) => orderedQuestionnaireItemModels().elementAt(index).isEnabled,
+        growable: false,
+      );
 
   /// Update the current enablement status of all items.
   ///
@@ -489,7 +519,10 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     final patient = fhirResourceProvider.getResource(subjectResourceUri);
 
     final fhirPathResult = r4WalkFhirPath(
-        questionnaireResponse, pathExpression, {'%patient': patient});
+      questionnaireResponse,
+      pathExpression,
+      {'%patient': patient},
+    );
     _logger.debug('fhirPathResult: $fhirPathResult');
 
     return fhirPathResult;
@@ -502,7 +535,7 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   /// * All filled fields are valid
   ///
   /// Returns null, if everything is complete.
-  /// Returns [QuestionnaireErrorFlag]s, if item are incomplete.
+  /// Returns [QuestionnaireErrorFlag]s, if items are incomplete.
   Iterable<QuestionnaireErrorFlag>? get isQuestionnaireComplete {
     final errorFlags = <QuestionnaireErrorFlag>[];
     for (final itemModel in orderedQuestionnaireItemModels()) {

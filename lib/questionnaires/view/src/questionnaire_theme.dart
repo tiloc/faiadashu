@@ -74,7 +74,8 @@ class QuestionnaireTheme {
         return CodingAnswerFiller(responseFiller, answerIndex, key: key);
       } else if (answerModel is BooleanAnswerModel) {
         return BooleanAnswerFiller(responseFiller, answerIndex, key: key);
-      } else if (answerModel is StaticAnswerModel) {
+      } else if (answerModel is DisplayAnswerModel ||
+          answerModel is GroupAnswerModel) {
         return StaticItem(responseFiller, answerIndex, key: key);
       } else if (answerModel is UnsupportedAnswerModel) {
         throw QuestionnaireFormatException(

@@ -41,7 +41,9 @@ class _NarrativeDrawerState extends State<NarrativeDrawer> {
       margin: const EdgeInsets.all(8.0),
       child: ConstrainedBox(
         constraints: BoxConstraints(
-            maxHeight: preferredHeight, minHeight: preferredHeight),
+          maxHeight: preferredHeight,
+          minHeight: preferredHeight,
+        ),
         child: Container(
           padding: const EdgeInsets.all(16.0),
           child: Builder(
@@ -62,24 +64,28 @@ class _NarrativeDrawerState extends State<NarrativeDrawer> {
                     secondary: IconButton(
                       icon: const Icon(Icons.copy),
                       onPressed: () {
-                        Clipboard.setData(ClipboardData(
-                                text: _drawerMode
-                                    ? const JsonEncoder.withIndent('    ')
-                                        .convert(QuestionnaireFiller.of(context)
-                                            .aggregator<
-                                                QuestionnaireResponseAggregator>()
-                                            .aggregate(containPatient: true)
-                                            ?.toJson())
-                                    : QuestionnaireFiller.of(context)
-                                        .aggregator<NarrativeAggregator>()
-                                        .aggregate()
-                                        ?.div))
-                            .then((_) {
+                        Clipboard.setData(
+                          ClipboardData(
+                            text: _drawerMode
+                                ? const JsonEncoder.withIndent('    ').convert(
+                                    QuestionnaireFiller.of(context)
+                                        .aggregator<
+                                            QuestionnaireResponseAggregator>()
+                                        .aggregate(containPatient: true)
+                                        ?.toJson(),
+                                  )
+                                : QuestionnaireFiller.of(context)
+                                    .aggregator<NarrativeAggregator>()
+                                    .aggregate()
+                                    ?.div,
+                          ),
+                        ).then((_) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: _drawerMode
                                   ? const Text(
-                                      'QuestionnaireResponse copied to clipboard')
+                                      'QuestionnaireResponse copied to clipboard',
+                                    )
                                   : const Text(
                                       'Narrative copied to clipboard',
                                     ),

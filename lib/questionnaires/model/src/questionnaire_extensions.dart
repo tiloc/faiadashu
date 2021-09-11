@@ -16,22 +16,27 @@ extension FDashQuestionnaireAnswerOptionExtensions
   String get optionCode {
     if (valueString == null && valueCoding == null) {
       throw QuestionnaireFormatException(
-          'QuestionnaireAnswerOption requires either a valueString or a valueCoding.',
-          this);
+        'QuestionnaireAnswerOption requires either a valueString or a valueCoding.',
+        this,
+      );
     }
     return valueString ?? valueCoding!.code.toString();
   }
 
-  static QuestionnaireAnswerOption fromCoding(Coding coding,
-      {List<FhirExtension>? Function(Coding)? extensionBuilder,
-      List<FhirExtension>? Function(Coding)? codingExtensionBuilder,
-      bool userSelected = true}) {
+  static QuestionnaireAnswerOption fromCoding(
+    Coding coding, {
+    List<FhirExtension>? Function(Coding)? extensionBuilder,
+    List<FhirExtension>? Function(Coding)? codingExtensionBuilder,
+    bool userSelected = true,
+  }) {
     return QuestionnaireAnswerOption(
-        extension_: extensionBuilder?.call(coding),
-        valueCoding: coding.copyWith(
-            // TODO: swap out display for a localized display?
-            userSelected: Boolean(userSelected),
-            extension_: codingExtensionBuilder?.call(coding)));
+      extension_: extensionBuilder?.call(coding),
+      valueCoding: coding.copyWith(
+        // TODO: swap out display for a localized display?
+        userSelected: Boolean(userSelected),
+        extension_: codingExtensionBuilder?.call(coding),
+      ),
+    );
   }
 }
 
@@ -39,10 +44,13 @@ extension FDashQuestionnaireItemExtension on QuestionnaireItem {
   bool isItemControl(String itemControl) {
     return extension_
             ?.extensionOrNull(
-                'http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl')
+              'http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl',
+            )
             ?.valueCodeableConcept
-            ?.containsCoding('http://hl7.org/fhir/questionnaire-item-control',
-                itemControl) ??
+            ?.containsCoding(
+              'http://hl7.org/fhir/questionnaire-item-control',
+              itemControl,
+            ) ??
         false;
   }
 
@@ -50,7 +58,8 @@ extension FDashQuestionnaireItemExtension on QuestionnaireItem {
   Coding? get unit {
     return extension_
         ?.extensionOrNull(
-            'http://hl7.org/fhir/StructureDefinition/questionnaire-unit')
+          'http://hl7.org/fhir/StructureDefinition/questionnaire-unit',
+        )
         ?.valueCoding;
   }
 }

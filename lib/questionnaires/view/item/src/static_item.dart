@@ -33,7 +33,7 @@ class _StaticItemState extends State<StaticItem> {
         widget.itemModel.responseItem?.answer?.firstOrNull?.valueDecimal ??
             widget.itemModel.responseItem?.answer?.first.valueQuantity?.value;
 
-    if (widget.itemModel.isCalculatedExpression) {
+    if (widget.itemModel.isCalculated) {
       _logger.debug(
         'Adding listener to ${widget.itemModel} for calculated expression',
       );
@@ -84,7 +84,7 @@ class _StaticItemState extends State<StaticItem> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.itemModel.isCalculatedExpression) {
+    if (widget.itemModel.isScored) {
       final score = calcResult?.value?.round();
       final scoreText = score?.toString() ?? AnswerModel.nullText;
       final feedback = findDanishFeedback(score);

@@ -26,7 +26,8 @@ class StringAnswerModel extends AnswerModel<String, String> {
 
     minLength = qi.extension_
             ?.extensionOrNull(
-                'http://hl7.org/fhir/StructureDefinition/minLength')
+              'http://hl7.org/fhir/StructureDefinition/minLength',
+            )
             ?.valueInteger
             ?.value ??
         0;
@@ -79,17 +80,22 @@ class StringAnswerModel extends AnswerModel<String, String> {
     final dataAbsentReasonExtension = !valid
         ? [
             FhirExtension(
-                url: dataAbsentReasonExtensionUrl,
-                valueCode: dataAbsentReasonAsTextCode)
+              url: dataAbsentReasonExtensionUrl,
+              valueCode: dataAbsentReasonAsTextCode,
+            )
           ]
         : null;
 
     return (value != null && value!.isNotEmpty)
         ? (qi.type != QuestionnaireItemType.url)
             ? QuestionnaireResponseAnswer(
-                valueString: value, extension_: dataAbsentReasonExtension)
+                valueString: value,
+                extension_: dataAbsentReasonExtension,
+              )
             : QuestionnaireResponseAnswer(
-                valueUri: FhirUri(value), extension_: dataAbsentReasonExtension)
+                valueUri: FhirUri(value),
+                extension_: dataAbsentReasonExtension,
+              )
         : null;
   }
 
@@ -99,8 +105,11 @@ class StringAnswerModel extends AnswerModel<String, String> {
     if (valid == null) {
       return null;
     } else {
-      return QuestionnaireErrorFlag(responseModel.itemModel.linkId,
-          answerIndex: answerIndex, errorText: valid);
+      return QuestionnaireErrorFlag(
+        responseModel.itemModel.linkId,
+        answerIndex: answerIndex,
+        errorText: valid,
+      );
     }
   }
 

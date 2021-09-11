@@ -16,20 +16,28 @@ class QuestionnaireInformationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final defaultTextStyle = Theme.of(context).textTheme.subtitle1;
-    return Column(children: [
-      HTML.toRichText(
+    return Column(
+      children: [
+        HTML.toRichText(
           context,
-          Xhtml.toXhtml(questionnaire.title,
-                  questionnaire.titleElement?.extension_) ??
+          Xhtml.toXhtml(
+                questionnaire.title,
+                questionnaire.titleElement?.extension_,
+              ) ??
               FDashLocalizations.of(context).questionnaireUnknownTitle,
-          defaultTextStyle: defaultTextStyle),
-      const Divider(),
-      HTML.toRichText(
+          defaultTextStyle: defaultTextStyle,
+        ),
+        const Divider(),
+        HTML.toRichText(
           context,
-          Xhtml.toXhtml(questionnaire.publisher,
-                  questionnaire.publisherElement?.extension_) ??
+          Xhtml.toXhtml(
+                questionnaire.publisher,
+                questionnaire.publisherElement?.extension_,
+              ) ??
               FDashLocalizations.of(context).questionnaireUnknownPublisher,
-          defaultTextStyle: defaultTextStyle),
-    ]);
+          defaultTextStyle: defaultTextStyle,
+        ),
+      ],
+    );
   }
 }

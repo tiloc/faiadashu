@@ -130,8 +130,10 @@ class ResponseModel {
         answerModel = BooleanAnswerModel(this, answerIndex);
         break;
       case QuestionnaireItemType.display:
+        answerModel = DisplayAnswerModel(this, answerIndex);
+        break;
       case QuestionnaireItemType.group:
-        answerModel = StaticAnswerModel(this, answerIndex);
+        answerModel = GroupAnswerModel(this, answerIndex);
         break;
       case QuestionnaireItemType.attachment:
       case QuestionnaireItemType.unknown:

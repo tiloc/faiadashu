@@ -6,27 +6,13 @@ Information on Structured Data Capture can be found here:
 * [YT Video from FHIR DevDays](https://www.youtube.com/watch?v=WPudaF4S7Bk)
 * There is a chat channel at https://chat.fhir.org stream `#questionnaire`.
 
-  
-
-
 **Click this video to watch the capabilities in action**
 
 [![Walk-through of the capabilities](https://img.youtube.com/vi/k9vEy9Z_L18/hqdefault.jpg)](https://www.youtube.com/watch?v=k9vEy9Z_L18 "Walk-through of the Capabilities")
 
-### Argonaut
-[Argonaut](http://fhir.org/guides/argonaut/questionnaire/index.html) is a subset of SDC and based on FHIR R3. The Form Filler is based on FHIR R4, which inherently makes it non-conformant
-to Argonaut. It does fill all the corresponding mandatory fields in the R4 QuestionnaireResponse.
-
-### FHIR Clinical Guidelines (CPG IG)
-[CPG](http://build.fhir.org/ig/HL7/cqf-recommendations/index.html) is generally not supported by this Form Filler. 
-
-It does support select extensions for visual control:
-#### itemImage
-An image to display as a visual accompaniment to the question being asked.
-
-This extension can be applied to question items.
-
-### FHIRPath expressions
+### Advanced Behavior
+#### Expressions
+Only expressions of type `text/fhirpath` are supported.
 > FHIRPath support in Faiadashu is *highly experimental* and uses [fhir_path](https://pub.dev/packages/fhir_path) as its
 > underlying implementation. See the [fhir_path documentation](https://pub.dev/packages/fhir_path) for capabilities and
 > limitations.
@@ -224,7 +210,7 @@ A canonical reference to the questionnaire will be generated, including a versio
 The optional `http://hl7.org/fhir/StructureDefinition/display` extension will be set when the questionnaire has a title.
 
 #### Status
-Status can be set to any of the supported values. Setting the status to complete does currently not have impact on items affected by enableWhen (they should be discarded).
+Status can be set to any of the supported values. Setting the status to `complete` discards items which are not enabled.
 
 #### Authored
 Will be set to the current time.
@@ -292,3 +278,18 @@ Choice answers will be marked as "user selected".
   ]
 }
 ```
+
+## Support for other Implementation Guides
+### Argonaut
+[Argonaut](http://fhir.org/guides/argonaut/questionnaire/index.html) is a subset of SDC and based on FHIR R3. The Form Filler is based on FHIR R4, which inherently makes it non-conformant
+to Argonaut. It does fill all the corresponding mandatory fields in the R4 QuestionnaireResponse.
+
+### FHIR Clinical Guidelines (CPG IG)
+[CPG](http://build.fhir.org/ig/HL7/cqf-recommendations/index.html) is generally not supported by this Form Filler.
+
+It does support select extensions for visual control:
+#### itemImage
+An image to display as a visual accompaniment to the question being asked.
+
+This extension can be applied to question items.
+

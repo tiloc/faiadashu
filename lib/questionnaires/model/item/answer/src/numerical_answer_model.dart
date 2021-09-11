@@ -245,8 +245,9 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
     final dataAbsentReasonExtension = !valid
         ? [
             FhirExtension(
-                url: dataAbsentReasonExtensionUrl,
-                valueCode: dataAbsentReasonAsTextCode)
+              url: dataAbsentReasonExtensionUrl,
+              valueCode: dataAbsentReasonAsTextCode,
+            )
           ]
         : null;
 
@@ -257,12 +258,14 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
     } else {
       if (value == null) {
         returnValue = Quantity(
-            value: Decimal(numberFormat.parse(textInput)),
-            extension_: dataAbsentReasonExtension);
+          value: Decimal(numberFormat.parse(textInput)),
+          extension_: dataAbsentReasonExtension,
+        );
       } else {
         returnValue = value!.copyWith(
-            value: Decimal(numberFormat.parse(textInput)),
-            extension_: dataAbsentReasonExtension);
+          value: Decimal(numberFormat.parse(textInput)),
+          extension_: dataAbsentReasonExtension,
+        );
       }
     }
 
@@ -280,16 +283,21 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
       case QuestionnaireItemType.decimal:
         return (value!.value != null)
             ? QuestionnaireResponseAnswer(
-                valueDecimal: value!.value, extension_: value!.extension_)
+                valueDecimal: value!.value,
+                extension_: value!.extension_,
+              )
             : null;
       case QuestionnaireItemType.quantity:
         return QuestionnaireResponseAnswer(
-            valueQuantity: value, extension_: value!.extension_);
+          valueQuantity: value,
+          extension_: value!.extension_,
+        );
       case QuestionnaireItemType.integer:
         return (value!.value != null)
             ? QuestionnaireResponseAnswer(
                 valueInteger: Integer(value!.value!.value!.round()),
-                extension_: value!.extension_)
+                extension_: value!.extension_,
+              )
             : null;
       default:
         throw StateError('item.type cannot be ${qi.type}');

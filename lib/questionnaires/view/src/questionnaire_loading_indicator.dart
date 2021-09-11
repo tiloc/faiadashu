@@ -9,9 +9,10 @@ class QuestionnaireLoadingIndicator extends StatelessWidget {
   final Object? detail;
   final bool hasError;
 
-  QuestionnaireLoadingIndicator(AsyncSnapshot<QuestionnaireModel> snapshot,
-      {Key? key})
-      : state = snapshot.connectionState,
+  QuestionnaireLoadingIndicator(
+    AsyncSnapshot<QuestionnaireModel> snapshot, {
+    Key? key,
+  })  : state = snapshot.connectionState,
         hasError = snapshot.hasError,
         detail = (snapshot.hasData) ? snapshot.data?.linkId : snapshot.error,
         super(key: key);
@@ -32,12 +33,13 @@ class QuestionnaireLoadingIndicator extends StatelessWidget {
             )
           else
             SizedBox(
-                width: shortAxis,
-                height: shortAxis,
-                child: CircularProgressIndicator(
-                  semanticsLabel: FDashLocalizations.of(context)
-                      .progressQuestionnaireLoading,
-                )),
+              width: shortAxis,
+              height: shortAxis,
+              child: CircularProgressIndicator(
+                semanticsLabel:
+                    FDashLocalizations.of(context).progressQuestionnaireLoading,
+              ),
+            ),
           const SizedBox(
             height: 16,
           ),

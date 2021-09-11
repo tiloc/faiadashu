@@ -15,7 +15,8 @@ class QuestionnaireResponseFiller extends StatefulWidget {
       : super(key: ValueKey<String>(itemModel.linkId));
 
   factory QuestionnaireResponseFiller.fromQuestionnaireItemFiller(
-      QuestionnaireItemFiller itemFiller) {
+    QuestionnaireItemFiller itemFiller,
+  ) {
     return QuestionnaireResponseFiller._(itemFiller, itemFiller.itemModel);
   }
 
@@ -41,8 +42,9 @@ class QuestionnaireResponseFillerState
     responseModel = widget.itemModel.responseModel;
 
     _skipSwitchFocusNode = FocusNode(
-        skipTraversal: true,
-        debugLabel: 'SkipSwitch ${widget.itemModel.linkId}');
+      skipTraversal: true,
+      debugLabel: 'SkipSwitch ${widget.itemModel.linkId}',
+    );
 
     // TODO: Enhancement: Allow repeats = true for other kinds of items
     // This assumes that all answers are of the same kind
@@ -57,7 +59,9 @@ class QuestionnaireResponseFillerState
   }
 
   void onAnswered(
-      List<QuestionnaireResponseAnswer?>? answers, int answerIndex) {
+    List<QuestionnaireResponseAnswer?>? answers,
+    int answerIndex,
+  ) {
     // TODO: Should the responsemodel be updated in model code and then
     // setState() be invoked afterwards?
     if (mounted) {
@@ -90,23 +94,31 @@ class QuestionnaireResponseFillerState
     final canSkipQuestions = questionnaireTheme.canSkipQuestions;
 
     // TODO(tiloc) show a list of answers, and buttons to add/remove if repeat
-    return Column(mainAxisSize: MainAxisSize.min, children: [
-      if (!responseModel.isAskedButDeclined) ..._answerFillers,
-      if (canSkipQuestions &&
-          !widget.itemModel.isReadOnly &&
-          !widget.itemModel.isRequired)
-        Row(children: [
-          Text(FDashLocalizations.of(context)
-              .dataAbsentReasonAskedDeclinedInputLabel),
-          Switch(
-            focusNode: _skipSwitchFocusNode,
-            value: responseModel.isAskedButDeclined,
-            onChanged: (bool value) {
-              _setDataAbsentReason(
-                  value ? dataAbsentReasonAskedButDeclinedCode : null);
-            },
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (!responseModel.isAskedButDeclined) ..._answerFillers,
+        if (canSkipQuestions &&
+            !widget.itemModel.isReadOnly &&
+            !widget.itemModel.isRequired)
+          Row(
+            children: [
+              Text(
+                FDashLocalizations.of(context)
+                    .dataAbsentReasonAskedDeclinedInputLabel,
+              ),
+              Switch(
+                focusNode: _skipSwitchFocusNode,
+                value: responseModel.isAskedButDeclined,
+                onChanged: (bool value) {
+                  _setDataAbsentReason(
+                    value ? dataAbsentReasonAskedButDeclinedCode : null,
+                  );
+                },
+              )
+            ],
           )
-        ])
-    ]);
+      ],
+    );
   }
 }
