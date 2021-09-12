@@ -312,4 +312,17 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
 
   @override
   bool get isUnanswered => (value == null) || (value!.value == null);
+
+  @override
+  void populateFromExpression(dynamic evaluationResult) {
+    if (evaluationResult == null) {
+      value = null;
+      return;
+    }
+
+    // WIP: Support for unit
+    value = Quantity(value: Decimal(evaluationResult));
+
+    responseModel.answers = [filledAnswer];
+  }
 }

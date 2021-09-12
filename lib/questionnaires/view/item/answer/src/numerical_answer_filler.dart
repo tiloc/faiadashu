@@ -21,11 +21,22 @@ class NumericalAnswerFiller extends QuestionnaireAnswerFiller {
 class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
     NumericalAnswerFiller, NumericalAnswerModel> {
   late final TextInputFormatter _numberInputFormatter;
+  final TextEditingController _editingController = TextEditingController();
 
   @override
   void postInitState() {
     _numberInputFormatter =
         NumericalTextInputFormatter(answerModel.numberFormat);
+
+    final initialValue =
+        (value?.value != null) ? value!.value!.format(locale) : '';
+
+    _editingController.value = TextEditingValue(
+      text: initialValue,
+      selection: TextSelection.fromPosition(
+        TextPosition(offset: initialValue.length),
+      ),
+    );
   }
 
   Widget _buildDropDownFromUnits(BuildContext context) {
@@ -72,6 +83,19 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
 
   @override
   Widget buildInputControl(BuildContext context) {
+    // Calculated items need an automated entry into the text field.
+    if (itemModel.isCalculated) {
+      final currentValue =
+          (value?.value != null) ? value!.value!.format(locale) : '';
+
+      _editingController.value = TextEditingValue(
+        text: currentValue,
+        selection: TextSelection.fromPosition(
+          TextPosition(offset: currentValue.length),
+        ),
+      );
+    }
+
     return answerModel.isSliding
         ? Slider(
             focusNode: firstFocusNode,
@@ -98,9 +122,7 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
                   child: TextFormField(
                     focusNode: firstFocusNode,
                     enabled: answerModel.isEnabled,
-                    initialValue: (value?.value != null)
-                        ? value!.value!.format(locale)
-                        : null,
+                    controller: _editingController,
                     textAlignVertical: TextAlignVertical.center,
                     textAlign: TextAlign.end,
                     decoration: questionnaireTheme.createDecoration().copyWith(

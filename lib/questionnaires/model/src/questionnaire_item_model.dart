@@ -60,10 +60,10 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   void _populateInitialValue() {
     _qimLogger.debug('_populateInitialValue: $linkId');
     if (hasInitialExpression) {
-      final initialExpressionResult = _evaluateInitialExpression();
+      final initialEvaluationResult = _evaluateInitialExpression();
       responseModel
           .answerModel(0)
-          .populateFromExpression(initialExpressionResult);
+          .populateFromExpression(initialEvaluationResult);
     } else {
       // initial.value[x]
       // TODO: Implement
@@ -75,27 +75,27 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   /// Returns null if the item does not have an initialExpression,
   /// or it evaluates to an empty list.
   dynamic _evaluateInitialExpression() {
-    final pathExpression = questionnaireItem.extension_
+    final fhirPathExpression = questionnaireItem.extension_
         ?.extensionOrNull(
           'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression',
         )
         ?.valueExpression
         ?.expression;
 
-    if (pathExpression == null) {
+    if (fhirPathExpression == null) {
       return null;
     }
 
-    final fhirPathResult = questionnaireModel.evaluateFhirPathExpression(
-      pathExpression,
+    final evaluationResult = questionnaireModel.evaluateFhirPathExpression(
+      fhirPathExpression,
       requiresQuestionnaireResponse: false,
     );
 
-    if (fhirPathResult.isEmpty) {
+    if (evaluationResult.isEmpty) {
       return null;
     }
 
-    return fhirPathResult.first;
+    return evaluationResult.first;
   }
 
   void _disableWithChildren() {
@@ -504,7 +504,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
         ?.expression;
   }
 
-  /// Is this item a calculated expression?
+  /// Is the value of this item calculated by an expression?
   bool get isCalculatedExpression {
     if (questionnaireItem.extension_?.firstWhereOrNull((ext) {
           return {
@@ -527,15 +527,20 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
       return;
     }
 
-    final expressionResult =
+    final rawEvaluationResult =
         r4WalkFhirPath(responseResource, fhirPathExpression, passedVariables);
 
     _qimLogger.debug(
-      'updateCalculatedExpression on $linkId: $fhirPathExpression = $expressionResult',
+      'updateCalculatedExpression on $linkId: $fhirPathExpression = $rawEvaluationResult',
     );
 
+    final evaluationResult =
+        (rawEvaluationResult.isNotEmpty) ? rawEvaluationResult.first : null;
+
     // Write the value back to the answer model
-    responseModel.answerModel(0).populateFromExpression(expressionResult);
+    responseModel.answerModel(0).populateFromExpression(evaluationResult);
+    // ... and make sure the world will know about it
+    responseModel.updateResponse();
   }
 
   void _updateVariables() {

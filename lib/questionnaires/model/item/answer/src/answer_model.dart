@@ -90,7 +90,7 @@ abstract class AnswerModel<I, V> {
   ///
   /// This function is designed for a very specific internal purpose and should
   /// not be invoked by application code.
-  void populateFromExpression(dynamic expressionResult) {
+  void populateFromExpression(dynamic evaluationResult) {
     throw UnimplementedError('populateFromExpression not implemented.');
   }
 }

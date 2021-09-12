@@ -61,8 +61,8 @@ class QuestionnaireTheme {
       _logger.debug('Creating AnswerFiller for ${responseModel.itemModel}');
       final answerModel = responseModel.answerModel(answerIndex);
 
-      if (responseModel.itemModel.isCalculatedExpression) {
-        // TODO: Should there be a dedicated CalculatedExpression Model and item?
+      if (responseModel.itemModel.isScored) {
+        // TODO: Should there be a dedicated Total Score item?
         return StaticItem(responseFiller, answerIndex, key: key);
       } else if (answerModel is NumericalAnswerModel) {
         return NumericalAnswerFiller(responseFiller, answerIndex, key: key);

@@ -62,12 +62,12 @@ class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
   bool get isUnanswered => value == null;
 
   @override
-  void populateFromExpression(dynamic expressionResult) {
-    if (expressionResult == null) {
+  void populateFromExpression(dynamic evaluationResult) {
+    if (evaluationResult == null) {
       value = null;
       return;
     }
 
-    value = FhirDateTime(expressionResult);
+    value = FhirDateTime(evaluationResult);
   }
 }
