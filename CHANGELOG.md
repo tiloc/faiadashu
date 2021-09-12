@@ -1,3 +1,6 @@
+## 0.5.4-dev.3
+* WIP to use [Grey Faulkenberry's](https://github.com/Dokotela) implementation of FHIRPath for `calculatedExpression`.
+
 ## 0.5.4-dev.2
 * WIP attempt to use [Grey Faulkenberry's](https://github.com/Dokotela) implementation of FHIR Path for `initialExpression`.
 

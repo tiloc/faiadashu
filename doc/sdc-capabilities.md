@@ -17,6 +17,16 @@ Only expressions of type `text/fhirpath` are supported.
 > underlying implementation. See the [fhir_path documentation](https://pub.dev/packages/fhir_path) for capabilities and
 > limitations.
 
+#### Variables
+Limited support for variables is available. 
+The general concept is described here: https://www.hl7.org/fhir/extension-variable.html
+
+Variables can only be used on the Questionnaire level.
+They are currently not supported on individual items.
+
+Variables' `calculatedExpression` cannot refer to other variables. 
+`calculatedExpression` on items can refer to any variable, though.
+
 ### Advanced Rendering
 #### rendering-style
 Support for colors. Usable in many places (title, text, option) as permitted by the specification.
@@ -48,15 +58,15 @@ The filler never chooses to omit a field from display.
 Supported
 
 
-### Item types: Grouping
+### Item category: Group
 #### group
 Supported, but no support for item-control.
 
-### Item types: Static display
+### Item category: Display
 ### display
 Supported for styled static output.
 
-### Item types: Questions
+### Item category: Question
 #### All types
 ##### required
 Supported. Renders a '*' after the label
@@ -67,7 +77,7 @@ Only supported for `choice`
 ##### readOnly
 Supported.
 
-#### enableWhen
+##### enableWhen
 Support for all behaviors: `any`, `all`
 
 Limited support for operators:
@@ -75,11 +85,19 @@ Limited support for operators:
 * `exists` on all types
 * All other operators: always return true, as to not prevent filling of the questionnaire.
 
+##### enableWhenExpression
+Supported.
+
+Reference:
+[sdc-questionnaire-enableWhenExpression](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-enableWhenExpression.html)
+
+---
 #### boolean
 Comprehensive support, incl. tri-state for "not answered"
 
 See: http://build.fhir.org/questionnaire.html#booleans for a discussion of tri-state.
 
+---
 #### quantity
 Comprehensive support.
 
@@ -96,10 +114,9 @@ Quantity requires the declaration of units. It does not support free-text entry 
 - sliderStepValue
 - unitValueSet
 - unit
-- [sdc-questionnaire-enableWhenExpression](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-enableWhenExpression.html)
 
 
-
+---
 #### decimal
 Comprehensive support.
 
@@ -112,7 +129,9 @@ Special support for read-only display of total score.
 - questionnaire-itemControl: slider
 - sliderStepValue
 - unit
+- calculatedExpression
 
+---
 #### integer
 Comprehensive support
 
@@ -129,13 +148,17 @@ Special support for 🇩🇰 Danish specification on patient feedback.
 - unit
 - http://ehealth.sundhed.dk/fhir/StructureDefinition/ehealth-questionnaire-feedback
 
+---
 #### date
 Comprehensive support. Date picker with localized format.
+
 ##### Extensions
 - (none)
 
+---
 #### dateTime
 Comprehensive support. Date/Time picker with localized format.
+
 ##### Extensions
 - sdc-questionnaire-initialExpression
 
@@ -144,6 +167,7 @@ Comprehensive support. Time picker with localized format.
 
 #### string, text 
 Comprehensive support
+
 ##### Extensions
 - entryFormat (use regular expressions, *not the "ANA NAN" format as seen in some examples.*)
 - minLength  
@@ -151,6 +175,7 @@ Comprehensive support
 - regex  
 - questionnaire-itemControl: text-box 
 
+---
 #### choice
 Comprehensive support, incl. optionChoice and choices from ValueSets.
 Support for multiple choice (item.repeats = true) and autocomplete from ValueSets (triggered automatically by large # of choices).
@@ -175,18 +200,22 @@ See: http://build.fhir.org/questionnaire.html#valuesets
 - minOccurs
 - maxOccurs
 
+---
 #### open-choice 
 Same as `choice` with the following differences:
 - repeats is not supported
 - a single text input field labeled 'Other' is presented below the selections
 
+---
 #### url
 Supported (accepts http, https, ftp, and sftp)
 
+---
 #### attachment, reference
 Not supported
 
 
+---
 ### Scoring
 Ability to add up the ordinalValue or iso21090-CO-value of all choice questions into a total score.
 

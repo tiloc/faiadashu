@@ -5,7 +5,7 @@ description: Faiadashu Online - Functionalities for faiadashu that connect to FH
 # pub.dev using `pub publish`. This is preferred for private packages.
 publish_to: none
 
-version: 0.5.4-dev.1
+version: 0.5.4-dev.2
 homepage: https://tiloc.github.io/faiadashu/
 repository: https://github.com/tiloc/faiadashu
 issue_tracker: https://github.com/tiloc/faiadashu/issues
@@ -33,6 +33,9 @@ dev_dependencies:
     sdk: flutter
 
   lint: ^1.5.3
+
+dependency_overrides:
+  fhir: ^0.5.0-1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
