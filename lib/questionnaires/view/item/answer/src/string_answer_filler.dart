@@ -33,12 +33,18 @@ class _StringAnswerState extends QuestionnaireAnswerFillerState<String,
 
   @override
   Widget buildInputControl(BuildContext context) {
+    final keyBoardType = (qi.type == QuestionnaireItemType.text)
+        ? TextInputType.multiline
+        : (qi.type == QuestionnaireItemType.url)
+            ? TextInputType.url
+            : TextInputType.text;
+
     return Container(
       padding: const EdgeInsets.only(top: 8, bottom: 8),
       child: TextFormField(
         focusNode: firstFocusNode,
         enabled: answerModel.isEnabled,
-        keyboardType: TextInputType.text,
+        keyboardType: keyBoardType,
         controller: _controller,
         maxLines: (qi.type == QuestionnaireItemType.text) ? 4 : 1,
         decoration: questionnaireTheme.createDecoration().copyWith(

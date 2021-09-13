@@ -136,7 +136,10 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
                               : null,
                         ),
                     inputFormatters: [_numberInputFormatter],
-                    keyboardType: TextInputType.number,
+                    keyboardType: TextInputType.numberWithOptions(
+                      signed: answerModel.minValue < 0,
+                      decimal: answerModel.maxDecimal > 0,
+                    ),
                     validator: (inputValue) {
                       return answerModel.validateInput(inputValue);
                     },

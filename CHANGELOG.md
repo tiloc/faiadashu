@@ -1,5 +1,7 @@
 ## 0.5.4-dev.3
-* WIP to use [Grey Faulkenberry's](https://github.com/Dokotela) implementation of FHIRPath for `calculatedExpression`.
+* WIP: use [Grey Faulkenberry's](https://github.com/Dokotela) implementation of FHIRPath for `calculatedExpression`.
+* Bugfix for questionnaires where the top level item is not a group item
+* Use different keyboard types, based on item type and other item properties
 
 ## 0.5.4-dev.2
 * WIP attempt to use [Grey Faulkenberry's](https://github.com/Dokotela) implementation of FHIR Path for `initialExpression`.
