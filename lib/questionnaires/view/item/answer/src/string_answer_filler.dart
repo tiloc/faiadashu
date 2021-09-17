@@ -17,6 +17,7 @@ class StringAnswerFiller extends QuestionnaireAnswerFiller {
 class _StringAnswerState extends QuestionnaireAnswerFillerState<String,
     StringAnswerFiller, StringAnswerModel> {
   final _controller = TextEditingController();
+  late final TextInputType _keyboardType;
 
   _StringAnswerState();
 
@@ -29,22 +30,25 @@ class _StringAnswerState extends QuestionnaireAnswerFillerState<String,
   @override
   void postInitState() {
     _controller.text = value ?? '';
+
+    _keyboardType = const {
+      StringAnswerKeyboard.plain: TextInputType.text,
+      StringAnswerKeyboard.email: TextInputType.emailAddress,
+      StringAnswerKeyboard.phone: TextInputType.phone,
+      StringAnswerKeyboard.number: TextInputType.number,
+      StringAnswerKeyboard.url: TextInputType.url,
+      StringAnswerKeyboard.multiline: TextInputType.multiline,
+    }[answerModel.keyboard]!;
   }
 
   @override
   Widget buildInputControl(BuildContext context) {
-    final keyBoardType = (qi.type == QuestionnaireItemType.text)
-        ? TextInputType.multiline
-        : (qi.type == QuestionnaireItemType.url)
-            ? TextInputType.url
-            : TextInputType.text;
-
     return Container(
       padding: const EdgeInsets.only(top: 8, bottom: 8),
       child: TextFormField(
         focusNode: firstFocusNode,
         enabled: answerModel.isEnabled,
-        keyboardType: keyBoardType,
+        keyboardType: _keyboardType,
         controller: _controller,
         maxLines: (qi.type == QuestionnaireItemType.text) ? 4 : 1,
         decoration: questionnaireTheme.createDecoration().copyWith(
