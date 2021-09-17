@@ -1,3 +1,6 @@
+## 0.5.4-dev.4
+* Support keyboard extension: https://jira.hl7.org/browse/FHIR-33675
+
 ## 0.5.4-dev.3
 * WIP: use [Grey Faulkenberry's](https://github.com/Dokotela) implementation of FHIRPath for `calculatedExpression`.
 * Bugfix for questionnaires where the top level item is not a group item

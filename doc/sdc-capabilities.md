@@ -166,7 +166,7 @@ Comprehensive support. Date/Time picker with localized format.
 Comprehensive support. Time picker with localized format.
 
 #### string, text 
-Comprehensive support
+Comprehensive support. Keyboard type can be hinted.
 
 ##### Extensions
 - entryFormat (use regular expressions, *not the "ANA NAN" format as seen in some examples.*)
@@ -174,6 +174,7 @@ Comprehensive support
 - maxLength
 - regex  
 - questionnaire-itemControl: text-box 
+- sdc-questionnaire-keyboard: email, phone, number
 
 ---
 #### choice
