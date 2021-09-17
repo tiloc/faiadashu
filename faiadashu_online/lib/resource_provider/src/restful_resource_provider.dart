@@ -14,10 +14,21 @@ class RestfulResourceProvider extends FhirResourceProvider {
   FhirClient? client;
 
   RestfulResourceProvider.open(
-      this.uri, this.resource, this.fhirServer, this.resourceType, this.id);
+    this.uri,
+    this.resource,
+    this.fhirServer,
+    this.resourceType,
+    this.id,
+  );
 
-  RestfulResourceProvider.secure(this.uri, this.resource, this.fhirServer,
-      this.resourceType, this.id, this.client);
+  RestfulResourceProvider.secure(
+    this.uri,
+    this.resource,
+    this.fhirServer,
+    this.resourceType,
+    this.id,
+    this.client,
+  );
 
   @override
   Resource? getResource(String uri) {
@@ -29,9 +40,10 @@ class RestfulResourceProvider extends FhirResourceProvider {
     final request =
         FhirRequest.read(base: fhirServer, type: resourceType, id: id);
     resource = await request.request(
-        headers: client == null
-            ? {'Content-Type': 'application/fhir+json'}
-            : await client!.authHeaders);
+      headers: client == null
+          ? {'Content-Type': 'application/fhir+json'}
+          : await client!.authHeaders,
+    );
     return;
   }
 

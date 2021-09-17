@@ -68,10 +68,12 @@ class _SmartLoginButtonState extends State<SmartLoginButton> {
 
     ScaffoldMessenger.of(context)
       ..removeCurrentSnackBar()
-      ..showSnackBar(SnackBar(
-        content: Text(message),
-        duration: const Duration(milliseconds: 1500),
-      ));
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          duration: const Duration(milliseconds: 1500),
+        ),
+      );
   }
 
   @override
@@ -81,45 +83,53 @@ class _SmartLoginButtonState extends State<SmartLoginButton> {
     switch (_loginStatus.value) {
       case LoginStatus.loggedIn:
         child = IconButton(
-            key: _loggedInKey,
-            onPressed: () async {
-              setState(() {
-                _loginStatus.value = LoginStatus.loggingOut;
-              });
-              _showStatusSnackBar(context);
-              await widget.smartClient.logout();
-              setState(() {
-                _loginStatus.value = LoginStatus.loggedOut;
-              });
-              _showStatusSnackBar(context);
-            },
-            icon: const Icon(Icons.logout));
+          key: _loggedInKey,
+          onPressed: () async {
+            setState(() {
+              _loginStatus.value = LoginStatus.loggingOut;
+            });
+            _showStatusSnackBar(context);
+            await widget.smartClient.logout();
+            if (!mounted) {
+              return;
+            }
+            setState(() {
+              _loginStatus.value = LoginStatus.loggedOut;
+            });
+            _showStatusSnackBar(context);
+          },
+          icon: const Icon(Icons.logout),
+        );
         break;
       case LoginStatus.loggedOut:
       case LoginStatus.error:
         child = IconButton(
-            key: _loggedOutKey,
-            onPressed: () async {
+          key: _loggedOutKey,
+          onPressed: () async {
+            setState(() {
+              _loginStatus.value = LoginStatus.loggingIn;
+            });
+            _showStatusSnackBar(context);
+            try {
+              await widget.smartClient.login();
+              if (!mounted) {
+                return;
+              }
               setState(() {
-                _loginStatus.value = LoginStatus.loggingIn;
+                _loginStatus.value = LoginStatus.loggedIn;
               });
               _showStatusSnackBar(context);
-              try {
-                await widget.smartClient.login();
-                setState(() {
-                  _loginStatus.value = LoginStatus.loggedIn;
-                });
+            } catch (e) {
+              setState(() {
+                _loginStatus.value = LoginStatus.error;
                 _showStatusSnackBar(context);
-              } catch (e) {
-                setState(() {
-                  _loginStatus.value = LoginStatus.error;
-                  _showStatusSnackBar(context);
-                });
-              }
-            },
-            icon: (_loginStatus.value == LoginStatus.loggedOut)
-                ? const Icon(Icons.login)
-                : const Icon(Icons.error));
+              });
+            }
+          },
+          icon: (_loginStatus.value == LoginStatus.loggedOut)
+              ? const Icon(Icons.login)
+              : const Icon(Icons.error),
+        );
         break;
       case LoginStatus.loggingIn:
       case LoginStatus.loggingOut:
@@ -134,7 +144,9 @@ class _SmartLoginButtonState extends State<SmartLoginButton> {
       height: 32,
       child: Center(
         child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 1000), child: child),
+          duration: const Duration(milliseconds: 1000),
+          child: child,
+        ),
       ),
     );
   }

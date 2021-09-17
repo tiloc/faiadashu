@@ -80,9 +80,38 @@
       "type": "string"
     },
     {
-      "linkId": "1.1-hidden",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-keyboard",
+          "valueCode": "number"
+        }
+      ],
+      "linkId": "1.1-event-id",
       "text": "Event ID",
       "type": "string"
+    },
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-keyboard",
+          "valueCode": "phone"
+        }
+      ],
+      "linkId": "1.1-phone",
+      "text": "Daytime phone",
+      "type": "string"
+    },
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-keyboard",
+          "valueCode": "email"
+        }
+      ],
+      "linkId": "2.3.b",
+      "text": "Email",
+      "type": "string",
+      "required": true
     },
     {
       "linkId": "1",
@@ -167,12 +196,6 @@
           }
         }
       ]
-    },
-    {
-      "linkId": "2.3.b",
-      "text": "Email",
-      "type": "string",
-      "required": true
     },
     {
       "extension": [
