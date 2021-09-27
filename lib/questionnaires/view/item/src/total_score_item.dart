@@ -7,22 +7,26 @@ import '../../../../l10n/l10n.dart';
 import '../../../../logging/logging.dart';
 import '../../../questionnaires.dart';
 
-class StaticItem extends QuestionnaireAnswerFiller {
-  StaticItem(
+/// A styled display item for total scores.
+///
+/// Shows a large, animated score and also supports the Danish
+/// sundhed.dk questionnaire-feedback extension.
+class TotalScoreItem extends QuestionnaireAnswerFiller {
+  TotalScoreItem(
     QuestionnaireResponseFillerState responseFillerState,
     int answerIndex, {
     Key? key,
   }) : super(responseFillerState, answerIndex, key: key);
   @override
-  State<StatefulWidget> createState() => _StaticItemState();
+  State<StatefulWidget> createState() => _TotalScoreItemState();
 }
 
-class _StaticItemState extends State<StaticItem> {
-  static final _logger = Logger(_StaticItemState);
+class _TotalScoreItemState extends State<TotalScoreItem> {
+  static final _logger = Logger(_TotalScoreItemState);
 
   Decimal? calcResult;
 
-  _StaticItemState();
+  _TotalScoreItemState();
 
   @override
   void initState() {
@@ -37,13 +41,21 @@ class _StaticItemState extends State<StaticItem> {
       _logger.debug(
         'Adding listener to ${widget.itemModel} for calculated expression',
       );
-      widget.itemModel.questionnaireModel
-          .addListener(() => _questionnaireChanged());
+      widget.itemModel.questionnaireModel.addListener(_questionnaireChanged);
     }
+  }
+
+  @override
+  void dispose() {
+    widget.itemModel.questionnaireModel.removeListener(_questionnaireChanged);
+    super.dispose();
   }
 
   void _questionnaireChanged() {
     _logger.debug('questionnaireChanged(): ${widget.itemModel.responseItem}');
+    if (!mounted) {
+      return;
+    }
     if (widget.itemModel.responseItem != null) {
       setState(() {
         calcResult =
@@ -84,7 +96,7 @@ class _StaticItemState extends State<StaticItem> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.itemModel.isScored) {
+    if (widget.itemModel.isTotalScore) {
       final score = calcResult?.value?.round();
       final scoreText = score?.toString() ?? AnswerModel.nullText;
       final feedback = findDanishFeedback(score);

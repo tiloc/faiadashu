@@ -10,13 +10,13 @@ class QuestionnaireStepper extends StatefulWidget {
   final Locale? locale;
   final FhirResourceProvider fhirResourceProvider;
   final QuestionnairePageScaffoldBuilder scaffoldBuilder;
-  final QuestionnaireTheme? questionnaireTheme;
+  final QuestionnaireTheme questionnaireTheme;
 
   const QuestionnaireStepper({
     this.locale,
     required this.scaffoldBuilder,
     required this.fhirResourceProvider,
-    this.questionnaireTheme,
+    this.questionnaireTheme = const QuestionnaireTheme(),
     Key? key,
   }) : super(key: key);
 
@@ -90,9 +90,10 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
                           valueListenable: QuestionnaireFiller.of(context)
                               .aggregator<TotalScoreAggregator>(),
                         ),
-                        QuestionnaireFillerProgressBar(
-                          questionnaireFiller.questionnaireModel,
-                        ),
+                        if (widget.questionnaireTheme.showProgress)
+                          QuestionnaireFillerProgressBar(
+                            questionnaireFiller.questionnaireModel,
+                          ),
                       ],
                     ),
                   ),
@@ -117,7 +118,7 @@ class QuestionnaireStepperPage extends QuestionnaireStepper {
   const QuestionnaireStepperPage({
     Locale? locale,
     required FhirResourceProvider fhirResourceProvider,
-    QuestionnaireTheme? questionnaireTheme,
+    QuestionnaireTheme questionnaireTheme = const QuestionnaireTheme(),
     Key? key,
   }) : super(
           locale: locale,

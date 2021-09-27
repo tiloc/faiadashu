@@ -38,9 +38,8 @@ class QuestionnaireFiller extends StatefulWidget {
     this.aggregators,
     this.onDataAvailable,
     this.onLinkTap,
-    QuestionnaireTheme? questionnaireTheme,
-  })  : questionnaireTheme = questionnaireTheme ?? const QuestionnaireTheme(),
-        super(key: key);
+    this.questionnaireTheme = const QuestionnaireTheme(),
+  }) : super(key: key);
 
   static QuestionnaireFillerData of(BuildContext context) {
     final result =
@@ -140,7 +139,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
   }
 }
 
-// OPTIMIZE: Is there any benefit in making this an InheritedNotifier, listening to the QuestionnaireModel?
+// OPTIMIZE: Would there be any benefit in making this an InheritedNotifier, listening to the QuestionnaireModel?
 
 class QuestionnaireFillerData extends InheritedWidget {
   static final _logger = Logger(QuestionnaireFillerData);

@@ -38,7 +38,6 @@ dependencies:
   intl: ^0.17.0
   logging: ^1.0.1
   meta: ^1.7.0
-  pedantic: ^1.11.0
   scrollable_positioned_list: ^0.2.0-nullsafety.0
   simple_html_css: ^3.0.1
 

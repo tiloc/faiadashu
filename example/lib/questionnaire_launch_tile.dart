@@ -215,11 +215,6 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                   ),
                 ),
               ],
-              // This FAB is really a floating progress indicator
-              floatingActionButton: Builder(
-                builder: (context) =>
-                    const QuestionnaireFillerCircularProgress(),
-              ),
             ),
           ),
         ).then((value) {

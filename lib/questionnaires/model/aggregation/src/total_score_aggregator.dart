@@ -29,8 +29,7 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
 
     totalScoreItem =
         questionnaireModel.orderedQuestionnaireItemModels().firstWhereOrNull(
-              (itemModel) =>
-                  TotalScoreAggregator.isTotalScoreExpression(itemModel),
+              (itemModel) => itemModel.isTotalScore,
             );
     // if there is no total score itemModel then leave value at 0 indefinitely
     if (autoAggregate) {
@@ -65,6 +64,8 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
       value = result;
     }
 
+    // TODO: Consolidate with populateFromExpression in NumericalAnswerModel
+
     final unit = totalScoreItem!.questionnaireItem.extension_
         ?.extensionOrNull(
           'http://hl7.org/fhir/StructureDefinition/questionnaire-unit',
@@ -78,7 +79,7 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
         text: totalScoreItem!.questionnaireItem.text,
         answer: [
           QuestionnaireResponseAnswer(
-            valueQuantity: Quantity(value: value, unit: unit),
+            valueQuantity: Quantity(value: result, unit: unit),
           )
         ],
       );
@@ -86,41 +87,10 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
       totalScoreItem!.responseItem = QuestionnaireResponseItem(
         linkId: totalScoreItem!.linkId,
         text: totalScoreItem!.questionnaireItem.text,
-        answer: [QuestionnaireResponseAnswer(valueDecimal: value)],
+        answer: [QuestionnaireResponseAnswer(valueDecimal: result)],
       );
     }
 
     return result;
-  }
-
-  /// Returns whether the [QuestionnaireItemModel] asks to calculate a total score.
-  static bool isTotalScoreExpression(QuestionnaireItemModel itemModel) {
-    final questionnaireItem = itemModel.questionnaireItem;
-
-    if (questionnaireItem.type == QuestionnaireItemType.quantity ||
-        questionnaireItem.type == QuestionnaireItemType.decimal) {
-      if (questionnaireItem.extension_?.firstWhereOrNull((ext) {
-            return 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression' ==
-                    ext.url?.value.toString() &&
-                ext.valueExpression?.expression ==
-                    'answers().sum(value.ordinal())';
-          }) !=
-          null) {
-        return true;
-      }
-
-      // From the description of the extension it is not entirely clear
-      // whether the unit should be in display or code.
-      // NLM Forms Builder puts it into display.
-      //
-      // Checking for read-only is relevant,
-      // as there are also input fields (e.g. pain score) with unit {score}.
-      if (questionnaireItem.readOnly == Boolean(true) &&
-          questionnaireItem.unit?.display == '{score}') {
-        return true;
-      }
-    }
-
-    return false;
   }
 }

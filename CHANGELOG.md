@@ -1,16 +1,15 @@
-## 0.5.4-dev.4
+## 0.5.4
+* [Breaking] Updated dependencies (Dart 2.14, Flutter 2.5, latest FHIR and FHIRPath)
 * Support keyboard extension: https://jira.hl7.org/browse/FHIR-33675
-
-## 0.5.4-dev.3
-* WIP: use [Grey Faulkenberry's](https://github.com/Dokotela) implementation of FHIRPath for `calculatedExpression`.
-* Bugfix for questionnaires where the top level item is not a group item
 * Use different keyboard types, based on item type and other item properties
+* WIP: use [Grey Faulkenberry's](https://github.com/Dokotela) implementation of FHIRPath for `calculatedExpression`.
+* WIP: use [Grey Faulkenberry's](https://github.com/Dokotela) implementation of FHIRPath for `initialExpression`.
+* WIP: use [Grey Faulkenberry's](https://github.com/Dokotela) implementation of FHIRPath for `enableWhenExpression`.
 
-## 0.5.4-dev.2
-* WIP attempt to use [Grey Faulkenberry's](https://github.com/Dokotela) implementation of FHIR Path for `initialExpression`.
+* Changed handling of `questionnaireTheme` parameter
+* Added `showProgress` to `QuestionnaireTheme` to enabled/disable progress indicator
 
-## 0.5.4-dev.1
-* WIP attempt to use [Grey Faulkenberry's](https://github.com/Dokotela) implementation of FHIR Path for `enableWhenExpression`.
+* Bugfix for questionnaires where the top level item is not a group item
 * General cleanup based on new linter rules
 
 ## 0.5.3

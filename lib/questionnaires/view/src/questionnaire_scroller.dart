@@ -33,7 +33,7 @@ class QuestionnaireScroller extends StatefulWidget {
   final List<Aggregator<dynamic>>? aggregators;
   final void Function(BuildContext context, Uri url)? onLinkTap;
   final QuestionnairePageScaffoldBuilder scaffoldBuilder;
-  final QuestionnaireTheme? questionnaireTheme;
+  final QuestionnaireTheme questionnaireTheme;
 
   const QuestionnaireScroller({
     this.locale,
@@ -43,7 +43,7 @@ class QuestionnaireScroller extends StatefulWidget {
     this.backMatter,
     this.aggregators,
     this.onLinkTap,
-    this.questionnaireTheme,
+    this.questionnaireTheme = const QuestionnaireTheme(),
     Key? key,
   }) : super(key: key);
 
@@ -339,12 +339,19 @@ class QuestionnaireScrollerPage extends QuestionnaireScroller {
     ],
     List<Aggregator<dynamic>>? aggregators,
     void Function(BuildContext context, Uri url)? onLinkTap,
-    QuestionnaireTheme? questionnaireTheme,
+    QuestionnaireTheme questionnaireTheme = const QuestionnaireTheme(),
     Key? key,
   }) : super(
           locale: locale,
           scaffoldBuilder: DefaultQuestionnairePageScaffoldBuilder(
-            floatingActionButton: floatingActionButton,
+            // Progress can only be shown instead of a FAB
+            floatingActionButton: floatingActionButton ??
+                (questionnaireTheme.showProgress
+                    ? Builder(
+                        builder: (context) =>
+                            const QuestionnaireFillerCircularProgress(),
+                      )
+                    : null),
             persistentFooterButtons: persistentFooterButtons,
           ),
           fhirResourceProvider: fhirResourceProvider,

@@ -3,7 +3,6 @@ import 'package:fhir/r4.dart';
 import '../../../../../coding/coding.dart';
 import '../../../../../fhir_types/fhir_types.dart';
 import '../../../../../l10n/l10n.dart';
-import '../../../../../logging/logging.dart';
 import '../../../../model/model.dart';
 
 enum StringAnswerKeyboard { plain, email, phone, number, multiline, url }

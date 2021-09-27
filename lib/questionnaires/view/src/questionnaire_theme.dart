@@ -16,10 +16,14 @@ class QuestionnaireTheme {
   /// Returns whether each question will be preceded by its own ID.
   final bool showQuestionNumbers;
 
+  /// Returns whether a progress bar/circle is displayed while filling
+  final bool showProgress;
+
   const QuestionnaireTheme({
     this.canSkipQuestions = false,
     this.showNullAnswerOption = true,
     this.showQuestionNumbers = false,
+    this.showProgress = true,
   });
 
   /// Returns a [QuestionnaireItemFiller] for a given [QuestionnaireFiller].
@@ -61,9 +65,8 @@ class QuestionnaireTheme {
       _logger.debug('Creating AnswerFiller for ${responseModel.itemModel}');
       final answerModel = responseModel.answerModel(answerIndex);
 
-      if (responseModel.itemModel.isScored) {
-        // TODO: Should there be a dedicated Total Score item?
-        return StaticItem(responseFiller, answerIndex, key: key);
+      if (responseModel.itemModel.isTotalScore) {
+        return TotalScoreItem(responseFiller, answerIndex, key: key);
       } else if (answerModel is NumericalAnswerModel) {
         return NumericalAnswerFiller(responseFiller, answerIndex, key: key);
       } else if (answerModel is StringAnswerModel) {
@@ -74,9 +77,10 @@ class QuestionnaireTheme {
         return CodingAnswerFiller(responseFiller, answerIndex, key: key);
       } else if (answerModel is BooleanAnswerModel) {
         return BooleanAnswerFiller(responseFiller, answerIndex, key: key);
-      } else if (answerModel is DisplayAnswerModel ||
-          answerModel is GroupAnswerModel) {
-        return StaticItem(responseFiller, answerIndex, key: key);
+      } else if (answerModel is DisplayAnswerModel) {
+        return DisplayItem(responseFiller, answerIndex, key: key);
+      } else if (answerModel is GroupAnswerModel) {
+        return GroupItem(responseFiller, answerIndex, key: key);
       } else if (answerModel is UnsupportedAnswerModel) {
         throw QuestionnaireFormatException(
           'Unsupported item type: ${answerModel.qi.type}',

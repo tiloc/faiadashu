@@ -471,11 +471,11 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
 
   /// Is this item's value calculated?
   bool get isCalculated {
-    return isCalculatedExpression || isScored;
+    return isCalculatedExpression || isTotalScore;
   }
 
   /// Is this item a total score calculation?
-  bool get isScored {
+  bool get isTotalScore {
     // From the description of the extension it is not entirely clear
     // whether the unit should be in display or code.
     // NLM Forms Builder puts it into display.
@@ -484,6 +484,16 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     // as there are also input fields (e.g. pain score) with unit {score}.
     if (questionnaireItem.type == QuestionnaireItemType.quantity ||
         questionnaireItem.type == QuestionnaireItemType.decimal) {
+      if (questionnaireItem.extension_?.firstWhereOrNull((ext) {
+            return 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression' ==
+                    ext.url?.value.toString() &&
+                ext.valueExpression?.expression ==
+                    'answers().sum(value.ordinal())';
+          }) !=
+          null) {
+        return true;
+      }
+
       if (questionnaireItem.readOnly == Boolean(true) &&
           questionnaireItem.unit?.display == '{score}') {
         return true;
@@ -527,8 +537,19 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
       return;
     }
 
-    final rawEvaluationResult =
-        r4WalkFhirPath(responseResource, fhirPathExpression, passedVariables);
+    // TODO: This is a hack. fhir_path package is known to lack the functions for
+    // score calculations, so if these are detected we use a hard-coded
+    // scoring instead.
+    final rawEvaluationResult = (fhirPathExpression !=
+            'answers().sum(value.ordinal())')
+        ? r4WalkFhirPath(responseResource, fhirPathExpression, passedVariables)
+        : [
+            questionnaireModel.orderedQuestionnaireItemModels().fold<double>(
+                  0.0,
+                  (previousValue, element) =>
+                      previousValue + (element.ordinalValue?.value ?? 0.0),
+                )
+          ];
 
     _qimLogger.debug(
       'updateCalculatedExpression on $linkId: $fhirPathExpression = $rawEvaluationResult',

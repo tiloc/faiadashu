@@ -80,7 +80,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
           if (answer.valueString != null) {
             div.write('<p>${answer.valueString}</p>');
           } else if (answer.valueDecimal != null) {
-            if (itemModel.isScored) {
+            if (itemModel.isTotalScore) {
               div.write('<h3>${answer.valueDecimal!.format(locale)}</h3>');
             } else {
               div.write('<p>${answer.valueDecimal!.format(locale)}</p>');
