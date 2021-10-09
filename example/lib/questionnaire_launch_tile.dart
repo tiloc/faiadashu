@@ -14,6 +14,7 @@ class QuestionnaireLaunchTile extends StatefulWidget {
   final String questionnairePath;
   final Locale? locale;
   final FhirResourceProvider fhirResourceProvider;
+  final LaunchContext launchContext;
   final void Function(String id, QuestionnaireResponse? questionnaireResponse)
       saveResponseFunction;
   final void Function(String id, QuestionnaireResponse? questionnaireResponse)?
@@ -26,6 +27,7 @@ class QuestionnaireLaunchTile extends StatefulWidget {
     this.locale,
     required this.questionnairePath,
     required this.fhirResourceProvider,
+    required this.launchContext,
     required this.saveResponseFunction,
     this.uploadResponseFunction,
     required this.restoreResponseFunction,
@@ -55,6 +57,7 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
   Future<QuestionnaireModel> _createModelFuture() {
     return QuestionnaireModel.fromFhirResourceBundle(
       fhirResourceProvider: _questionnaireProvider,
+      launchContext: widget.launchContext,
       locale: _locale,
     ).then<QuestionnaireModel>((qm) {
       qm.populate(
@@ -104,13 +107,17 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
             onPressed: () async {
               final questionnaireModel =
                   await QuestionnaireModel.fromFhirResourceBundle(
-                      fhirResourceProvider: _questionnaireProvider,
-                      locale: _locale,
-                      aggregators: [NarrativeAggregator()],);
+                fhirResourceProvider: _questionnaireProvider,
+                launchContext: widget.launchContext,
+                locale: _locale,
+                aggregators: [NarrativeAggregator()],
+              );
               questionnaireModel.populate(
                 widget.restoreResponseFunction.call(widget.questionnairePath),
               );
-              if(!mounted) {return;}
+              if (!mounted) {
+                return;
+              }
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -140,8 +147,9 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                     widget.questionnairePath,
                   ),
                 ),
-                widget.fhirResourceProvider
+                widget.fhirResourceProvider,
               ]),
+              launchContext: widget.launchContext,
               // Callback for supportLink
               onLinkTap: launchUrl,
               persistentFooterButtons: [

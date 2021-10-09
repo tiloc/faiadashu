@@ -22,12 +22,14 @@ class QuestionnaireFiller extends StatefulWidget {
   final QuestionnaireTheme questionnaireTheme;
 
   final FhirResourceProvider fhirResourceProvider;
+  final LaunchContext launchContext;
 
   Future<QuestionnaireModel> _createQuestionnaireModel() async =>
       QuestionnaireModel.fromFhirResourceBundle(
         locale: locale,
         aggregators: aggregators,
         fhirResourceProvider: fhirResourceProvider,
+        launchContext: launchContext,
       );
 
   const QuestionnaireFiller({
@@ -35,6 +37,7 @@ class QuestionnaireFiller extends StatefulWidget {
     required this.locale,
     required this.builder,
     required this.fhirResourceProvider,
+    required this.launchContext,
     this.aggregators,
     this.onDataAvailable,
     this.onLinkTap,

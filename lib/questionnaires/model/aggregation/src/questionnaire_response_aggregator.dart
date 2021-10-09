@@ -2,7 +2,6 @@ import 'package:fhir/r4.dart';
 
 import '../../../../fhir_types/fhir_types.dart';
 import '../../../../logging/logging.dart';
-import '../../../../resource_provider/resource_provider.dart';
 import '../../../questionnaires.dart';
 
 /// Aggregates the user's responses into a [QuestionnaireResponse].
@@ -103,8 +102,7 @@ class QuestionnaireResponseAggregator
 
     final contained = <Resource>[];
 
-    final subject = questionnaireModel.fhirResourceProvider
-        .getResource(subjectResourceUri) as Patient?;
+    final subject = questionnaireModel.launchContext.patient;
 
     Reference? subjectReference;
     if (subject != null) {

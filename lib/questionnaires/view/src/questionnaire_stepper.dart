@@ -9,6 +9,7 @@ import '../../questionnaires.dart';
 class QuestionnaireStepper extends StatefulWidget {
   final Locale? locale;
   final FhirResourceProvider fhirResourceProvider;
+  final LaunchContext launchContext;
   final QuestionnairePageScaffoldBuilder scaffoldBuilder;
   final QuestionnaireTheme questionnaireTheme;
 
@@ -16,6 +17,7 @@ class QuestionnaireStepper extends StatefulWidget {
     this.locale,
     required this.scaffoldBuilder,
     required this.fhirResourceProvider,
+    required this.launchContext,
     this.questionnaireTheme = const QuestionnaireTheme(),
     Key? key,
   }) : super(key: key);
@@ -33,6 +35,7 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
     return QuestionnaireFiller(
       locale: widget.locale ?? Localizations.localeOf(context),
       fhirResourceProvider: widget.fhirResourceProvider,
+      launchContext: widget.launchContext,
       questionnaireTheme: widget.questionnaireTheme,
       builder: (BuildContext context) {
         final questionnaireFiller = QuestionnaireFiller.of(context);
@@ -118,12 +121,14 @@ class QuestionnaireStepperPage extends QuestionnaireStepper {
   const QuestionnaireStepperPage({
     Locale? locale,
     required FhirResourceProvider fhirResourceProvider,
+    required LaunchContext launchContext,
     QuestionnaireTheme questionnaireTheme = const QuestionnaireTheme(),
     Key? key,
   }) : super(
           locale: locale,
           scaffoldBuilder: const DefaultQuestionnairePageScaffoldBuilder(),
           fhirResourceProvider: fhirResourceProvider,
+          launchContext: launchContext,
           questionnaireTheme: questionnaireTheme,
           key: key,
         );

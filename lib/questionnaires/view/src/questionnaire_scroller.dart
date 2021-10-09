@@ -30,6 +30,7 @@ class QuestionnaireScroller extends StatefulWidget {
   final List<Widget>? frontMatter;
   final List<Widget>? backMatter;
   final FhirResourceProvider fhirResourceProvider;
+  final LaunchContext launchContext;
   final List<Aggregator<dynamic>>? aggregators;
   final void Function(BuildContext context, Uri url)? onLinkTap;
   final QuestionnairePageScaffoldBuilder scaffoldBuilder;
@@ -39,6 +40,7 @@ class QuestionnaireScroller extends StatefulWidget {
     this.locale,
     required this.scaffoldBuilder,
     required this.fhirResourceProvider,
+    required this.launchContext,
     this.frontMatter,
     this.backMatter,
     this.aggregators,
@@ -149,6 +151,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
 
     return QuestionnaireFiller(
       fhirResourceProvider: widget.fhirResourceProvider,
+      launchContext: widget.launchContext,
       locale: locale,
       questionnaireTheme: widget.questionnaireTheme,
       builder: (BuildContext context) {
@@ -329,6 +332,7 @@ class QuestionnaireScrollerPage extends QuestionnaireScroller {
   QuestionnaireScrollerPage({
     Locale? locale,
     required FhirResourceProvider fhirResourceProvider,
+    required LaunchContext launchContext,
     Widget? floatingActionButton,
     List<Widget>? persistentFooterButtons,
     List<Widget>? frontMatter,
@@ -355,6 +359,7 @@ class QuestionnaireScrollerPage extends QuestionnaireScroller {
             persistentFooterButtons: persistentFooterButtons,
           ),
           fhirResourceProvider: fhirResourceProvider,
+          launchContext: launchContext,
           frontMatter: frontMatter,
           backMatter: backMatter,
           aggregators: aggregators,

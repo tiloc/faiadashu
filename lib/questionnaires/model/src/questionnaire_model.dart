@@ -23,6 +23,8 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   ///
   /// see: [getResource] for the preferred access method.
   final FhirResourceProvider fhirResourceProvider;
+  final LaunchContext launchContext;
+
   int _generation = 1;
   final Locale locale;
   static final _logger = Logger(QuestionnaireModel);
@@ -31,6 +33,7 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     required this.locale,
     required Questionnaire questionnaire,
     required this.fhirResourceProvider,
+    required this.launchContext,
     required List<Aggregator>? aggregators,
   })  : _aggregators = aggregators,
         super._(
@@ -112,6 +115,7 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     required Locale locale,
     List<Aggregator>? aggregators,
     required FhirResourceProvider fhirResourceProvider,
+    required LaunchContext launchContext,
   }) async {
     _logger.debug('QuestionnaireModel.fromFhirResourceBundle');
 
@@ -132,6 +136,7 @@ class QuestionnaireModel extends QuestionnaireItemModel {
             QuestionnaireResponseAggregator()
           ],
       fhirResourceProvider: fhirResourceProvider,
+      launchContext: launchContext,
     );
 
     await questionnaireModel.fhirResourceProvider.init();
@@ -545,9 +550,12 @@ class QuestionnaireModel extends QuestionnaireItemModel {
         requiresQuestionnaireResponse ? questionnaireResponse : null;
 
     // Variables for launch context
-    // FIXME: Patient not properly set?
-    final patient = fhirResourceProvider.getResource(subjectResourceUri);
-    final launchContext = <String, dynamic>{'%patient': patient};
+    final launchContextVariables = <String, dynamic>{};
+    if (launchContext.patient != null) {
+      launchContextVariables.addEntries(
+        [MapEntry<String, dynamic>('%patient', launchContext.patient)],
+      );
+    }
 
     // Calculated variables
     final calculatedVariables = (_variables != null)
@@ -561,7 +569,7 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     // SDC variables
     // TODO: %qi, etc.
 
-    final evaluationVariables = launchContext;
+    final evaluationVariables = launchContextVariables;
     if (calculatedVariables != null) {
       evaluationVariables.addAll(calculatedVariables);
     }
@@ -585,7 +593,8 @@ class QuestionnaireModel extends QuestionnaireItemModel {
           ];
 
     _logger.debug(
-        'evaluateFhirPathExpression on $linkId: $fhirPathExpression = $fhirPathResult');
+      'evaluateFhirPathExpression on $linkId: $fhirPathExpression = $fhirPathResult',
+    );
 
     return fhirPathResult;
   }

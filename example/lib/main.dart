@@ -159,21 +159,21 @@ class _HomePageState extends State<HomePage> {
 
   late final SmartClient smartClient;
 
+  // Patient ID matches a patient on Logica Sandbox server.
+  final launchContext = LaunchContext(
+    patient: Patient(
+      id: Id('14603'),
+      name: [
+        HumanName(given: ['Emma'], family: 'Lee')
+      ],
+      birthDate: Date('1940-08-12'),
+    ),
+  );
+
   @override
   void initState() {
     super.initState();
     resourceBundleProvider = RegistryFhirResourceProvider([
-      InMemoryResourceProvider.inMemory(
-        subjectResourceUri,
-        // Patient ID matches a patient on Logica Sandbox server.
-        Patient(
-          id: Id('14603'),
-          name: [
-            HumanName(given: ['Emma'], family: 'Lee')
-          ],
-          birthDate: Date('1940-08-12'),
-        ),
-      ),
       AssetImageAttachmentProvider(
         'http://example.org/images',
         'assets/images',
@@ -314,6 +314,7 @@ class _HomePageState extends State<HomePage> {
                 title: 'SDC Demo Scroller',
                 subtitle: 'A gallery of SDC feature support.',
                 fhirResourceProvider: resourceBundleProvider,
+                launchContext: launchContext,
                 questionnairePath: 'assets/instruments/sdc_demo.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
@@ -323,6 +324,7 @@ class _HomePageState extends State<HomePage> {
                 title: 'FHIR Hot Beverage IG',
                 subtitle: 'WIP Beverage Questionnaire',
                 fhirResourceProvider: resourceBundleProvider,
+                launchContext: launchContext,
                 questionnairePath: 'assets/instruments/beverage_ig.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
@@ -333,6 +335,7 @@ class _HomePageState extends State<HomePage> {
                 subtitle:
                     'The reference questionnaire for SDC render features.',
                 fhirResourceProvider: resourceBundleProvider,
+                launchContext: launchContext,
                 questionnairePath: 'assets/instruments/sdc-example-render.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
@@ -342,6 +345,7 @@ class _HomePageState extends State<HomePage> {
                 title: 'Weight/Height Tracking',
                 subtitle: 'Example for BMI calculation with FHIRPath',
                 fhirResourceProvider: resourceBundleProvider,
+                launchContext: launchContext,
                 questionnairePath:
                     'assets/instruments/weight-height-tracking.json',
                 saveResponseFunction: _saveResponse,
@@ -353,6 +357,7 @@ class _HomePageState extends State<HomePage> {
                 subtitle:
                     'Reference sample from the Argonaut Questionnaire Implementation Guide.',
                 fhirResourceProvider: resourceBundleProvider,
+                launchContext: launchContext,
                 questionnairePath: 'assets/instruments/argonaut_sampler.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
@@ -363,6 +368,7 @@ class _HomePageState extends State<HomePage> {
                 title: 'Der Argonaut-Fragebogen',
                 subtitle: 'Ein deutsches Beispiel für einen Fragebogen.',
                 fhirResourceProvider: resourceBundleProvider,
+                launchContext: launchContext,
                 questionnairePath: 'assets/instruments/argonaut_sampler.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
@@ -373,6 +379,7 @@ class _HomePageState extends State<HomePage> {
                 title: 'استبيان "أرجونوت"',
                 subtitle: 'مثال على استبيان عربي.',
                 fhirResourceProvider: resourceBundleProvider,
+                launchContext: launchContext,
                 questionnairePath: 'assets/instruments/argonaut_sampler.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
@@ -383,6 +390,7 @@ class _HomePageState extends State<HomePage> {
                 title: 'アルゴノート」のアンケートです。',
                 subtitle: '日本でのアンケートの例です。',
                 fhirResourceProvider: resourceBundleProvider,
+                launchContext: launchContext,
                 questionnairePath: 'assets/instruments/argonaut_sampler.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
@@ -392,6 +400,7 @@ class _HomePageState extends State<HomePage> {
                 title: 'PHQ9 Questionnaire Scroller',
                 subtitle: 'Simple choice-based survey with a total score.',
                 fhirResourceProvider: resourceBundleProvider,
+                launchContext: launchContext,
                 questionnairePath: 'assets/instruments/phq9_instrument.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
@@ -411,6 +420,7 @@ class _HomePageState extends State<HomePage> {
                           questionnaireResourceUri,
                           'assets/instruments/phq9_instrument.json',
                         ),
+                        launchContext: launchContext,
                       ),
                     ),
                   );
@@ -434,6 +444,7 @@ class _HomePageState extends State<HomePage> {
                             'assets/instruments/sdc_demo.json',
                           )
                         ]),
+                        launchContext: launchContext,
                         questionnaireTheme: const QuestionnaireTheme(
                           canSkipQuestions: true,
                           showNullAnswerOption: false,
@@ -448,6 +459,7 @@ class _HomePageState extends State<HomePage> {
                 title: 'HF Questionnaire Scroller',
                 subtitle: 'A heart failure survey with a total score.',
                 fhirResourceProvider: resourceBundleProvider,
+                launchContext: launchContext,
                 questionnairePath: 'assets/instruments/hf_instrument.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
@@ -457,6 +469,7 @@ class _HomePageState extends State<HomePage> {
                 title: 'PRAPARE Questionnaire Scroller',
                 subtitle: 'Real-world, mixed-type survey from the US',
                 fhirResourceProvider: resourceBundleProvider,
+                launchContext: launchContext,
                 questionnairePath: 'assets/instruments/prapare_instrument.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
@@ -473,6 +486,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   resourceBundleProvider
                 ]),
+                launchContext: launchContext,
                 questionnairePath: 'assets/instruments/bluebook.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
@@ -483,6 +497,7 @@ class _HomePageState extends State<HomePage> {
                 subtitle:
                     'Real-world example with very long ValueSets and enableWhen',
                 fhirResourceProvider: resourceBundleProvider,
+                launchContext: launchContext,
                 questionnairePath: 'assets/instruments/who_covid19.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
