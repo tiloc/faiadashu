@@ -160,7 +160,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     if (!_isFhirPathResultTrue(
       fhirPathResult,
       fhirPathExpression,
-      orElse: false,
+      unknownValue: false,
     )) {
       _disableWithChildren();
     }
@@ -169,11 +169,11 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   bool _isFhirPathResultTrue(
     List<dynamic> fhirPathResult,
     String fhirPathExpression, {
-    required bool orElse,
+    required bool unknownValue,
   }) {
     // TODO: Final specification of proper behavior pending: http://jira.hl7.org/browse/FHIR-33295
     if (fhirPathResult.isEmpty) {
-      return orElse;
+      return unknownValue;
     } else if (fhirPathResult.first is! bool) {
       throw QuestionnaireFormatException(
         'FHIRPath expression does not return a bool: $fhirPathExpression',
@@ -233,6 +233,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
         default:
           _qimLogger.warn('Unsupported operator: ${qew.operator_}.');
           // Err on the side of caution: Enable fields when enableWhen cannot be evaluated.
+          // See http://hl7.org/fhir/uv/sdc/2019May/expressions.html#missing-information for specification
           anyTrigger = true;
           allTriggered++;
       }
@@ -454,14 +455,35 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
         )
       ];
     }
+
+    if (!isSatisfyingConstraint) {
+      return [
+        // TODO: Extract human text from extension
+        QuestionnaireErrorFlag(linkId, errorText: 'Constraint not satisfied!')
+      ];
+    }
+
     return responseModel.isComplete;
   }
 
   bool get hasConstraint => constraintExpression != null;
 
-  bool get isFulfillingConstraint {
-    // TODO: Implement
-    return true;
+  /// Returns whether the item is satisfying the `questionnaire-constraint`.
+  ///
+  /// Returns true if no constraint is specified.
+  bool get isSatisfyingConstraint {
+    final fhirPathExpression = constraintExpression;
+    if (fhirPathExpression == null) {
+      return true;
+    }
+
+    final fhirPathResult =
+        questionnaireModel.evaluateFhirPathExpression(fhirPathExpression);
+    return _isFhirPathResultTrue(
+      fhirPathResult,
+      fhirPathExpression,
+      unknownValue: true,
+    );
   }
 
   String? get constraintExpression {

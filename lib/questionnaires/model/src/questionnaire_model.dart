@@ -553,7 +553,9 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     final launchContextVariables = <String, dynamic>{};
     if (launchContext.patient != null) {
       launchContextVariables.addEntries(
-        [MapEntry<String, dynamic>('%patient', launchContext.patient)],
+        [
+          MapEntry<String, dynamic>('%patient', launchContext.patient?.toJson())
+        ],
       );
     }
 
@@ -568,6 +570,7 @@ class QuestionnaireModel extends QuestionnaireItemModel {
 
     // SDC variables
     // TODO: %qi, etc.
+    // http://hl7.org/fhir/uv/sdc/2019May/expressions.html#fhirpath-and-questionnaire
 
     final evaluationVariables = launchContextVariables;
     if (calculatedVariables != null) {

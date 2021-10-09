@@ -1,5 +1,5 @@
 ## 0.5.4
-* [Breaking] Updated dependencies (Dart 2.14, Flutter 2.5, latest FHIR and FHIRPath)
+* [Breaking] Updated dependencies (Dart 2.14, Flutter 2.5, the latest FHIR and FHIRPath)
 * [Breaking] New mandatory parameter `launchContext` to provide patient into questionnaire filler, rather
 than mixing it in with the `fhirResourceProvider`.
 * Support keyboard extension: https://jira.hl7.org/browse/FHIR-33675

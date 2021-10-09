@@ -137,4 +137,16 @@ class StringAnswerModel extends AnswerModel<String, String> {
 
   @override
   bool get isUnanswered => (value == null) || value!.trim().isEmpty;
+
+  @override
+  void populateFromExpression(dynamic evaluationResult) {
+    if (evaluationResult == null) {
+      value = null;
+      return;
+    }
+
+    value = evaluationResult as String?;
+
+    responseModel.answers = [filledAnswer];
+  }
 }

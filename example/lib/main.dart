@@ -164,9 +164,10 @@ class _HomePageState extends State<HomePage> {
     patient: Patient(
       id: Id('14603'),
       name: [
-        HumanName(given: ['Emma'], family: 'Lee')
+        HumanName(given: ['Emma'], family: 'Lee', use: HumanNameUse.official)
       ],
       birthDate: Date('1940-08-12'),
+      gender: PatientGender.female,
     ),
   );
 
