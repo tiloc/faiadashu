@@ -196,18 +196,23 @@ class QuestionnaireModel extends QuestionnaireItemModel {
       'nextGeneration $notifyListeners: $_generation -> $newGeneration',
     );
     _generation = newGeneration;
+
+    // Invalidate cached items
+    _cachedQuestionnaireResponse = null;
+
     if (notifyListeners) {
       this.notifyListeners();
     }
   }
 
+  QuestionnaireResponse? _cachedQuestionnaireResponse;
+
   /// Returns a [QuestionnaireResponse].
   ///
   /// The response matches the model as of the current generation.
-  QuestionnaireResponse? get questionnaireResponse {
-    // OPTIMIZE: Hugely expensive (maybe cache response during same generation?)
-    return aggregator<QuestionnaireResponseAggregator>().aggregate();
-  }
+  QuestionnaireResponse? get questionnaireResponse =>
+      _cachedQuestionnaireResponse ??=
+          aggregator<QuestionnaireResponseAggregator>().aggregate();
 
   /// Returns a [Resource] which is referenced in the [Questionnaire].
   ///
@@ -381,8 +386,6 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   }
 
   /// Returns a number that indicates whether the model has changed.
-  ///
-  ///
   int get generation => _generation;
 
   /// Returns the [QuestionnaireItemModel] that corresponds to the linkId.
@@ -447,19 +450,10 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   }
 
   void _updateCalculations() {
-    final responseResource = questionnaireModel.questionnaireResponse;
-    final passedVariables = (_variables != null)
-        ? Map.fromEntries(
-            _variables!.map<MapEntry<String, dynamic>>(
-              (variable) => MapEntry('%${variable.name}', variable.value),
-            ),
-          )
-        : null;
-
     orderedQuestionnaireItemModels()
         .where((qim) => qim.isCalculatedExpression)
         .forEach((qim) {
-      qim._updateCalculatedExpression(responseResource, passedVariables);
+      qim._updateCalculatedExpression();
     });
   }
 
@@ -544,21 +538,54 @@ class QuestionnaireModel extends QuestionnaireItemModel {
 
   /// Returns the evaluation result of a FHIRPath expression
   List<dynamic> evaluateFhirPathExpression(
-    String pathExpression, {
+    String fhirPathExpression, {
     bool requiresQuestionnaireResponse = true,
   }) {
     final responseResource =
         requiresQuestionnaireResponse ? questionnaireResponse : null;
 
-    // Pass in variables, especially "%patient".
+    // Variables for launch context
+    // FIXME: Patient not properly set?
     final patient = fhirResourceProvider.getResource(subjectResourceUri);
+    final launchContext = <String, dynamic>{'%patient': patient};
 
-    final fhirPathResult = r4WalkFhirPath(
-      responseResource,
-      pathExpression,
-      {'%patient': patient}, // FIXME: Not properly set?
-    );
-    _logger.debug('fhirPathResult: $fhirPathResult');
+    // Calculated variables
+    final calculatedVariables = (_variables != null)
+        ? Map.fromEntries(
+            _variables!.map<MapEntry<String, dynamic>>(
+              (variable) => MapEntry('%${variable.name}', variable.value),
+            ),
+          )
+        : null;
+
+    // SDC variables
+    // TODO: %qi, etc.
+
+    final evaluationVariables = launchContext;
+    if (calculatedVariables != null) {
+      evaluationVariables.addAll(calculatedVariables);
+    }
+
+    // TODO: This is a hack. fhir_path package is known to lack the functions for
+    // score calculations, so if these are detected we use a hard-coded
+    // scoring instead.
+    final fhirPathResult = (fhirPathExpression !=
+            'answers().sum(value.ordinal())')
+        ? r4WalkFhirPath(
+            responseResource,
+            fhirPathExpression,
+            evaluationVariables,
+          )
+        : [
+            questionnaireModel.orderedQuestionnaireItemModels().fold<double>(
+                  0.0,
+                  (previousValue, element) =>
+                      previousValue + (element.ordinalValue?.value ?? 0.0),
+                )
+          ];
+
+    _logger.debug(
+        'evaluateFhirPathExpression on $linkId: $fhirPathExpression = $fhirPathResult');
 
     return fhirPathResult;
   }

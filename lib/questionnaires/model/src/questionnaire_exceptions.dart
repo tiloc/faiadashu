@@ -8,7 +8,8 @@ class QuestionnaireFormatException implements Exception {
 
   /// A throwable
   final Object? cause;
-  QuestionnaireFormatException(this.message, [this.element, this.cause]);
+
+  const QuestionnaireFormatException(this.message, [this.element, this.cause]);
 
   @override
   String toString() {

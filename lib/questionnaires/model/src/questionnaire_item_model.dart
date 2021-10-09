@@ -139,14 +139,14 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   void _updateEnabledByEnableWhenExpression() {
     _qimLogger.trace('Enter _updateEnabledByEnableWhenExpression()');
 
-    final pathExpression = questionnaireItem.extension_
+    final fhirPathExpression = questionnaireItem.extension_
         ?.extensionOrNull(
           'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression',
         )
         ?.valueExpression
         ?.expression;
 
-    if (pathExpression == null) {
+    if (fhirPathExpression == null) {
       throw QuestionnaireFormatException(
         'enableWhenExpression missing expression',
         questionnaireItem,
@@ -154,21 +154,34 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     }
 
     final fhirPathResult =
-        questionnaireModel.evaluateFhirPathExpression(pathExpression);
+        questionnaireModel.evaluateFhirPathExpression(fhirPathExpression);
 
-    // TODO: Final specification of proper behavior pending: http://jira.hl7.org/browse/FHIR-33295
     // Evaluate result
-    if (fhirPathResult.isEmpty) {
-      // Empty is a typical result of missing inputs. Same as false.
+    if (!_isFhirPathResultTrue(
+      fhirPathResult,
+      fhirPathExpression,
+      orElse: false,
+    )) {
       _disableWithChildren();
+    }
+  }
+
+  bool _isFhirPathResultTrue(
+    List<dynamic> fhirPathResult,
+    String fhirPathExpression, {
+    required bool orElse,
+  }) {
+    // TODO: Final specification of proper behavior pending: http://jira.hl7.org/browse/FHIR-33295
+    if (fhirPathResult.isEmpty) {
+      return orElse;
     } else if (fhirPathResult.first is! bool) {
       throw QuestionnaireFormatException(
-        'FHIRPath expression does not return a bool: $pathExpression',
+        'FHIRPath expression does not return a bool: $fhirPathExpression',
         this,
       );
-    } else if ((fhirPathResult.first as bool) == false) {
-      _disableWithChildren();
-    } // true == do nothing (is already enabled)
+    } else {
+      return fhirPathResult.first as bool;
+    }
   }
 
   /// Updates the current enablement status of this item, based on enabledWhen.
@@ -444,6 +457,24 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     return responseModel.isComplete;
   }
 
+  bool get hasConstraint => constraintExpression != null;
+
+  bool get isFulfillingConstraint {
+    // TODO: Implement
+    return true;
+  }
+
+  String? get constraintExpression {
+    return questionnaireItem.extension_
+        ?.firstWhereOrNull(
+          (ext) =>
+              ext.url?.value.toString() ==
+              'http://hl7.org/fhir/StructureDefinition/questionnaire-constraint',
+        )
+        ?.valueExpression
+        ?.expression;
+  }
+
   /// Returns a [Decimal] value which can be added to a score.
   ///
   /// Returns null if not applicable (either question unanswered, or wrong type)
@@ -502,13 +533,14 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     return false;
   }
 
+  static const String calculatedExpressionExtensionUrl =
+      'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression';
+
   String? get calculatedExpression {
     return questionnaireItem.extension_
         ?.firstWhereOrNull(
           (ext) =>
-              ext.url?.value.toString() ==
-              // TODO: Move to constant
-              'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression',
+              ext.url?.value.toString() == calculatedExpressionExtensionUrl,
         )
         ?.valueExpression
         ?.expression;
@@ -518,7 +550,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
   bool get isCalculatedExpression {
     if (questionnaireItem.extension_?.firstWhereOrNull((ext) {
           return {
-            'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression',
+            calculatedExpressionExtensionUrl,
             'http://hl7.org/fhir/StructureDefinition/cqf-expression'
           }.contains(ext.url?.value.toString());
         }) !=
@@ -528,31 +560,14 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     return false;
   }
 
-  void _updateCalculatedExpression(
-    Resource? responseResource,
-    Map<String, dynamic>? passedVariables,
-  ) {
+  void _updateCalculatedExpression() {
     final fhirPathExpression = calculatedExpression;
     if (fhirPathExpression == null) {
       return;
     }
 
-    // TODO: This is a hack. fhir_path package is known to lack the functions for
-    // score calculations, so if these are detected we use a hard-coded
-    // scoring instead.
-    final rawEvaluationResult = (fhirPathExpression !=
-            'answers().sum(value.ordinal())')
-        ? r4WalkFhirPath(responseResource, fhirPathExpression, passedVariables)
-        : [
-            questionnaireModel.orderedQuestionnaireItemModels().fold<double>(
-                  0.0,
-                  (previousValue, element) =>
-                      previousValue + (element.ordinalValue?.value ?? 0.0),
-                )
-          ];
-
-    _qimLogger.debug(
-      'updateCalculatedExpression on $linkId: $fhirPathExpression = $rawEvaluationResult',
+    final rawEvaluationResult = questionnaireModel.evaluateFhirPathExpression(
+      fhirPathExpression,
     );
 
     final evaluationResult =
