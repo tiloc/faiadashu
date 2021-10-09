@@ -12,6 +12,7 @@ than mixing it in with the `fhirResourceProvider`.
 * WIP: use [Grey Faulkenberry's](https://github.com/Dokotela) implementation of FHIRPath for `calculatedExpression`.
 * WIP: use [Grey Faulkenberry's](https://github.com/Dokotela) implementation of FHIRPath for `initialExpression`.
 * WIP: use [Grey Faulkenberry's](https://github.com/Dokotela) implementation of FHIRPath for `enableWhenExpression`.
+* WIP: use [Grey Faulkenberry's](https://github.com/Dokotela) implementation of FHIRPath for `constraint`.
 
 * Changed handling of `questionnaireTheme` parameter
 * Added `showProgress` to `QuestionnaireTheme` to enable/disable progress indicator
