@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
@@ -69,9 +68,7 @@ abstract class AnswerModel<I, V> {
   bool get isUnanswered;
 
   String? get errorText {
-    return questionnaireModel.errorFlags.value
-        ?.firstWhereOrNull((qm) => qm.linkId == itemModel.linkId)
-        ?.errorText;
+    return questionnaireModel.errorFlagForLinkId(itemModel.linkId)?.errorText;
   }
 
   /// Returns a [QuestionnaireResponseAnswer] based on the current value.

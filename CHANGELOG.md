@@ -1,18 +1,20 @@
-## 0.5.4
+## 0.5.4-dev.5
 * [Breaking] Updated dependencies (Dart 2.14, Flutter 2.5, the latest FHIR and FHIRPath)
 * [Breaking] New mandatory parameter `launchContext` to provide patient into questionnaire filler, rather
 than mixing it in with the `fhirResourceProvider`.
 * Support keyboard extension: https://jira.hl7.org/browse/FHIR-33675
 * Use different keyboard types, based on item type and other item properties
 
-> The following WIP items should not break anything if you are not using these features. They are experimental betas if 
+> The following WIP items should not break anything if you are not using these features. They are experimental alphas if 
 > you decide to use them. 
 > 
+> FHIRPath implementation provided by [Grey Faulkenberry's](https://github.com/Dokotela) through the `fhir_path` package. 
+>  
 > **Feedback welcome!** 
-* WIP: use [Grey Faulkenberry's](https://github.com/Dokotela) implementation of FHIRPath for `calculatedExpression`.
-* WIP: use [Grey Faulkenberry's](https://github.com/Dokotela) implementation of FHIRPath for `initialExpression`.
-* WIP: use [Grey Faulkenberry's](https://github.com/Dokotela) implementation of FHIRPath for `enableWhenExpression`.
-* WIP: use [Grey Faulkenberry's](https://github.com/Dokotela) implementation of FHIRPath for `constraint`.
+* WIP: use FHIRPath for `calculatedExpression`.
+* WIP: use FHIRPath for `initialExpression`.
+* WIP: use FHIRPath for `enableWhenExpression`.
+* WIP: use FHIRPath for `constraint`.
 
 * Changed handling of `questionnaireTheme` parameter
 * Added `showProgress` to `QuestionnaireTheme` to enable/disable progress indicator

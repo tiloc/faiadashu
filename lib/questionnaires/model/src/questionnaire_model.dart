@@ -607,6 +607,7 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   /// Completeness criteria include:
   /// * All required fields are filled
   /// * All filled fields are valid
+  /// * All expression-based constraints are satisfied
   ///
   /// Returns null, if everything is complete.
   /// Returns [QuestionnaireErrorFlag]s, if items are incomplete.
@@ -627,4 +628,10 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   }
 
   final errorFlags = ValueNotifier<Iterable<QuestionnaireErrorFlag>?>(null);
+
+  /// Returns the [QuestionnaireErrorFlag] for an item with [linkId].
+  QuestionnaireErrorFlag? errorFlagForLinkId(String linkId) {
+    return questionnaireModel.errorFlags.value
+        ?.firstWhereOrNull((qm) => qm.linkId == linkId);
+  }
 }

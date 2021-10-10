@@ -18,8 +18,26 @@ class _GroupItemState extends State<GroupItem> {
 
   @override
   Widget build(BuildContext context) {
-    return const SizedBox(
-      height: 16.0,
+    final errorText = widget.itemModel.questionnaireModel
+        .errorFlagForLinkId(widget.itemModel.linkId)
+        ?.errorText;
+    return Column(
+      children: [
+        if (errorText != null)
+          Container(
+            padding: const EdgeInsets.only(top: 4.0),
+            child: Text(
+              errorText,
+              style: Theme.of(context)
+                  .textTheme
+                  .subtitle1!
+                  .copyWith(color: Theme.of(context).errorColor),
+            ),
+          ),
+        const SizedBox(
+          height: 16.0,
+        )
+      ],
     );
   }
 }

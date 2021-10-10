@@ -49,21 +49,21 @@ packages:
       name: csslib
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.17.0"
+    version: "0.17.1"
   faiadashu:
     dependency: "direct main"
     description:
       path: ".."
       relative: true
     source: path
-    version: "0.5.4"
+    version: "0.5.4-dev.5"
   faiadashu_online:
     dependency: "direct main"
     description:
       path: "../faiadashu_online"
       relative: true
     source: path
-    version: "0.5.4"
+    version: "0.5.4-dev.5"
   fhir:
     dependency: "direct main"
     description:
@@ -155,7 +155,7 @@ packages:
       name: google_sign_in_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.1"
+    version: "2.1.0"
   google_sign_in_web:
     dependency: transitive
     description:
@@ -183,7 +183,7 @@ packages:
       name: http
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.13.3"
+    version: "0.13.4"
   http_parser:
     dependency: transitive
     description:
@@ -254,13 +254,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.8.0"
-  pedantic:
-    dependency: transitive
-    description:
-      name: pedantic
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.11.1"
   petitparser:
     dependency: transitive
     description:
@@ -398,7 +391,7 @@ packages:
       name: uuid
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.0.4"
+    version: "3.0.5"
   vector_math:
     dependency: transitive
     description:

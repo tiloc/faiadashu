@@ -6,7 +6,6 @@ import '../../../../questionnaires.dart';
 
 /// Filler for an individual [QuestionnaireResponseAnswer].
 abstract class QuestionnaireAnswerFiller extends StatefulWidget {
-//  static final _logger = Logger(QuestionnaireAnswerFiller);
   final QuestionnaireResponseFillerState responseFillerState;
   final int answerIndex;
   final QuestionnaireItemModel itemModel;

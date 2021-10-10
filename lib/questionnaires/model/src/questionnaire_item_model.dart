@@ -458,8 +458,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
 
     if (!isSatisfyingConstraint) {
       return [
-        // TODO: Extract human text from extension
-        QuestionnaireErrorFlag(linkId, errorText: 'Constraint not satisfied!')
+        QuestionnaireErrorFlag(linkId, errorText: constraintHuman)
       ];
     }
 
@@ -493,8 +492,21 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
               ext.url?.value.toString() ==
               'http://hl7.org/fhir/StructureDefinition/questionnaire-constraint',
         )
-        ?.valueExpression
-        ?.expression;
+        ?.extension_
+        ?.firstWhereOrNull((ext) => ext.url?.value.toString() == 'expression')
+        ?.valueString;
+  }
+
+  String? get constraintHuman {
+    return questionnaireItem.extension_
+        ?.firstWhereOrNull(
+          (ext) =>
+              ext.url?.value.toString() ==
+              'http://hl7.org/fhir/StructureDefinition/questionnaire-constraint',
+        )
+        ?.extension_
+        ?.firstWhereOrNull((ext) => ext.url?.value.toString() == 'human')
+        ?.valueString;
   }
 
   /// Returns a [Decimal] value which can be added to a score.
