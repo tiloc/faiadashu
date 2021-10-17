@@ -457,12 +457,64 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     }
 
     if (!isSatisfyingConstraint) {
-      return [
-        QuestionnaireErrorFlag(linkId, errorText: constraintHuman)
-      ];
+      return [QuestionnaireErrorFlag(linkId, errorText: constraintHuman)];
     }
 
     return responseModel.isComplete;
+  }
+
+  /// Returns the evaluation result of a FHIRPath expression
+  List<dynamic> evaluateFhirPathExpression(
+    String fhirPathExpression, {
+    bool requiresQuestionnaireResponse = true,
+  }) {
+    final responseResource = requiresQuestionnaireResponse
+        ? questionnaireModel.questionnaireResponse
+        : null;
+
+    // Variables for launch context
+    final launchContextVariables = <String, dynamic>{};
+    if (questionnaireModel.launchContext.patient != null) {
+      launchContextVariables.addEntries(
+        [
+          MapEntry<String, dynamic>(
+            '%patient',
+            questionnaireModel.launchContext.patient?.toJson(),
+          )
+        ],
+      );
+    }
+
+    // Calculated variables
+    final calculatedVariables = (_variables != null)
+        ? Map.fromEntries(
+            _variables!.map<MapEntry<String, dynamic>>(
+              (variable) => MapEntry('%${variable.name}', variable.value),
+            ),
+          )
+        : null;
+
+    // SDC variables
+    // TODO: %qitem, etc.
+    // http://hl7.org/fhir/uv/sdc/2019May/expressions.html#fhirpath-and-questionnaire
+    // http://build.fhir.org/ig/HL7/sdc/expressions.html#fhirpath
+
+    final evaluationVariables = launchContextVariables;
+    if (calculatedVariables != null) {
+      evaluationVariables.addAll(calculatedVariables);
+    }
+
+    final fhirPathResult = r4WalkFhirPath(
+      responseResource,
+      fhirPathExpression,
+      evaluationVariables,
+    );
+
+    _qimLogger.debug(
+      'evaluateFhirPathExpression on $linkId: $fhirPathExpression = $fhirPathResult',
+    );
+
+    return fhirPathResult;
   }
 
   bool get hasConstraint => constraintExpression != null;

@@ -541,67 +541,6 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     updateEnabledItems();
   }
 
-  /// Returns the evaluation result of a FHIRPath expression
-  List<dynamic> evaluateFhirPathExpression(
-    String fhirPathExpression, {
-    bool requiresQuestionnaireResponse = true,
-  }) {
-    final responseResource =
-        requiresQuestionnaireResponse ? questionnaireResponse : null;
-
-    // Variables for launch context
-    final launchContextVariables = <String, dynamic>{};
-    if (launchContext.patient != null) {
-      launchContextVariables.addEntries(
-        [
-          MapEntry<String, dynamic>('%patient', launchContext.patient?.toJson())
-        ],
-      );
-    }
-
-    // Calculated variables
-    final calculatedVariables = (_variables != null)
-        ? Map.fromEntries(
-            _variables!.map<MapEntry<String, dynamic>>(
-              (variable) => MapEntry('%${variable.name}', variable.value),
-            ),
-          )
-        : null;
-
-    // SDC variables
-    // TODO: %qi, etc.
-    // http://hl7.org/fhir/uv/sdc/2019May/expressions.html#fhirpath-and-questionnaire
-
-    final evaluationVariables = launchContextVariables;
-    if (calculatedVariables != null) {
-      evaluationVariables.addAll(calculatedVariables);
-    }
-
-    // TODO: This is a hack. fhir_path package is known to lack the functions for
-    // score calculations, so if these are detected we use a hard-coded
-    // scoring instead.
-    final fhirPathResult = (fhirPathExpression !=
-            'answers().sum(value.ordinal())')
-        ? r4WalkFhirPath(
-            responseResource,
-            fhirPathExpression,
-            evaluationVariables,
-          )
-        : [
-            questionnaireModel.orderedQuestionnaireItemModels().fold<double>(
-                  0.0,
-                  (previousValue, element) =>
-                      previousValue + (element.ordinalValue?.value ?? 0.0),
-                )
-          ];
-
-    _logger.debug(
-      'evaluateFhirPathExpression on $linkId: $fhirPathExpression = $fhirPathResult',
-    );
-
-    return fhirPathResult;
-  }
-
   /// Returns whether the questionnaire meets all completeness criteria.
   ///
   /// Completeness criteria include:

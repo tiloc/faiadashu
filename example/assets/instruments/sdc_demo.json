@@ -830,7 +830,7 @@
               "valueExpression": {
                 "description": "patient's last name",
                 "language": "text/fhirpath",
-                "expression": "%patient.name.where(use='official').family()"
+                "expression": "%patient.name.where(use='official').family"
               }
             }
           ],
@@ -1008,7 +1008,7 @@
                 "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression",
                 "valueExpression": {
                   "description": "Total score",
-                  "expression": "%resource.repeat(item).where(linkId='4.3.b').item.answer.ordinalValue().aggregate($this + $total, 0)",
+                  "expression": "%resource.repeat(item).where(linkId='4.3.b').item.answer.ordinal().aggregate($this + $total, 0)",
                   "language": "text/fhirpath"
                 }
               }

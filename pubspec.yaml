@@ -25,8 +25,8 @@ environment:
 
 dependencies:
   collection: ^1.15.0
-  fhir: ^0.5.0-3
-  fhir_path: ^0.5.0-5
+  fhir: ^0.5.0-4
+  fhir_path: ^0.5.0-9
 #  fhir_path:
 #    path: /Users/tilo/Projects/fhir/fhir_path
 #  fhir:
@@ -36,9 +36,9 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: ^0.17.0
-  logging: ^1.0.1
+  logging: ^1.0.2
   meta: ^1.7.0
-  scrollable_positioned_list: ^0.2.0-nullsafety.0
+  scrollable_positioned_list: ^0.2.2
   simple_html_css: ^3.0.1
 
 dev_dependencies:
