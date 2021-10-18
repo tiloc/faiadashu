@@ -593,30 +593,22 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
 
   /// Is this item a total score calculation?
   bool get isTotalScore {
-    // From the description of the extension it is not entirely clear
-    // whether the unit should be in display or code.
-    // NLM Forms Builder puts it into display.
-    //
     // Checking for read-only is relevant,
     // as there are also input fields (e.g. pain score) with unit {score}.
-    if (questionnaireItem.type == QuestionnaireItemType.quantity ||
-        questionnaireItem.type == QuestionnaireItemType.decimal) {
-      if (questionnaireItem.extension_?.firstWhereOrNull((ext) {
-            return 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression' ==
-                    ext.url?.value.toString() &&
-                ext.valueExpression?.expression ==
-                    'answers().sum(value.ordinal())';
-          }) !=
-          null) {
-        return true;
-      }
-
-      if (questionnaireItem.readOnly == Boolean(true) &&
-          questionnaireItem.unit?.display == '{score}') {
-        return true;
-      }
-    }
-    return false;
+    return (questionnaireItem.type == QuestionnaireItemType.quantity ||
+            questionnaireItem.type == QuestionnaireItemType.decimal) &&
+        ((questionnaireItem.readOnly == Boolean(true) &&
+                questionnaireItem.unit?.display == '{score}') ||
+            questionnaireItem.extension_
+                    ?.firstWhereOrNull(
+                      (ext) =>
+                          ext.url?.value.toString() ==
+                          calculatedExpressionExtensionUrl,
+                    )
+                    ?.valueExpression
+                    ?.name
+                    .toString() ==
+                'score');
   }
 
   static const String calculatedExpressionExtensionUrl =

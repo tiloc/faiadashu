@@ -120,7 +120,8 @@ Quantity requires the declaration of units. It does not support free-text entry 
 #### decimal
 Comprehensive support.
 
-Special support for read-only display of total score.
+Special support for read-only display of total score - see [Scoring](#scoring)
+
 ##### Extensions
 - entryFormat
 - minValue
@@ -135,7 +136,7 @@ Special support for read-only display of total score.
 #### integer
 Comprehensive support
 
-Special support for read-only display of total score.
+Special support for read-only display of total score - see [Scoring](#scoring)
 
 Special support for 🇩🇰 Danish specification on patient feedback.
 
@@ -218,19 +219,22 @@ Not supported
 
 ---
 ### Scoring
-Ability to add up the ordinalValue or iso21090-CO-value of all choice questions into a total score.
+The ordinalValue or iso21090-CO-value of all choice questions can be summed up into a total score.
 
-![total_score](images/total_score.png)
-
-Total score will be entered into any field which meets one of the following:
-- has extension `sdc-questionnaire-calculatedExpression` with valueExpression.expression = `answers().sum(value.ordinal())`.
+The total score will be entered into a field which meets one of the following characteristics:
 - is readOnly and has extension `http://hl7.org/fhir/StructureDefinition/questionnaire-unit` with *display* value = `{score}`
+- has a calculatedExpression with name 'score'
 
-> The well-known [NLM Form Builder](https://lhcformbuilder.nlm.nih.gov) will set the `questionnaire-unit` extension 
+> The well-known [NLM Form Builder](https://lhcformbuilder.nlm.nih.gov) will set the `questionnaire-unit` extension
 > to `{score}`, but will not set the item to `readOnly`. Setting this manually to `true` will result in a questionnaire
 > with fully functioning scoring.
 
-> Scoring is hard-coded and does not offer actual support for a `valueExpression` based on FHIRPath.
+A total score field will be visualized with a "Total Score" heading and a large number.
+
+![total_score](images/total_score.png)
+
+It will also evaluate and visualize the Danish http://ehealth.sundhed.dk/fhir/StructureDefinition/ehealth-questionnaire-feedback extension
+for patient feedback.
 
 ### Response creation
 
