@@ -128,6 +128,9 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
                     decoration: questionnaireTheme.createDecoration().copyWith(
                           errorText: answerModel.errorText,
                           hintText: answerModel.entryFormat,
+                          prefixIcon: answerModel.itemModel.isCalculated
+                              ? const Icon(Icons.calculate)
+                              : null,
                           suffixIcon: (answerModel.hasUnitChoices)
                               ? SizedBox(
                                   height: 16,
