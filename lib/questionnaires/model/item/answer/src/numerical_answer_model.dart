@@ -320,8 +320,19 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
       return;
     }
 
-    // WIP: Support for unit
-    value = Quantity(value: Decimal(evaluationResult));
+    final unitCoding = qi.unit;
+
+    // OPTIMIZE: Submit improvement to Grey: Decimal factory should accept Decimal inValue
+    final quantityValue = (evaluationResult is Decimal)
+        ? evaluationResult
+        : Decimal(evaluationResult);
+
+    value = Quantity(
+      value: quantityValue,
+      unit: unitCoding?.localizedDisplay(locale),
+      system: unitCoding?.system,
+      code: unitCoding?.code,
+    );
 
     responseModel.answers = [filledAnswer];
   }

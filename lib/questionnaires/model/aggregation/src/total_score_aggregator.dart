@@ -1,7 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
 
-import '../../../../fhir_types/fhir_types.dart';
 import '../../../../logging/logging.dart';
 import '../../model.dart';
 
@@ -46,6 +45,7 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
 
   @override
   Decimal? aggregate({bool notifyListeners = false}) {
+    final totalScoreItem = this.totalScoreItem;
     if (totalScoreItem == null) {
       return null;
     }
@@ -64,32 +64,8 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
       value = result;
     }
 
-    // TODO: Consolidate with populateFromExpression in NumericalAnswerModel
-
-    final unit = totalScoreItem!.questionnaireItem.extension_
-        ?.extensionOrNull(
-          'http://hl7.org/fhir/StructureDefinition/questionnaire-unit',
-        )
-        ?.valueCoding
-        ?.display;
-
-    if (unit != null) {
-      totalScoreItem!.responseItem = QuestionnaireResponseItem(
-        linkId: totalScoreItem!.linkId,
-        text: totalScoreItem!.questionnaireItem.text,
-        answer: [
-          QuestionnaireResponseAnswer(
-            valueQuantity: Quantity(value: result, unit: unit),
-          )
-        ],
-      );
-    } else {
-      totalScoreItem!.responseItem = QuestionnaireResponseItem(
-        linkId: totalScoreItem!.linkId,
-        text: totalScoreItem!.questionnaireItem.text,
-        answer: [QuestionnaireResponseAnswer(valueDecimal: result)],
-      );
-    }
+    totalScoreItem.responseModel.answerModel(0).populateFromExpression(result);
+    totalScoreItem.responseModel.updateResponse();
 
     return result;
   }
