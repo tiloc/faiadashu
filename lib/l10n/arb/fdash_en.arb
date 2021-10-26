@@ -1,98 +1,95 @@
 {
-  "@@locale": "en",
-  "validatorRequiredItem": "This question needs to be completed.",
-  "validatorMinLength": "{minLength, plural, =1 {Enter at least one character.} other {Enter at least {minLength} characters.}}",
-  "@validatorMinLength": {
-    "placeholders": {
-      "minLength": {
-      }
+    "@@locale": "en",
+    "validatorRequiredItem": "This question needs to be completed.",
+    "validatorMinLength": "{minLength, plural, =1 {Enter at least one character.} other {Enter at least {minLength} characters.}}",
+    "@validatorMinLength": {
+        "placeholders": {
+            "minLength": {}
+        }
+    },
+    "validatorMaxLength": "{maxLength, plural, other{Enter up to {maxLength} characters.}}",
+    "@validatorMaxLength": {
+        "placeholders": {
+            "maxLength": {}
+        }
+    },
+    "validatorUrl": "Enter a valid URL in format https://...",
+    "validatorRegExp": "Enter a valid response.",
+    "validatorEntryFormat": "Enter in format {entryFormat}.",
+    "@validatorEntryFormat": {
+        "placeholders": {
+            "entryFormat": {
+                "type": "String"
+            }
+        }
+    },
+    "validatorNan": "Enter a valid number.",
+    "validatorMinValue": "Enter a number of {minValue} or higher.",
+    "@validatorMinValue": {
+        "placeholders": {
+            "minValue": {
+                "type": "String"
+            }
+        }
+    },
+    "validatorMaxValue": "Enter a number up to {maxValue}.",
+    "@validatorMaxValue": {
+        "placeholders": {
+            "maxValue": {
+                "type": "String"
+            }
+        }
+    },
+    "dataAbsentReasonAskedDeclined": "I choose not to answer.",
+    "narrativePageTitle": "Narrative",
+    "questionnaireGenericTitle": "Survey",
+    "questionnaireUnknownTitle": "Untitled",
+    "questionnaireUnknownPublisher": "Unknown publisher",
+    "validatorDate": "Enter a valid date.",
+    "validatorTime": "Enter a valid time.",
+    "validatorDateTime": "Enter a valid date and time.",
+    "validatorMinOccurs": "{minOccurs, plural, =1 {Select at least one option.} other {Select {minOccurs} or more options.}}",
+    "@validatorMinOccurs": {
+        "placeholders": {
+            "minOccurs": {}
+        }
+    },
+    "validatorMaxOccurs": "{maxOccurs, plural, =1 {Select up to one option.} other {Select up to {maxOccurs} options.}}",
+    "@validatorMaxOccurs": {
+        "placeholders": {
+            "maxOccurs": {}
+        }
+    },
+    "dataAbsentReasonAskedDeclinedInputLabel": "I choose not to answer.",
+    "dataAbsentReasonAskedDeclinedOutput": "Declined to answer",
+    "dataAbsentReasonAsTextOutput": "[AS TEXT]",
+    "autoCompleteSearchTermInput": "Enter search term…",
+    "responseStatusToCompleteButtonLabel": "Complete",
+    "responseStatusToInProgressButtonLabel": "Amend",
+    "progressQuestionnaireLoading": "The survey is loading…",
+    "handlingSaveButtonLabel": "Save",
+    "handlingUploadButtonLabel": "Upload",
+    "handlingUploading": "Uploading survey…",
+    "loginStatusLoggingIn": "Signing in…",
+    "loginStatusLoggedIn": "Signed in…",
+    "loginStatusLoggingOut": "Signing out…",
+    "loginStatusLoggedOut": "Signed out…",
+    "loginStatusUnknown": "Not sure what's going on?",
+    "loginStatusError": "Something went wrong.",
+    "handlingSaved": "Survey saved.",
+    "handlingUploaded": "Survey uploaded.",
+    "aggregationScore": "Score: {score}",
+    "@aggregationScore": {
+        "placeholders": {
+            "score": {}
+        }
+    },
+    "aggregationTotalScoreTitle": "Total Score",
+    "fillerOpenCodingOtherLabel": "Other",
+    "fillerAddAnotherItemLabel": "Add another \"{itemLabel}\"",
+    "@fillerAddAnotherItemLabel": {
+        "placeholders": {
+            "itemLabel": {}
+        }
     }
-  },
-  "validatorMaxLength": "{maxLength, plural, other{Enter up to {maxLength} characters.}}",
-  "@validatorMaxLength": {
-    "placeholders": {
-      "maxLength": {
-      }
-    }
-  },
-  "validatorUrl": "Enter a valid URL in format https://...",
-  "validatorRegExp": "Enter a valid response.",
-  "validatorEntryFormat": "Enter in format {entryFormat}.",
-  "@validatorEntryFormat": {
-    "placeholders": {
-      "entryFormat": {
-        "type": "String"
-      }
-    }
-  },
-  "validatorDate" : "Enter a valid date.",
-  "validatorTime" : "Enter a valid time.",
-  "validatorDateTime" : "Enter a valid date and time.",
-  "validatorNan": "Enter a valid number.",
-  "validatorMinValue": "Enter a number of {minValue} or higher.",
-  "@validatorMinValue": {
-    "placeholders": {
-      "minValue": {
-        "type": "String"
-      }
-    }
-  },
-  "validatorMaxValue": "Enter a number up to {maxValue}.",
-  "@validatorMaxValue": {
-    "placeholders": {
-      "maxValue": {
-        "type": "String"
-      }
-    }
-  },
-  "validatorMinOccurs": "{minOccurs, plural, =1 {Select at least one option.} other {Select {minOccurs} or more options.}}",
-  "@validatorMinOccurs": {
-    "placeholders": {
-      "minOccurs": {
-      }
-    }
-  },
-  "validatorMaxOccurs": "{maxOccurs, plural, =1 {Select up to one option.} other {Select up to {maxOccurs} options.}}",
-  "@validatorMaxOccurs": {
-    "placeholders": {
-      "maxOccurs": {
-      }
-    }
-  },
-  "dataAbsentReasonAskedDeclinedInputLabel" : "I choose not to answer.",
-  "dataAbsentReasonAskedDeclinedOutput" : "Declined to answer",
-  "dataAbsentReasonAsTextOutput" : "[AS TEXT]",
-  "narrativePageTitle" : "Narrative",
-  "questionnaireGenericTitle" : "Survey",
-  "questionnaireUnknownTitle" : "Untitled",
-  "questionnaireUnknownPublisher" : "Unknown publisher",
-  "autoCompleteSearchTermInput" : "Enter search term…",
-  "responseStatusToCompleteButtonLabel" : "Complete",
-  "responseStatusToInProgressButtonLabel" : "Amend",
-  "progressQuestionnaireLoading" : "The survey is loading…",
-  "handlingSaveButtonLabel" : "Save",
-  "handlingSaved" : "Survey saved.",
-  "handlingUploadButtonLabel" : "Upload",
-  "handlingUploading" : "Uploading survey…",
-  "handlingUploaded" : "Survey uploaded.",
-  "loginStatusLoggingIn" : "Signing in…",
-  "loginStatusLoggedIn" : "Signed in…",
-  "loginStatusLoggingOut" : "Signing out…",
-  "loginStatusLoggedOut" : "Signed out…",
-  "loginStatusUnknown" : "Not sure what's going on?",
-  "loginStatusError" : "Something went wrong.",
-  "aggregationScore" : "Score: {score}",
-  "@aggregationScore" : {
-    "placeholders" : {
-      "score": {}
-    }
-  },
-  "aggregationTotalScoreTitle" : "Total Score",
-  "fillerOpenCodingOtherLabel" : "Other",
-  "fillerAddAnotherItemLabel" : "Add another \"{itemLabel}\"",
-  "@fillerAddAnotherItemLabel" : {
-    "placeholders" : {
-      "itemLabel": {}
-    }
-  }
 }
