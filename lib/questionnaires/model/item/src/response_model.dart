@@ -104,14 +104,13 @@ class ResponseModel {
   ///
   /// Returns the newly added [AnswerModel].
   AnswerModel addAnswerModel() {
-    // TODO: Should there be any criteria? isAnswered of the previous model?
     return answerModel(numberOfAnswers);
   }
 
   /// Returns the number of answers in the response model.
   ///
   /// Includes unanswered answers, and thus the minimum value is 1.
-  int get numberOfAnswers => max(_cachedAnswerModels.length, 1);
+  int get numberOfAnswers => max(answers.length, 1);
 
   /// Returns an [AnswerModel] for the nth answer to an overall response.
   AnswerModel answerModel(int answerIndex) {
@@ -121,7 +120,10 @@ class ResponseModel {
 
     // Prepare slots in the underlying FHIR domain model.
     if (answers.length <= answerIndex) {
-      answers.addAll(List.filled((answerIndex - answers.length) + 1, null));
+      final List<QuestionnaireResponseAnswer?> additionalSlots =
+          List.filled((answerIndex - answers.length) + 1, null);
+      // + operator on List crashes due to incompatible types.
+      answers = [...answers, ...additionalSlots];
     }
 
     final AnswerModel? answerModel;

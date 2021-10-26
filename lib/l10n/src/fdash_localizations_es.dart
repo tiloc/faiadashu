@@ -157,4 +157,12 @@ class FDashLocalizationsEs extends FDashLocalizations {
 
   @override
   String get aggregationTotalScoreTitle => 'Total Score';
+
+  @override
+  String get fillerOpenCodingOtherLabel => 'Other';
+
+  @override
+  String fillerAddAnotherItemLabel(Object itemLabel) {
+    return 'Add another \"$itemLabel\"';
+  }
 }

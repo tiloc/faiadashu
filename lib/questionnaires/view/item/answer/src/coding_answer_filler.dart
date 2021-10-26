@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:faiadashu/faiadashu.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
@@ -191,7 +192,8 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
                       );
               },
             ),
-            secondary: const Text('Other'),
+            secondary:
+                Text(FDashLocalizations.of(context).fillerOpenCodingOtherLabel),
           ),
         ),
       );

@@ -64,22 +64,26 @@ class FDashLocalizationsJa extends FDashLocalizations {
 
   @override
   String validatorMinOccurs(int minOccurs) {
-    return intl.Intl.pluralLogic(
+    final String pluralString = intl.Intl.pluralLogic(
       minOccurs,
       locale: localeName,
       one: '少なくとも1つの選択肢を選ぶ',
       other: '$minOccurs以上の選択肢を選ぶ',
     );
+
+    return '${pluralString}。';
   }
 
   @override
   String validatorMaxOccurs(int maxOccurs) {
-    return intl.Intl.pluralLogic(
+    final String pluralString = intl.Intl.pluralLogic(
       maxOccurs,
       locale: localeName,
       one: '選択肢を1つまで選ぶ',
       other: '$maxOccurs選択肢を1つまで選ぶ',
     );
+
+    return '${pluralString}。';
   }
 
   @override
@@ -155,4 +159,12 @@ class FDashLocalizationsJa extends FDashLocalizations {
 
   @override
   String get aggregationTotalScoreTitle => 'トータルスコア';
+
+  @override
+  String get fillerOpenCodingOtherLabel => 'Other';
+
+  @override
+  String fillerAddAnotherItemLabel(Object itemLabel) {
+    return 'Add another \"$itemLabel\"';
+  }
 }

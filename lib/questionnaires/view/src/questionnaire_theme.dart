@@ -1,3 +1,4 @@
+import 'package:faiadashu/faiadashu.dart';
 import 'package:flutter/material.dart';
 
 import '../../../logging/logging.dart';
@@ -109,10 +110,11 @@ class QuestionnaireTheme {
     return const InputDecoration(filled: true);
   }
 
-  /// Returns a UI element to add another answer to a repeating item
+  /// Build a UI element to add another answer to a repeating item
   ///
   /// Will be disabled if [callback] is null.
-  Widget createAddRepetition(
+  Widget buildAddRepetition(
+    BuildContext context,
     QuestionnaireResponseFillerState responseFiller,
     VoidCallback? callback, {
     Key? key,
@@ -125,8 +127,13 @@ class QuestionnaireTheme {
         ElevatedButton.icon(
           onPressed: callback,
           key: key,
-          // TODO: Make translatable
-          label: Text('Add another "${responseModel.itemModel.titleText}"'),
+          label: Text(
+            FDashLocalizations.of(context).fillerAddAnotherItemLabel(
+              responseModel.itemModel.shortText ??
+                  responseModel.itemModel.titleText ??
+                  '',
+            ),
+          ),
           icon: const Icon(Icons.add),
         ),
         const SizedBox(height: 8.0),

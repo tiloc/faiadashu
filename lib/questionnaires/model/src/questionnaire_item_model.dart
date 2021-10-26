@@ -739,6 +739,15 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     return (prefix != null) ? '$prefix $title' : title;
   }
 
+  /// Returns the `shortText` provided for the item, or null.
+  String? get shortText {
+    return questionnaireItem.extension_
+        ?.extensionOrNull(
+          'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-shortText',
+        )
+        ?.valueString;
+  }
+
   LinkedHashMap<String, QuestionnaireItemModel> _addChildren() {
     _qimLogger.trace('_addChildren $linkId');
     final LinkedHashMap<String, QuestionnaireItemModel> itemModelMap =

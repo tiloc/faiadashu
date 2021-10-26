@@ -111,8 +111,11 @@ class QuestionnaireResponseFillerState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (!responseModel.isAskedButDeclined) ..._answerFillers,
-        if (widget.itemModel.isRepeating)
-          questionnaireTheme.createAddRepetition(
+        if (widget.itemModel.isRepeating &&
+            widget.itemModel.questionnaireModel.responseStatus ==
+                QuestionnaireResponseStatus.in_progress)
+          questionnaireTheme.buildAddRepetition(
+            context,
             this,
             (!responseModel
                     .answerModel(responseModel.numberOfAnswers - 1)

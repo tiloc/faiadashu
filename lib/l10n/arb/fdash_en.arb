@@ -87,5 +87,12 @@
       "score": {}
     }
   },
-  "aggregationTotalScoreTitle" : "Total Score"
+  "aggregationTotalScoreTitle" : "Total Score",
+  "fillerOpenCodingOtherLabel" : "Other",
+  "fillerAddAnotherItemLabel" : "Add another \"{itemLabel}\"",
+  "@fillerAddAnotherItemLabel" : {
+    "placeholders" : {
+      "itemLabel": {}
+    }
+  }
 }

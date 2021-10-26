@@ -147,6 +147,6 @@ class StringAnswerModel extends AnswerModel<String, String> {
 
     value = evaluationResult as String?;
 
-    responseModel.answers = [filledAnswer];
+    responseModel.answers[answerIndex] = filledAnswer;
   }
 }

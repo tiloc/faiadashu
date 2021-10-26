@@ -57,6 +57,8 @@ The filler never chooses to omit a field from display.
 #### hidden
 Supported
 
+#### shortText
+Supported
 
 ### Item category: Group
 #### group
@@ -72,7 +74,10 @@ Supported for styled static output.
 Supported. Renders a '*' after the label
 
 ##### repeats
-Only supported for `choice`
+Supported. Renders a multi-selection for items of type `choice`. Not supported for `open-choice`. 
+Renders UI elements to add/remove repeating answers for all other item types.
+
+The label of the UI element uses the `shortText` as a description for a single item.
 
 ##### readOnly
 Supported.

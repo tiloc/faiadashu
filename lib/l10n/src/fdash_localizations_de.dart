@@ -155,4 +155,12 @@ class FDashLocalizationsDe extends FDashLocalizations {
 
   @override
   String get aggregationTotalScoreTitle => 'Gesamtpunktzahl';
+
+  @override
+  String get fillerOpenCodingOtherLabel => 'Other';
+
+  @override
+  String fillerAddAnotherItemLabel(Object itemLabel) {
+    return 'Add another \"$itemLabel\"';
+  }
 }
