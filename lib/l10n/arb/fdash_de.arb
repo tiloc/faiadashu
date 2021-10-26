@@ -84,5 +84,12 @@
             "score": {}
         }
     },
-    "aggregationTotalScoreTitle": "Gesamtpunktzahl"
+    "aggregationTotalScoreTitle": "Gesamtpunktzahl",
+    "fillerOpenCodingOtherLabel": "sonstiges",
+    "fillerAddAnotherItemLabel": "\"{itemLabel}\" hinzufügen",
+    "@fillerAddAnotherItemLabel": {
+        "placeholders": {
+            "itemLabel": {}
+        }
+    }
 }
