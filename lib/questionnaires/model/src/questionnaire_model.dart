@@ -13,47 +13,69 @@ part of 'questionnaire_item_model.dart';
 /// [QuestionnaireModel] provides direct access to any [QuestionnaireItemModel] through linkId.
 class QuestionnaireModel extends QuestionnaireItemModel {
   final Map<String, QuestionnaireItemModel> _cachedItems = {};
-  List<QuestionnaireItemModel>? _enabledWhens;
+  List<QuestionnaireItemModel>? _itemsWithEnableWhen;
+  List<QuestionnaireItemModel>? _itemsWithEnableWhenExpression;
+  // In which generation were the enabled items last determined?
+  int _updateEnabledGeneration = -1;
   final List<Aggregator>? _aggregators;
 
   /// Direct access to [FhirResourceProvider]s for special use-cases.
   ///
   /// see: [getResource] for the preferred access method.
   final FhirResourceProvider fhirResourceProvider;
+  final LaunchContext launchContext;
+
   int _generation = 1;
   final Locale locale;
   static final _logger = Logger(QuestionnaireModel);
 
-  QuestionnaireModel._(
-      {required this.locale,
-      required Questionnaire questionnaire,
-      required this.fhirResourceProvider,
-      required List<Aggregator>? aggregators})
-      : _aggregators = aggregators,
+  QuestionnaireModel._({
+    required this.locale,
+    required Questionnaire questionnaire,
+    required this.fhirResourceProvider,
+    required this.launchContext,
+    required List<Aggregator>? aggregators,
+  })  : _aggregators = aggregators,
         super._(
-            questionnaire,
-            null,
-            ArgumentError.checkNotNull(questionnaire.item?.first),
-            ArgumentError.checkNotNull(questionnaire.item?.first.linkId),
-            null,
-            0,
-            0) {
+          questionnaire,
+          null,
+          ArgumentError.checkNotNull(questionnaire.item?.first),
+          ArgumentError.checkNotNull(questionnaire.item?.first.linkId),
+          null,
+          0,
+          0,
+        ) {
     _questionnaireModel = this;
     // This will set up the traversal order and fill up the cache.
     _ensureOrderedItems();
 
+    // Set up conventional enableWhen feature
     for (final itemModel in orderedQuestionnaireItemModels()) {
-      final enableWhens = itemModel.questionnaireItem.enableWhen;
-      if ((enableWhens != null) && enableWhens.isNotEmpty) {
-        if (_enabledWhens == null) {
-          _enabledWhens = [itemModel];
+      if (itemModel.isEnabledWhen) {
+        if (_itemsWithEnableWhen == null) {
+          _itemsWithEnableWhen = [itemModel];
         } else {
-          _enabledWhens!.add(itemModel);
+          _itemsWithEnableWhen!.add(itemModel);
         }
       }
     }
 
-    _logger.debug('_enabledWhens: $_enabledWhens');
+    _logger.debug('_itemsWithEnableWhen: $_itemsWithEnableWhen');
+
+    // Set up FHIRPath based enableWhenExpression feature
+    for (final itemModel in orderedQuestionnaireItemModels()) {
+      if (itemModel.isEnabledWhenExpression) {
+        if (_itemsWithEnableWhenExpression == null) {
+          _itemsWithEnableWhenExpression = [itemModel];
+        } else {
+          _itemsWithEnableWhenExpression!.add(itemModel);
+        }
+      }
+    }
+
+    _logger.debug(
+      '_itemsWithEnableWhenExpression: $_itemsWithEnableWhenExpression',
+    );
 
     if (aggregators != null) {
       for (final aggregator in aggregators) {
@@ -65,8 +87,10 @@ class QuestionnaireModel extends QuestionnaireItemModel {
       }
     }
 
-    activateEnableWhen();
+    // TODO: Should the constructor activate any kind of dynamic behavior?
+    activateEnableBehavior();
 
+    // This ensures screen updates in case of invalid responses.
     errorFlags.addListener(() {
       nextGeneration();
     });
@@ -87,10 +111,12 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   ///
   /// If no [QuestionnaireResponse] has been provided here, it can still later
   /// be provided through the [populate] function.
-  static Future<QuestionnaireModel> fromFhirResourceBundle(
-      {required Locale locale,
-      List<Aggregator>? aggregators,
-      required FhirResourceProvider fhirResourceProvider}) async {
+  static Future<QuestionnaireModel> fromFhirResourceBundle({
+    required Locale locale,
+    List<Aggregator>? aggregators,
+    required FhirResourceProvider fhirResourceProvider,
+    required LaunchContext launchContext,
+  }) async {
     _logger.debug('QuestionnaireModel.fromFhirResourceBundle');
 
     final questionnaire = await fhirResourceProvider
@@ -101,22 +127,61 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     }
 
     final questionnaireModel = QuestionnaireModel._(
-        questionnaire: questionnaire,
-        locale: locale,
-        aggregators: aggregators ??
-            [
-              TotalScoreAggregator(),
-              NarrativeAggregator(),
-              QuestionnaireResponseAggregator()
-            ],
-        fhirResourceProvider: fhirResourceProvider);
+      questionnaire: questionnaire,
+      locale: locale,
+      aggregators: aggregators ??
+          [
+            TotalScoreAggregator(),
+            NarrativeAggregator(),
+            QuestionnaireResponseAggregator()
+          ],
+      fhirResourceProvider: fhirResourceProvider,
+      launchContext: launchContext,
+    );
 
     await questionnaireModel.fhirResourceProvider.init();
 
     final response =
         fhirResourceProvider.getResource(questionnaireResponseResourceUri)
             as QuestionnaireResponse?;
-    questionnaireModel.populate(response);
+
+    // ================================================================
+    // Behaviors require a defined sequence during setup:
+    // * initialValue
+    // * variables
+    // * calculated
+    // * enableWhen
+    // * error flagging
+    // ================================================================
+
+    // Populate initial values if response == null
+    // This cannot happen in the constructor, as only this method has the
+    // extra information to populate variables.
+    if (response == null) {
+      questionnaireModel
+          .orderedQuestionnaireItemModels()
+          .where((qim) => qim.hasInitialValue)
+          .forEach((qim) {
+        qim._populateInitialValue();
+      });
+    } else {
+      questionnaireModel.populate(response);
+    }
+
+    // Set up updates for values of questionnaire-level variables
+    if (questionnaireModel.hasVariables) {
+      questionnaireModel._updateVariables();
+      questionnaireModel.addListener(questionnaireModel._updateVariables);
+    }
+
+    // WIP: Set up calculatedExpressions on items
+    questionnaireModel._updateCalculations();
+    questionnaireModel.addListener(questionnaireModel._updateCalculations);
+
+    // WIP: Set up enableWhen behavior on items
+    // TODO: Move this here from the constructor
+
+    // TODO: Move error flagging here from constructor
 
     return questionnaireModel;
   }
@@ -135,12 +200,26 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   void nextGeneration({bool notifyListeners = true}) {
     final newGeneration = _generation + 1;
     _logger.debug(
-        'nextGeneration $notifyListeners: $_generation -> $newGeneration');
+      'nextGeneration $notifyListeners: $_generation -> $newGeneration',
+    );
     _generation = newGeneration;
+
+    // Invalidate cached items
+    _cachedQuestionnaireResponse = null;
+
     if (notifyListeners) {
       this.notifyListeners();
     }
   }
+
+  QuestionnaireResponse? _cachedQuestionnaireResponse;
+
+  /// Returns a [QuestionnaireResponse].
+  ///
+  /// The response matches the model as of the current generation.
+  QuestionnaireResponse? get questionnaireResponse =>
+      _cachedQuestionnaireResponse ??=
+          aggregator<QuestionnaireResponseAggregator>().aggregate();
 
   /// Returns a [Resource] which is referenced in the [Questionnaire].
   ///
@@ -156,16 +235,20 @@ class QuestionnaireModel extends QuestionnaireItemModel {
         ? findContainedByElementId(uri)
         : RegistryFhirResourceProvider(
             // Certain Value Sets need to be made available to questionnaires, even if they are not explicitly provided.
-            [FhirValueSetProvider(), fhirResourceProvider]).getResource(uri);
+            [FhirValueSetProvider(), fhirResourceProvider],
+          ).getResource(uri);
 
     if (resource == null) {
       if (isResourceContained) {
         throw QuestionnaireFormatException(
-            'Questionnaire does not contain referenced Resource $uri',
-            questionnaire.contained);
+          'Questionnaire does not contain referenced Resource $uri',
+          questionnaire.contained,
+        );
       } else {
         throw QuestionnaireFormatException(
-            'External Resource $uri cannot be located.', context);
+          'External Resource $uri cannot be located.',
+          context,
+        );
       }
     }
 
@@ -177,8 +260,11 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   /// The ValueSet is identified through the [uri].
   ///
   /// Includes all the contained, included, etc. elements.
-  void forEachInValueSet(String uri, void Function(Coding coding) f,
-      {Object? context}) {
+  void forEachInValueSet(
+    String uri,
+    void Function(Coding coding) f, {
+    Object? context,
+  }) {
     final valueSet = getResource(uri, context: context) as ValueSet;
 
     final List<ValueSetContains>? valueSetContains =
@@ -188,10 +274,11 @@ class QuestionnaireModel extends QuestionnaireItemModel {
       // Expansion has preference over includes. They are not additive.
       for (final contains in valueSetContains) {
         final coding = Coding(
-            system: contains.system,
-            code: contains.code,
-            display: contains.display,
-            extension_: contains.extension_);
+          system: contains.system,
+          code: contains.code,
+          display: contains.display,
+          extension_: contains.extension_,
+        );
 
         f.call(coding);
       }
@@ -200,7 +287,9 @@ class QuestionnaireModel extends QuestionnaireItemModel {
 
       if (valueSetIncludes == null) {
         throw QuestionnaireFormatException(
-            'Include in ValueSet $uri does not exist.', context);
+          'Include in ValueSet $uri does not exist.',
+          context,
+        );
       }
 
       for (final valueSetInclude in valueSetIncludes) {
@@ -228,14 +317,16 @@ class QuestionnaireModel extends QuestionnaireItemModel {
             final codeSystem =
                 getResource(valueSetInclude.system.toString()) as CodeSystem;
             _logger.debug(
-                'Processing included CodeSystem ${codeSystem.url.toString()}');
+              'Processing included CodeSystem ${codeSystem.url.toString()}',
+            );
             if (codeSystem.concept != null) {
               for (final concept in codeSystem.concept!) {
                 final coding = Coding(
-                    system: valueSetInclude.system,
-                    code: concept.code,
-                    display: concept.display,
-                    extension_: concept.extension_);
+                  system: valueSetInclude.system,
+                  code: concept.code,
+                  display: concept.display,
+                  extension_: concept.extension_,
+                );
                 f.call(coding);
               }
             }
@@ -244,10 +335,11 @@ class QuestionnaireModel extends QuestionnaireItemModel {
 
         for (final concept in valueSetConcepts) {
           final coding = Coding(
-              system: valueSetInclude.system,
-              code: concept.code,
-              display: concept.display,
-              extension_: concept.extension_);
+            system: valueSetInclude.system,
+            code: concept.code,
+            display: concept.display,
+            extension_: concept.extension_,
+          );
 
           f.call(coding);
         }
@@ -267,7 +359,9 @@ class QuestionnaireModel extends QuestionnaireItemModel {
 
     if (questionnaire.contained == null) {
       throw QuestionnaireFormatException(
-          'Questionnaire does not have contained elements.', questionnaire);
+        'Questionnaire does not have contained elements.',
+        questionnaire,
+      );
     }
 
     final key = elementId.startsWith('#')
@@ -293,13 +387,12 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     }
 
     throw QuestionnaireFormatException(
-        'Questionnaire does not contain element with id #$elementId',
-        questionnaire.contained);
+      'Questionnaire does not contain element with id #$elementId',
+      questionnaire.contained,
+    );
   }
 
   /// Returns a number that indicates whether the model has changed.
-  ///
-  ///
   int get generation => _generation;
 
   /// Returns the [QuestionnaireItemModel] that corresponds to the linkId.
@@ -324,11 +417,13 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     nextGeneration();
   }
 
-  void _populateItems(List<QuestionnaireResponseItem>? qris) {
-    if (qris == null) {
+  void _populateItems(
+    List<QuestionnaireResponseItem>? questionnaireResponseItems,
+  ) {
+    if (questionnaireResponseItems == null) {
       return;
     }
-    for (final item in qris) {
+    for (final item in questionnaireResponseItems) {
       fromLinkId(item.linkId!).responseItem = item;
       _populateItems(item.item);
       if (item.answer != null) {
@@ -361,50 +456,91 @@ class QuestionnaireModel extends QuestionnaireItemModel {
         questionnaireResponse.status ?? QuestionnaireResponseStatus.in_progress;
   }
 
+  void _updateCalculations() {
+    orderedQuestionnaireItemModels()
+        .where((qim) => qim.isCalculatedExpression)
+        .forEach((qim) {
+      qim._updateCalculatedExpression();
+    });
+  }
+
+  /// Returns a bitfield of the items with `isEnabled` == true.
+  List<bool> get _currentlyEnabledItems => List<bool>.generate(
+        orderedQuestionnaireItemModels().length,
+        (index) => orderedQuestionnaireItemModels().elementAt(index).isEnabled,
+        growable: false,
+      );
+
   /// Update the current enablement status of all items.
-  void updateEnableWhen({bool notifyListeners = true}) {
-    if (_enabledWhens == null) {
-      _logger.trace(
-        'updateEnableWhen: no conditional items',
+  ///
+  /// This updates enablement through enableWhen and enableWhenExpression.
+  void updateEnabledItems({bool notifyListeners = true}) {
+    _logger.trace('updateEnabledItems()');
+
+    if (_updateEnabledGeneration == _generation) {
+      _logger.debug(
+        'updateEnabledItems: already updated during this generation',
       );
       return;
     }
-    _logger.trace('updateEnableWhen()');
 
-    final previouslyEnabled = List<bool>.generate(
-        orderedQuestionnaireItemModels().length,
-        (index) => orderedQuestionnaireItemModels().elementAt(index).isEnabled,
-        growable: false);
+    _updateEnabledGeneration = _generation;
+
+    if (_itemsWithEnableWhen == null &&
+        _itemsWithEnableWhenExpression == null) {
+      _logger.debug(
+        'updateEnabledItems: no conditionally enabled items',
+      );
+      return;
+    }
+
+    final previouslyEnabled = _currentlyEnabledItems;
     _logger.trace('prevEnabled: $previouslyEnabled');
     for (final itemModel in orderedQuestionnaireItemModels()) {
       itemModel._isEnabled = true;
     }
 
-    for (final itemModel in _enabledWhens!) {
-      itemModel._calculateEnabled();
+    if (_itemsWithEnableWhen != null) {
+      for (final itemModel in _itemsWithEnableWhen!) {
+        itemModel._updateEnabled();
+      }
     }
-    final afterEnabled = List<bool>.generate(
-        orderedQuestionnaireItemModels().length,
-        (index) => orderedQuestionnaireItemModels().elementAt(index).isEnabled,
-        growable: false);
-    _logger.trace('afterEnabled: $afterEnabled');
 
-    if (!listEquals(previouslyEnabled, afterEnabled)) {
+    if (_itemsWithEnableWhenExpression != null) {
+      for (final itemModel in _itemsWithEnableWhenExpression!) {
+        itemModel._updateEnabled();
+      }
+    }
+
+    final nowEnabled = _currentlyEnabledItems;
+    _logger.trace('nowEnabled: $nowEnabled');
+
+    if (!listEquals(previouslyEnabled, nowEnabled)) {
       nextGeneration(notifyListeners: notifyListeners);
     } else {
-      _logger.debug('enableWhen unchanged.');
+      _logger.debug('Enabled items unchanged.');
     }
   }
 
-  /// Activate the "enableWhen" behaviors.
-  void activateEnableWhen() {
-    for (final itemModel in orderedQuestionnaireItemModels()) {
-      itemModel.forEnableWhens((qew) {
-        fromLinkId(qew.question!).addListener(() => updateEnableWhen());
-      });
+  /// Activate the enable behavior.
+  ///
+  /// Adds the required listeners to evaluate enableWhen and
+  /// enableWhenExpression as items are changed.
+  void activateEnableBehavior() {
+    if (_itemsWithEnableWhenExpression != null) {
+      // When enableWhenExpression is involved we need to add listeners to every
+      // non-static item, as we have no way to find out which items are referenced
+      // by the FHIR Path expression.
+      addListener(() => updateEnabledItems());
+    } else {
+      for (final itemModel in orderedQuestionnaireItemModels()) {
+        itemModel.forEnableWhens((qew) {
+          fromLinkId(qew.question!).addListener(() => updateEnabledItems());
+        });
+      }
     }
 
-    updateEnableWhen();
+    updateEnabledItems();
   }
 
   /// Returns whether the questionnaire meets all completeness criteria.
@@ -412,9 +548,10 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   /// Completeness criteria include:
   /// * All required fields are filled
   /// * All filled fields are valid
+  /// * All expression-based constraints are satisfied
   ///
   /// Returns null, if everything is complete.
-  /// Returns [QuestionnaireErrorFlag]s, if item are incomplete.
+  /// Returns [QuestionnaireErrorFlag]s, if items are incomplete.
   Iterable<QuestionnaireErrorFlag>? get isQuestionnaireComplete {
     final errorFlags = <QuestionnaireErrorFlag>[];
     for (final itemModel in orderedQuestionnaireItemModels()) {
@@ -432,4 +569,10 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   }
 
   final errorFlags = ValueNotifier<Iterable<QuestionnaireErrorFlag>?>(null);
+
+  /// Returns the [QuestionnaireErrorFlag] for an item with [linkId].
+  QuestionnaireErrorFlag? errorFlagForLinkId(String linkId) {
+    return questionnaireModel.errorFlags.value
+        ?.firstWhereOrNull((qm) => qm.linkId == linkId);
+  }
 }

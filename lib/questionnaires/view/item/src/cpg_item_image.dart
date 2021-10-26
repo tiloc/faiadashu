@@ -16,11 +16,16 @@ class CpgItemImage extends StatelessWidget {
   /// Returns the itemImage [Widget] for a given [QuestionnaireItemModel].
   ///
   /// Returns null if no itemImage has been specified for the given item.
-  static Widget? fromQuestionnaireItem(QuestionnaireItemModel itemModel,
-      {Key? key, double? width, double? height}) {
+  static Widget? fromQuestionnaireItem(
+    QuestionnaireItemModel itemModel, {
+    Key? key,
+    double? width,
+    double? height,
+  }) {
     final itemImageUri = itemModel.questionnaireItem.extension_
         ?.extensionOrNull(
-            'http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-itemImage')
+          'http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-itemImage',
+        )
         ?.valueAttachment
         ?.url
         .toString();

@@ -180,6 +180,17 @@
       "required": false,
       "linkId": "/38214-3",
       "text": "How would you rate your pain if coffee was gone?"
+    },
+    {
+      "extension": [
+      {
+        "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-shortText",
+        "valueString": "Cookie"
+      }],
+      "type": "string",
+      "repeats": true,
+      "linkId": "cookie-lid",
+      "text": "What cookies do you like with your coffee?"
     }
   ]
 }

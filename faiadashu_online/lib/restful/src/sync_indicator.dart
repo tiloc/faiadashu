@@ -35,14 +35,15 @@ class _SyncIndicatorState extends State<SyncIndicator>
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-        key: _ingKey,
-        animation: _animationController,
-        builder: (BuildContext context, Widget? _widget) {
-          return Transform.rotate(
-            angle: _animationController.value * 2 * pi,
-            child: _widget,
-          );
-        },
-        child: Icon(Icons.sync, color: widget.color));
+      key: _ingKey,
+      animation: _animationController,
+      builder: (BuildContext context, Widget? _widget) {
+        return Transform.rotate(
+          angle: _animationController.value * 2 * pi,
+          child: _widget,
+        );
+      },
+      child: Icon(Icons.sync, color: widget.color),
+    );
   }
 }

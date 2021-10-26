@@ -1,7 +1,11 @@
+import 'dart:math';
+
 import 'package:fhir/r4.dart';
 
 import '../../../../coding/coding.dart';
 import '../../../questionnaires.dart';
+
+// TODO: Properly model nested and repeating responses: https://chat.fhir.org/#narrow/stream/179255-questionnaire
 
 /// Model a response item, which might consist of multiple answers.
 class ResponseModel {
@@ -19,8 +23,8 @@ class ResponseModel {
       itemModel.responseItem = ri;
 
   ResponseModel(this.itemModel) {
-    final int? answerCount = responseItem?.answer?.length;
-    if (answerCount != null && answerCount > 0) {
+    final int answerCount = responseItem?.answer?.length ?? 0;
+    if (answerCount > 0) {
       answers = responseItem!.answer!;
     } else {
       answers = [null];
@@ -50,12 +54,14 @@ class ResponseModel {
             extension_: (dataAbsentReason != null)
                 ? [
                     FhirExtension(
-                        url: dataAbsentReasonExtensionUrl,
-                        valueCode: dataAbsentReason)
+                      url: dataAbsentReasonExtensionUrl,
+                      valueCode: dataAbsentReason,
+                    )
                   ]
                 : null,
             // FHIR cannot have empty arrays.
-            answer: filledAnswers.isEmpty ? null : filledAnswers);
+            answer: filledAnswers.isEmpty ? null : filledAnswers,
+          );
   }
 
   /// Is this response invalid?
@@ -65,8 +71,8 @@ class ResponseModel {
     return dataAbsentReason == dataAbsentReasonAsTextCode;
   }
 
+  // Ensures at least a single answer model exists.
   void _ensureAnswerModel() {
-    // TODO: this assumes only a single answer.
     answerModel(0);
   }
 
@@ -94,17 +100,35 @@ class ResponseModel {
 
   final Map<int, AnswerModel> _cachedAnswerModels = <int, AnswerModel>{};
 
-  /// Returns an [AnswerModel] for the nth answer to an overall response.
+  /// Add the next answer to this response.
   ///
-  /// Only [answerIndex] == 0 is currently supported.
+  /// Returns the newly added [AnswerModel].
+  AnswerModel addAnswerModel() {
+    return answerModel(numberOfAnswers);
+  }
+
+  /// Returns the number of answers in the response model.
+  ///
+  /// Includes unanswered answers, and thus the minimum value is 1.
+  int get numberOfAnswers => max(answers.length, 1);
+
+  /// Returns an [AnswerModel] for the nth answer to an overall response.
   AnswerModel answerModel(int answerIndex) {
     if (_cachedAnswerModels.containsKey(answerIndex)) {
       return _cachedAnswerModels[answerIndex]!;
     }
 
+    // Prepare slots in the underlying FHIR domain model.
+    if (answers.length <= answerIndex) {
+      final List<QuestionnaireResponseAnswer?> additionalSlots =
+          List.filled((answerIndex - answers.length) + 1, null);
+      // + operator on List crashes due to incompatible types.
+      answers = [...answers, ...additionalSlots];
+    }
+
     final AnswerModel? answerModel;
 
-    switch (itemModel.questionnaireItem.type!) {
+    switch (itemModel.questionnaireItem.type) {
       case QuestionnaireItemType.choice:
       case QuestionnaireItemType.open_choice:
         answerModel = CodingAnswerModel(this, answerIndex);
@@ -128,8 +152,10 @@ class ResponseModel {
         answerModel = BooleanAnswerModel(this, answerIndex);
         break;
       case QuestionnaireItemType.display:
+        answerModel = DisplayAnswerModel(this, answerIndex);
+        break;
       case QuestionnaireItemType.group:
-        answerModel = StaticAnswerModel(this, answerIndex);
+        answerModel = GroupAnswerModel(this, answerIndex);
         break;
       case QuestionnaireItemType.attachment:
       case QuestionnaireItemType.unknown:

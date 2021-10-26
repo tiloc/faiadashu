@@ -126,15 +126,15 @@ import '../../../l10n/l10n.dart';
 ///    contains more detailed examples.
 class FDashAutocomplete<T extends Object> extends StatefulWidget {
   /// Creates an instance of [FDashAutocomplete].
-  const FDashAutocomplete(
-      {Key? key,
-      this.focusNode,
-      required this.optionsBuilder,
-      this.displayStringForOption = RawAutocomplete.defaultStringForOption,
-      this.onSelected,
-      this.optionsViewBuilder,
-      this.initialValue})
-      : super(key: key);
+  const FDashAutocomplete({
+    Key? key,
+    this.focusNode,
+    required this.optionsBuilder,
+    this.displayStringForOption = RawAutocomplete.defaultStringForOption,
+    this.onSelected,
+    this.optionsViewBuilder,
+    this.initialValue,
+  }) : super(key: key);
 
   /// {@macro flutter.widgets.RawAutocomplete.displayStringForOption}
   final AutocompleteOptionToString<T> displayStringForOption;
@@ -179,10 +179,11 @@ class FDashAutocompleteState<T extends Object>
   }
 
   Widget _defaultFieldViewBuilder(
-      BuildContext context,
-      TextEditingController textEditingController,
-      FocusNode focusNode,
-      VoidCallback onFieldSubmitted) {
+    BuildContext context,
+    TextEditingController textEditingController,
+    FocusNode focusNode,
+    VoidCallback onFieldSubmitted,
+  ) {
     return _AutocompleteField(
       initialValue: widget.initialValue,
       focusNode: focusNode,
@@ -194,29 +195,34 @@ class FDashAutocompleteState<T extends Object>
   @override
   Widget build(BuildContext context) {
     return Container(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: (widget.onSelected != null)
-            ? RawAutocomplete<T>(
-                focusNode: widget.focusNode,
-                textEditingController: _textEditingController,
-                displayStringForOption: widget.displayStringForOption,
-                fieldViewBuilder: _defaultFieldViewBuilder,
-                optionsBuilder: widget.optionsBuilder,
-                optionsViewBuilder: widget.optionsViewBuilder ??
-                    (BuildContext context, AutocompleteOnSelected<T> onSelected,
-                        Iterable<T> options) {
-                      return _AutocompleteOptions<T>(
-                        displayStringForOption: widget.displayStringForOption,
-                        onSelected: onSelected,
-                        options: options,
-                      );
-                    },
-                onSelected: widget.onSelected,
-              )
-            : TextFormField(
-                focusNode: widget.focusNode,
-                controller: _textEditingController,
-                enabled: false));
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: (widget.onSelected != null)
+          ? RawAutocomplete<T>(
+              focusNode: widget.focusNode,
+              textEditingController: _textEditingController,
+              displayStringForOption: widget.displayStringForOption,
+              fieldViewBuilder: _defaultFieldViewBuilder,
+              optionsBuilder: widget.optionsBuilder,
+              optionsViewBuilder: widget.optionsViewBuilder ??
+                  (
+                    BuildContext context,
+                    AutocompleteOnSelected<T> onSelected,
+                    Iterable<T> options,
+                  ) {
+                    return _AutocompleteOptions<T>(
+                      displayStringForOption: widget.displayStringForOption,
+                      onSelected: onSelected,
+                      options: options,
+                    );
+                  },
+              onSelected: widget.onSelected,
+            )
+          : TextFormField(
+              focusNode: widget.focusNode,
+              controller: _textEditingController,
+              enabled: false,
+            ),
+    );
   }
 }
 

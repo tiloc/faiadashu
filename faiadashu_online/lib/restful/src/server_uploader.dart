@@ -6,7 +6,9 @@ import 'package:fhir_auth/r4.dart';
 
 /// Uploads a [QuestionnaireResponse] to a server.
 Future<Id?> uploadQuestionnaireResponse(
-    SmartClient smartClient, QuestionnaireResponse resource) async {
+  SmartClient smartClient,
+  QuestionnaireResponse resource,
+) async {
   final _logger = Logger.tag('server_uploader');
 
   try {
@@ -18,7 +20,8 @@ Future<Id?> uploadQuestionnaireResponse(
   }
 
   _logger.debug(
-      '${resource.resourceTypeString()} to be uploaded:\n${resource.toJson()}');
+    '${resource.resourceTypeString()} to be uploaded:\n${resource.toJson()}',
+  );
   final request1 = FhirRequest.create(
     base: smartClient.fhirUrl.value!,
     resource: resource,

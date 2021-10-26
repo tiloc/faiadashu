@@ -7,9 +7,10 @@ import '../../../../questionnaires.dart';
 
 class DateTimeAnswerFiller extends QuestionnaireAnswerFiller {
   DateTimeAnswerFiller(
-      QuestionnaireResponseFillerState responseFillerState, int answerIndex,
-      {Key? key})
-      : super(responseFillerState, answerIndex, key: key);
+    QuestionnaireResponseFillerState responseFillerState,
+    int answerIndex, {
+    Key? key,
+  }) : super(responseFillerState, answerIndex, key: key);
   @override
   State<StatefulWidget> createState() => _DateTimeAnswerState();
 }
@@ -29,11 +30,13 @@ class _DateTimeAnswerState extends QuestionnaireAnswerFillerState<FhirDateTime,
 
     final initialDate = (itemType != QuestionnaireItemType.time) ? value : null;
 
-    final pickerType = ArgumentError.checkNotNull(const {
-      QuestionnaireItemType.date: Date,
-      QuestionnaireItemType.datetime: FhirDateTime,
-      QuestionnaireItemType.time: Time,
-    }[itemType]);
+    final pickerType = ArgumentError.checkNotNull(
+      const {
+        QuestionnaireItemType.date: Date,
+        QuestionnaireItemType.datetime: FhirDateTime,
+        QuestionnaireItemType.time: Time,
+      }[itemType],
+    );
 
     return Container(
       padding: const EdgeInsets.only(top: 8, bottom: 8),

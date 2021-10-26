@@ -10,15 +10,20 @@ class FhirDateTimeText extends StatelessWidget {
   final TextStyle? style;
   final String defaultText;
   final Locale? locale;
-  const FhirDateTimeText(this.dateTime,
-      {this.style, this.defaultText = '', this.locale, Key? key})
-      : super(key: key);
+  const FhirDateTimeText(
+    this.dateTime, {
+    this.style,
+    this.defaultText = '',
+    this.locale,
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Text(
-        dateTime?.format(locale ?? Localizations.localeOf(context)) ??
-            defaultText,
-        style: style);
+      dateTime?.format(locale ?? Localizations.localeOf(context)) ??
+          defaultText,
+      style: style,
+    );
   }
 }

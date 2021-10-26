@@ -41,77 +41,88 @@ class _NarrativeDrawerState extends State<NarrativeDrawer> {
       margin: const EdgeInsets.all(8.0),
       child: ConstrainedBox(
         constraints: BoxConstraints(
-            maxHeight: preferredHeight, minHeight: preferredHeight),
+          maxHeight: preferredHeight,
+          minHeight: preferredHeight,
+        ),
         child: Container(
           padding: const EdgeInsets.all(16.0),
           child: Builder(
             builder: (context) => AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                child: Column(
+              duration: const Duration(milliseconds: 300),
+              child: Column(
+                key: UniqueKey(),
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SwitchListTile(
                     key: UniqueKey(),
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SwitchListTile(
-                        key: UniqueKey(),
-                        title: Text(
-                          !_drawerMode
-                              ? FDashLocalizations.of(context)
-                                  .narrativePageTitle
-                              : 'FHIR R4 JSON',
-                          style: Theme.of(context).textTheme.headline5,
-                        ),
-                        secondary: IconButton(
-                          icon: const Icon(Icons.copy),
-                          onPressed: () {
-                            Clipboard.setData(ClipboardData(
-                                    text: _drawerMode
-                                        ? const JsonEncoder.withIndent('    ')
-                                            .convert(QuestionnaireFiller.of(
-                                                    context)
-                                                .aggregator<
-                                                    QuestionnaireResponseAggregator>()
-                                                .aggregate(containPatient: true)
-                                                ?.toJson())
-                                        : QuestionnaireFiller.of(context)
-                                            .aggregator<NarrativeAggregator>()
-                                            .aggregate()
-                                            ?.div))
-                                .then((_) {
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                  content: _drawerMode
-                                      ? const Text(
-                                          'QuestionnaireResponse copied to clipboard')
-                                      : const Text(
-                                          'Narrative copied to clipboard')));
-                            });
-                          },
-                        ),
-                        value: _drawerMode,
-                        onChanged: (newState) {
-                          setState(() {
-                            _drawerMode = newState;
-                          });
-                        },
-                      ),
-                      const Divider(),
-                      Expanded(
-                          child: _drawerMode
-                              ? Scrollbar(
-                                  isAlwaysShown: true,
-                                  controller: _responseScrollController,
-                                  child: SingleChildScrollView(
-                                    controller: _responseScrollController,
-                                    child: ResourceJsonTree(
-                                      QuestionnaireFiller.of(context)
-                                          .aggregator<
-                                              QuestionnaireResponseAggregator>()
-                                          .aggregate(containPatient: true)
-                                          ?.toJson(),
+                    title: Text(
+                      !_drawerMode
+                          ? FDashLocalizations.of(context).narrativePageTitle
+                          : 'FHIR R4 JSON',
+                      style: Theme.of(context).textTheme.headline5,
+                    ),
+                    secondary: IconButton(
+                      icon: const Icon(Icons.copy),
+                      onPressed: () {
+                        Clipboard.setData(
+                          ClipboardData(
+                            text: _drawerMode
+                                ? const JsonEncoder.withIndent('    ').convert(
+                                    QuestionnaireFiller.of(context)
+                                        .aggregator<
+                                            QuestionnaireResponseAggregator>()
+                                        .aggregate(containPatient: true)
+                                        ?.toJson(),
+                                  )
+                                : QuestionnaireFiller.of(context)
+                                    .aggregator<NarrativeAggregator>()
+                                    .aggregate()
+                                    ?.div,
+                          ),
+                        ).then((_) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: _drawerMode
+                                  ? const Text(
+                                      'QuestionnaireResponse copied to clipboard',
+                                    )
+                                  : const Text(
+                                      'Narrative copied to clipboard',
                                     ),
-                                  ),
-                                )
-                              : const NarrativeTile()),
-                    ])),
+                            ),
+                          );
+                        });
+                      },
+                    ),
+                    value: _drawerMode,
+                    onChanged: (newState) {
+                      setState(() {
+                        _drawerMode = newState;
+                      });
+                    },
+                  ),
+                  const Divider(),
+                  Expanded(
+                    child: _drawerMode
+                        ? Scrollbar(
+                            isAlwaysShown: true,
+                            controller: _responseScrollController,
+                            child: SingleChildScrollView(
+                              controller: _responseScrollController,
+                              child: ResourceJsonTree(
+                                QuestionnaireFiller.of(context)
+                                    .aggregator<
+                                        QuestionnaireResponseAggregator>()
+                                    .aggregate(containPatient: true)
+                                    ?.toJson(),
+                              ),
+                            ),
+                          )
+                        : const NarrativeTile(),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),

@@ -2,8 +2,9 @@ import 'package:fhir/r4.dart';
 
 import '../../../../fhir_types/fhir_types.dart';
 import '../../../../logging/logging.dart';
-import '../../../../resource_provider/resource_provider.dart';
 import '../../../questionnaires.dart';
+
+// TODO: Properly support nested questionnaire items (questions being children of other questions).
 
 /// Aggregates the user's responses into a [QuestionnaireResponse].
 ///
@@ -23,8 +24,10 @@ class QuestionnaireResponseAggregator
     super.init(questionnaireModel);
   }
 
-  QuestionnaireResponseItem? _fromGroupItem(QuestionnaireItemModel itemModel,
-      QuestionnaireResponseStatus responseStatus) {
+  QuestionnaireResponseItem? _fromGroupItem(
+    QuestionnaireItemModel itemModel,
+    QuestionnaireResponseStatus responseStatus,
+  ) {
     if (responseStatus == QuestionnaireResponseStatus.completed &&
         !itemModel.isEnabled) {
       return null;
@@ -33,7 +36,7 @@ class QuestionnaireResponseAggregator
     final nestedItems = <QuestionnaireResponseItem>[];
 
     for (final nestedItem in itemModel.children) {
-      if (nestedItem.questionnaireItem.type == QuestionnaireItemType.group) {
+      if (nestedItem.isGroup) {
         final groupItem = _fromGroupItem(nestedItem, responseStatus);
         if (groupItem != null) {
           nestedItems.add(groupItem);
@@ -47,19 +50,21 @@ class QuestionnaireResponseAggregator
 
     if (nestedItems.isNotEmpty) {
       return QuestionnaireResponseItem(
-          linkId: itemModel.linkId,
-          text: itemModel.titleText,
-          item: nestedItems);
+        linkId: itemModel.linkId,
+        text: itemModel.titleText,
+        item: nestedItems,
+      );
     } else {
       return null;
     }
   }
 
   @override
-  QuestionnaireResponse? aggregate(
-      {QuestionnaireResponseStatus? responseStatus,
-      bool notifyListeners = false,
-      bool containPatient = false}) {
+  QuestionnaireResponse? aggregate({
+    QuestionnaireResponseStatus? responseStatus,
+    bool notifyListeners = false,
+    bool containPatient = false,
+  }) {
     _logger.trace('QuestionnaireResponse.aggregate');
 
     // Are all minimum fields for SDC profile present?
@@ -70,7 +75,7 @@ class QuestionnaireResponseAggregator
     final responseItems = <QuestionnaireResponseItem>[];
 
     for (final itemModel in questionnaireModel.siblings) {
-      if (itemModel.questionnaireItem.type == QuestionnaireItemType.group) {
+      if (itemModel.isGroup) {
         final groupItem = _fromGroupItem(itemModel, responseStatus);
         if (groupItem != null) {
           responseItems.add(groupItem);
@@ -91,15 +96,15 @@ class QuestionnaireResponseAggregator
     final questionnaireVersion = questionnaireModel.questionnaire.version;
     final questionnaireCanonical = (questionnaireUrl != null)
         ? Canonical(
-            "$questionnaireUrl${(questionnaireVersion != null) ? '|$questionnaireVersion' : ''}")
+            "$questionnaireUrl${(questionnaireVersion != null) ? '|$questionnaireVersion' : ''}",
+          )
         : null;
 
     final questionnaireTitle = questionnaireModel.questionnaire.title;
 
     final contained = <Resource>[];
 
-    final subject = questionnaireModel.fhirResourceProvider
-        .getResource(subjectResourceUri) as Patient?;
+    final subject = questionnaireModel.launchContext.patient;
 
     Reference? subjectReference;
     if (subject != null) {
@@ -120,13 +125,16 @@ class QuestionnaireResponseAggregator
 
     final profiles = [
       Canonical(
-          'http://hl7.org/fhir/4.0/StructureDefinition/QuestionnaireResponse'),
+        'http://hl7.org/fhir/4.0/StructureDefinition/QuestionnaireResponse',
+      ),
       if (isValidSdc)
         Canonical(
-            'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaireresponse'),
+          'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaireresponse',
+        ),
       if (isValidSdc)
         Canonical(
-            'http://fhir.org/guides/argonaut/questionnaire/StructureDefinition/argo-questionnaireresponse'),
+          'http://fhir.org/guides/argonaut/questionnaire/StructureDefinition/argo-questionnaireresponse',
+        ),
     ];
 
     final meta = (profiles.isNotEmpty)
@@ -146,12 +154,16 @@ class QuestionnaireResponseAggregator
       language: Code(locale.toLanguageTag()),
       subject: subjectReference,
       questionnaireElement: (questionnaireTitle != null)
-          ? Element(extension_: [
-              FhirExtension(
+          ? Element(
+              extension_: [
+                FhirExtension(
                   url: FhirUri(
-                      'http://hl7.org/fhir/StructureDefinition/display'),
-                  valueString: questionnaireModel.questionnaire.title)
-            ])
+                    'http://hl7.org/fhir/StructureDefinition/display',
+                  ),
+                  valueString: questionnaireModel.questionnaire.title,
+                )
+              ],
+            )
           : null,
     );
 

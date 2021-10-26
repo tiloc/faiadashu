@@ -16,7 +16,8 @@ class FhirValueSetProvider extends FhirResourceProvider {
     switch (uri) {
       case 'http://hl7.org/fhir/ValueSet/yesnodontknow':
         return ValueSet.fromJson(
-            jsonDecode(yesNoDontKnowValueSetRaw) as Map<String, dynamic>);
+          jsonDecode(yesNoDontKnowValueSetRaw) as Map<String, dynamic>,
+        );
       default:
         return null;
     }

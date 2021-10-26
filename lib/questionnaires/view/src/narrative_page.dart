@@ -14,8 +14,9 @@ class NarrativePage extends StatelessWidget {
       ),
       body: SafeArea(
         child: Container(
-            padding: const EdgeInsets.all(8.0),
-            child: NarrativeTile(questionnaireModel: questionnaireModel)),
+          padding: const EdgeInsets.all(8.0),
+          child: NarrativeTile(questionnaireModel: questionnaireModel),
+        ),
       ),
     );
   }

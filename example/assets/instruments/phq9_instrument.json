@@ -173,7 +173,7 @@
                 "description": "Score (0-4: None-minimal; 5-9: Mild; 19-14: Moderate; 15-19: Moderately severe; 20-27: Severe)",
                 "language": "text/fhirpath",
                 "name": "score",
-                "expression": "answers().sum(value.ordinal())"
+                "expression": "%resource.answers().value.ordinal().sum()"
               }
             }
           ]

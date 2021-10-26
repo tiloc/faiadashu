@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer' as developer;
 import 'dart:io';
 
@@ -13,7 +14,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:logging/logging.dart' as dartlog;
-import 'package:pedantic/pedantic.dart';
 
 import 'about_page.dart';
 import 'disclaimer_page.dart';
@@ -24,14 +24,16 @@ void main() {
   if (kDebugMode || kIsWeb) {
     dartlog.Logger.root.level = dartlog.Level.ALL;
     dartlog.Logger.root.onRecord.listen((dartlog.LogRecord rec) {
-      developer.log(rec.message,
-          time: rec.time,
-          sequenceNumber: rec.sequenceNumber,
-          level: rec.level.value,
-          name: rec.loggerName,
-          zone: rec.zone,
-          error: rec.error,
-          stackTrace: rec.stackTrace);
+      developer.log(
+        rec.message,
+        time: rec.time,
+        sequenceNumber: rec.sequenceNumber,
+        level: rec.level.value,
+        name: rec.loggerName,
+        zone: rec.zone,
+        error: rec.error,
+        stackTrace: rec.stackTrace,
+      );
     });
   } else {
     dartlog.Logger.root.level = dartlog.Level.WARNING;
@@ -101,7 +103,9 @@ class _HomePageState extends State<HomePage> {
   // Quick-and-dirty upload of QuestionnaireResponse to server
   // Not suitable for production use (no error-handling)
   Future<void> _uploadResponse(
-      String id, QuestionnaireResponse? response) async {
+    String id,
+    QuestionnaireResponse? response,
+  ) async {
     if (response == null) {
       return;
     }
@@ -155,18 +159,26 @@ class _HomePageState extends State<HomePage> {
 
   late final SmartClient smartClient;
 
+  // Patient ID matches a patient on Logica Sandbox server.
+  final launchContext = LaunchContext(
+    patient: Patient(
+      id: Id('14603'),
+      name: [
+        HumanName(given: ['Emma'], family: 'Lee', use: HumanNameUse.official)
+      ],
+      birthDate: Date('1940-08-12'),
+      gender: PatientGender.female,
+    ),
+  );
+
   @override
   void initState() {
     super.initState();
     resourceBundleProvider = RegistryFhirResourceProvider([
-      InMemoryResourceProvider.inMemory(
-          subjectResourceUri,
-          // Patient ID matches a patient on Logica Sandbox server.
-          Patient(id: Id('14603'), name: [
-            HumanName(given: ['Emma'], family: 'Lee')
-          ])),
       AssetImageAttachmentProvider(
-          'http://example.org/images', 'assets/images'),
+        'http://example.org/images',
+        'assets/images',
+      ),
       valueSetProvider
     ]);
 
@@ -226,8 +238,9 @@ class _HomePageState extends State<HomePage> {
               style: DefaultTextStyle.of(context).style,
               children: const <TextSpan>[
                 TextSpan(
-                    text: 'Widgets for Digital Health',
-                    style: TextStyle(fontSize: 12)),
+                  text: 'Widgets for Digital Health',
+                  style: TextStyle(fontSize: 12),
+                ),
               ],
             ),
           ),
@@ -251,9 +264,11 @@ class _HomePageState extends State<HomePage> {
                 ),
                 onTap: () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const AboutPage()));
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AboutPage(),
+                    ),
+                  );
                 },
               ),
               ListTile(
@@ -261,37 +276,46 @@ class _HomePageState extends State<HomePage> {
                 subtitle: const Text('Legalese'),
                 onTap: () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const DisclaimerPage()));
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const DisclaimerPage(),
+                    ),
+                  );
                 },
               ),
               ListTile(
                 title: const Text('Primitive Types'),
                 subtitle: const Text(
-                    'Formatted, internationalized text output of FHIR primitive types.'),
+                  'Formatted, internationalized text output of FHIR primitive types.',
+                ),
                 onTap: () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const PrimitivePage()));
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const PrimitivePage(),
+                    ),
+                  );
                 },
               ),
               ListTile(
                 title: const Text('Observation'),
                 subtitle: const Text(
-                    'Formatted, internationalized text output of observations.'),
+                  'Formatted, internationalized text output of observations.',
+                ),
                 onTap: () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ObservationPage()));
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ObservationPage(),
+                    ),
+                  );
                 },
               ),
               QuestionnaireLaunchTile(
                 title: 'SDC Demo Scroller',
                 subtitle: 'A gallery of SDC feature support.',
                 fhirResourceProvider: resourceBundleProvider,
+                launchContext: launchContext,
                 questionnairePath: 'assets/instruments/sdc_demo.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
@@ -301,7 +325,19 @@ class _HomePageState extends State<HomePage> {
                 title: 'FHIR Hot Beverage IG',
                 subtitle: 'WIP Beverage Questionnaire',
                 fhirResourceProvider: resourceBundleProvider,
+                launchContext: launchContext,
                 questionnairePath: 'assets/instruments/beverage_ig.json',
+                saveResponseFunction: _saveResponse,
+                restoreResponseFunction: _restoreResponse,
+                uploadResponseFunction: uploadResponseFunction,
+              ),
+              QuestionnaireLaunchTile(
+                title: 'SDC LOINC AHRQ Example',
+                subtitle:
+                    'WIP: Extensive use of ValueSets and a repeating group.',
+                fhirResourceProvider: resourceBundleProvider,
+                launchContext: launchContext,
+                questionnairePath: 'assets/instruments/sdc-loinc-ahrq.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
                 uploadResponseFunction: uploadResponseFunction,
@@ -311,7 +347,19 @@ class _HomePageState extends State<HomePage> {
                 subtitle:
                     'The reference questionnaire for SDC render features.',
                 fhirResourceProvider: resourceBundleProvider,
+                launchContext: launchContext,
                 questionnairePath: 'assets/instruments/sdc-example-render.json',
+                saveResponseFunction: _saveResponse,
+                restoreResponseFunction: _restoreResponse,
+                uploadResponseFunction: uploadResponseFunction,
+              ),
+              QuestionnaireLaunchTile(
+                title: 'Weight/Height Tracking',
+                subtitle: 'Example for BMI calculation with FHIRPath',
+                fhirResourceProvider: resourceBundleProvider,
+                launchContext: launchContext,
+                questionnairePath:
+                    'assets/instruments/weight-height-tracking.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
                 uploadResponseFunction: uploadResponseFunction,
@@ -321,6 +369,7 @@ class _HomePageState extends State<HomePage> {
                 subtitle:
                     'Reference sample from the Argonaut Questionnaire Implementation Guide.',
                 fhirResourceProvider: resourceBundleProvider,
+                launchContext: launchContext,
                 questionnairePath: 'assets/instruments/argonaut_sampler.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
@@ -331,6 +380,7 @@ class _HomePageState extends State<HomePage> {
                 title: 'Der Argonaut-Fragebogen',
                 subtitle: 'Ein deutsches Beispiel für einen Fragebogen.',
                 fhirResourceProvider: resourceBundleProvider,
+                launchContext: launchContext,
                 questionnairePath: 'assets/instruments/argonaut_sampler.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
@@ -341,6 +391,7 @@ class _HomePageState extends State<HomePage> {
                 title: 'استبيان "أرجونوت"',
                 subtitle: 'مثال على استبيان عربي.',
                 fhirResourceProvider: resourceBundleProvider,
+                launchContext: launchContext,
                 questionnairePath: 'assets/instruments/argonaut_sampler.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
@@ -351,6 +402,7 @@ class _HomePageState extends State<HomePage> {
                 title: 'アルゴノート」のアンケートです。',
                 subtitle: '日本でのアンケートの例です。',
                 fhirResourceProvider: resourceBundleProvider,
+                launchContext: launchContext,
                 questionnairePath: 'assets/instruments/argonaut_sampler.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
@@ -360,6 +412,7 @@ class _HomePageState extends State<HomePage> {
                 title: 'PHQ9 Questionnaire Scroller',
                 subtitle: 'Simple choice-based survey with a total score.',
                 fhirResourceProvider: resourceBundleProvider,
+                launchContext: launchContext,
                 questionnairePath: 'assets/instruments/phq9_instrument.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
@@ -368,46 +421,57 @@ class _HomePageState extends State<HomePage> {
               ListTile(
                 title: const Text('PHQ9 Questionnaire Stepper'),
                 subtitle: const Text(
-                    'Simple choice-based survey with a total score.'),
+                  'Simple choice-based survey with a total score.',
+                ),
                 onTap: () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => QuestionnaireStepperPage(
-                              fhirResourceProvider: AssetResourceProvider.singleton(
-                                  questionnaireResourceUri,
-                                  'assets/instruments/phq9_instrument.json'))));
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => QuestionnaireStepperPage(
+                        fhirResourceProvider: AssetResourceProvider.singleton(
+                          questionnaireResourceUri,
+                          'assets/instruments/phq9_instrument.json',
+                        ),
+                        launchContext: launchContext,
+                      ),
+                    ),
+                  );
                 },
               ),
               ListTile(
                 title: const Text('Cherry blossom Filler'),
                 subtitle: const Text(
-                    'Illustrates embedding of questionnaire (no Scaffold)'),
+                  'Illustrates embedding of questionnaire (no Scaffold)',
+                ),
                 onTap: () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => QuestionnaireScroller(
-                                scaffoldBuilder:
-                                    const _CherryBlossomScaffoldBuilder(),
-                                fhirResourceProvider:
-                                    RegistryFhirResourceProvider([
-                                  resourceBundleProvider,
-                                  AssetResourceProvider.singleton(
-                                      questionnaireResourceUri,
-                                      'assets/instruments/sdc_demo.json')
-                                ]),
-                                questionnaireTheme: const QuestionnaireTheme(
-                                    canSkipQuestions: true,
-                                    showNullAnswerOption: false,
-                                    showQuestionNumbers: true),
-                              )));
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => QuestionnaireScroller(
+                        scaffoldBuilder: const _CherryBlossomScaffoldBuilder(),
+                        fhirResourceProvider: RegistryFhirResourceProvider([
+                          resourceBundleProvider,
+                          AssetResourceProvider.singleton(
+                            questionnaireResourceUri,
+                            'assets/instruments/sdc_demo.json',
+                          )
+                        ]),
+                        launchContext: launchContext,
+                        questionnaireTheme: const QuestionnaireTheme(
+                          canSkipQuestions: true,
+                          showNullAnswerOption: false,
+                          showQuestionNumbers: true,
+                        ),
+                      ),
+                    ),
+                  );
                 },
               ),
               QuestionnaireLaunchTile(
                 title: 'HF Questionnaire Scroller',
                 subtitle: 'A heart failure survey with a total score.',
                 fhirResourceProvider: resourceBundleProvider,
+                launchContext: launchContext,
                 questionnairePath: 'assets/instruments/hf_instrument.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
@@ -417,6 +481,7 @@ class _HomePageState extends State<HomePage> {
                 title: 'PRAPARE Questionnaire Scroller',
                 subtitle: 'Real-world, mixed-type survey from the US',
                 fhirResourceProvider: resourceBundleProvider,
+                launchContext: launchContext,
                 questionnairePath: 'assets/instruments/prapare_instrument.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
@@ -428,10 +493,12 @@ class _HomePageState extends State<HomePage> {
                 // Provide a hard-coded response for initial population
                 fhirResourceProvider: RegistryFhirResourceProvider([
                   AssetResourceProvider.singleton(
-                      questionnaireResponseResourceUri,
-                      'assets/responses/bluebook_response.json'),
+                    questionnaireResponseResourceUri,
+                    'assets/responses/bluebook_response.json',
+                  ),
                   resourceBundleProvider
                 ]),
+                launchContext: launchContext,
                 questionnairePath: 'assets/instruments/bluebook.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
@@ -442,6 +509,7 @@ class _HomePageState extends State<HomePage> {
                 subtitle:
                     'Real-world example with very long ValueSets and enableWhen',
                 fhirResourceProvider: resourceBundleProvider,
+                launchContext: launchContext,
                 questionnairePath: 'assets/instruments/who_covid19.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
@@ -460,9 +528,11 @@ class _CherryBlossomScaffoldBuilder extends QuestionnairePageScaffoldBuilder {
   const _CherryBlossomScaffoldBuilder();
 
   @override
-  Widget build(BuildContext context,
-      {required void Function(void Function() p1) setStateCallback,
-      required Widget child}) {
+  Widget build(
+    BuildContext context, {
+    required void Function(void Function() p1) setStateCallback,
+    required Widget child,
+  }) {
     return Theme(
       data: ThemeData.light(), // Make it always light
       // We have to take care of SafeArea ourselves
@@ -485,10 +555,12 @@ class _CherryBlossomScaffoldBuilder extends QuestionnairePageScaffoldBuilder {
               const Divider(),
               // We're putting our own exit button in here
               Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: OutlinedButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('桜の園からの帰り道'))),
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: OutlinedButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('桜の園からの帰り道'),
+                ),
+              ),
             ],
           ),
         ),

@@ -8,9 +8,13 @@ class QuestionnaireFillerProgressBar extends StatefulWidget {
   final Color? answeredColor;
   final Color? unansweredColor;
 
-  const QuestionnaireFillerProgressBar(this.questionnaireItemModel,
-      {this.height, this.answeredColor, this.unansweredColor, Key? key})
-      : super(key: key);
+  const QuestionnaireFillerProgressBar(
+    this.questionnaireItemModel, {
+    this.height,
+    this.answeredColor,
+    this.unansweredColor,
+    Key? key,
+  }) : super(key: key);
 
   @override
   _QuestionnaireFillerProgressBarState createState() =>
@@ -53,10 +57,12 @@ class _QuestionnaireFillerProgressBarState
         final box = (qim.isAnswered)
             ? Container(
                 height: height,
-                color: widget.answeredColor ?? theme.accentColor)
+                color: widget.answeredColor ?? theme.colorScheme.secondary,
+              )
             : Container(
                 foregroundDecoration: BoxDecoration(
-                    border: Border.all(color: theme.disabledColor, width: 0.5)),
+                  border: Border.all(color: theme.disabledColor, width: 0.5),
+                ),
                 height: height,
                 color: widget.unansweredColor,
               );

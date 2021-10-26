@@ -15,7 +15,8 @@ class QuestionnaireResponseFiller extends StatefulWidget {
       : super(key: ValueKey<String>(itemModel.linkId));
 
   factory QuestionnaireResponseFiller.fromQuestionnaireItemFiller(
-      QuestionnaireItemFiller itemFiller) {
+    QuestionnaireItemFiller itemFiller,
+  ) {
     return QuestionnaireResponseFiller._(itemFiller, itemFiller.itemModel);
   }
 
@@ -25,7 +26,7 @@ class QuestionnaireResponseFiller extends StatefulWidget {
 
 class QuestionnaireResponseFillerState
     extends State<QuestionnaireResponseFiller> {
-  late final List<QuestionnaireAnswerFiller> _answerFillers;
+  List<QuestionnaireAnswerFiller> _answerFillers = [];
   late final ResponseModel responseModel;
 
   late final FocusNode _skipSwitchFocusNode;
@@ -41,13 +42,11 @@ class QuestionnaireResponseFillerState
     responseModel = widget.itemModel.responseModel;
 
     _skipSwitchFocusNode = FocusNode(
-        skipTraversal: true,
-        debugLabel: 'SkipSwitch ${widget.itemModel.linkId}');
+      skipTraversal: true,
+      debugLabel: 'SkipSwitch ${widget.itemModel.linkId}',
+    );
 
-    // TODO: Enhancement: Allow repeats = true for other kinds of items
-    // This assumes that all answers are of the same kind
-    // and repeats = true is only supported for choice items
-    _answerFillers = [questionnaireTheme.createAnswerFiller(this, 0)];
+    _createAnswerFillers();
   }
 
   @override
@@ -56,13 +55,30 @@ class QuestionnaireResponseFillerState
     super.dispose();
   }
 
+  void _createAnswerFillers() {
+    // OPTIMIZE: Reuse existing fillers
+    _answerFillers = List.generate(
+      responseModel.numberOfAnswers,
+      (index) => questionnaireTheme.createAnswerFiller(this, index),
+    );
+  }
+
   void onAnswered(
-      List<QuestionnaireResponseAnswer?>? answers, int answerIndex) {
+    List<QuestionnaireResponseAnswer?>? answers,
+    int answerIndex,
+  ) {
     // TODO: Should the responsemodel be updated in model code and then
     // setState() be invoked afterwards?
     if (mounted) {
       setState(() {
-        responseModel.answers = answers ?? [];
+        if (responseModel.itemModel.questionnaireItem.type ==
+                QuestionnaireItemType.choice ||
+            responseModel.itemModel.questionnaireItem.type ==
+                QuestionnaireItemType.open_choice) {
+          responseModel.answers = answers ?? [];
+        } else {
+          responseModel.answers[answerIndex] = answers?.firstOrNull;
+        }
         // This assumes all answers having the same dataAbsentReason.
         final newDataAbsentReason =
             answers?.firstOrNull?.extension_?.dataAbsentReason;
@@ -90,23 +106,49 @@ class QuestionnaireResponseFillerState
     final canSkipQuestions = questionnaireTheme.canSkipQuestions;
 
     // TODO(tiloc) show a list of answers, and buttons to add/remove if repeat
-    return Column(mainAxisSize: MainAxisSize.min, children: [
-      if (!responseModel.isAskedButDeclined) ..._answerFillers,
-      if (canSkipQuestions &&
-          !widget.itemModel.isReadOnly &&
-          !widget.itemModel.isRequired)
-        Row(children: [
-          Text(FDashLocalizations.of(context)
-              .dataAbsentReasonAskedDeclinedInputLabel),
-          Switch(
-            focusNode: _skipSwitchFocusNode,
-            value: responseModel.isAskedButDeclined,
-            onChanged: (bool value) {
-              _setDataAbsentReason(
-                  value ? dataAbsentReasonAskedButDeclinedCode : null);
-            },
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (!responseModel.isAskedButDeclined) ..._answerFillers,
+        if (widget.itemModel.isRepeating &&
+            widget.itemModel.questionnaireModel.responseStatus ==
+                QuestionnaireResponseStatus.in_progress)
+          questionnaireTheme.buildAddRepetition(
+            context,
+            this,
+            (!responseModel
+                    .answerModel(responseModel.numberOfAnswers - 1)
+                    .isUnanswered)
+                ? () {
+                    setState(() {
+                      responseModel.addAnswerModel();
+                      _createAnswerFillers();
+                    });
+                  }
+                : null,
+          ),
+        if (canSkipQuestions &&
+            !widget.itemModel.isReadOnly &&
+            !widget.itemModel.isRequired)
+          Row(
+            children: [
+              Text(
+                FDashLocalizations.of(context)
+                    .dataAbsentReasonAskedDeclinedInputLabel,
+              ),
+              Switch(
+                focusNode: _skipSwitchFocusNode,
+                value: responseModel.isAskedButDeclined,
+                onChanged: (bool value) {
+                  _setDataAbsentReason(
+                    value ? dataAbsentReasonAskedButDeclinedCode : null,
+                  );
+                },
+              )
+            ],
           )
-        ])
-    ]);
+      ],
+    );
   }
 }

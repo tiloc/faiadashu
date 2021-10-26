@@ -5,14 +5,18 @@ import '../../../../../fhir_types/fhir_types.dart';
 import '../../../../../l10n/l10n.dart';
 import '../../../../model/model.dart';
 
+enum StringAnswerKeyboard { plain, email, phone, number, multiline, url }
+
 /// Models string answers, incl. URLs.
 class StringAnswerModel extends AnswerModel<String, String> {
   static final _urlRegExp = RegExp(
-      r'^(http|https|ftp|sftp)://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+');
+    r'^(http|https|ftp|sftp)://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',
+  );
 
   late final RegExp? regExp;
   late final int minLength;
   late final int? maxLength;
+  late final StringAnswerKeyboard keyboard;
 
   StringAnswerModel(ResponseModel responseModel, int answerIndex)
       : super(responseModel, answerIndex) {
@@ -25,12 +29,32 @@ class StringAnswerModel extends AnswerModel<String, String> {
 
     minLength = qi.extension_
             ?.extensionOrNull(
-                'http://hl7.org/fhir/StructureDefinition/minLength')
+              'http://hl7.org/fhir/StructureDefinition/minLength',
+            )
             ?.valueInteger
             ?.value ??
         0;
 
     maxLength = qi.maxLength?.value;
+
+    final keyboardExtension = qi.extension_
+        ?.extensionOrNull(
+          'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-keyboard',
+        )
+        ?.valueCode
+        ?.value;
+
+    keyboard = (qi.type == QuestionnaireItemType.text)
+        ? StringAnswerKeyboard.multiline
+        : (qi.type == QuestionnaireItemType.url)
+            ? StringAnswerKeyboard.url
+            : (keyboardExtension == 'email')
+                ? StringAnswerKeyboard.email
+                : (keyboardExtension == 'phone')
+                    ? StringAnswerKeyboard.phone
+                    : (keyboardExtension == 'number')
+                        ? StringAnswerKeyboard.number
+                        : StringAnswerKeyboard.plain;
 
     value = answer?.valueString;
   }
@@ -78,17 +102,22 @@ class StringAnswerModel extends AnswerModel<String, String> {
     final dataAbsentReasonExtension = !valid
         ? [
             FhirExtension(
-                url: dataAbsentReasonExtensionUrl,
-                valueCode: dataAbsentReasonAsTextCode)
+              url: dataAbsentReasonExtensionUrl,
+              valueCode: dataAbsentReasonAsTextCode,
+            )
           ]
         : null;
 
     return (value != null && value!.isNotEmpty)
         ? (qi.type != QuestionnaireItemType.url)
             ? QuestionnaireResponseAnswer(
-                valueString: value, extension_: dataAbsentReasonExtension)
+                valueString: value,
+                extension_: dataAbsentReasonExtension,
+              )
             : QuestionnaireResponseAnswer(
-                valueUri: FhirUri(value), extension_: dataAbsentReasonExtension)
+                valueUri: FhirUri(value),
+                extension_: dataAbsentReasonExtension,
+              )
         : null;
   }
 
@@ -98,11 +127,26 @@ class StringAnswerModel extends AnswerModel<String, String> {
     if (valid == null) {
       return null;
     } else {
-      return QuestionnaireErrorFlag(responseModel.itemModel.linkId,
-          answerIndex: answerIndex, errorText: valid);
+      return QuestionnaireErrorFlag(
+        responseModel.itemModel.linkId,
+        answerIndex: answerIndex,
+        errorText: valid,
+      );
     }
   }
 
   @override
   bool get isUnanswered => (value == null) || value!.trim().isEmpty;
+
+  @override
+  void populateFromExpression(dynamic evaluationResult) {
+    if (evaluationResult == null) {
+      value = null;
+      return;
+    }
+
+    value = evaluationResult as String?;
+
+    responseModel.answers[answerIndex] = filledAnswer;
+  }
 }

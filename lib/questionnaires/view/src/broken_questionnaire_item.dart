@@ -12,9 +12,12 @@ class BrokenQuestionnaireItem extends StatelessWidget {
   final Object? element;
   final Object? cause;
 
-  const BrokenQuestionnaireItem(this.message, this.element, this.cause,
-      {Key? key})
-      : super(key: key);
+  const BrokenQuestionnaireItem(
+    this.message,
+    this.element,
+    this.cause, {
+    Key? key,
+  }) : super(key: key);
 
   /// Construct the item from an exception.
   /// Special support for [QuestionnaireFormatException].
@@ -40,20 +43,26 @@ class BrokenQuestionnaireItem extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (cause != null)
-              SelectableText(cause.toString(),
-                  style: Theme.of(context).textTheme.headline6?.copyWith(
-                        color: Theme.of(context).cardColor,
-                      )),
-            SelectableText(message,
-                style: Theme.of(context).textTheme.subtitle1?.copyWith(
-                      color: Colors.yellow,
-                    )),
+              SelectableText(
+                cause.toString(),
+                style: Theme.of(context).textTheme.headline6?.copyWith(
+                      color: Theme.of(context).cardColor,
+                    ),
+              ),
+            SelectableText(
+              message,
+              style: Theme.of(context).textTheme.subtitle1?.copyWith(
+                    color: Colors.yellow,
+                  ),
+            ),
             if (element != null)
-              SelectableText((element is Resource)
-                  ? jsonEncode((element! as Resource).toJson())
-                  : (element is QuestionnaireItem)
-                      ? jsonEncode((element! as QuestionnaireItem).toJson())
-                      : element.toString())
+              SelectableText(
+                (element is Resource)
+                    ? jsonEncode((element! as Resource).toJson())
+                    : (element is QuestionnaireItem)
+                        ? jsonEncode((element! as QuestionnaireItem).toJson())
+                        : element.toString(),
+              )
           ],
         ),
       ),

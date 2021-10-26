@@ -33,11 +33,12 @@ class _ProgressPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     canvas.drawArc(
-        const Offset(0, 0) & Size(radius - strokeWidth, radius - strokeWidth),
-        0,
-        2 * pi,
-        false,
-        _inactive);
+      Offset.zero & Size(radius - strokeWidth, radius - strokeWidth),
+      0,
+      2 * pi,
+      false,
+      _inactive,
+    );
 
     final paint = Paint()
       ..color = Colors.pink
@@ -50,12 +51,12 @@ class _ProgressPainter extends CustomPainter {
       final sweepColor = colors.elementAt(i);
       if (sweepColor != null) {
         canvas.drawArc(
-            const Offset(0, 0) &
-                Size(radius - strokeWidth, radius - strokeWidth),
-            i * sweepAngle,
-            sweepAngle,
-            false,
-            paint);
+          Offset.zero & Size(radius - strokeWidth, radius - strokeWidth),
+          i * sweepAngle,
+          sweepAngle,
+          false,
+          paint,
+        );
       }
     }
   }
@@ -99,13 +100,15 @@ class _QuestionnaireFillerCircularProgressState
       width: radius,
       height: radius,
       child: CustomPaint(
-        painter: _ProgressPainter(radius,
-            colors: _questionnaireItemModel
-                .orderedQuestionnaireItemModels()
-                .where((qim) => qim.isAnswerable)
-                .map<Color?>((qim) {
-              return qim.isAnswered ? Colors.green : null;
-            }).toList(growable: false)),
+        painter: _ProgressPainter(
+          radius,
+          colors: _questionnaireItemModel
+              .orderedQuestionnaireItemModels()
+              .where((qim) => qim.isAnswerable)
+              .map<Color?>((qim) {
+            return qim.isAnswered ? Colors.green : null;
+          }).toList(growable: false),
+        ),
       ),
     );
   }

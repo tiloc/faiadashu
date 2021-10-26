@@ -253,20 +253,18 @@
             {
               "url": "http://hl7.org/fhir/StructureDefinition/entryFormat",
               "valueString": "MM/DD/YYYY"
-            }
-          ],
-          "linkId": "1.6",
-          "text": "Birth Date (MM/DD/YYYY)",
-          "type": "date",
-          "required": true,
-          "extension" : [
+            },
             {
               "url" : "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-itemImage",
               "valueAttachment" : {
                 "url" : "http://example.org/images/calendar.png"
               }
             }
-          ]
+          ],
+          "linkId": "1.6",
+          "text": "Birth Date (MM/DD/YYYY)",
+          "type": "date",
+          "required": true
         },
         {
           "extension": [

@@ -2,8 +2,8 @@ name: faiadashu_example
 description: Example app for Faiadashu™
 
 environment:
-  sdk: '>=2.12.0 <3.0.0'
-  flutter: '>=2.0.0'
+  sdk: '>=2.14.0 <3.0.0'
+  flutter: '>=2.5.0'
 
 dependencies:
   collection: ^1.15.0
@@ -14,10 +14,10 @@ dependencies:
   faiadashu_online:
     path: ../faiadashu_online
 
-  fhir: ^0.4.7
+  fhir: ^0.5.0-4
 #  fhir:
 #    path: /Users/tilo/Projects/fhir/fhir
-  fhir_auth: ^0.4.0
+  fhir_auth: ^0.4.1
 
   flutter:
     sdk: flutter
@@ -28,10 +28,15 @@ dependencies:
 
   logging: ^1.0.1
 
-  pedantic: ^1.11.0
+  simple_html_css: ^3.0.1
 
 dev_dependencies:
-  lint: ^1.0.0
+  lint: ^1.7.2
+
+# Remove this when fhir_auth no longer depends on old fhir
+dependency_overrides:
+  fhir: ^0.5.0-4
+  freezed_annotation: ^0.15.0
 
 flutter:
   uses-material-design: true
@@ -42,7 +47,3 @@ flutter:
     - assets/codesystems/
     - assets/responses/
     - assets/images/
-
-
-
-

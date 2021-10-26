@@ -22,24 +22,27 @@ class QuestionnaireFiller extends StatefulWidget {
   final QuestionnaireTheme questionnaireTheme;
 
   final FhirResourceProvider fhirResourceProvider;
+  final LaunchContext launchContext;
 
   Future<QuestionnaireModel> _createQuestionnaireModel() async =>
       QuestionnaireModel.fromFhirResourceBundle(
-          locale: locale,
-          aggregators: aggregators,
-          fhirResourceProvider: fhirResourceProvider);
+        locale: locale,
+        aggregators: aggregators,
+        fhirResourceProvider: fhirResourceProvider,
+        launchContext: launchContext,
+      );
 
-  const QuestionnaireFiller(
-      {Key? key,
-      required this.locale,
-      required this.builder,
-      required this.fhirResourceProvider,
-      this.aggregators,
-      this.onDataAvailable,
-      this.onLinkTap,
-      QuestionnaireTheme? questionnaireTheme})
-      : questionnaireTheme = questionnaireTheme ?? const QuestionnaireTheme(),
-        super(key: key);
+  const QuestionnaireFiller({
+    Key? key,
+    required this.locale,
+    required this.builder,
+    required this.fhirResourceProvider,
+    required this.launchContext,
+    this.aggregators,
+    this.onDataAvailable,
+    this.onLinkTap,
+    this.questionnaireTheme = const QuestionnaireTheme(),
+  }) : super(key: key);
 
   static QuestionnaireFillerData of(BuildContext context) {
     final result =
@@ -91,52 +94,55 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
   Widget build(BuildContext context) {
     _logger.trace('Enter build()');
     return FutureBuilder<QuestionnaireModel>(
-        future: builderFuture,
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.active:
-              // This should never happen in our use-case (is for streaming)
-              _logger.warn('FutureBuilder is active...');
+      future: builderFuture,
+      builder: (context, snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.active:
+            // This should never happen in our use-case (is for streaming)
+            _logger.warn('FutureBuilder is active...');
+            return QuestionnaireLoadingIndicator(snapshot);
+          case ConnectionState.none:
+            return QuestionnaireLoadingIndicator(snapshot);
+          case ConnectionState.waiting:
+            _logger.debug('FutureBuilder still waiting for data...');
+            return QuestionnaireLoadingIndicator(snapshot);
+          case ConnectionState.done:
+            if (snapshot.hasError) {
+              _logger.warn('FutureBuilder hasError', error: snapshot.error);
               return QuestionnaireLoadingIndicator(snapshot);
-            case ConnectionState.none:
-              return QuestionnaireLoadingIndicator(snapshot);
-            case ConnectionState.waiting:
-              _logger.debug('FutureBuilder still waiting for data...');
-              return QuestionnaireLoadingIndicator(snapshot);
-            case ConnectionState.done:
-              if (snapshot.hasError) {
-                _logger.warn('FutureBuilder hasError');
-                return QuestionnaireLoadingIndicator(snapshot);
-              }
-              if (snapshot.hasData) {
-                _logger.debug('FutureBuilder hasData');
-                _questionnaireModel = snapshot.data;
-                // OPTIMIZE: There has got to be a more elegant way? Goal is to register the listener exactly once, after the future has completed.
-                if (_onQuestionnaireModelChangeListenerFunction == null) {
-                  _onQuestionnaireModelChangeListenerFunction =
-                      () => _onQuestionnaireModelChange();
-                  _questionnaireModel!.addListener(
-                      _onQuestionnaireModelChangeListenerFunction!);
+            }
+            if (snapshot.hasData) {
+              _logger.debug('FutureBuilder hasData');
+              _questionnaireModel = snapshot.data;
+              // OPTIMIZE: There has got to be a more elegant way? Goal is to register the listener exactly once, after the future has completed.
+              if (_onQuestionnaireModelChangeListenerFunction == null) {
+                _onQuestionnaireModelChangeListenerFunction =
+                    () => _onQuestionnaireModelChange();
+                _questionnaireModel!.addListener(
+                  _onQuestionnaireModelChangeListenerFunction!,
+                );
 
-                  _questionnaireFillerData = QuestionnaireFillerData._(
-                    _questionnaireModel!,
-                    locale: widget.locale,
-                    builder: widget.builder,
-                    onLinkTap: widget.onLinkTap,
-                    onDataAvailable: widget.onDataAvailable,
-                    questionnaireTheme: widget.questionnaireTheme,
-                  );
-                }
-                return _questionnaireFillerData;
+                _questionnaireFillerData = QuestionnaireFillerData._(
+                  _questionnaireModel!,
+                  locale: widget.locale,
+                  builder: widget.builder,
+                  onLinkTap: widget.onLinkTap,
+                  onDataAvailable: widget.onDataAvailable,
+                  questionnaireTheme: widget.questionnaireTheme,
+                );
               }
-              throw StateError(
-                  'FutureBuilder snapshot has unexpected state: $snapshot');
-          }
-        });
+              return _questionnaireFillerData;
+            }
+            throw StateError(
+              'FutureBuilder snapshot has unexpected state: $snapshot',
+            );
+        }
+      },
+    );
   }
 }
 
-// OPTIMIZE: Is there any benefit in making this an InheritedNotifier, listening to the QuestionnaireModel?
+// OPTIMIZE: Would there be any benefit in making this an InheritedNotifier, listening to the QuestionnaireModel?
 
 class QuestionnaireFillerData extends InheritedWidget {
   static final _logger = Logger(QuestionnaireFillerData);
@@ -163,7 +169,9 @@ class QuestionnaireFillerData extends InheritedWidget {
         questionnaireItemModels =
             questionnaireModel.orderedQuestionnaireItemModels(),
         _itemFillers = List<QuestionnaireItemFiller?>.filled(
-            questionnaireModel.orderedQuestionnaireItemModels().length, null),
+          questionnaireModel.orderedQuestionnaireItemModels().length,
+          null,
+        ),
         super(key: key, child: Builder(builder: builder)) {
     _logger.trace('constructor _');
     onDataAvailable?.call(questionnaireModel);
@@ -176,7 +184,8 @@ class QuestionnaireFillerData extends InheritedWidget {
 
   /// INTERNAL USE ONLY: Unregister a [QuestionnaireItemFillerState].
   void unregisterQuestionnaireItemFillerState(
-      QuestionnaireItemFillerState qifs) {
+    QuestionnaireItemFillerState qifs,
+  ) {
     _itemFillerStates.remove(_indexOfLinkId(qifs.linkId));
   }
 
@@ -212,9 +221,12 @@ class QuestionnaireFillerData extends InheritedWidget {
     if (_itemFillers[index] == null) {
       _logger.debug('itemFillerAt $index will be created.');
       _itemFillers[index] = questionnaireTheme.createQuestionnaireItemFiller(
-          this, index,
-          key: ValueKey<String>(
-              'item-filler-${questionnaireItemModels.elementAt(index).linkId}'));
+        this,
+        index,
+        key: ValueKey<String>(
+          'item-filler-${questionnaireItemModels.elementAt(index).linkId}',
+        ),
+      );
     } else {
       _logger.debug('itemFillerAt $index already exists.');
     }

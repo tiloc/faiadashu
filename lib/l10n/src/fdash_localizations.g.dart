@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_escaping_inner_quotes
+// ignore_for_file: avoid_escaping_inner_quotes, unnecessary_brace_in_string_interps, unnecessary_string_escapes
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -330,6 +330,18 @@ abstract class FDashLocalizations {
   /// In en, this message translates to:
   /// **'Total Score'**
   String get aggregationTotalScoreTitle;
+
+  /// No description provided for @fillerOpenCodingOtherLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get fillerOpenCodingOtherLabel;
+
+  /// No description provided for @fillerAddAnotherItemLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Add another \"{itemLabel}\"'**
+  String fillerAddAnotherItemLabel(Object itemLabel);
 }
 
 class _FDashLocalizationsDelegate
@@ -351,7 +363,7 @@ class _FDashLocalizationsDelegate
 }
 
 FDashLocalizations lookupFDashLocalizations(Locale locale) {
-// Lookup logic when only language code is specified.
+  // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
     case 'ar':
       return FDashLocalizationsAr();

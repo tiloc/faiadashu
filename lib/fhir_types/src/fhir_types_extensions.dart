@@ -91,8 +91,11 @@ extension FDashDecimalExtension on Decimal {
 }
 
 extension FDashQuantityExtension on Quantity {
-  String format(Locale locale,
-      {String defaultText = '', String unknownValueText = '?'}) {
+  String format(
+    Locale locale, {
+    String defaultText = '',
+    String unknownValueText = '?',
+  }) {
     if (value == null) {
       if (unit == null) {
         return defaultText;
@@ -144,14 +147,16 @@ extension FDashCodingExtension on Coding {
   String localizedDisplay(Locale locale) {
     // TODO: Carve this out to be used in other places (titles).
     final translationExtension = displayElement?.extension_?.firstWhereOrNull(
-        (transExt) =>
-            transExt.url ==
-                FhirUri(
-                    'http://hl7.org/fhir/StructureDefinition/translation') &&
-            transExt.extension_?.firstWhereOrNull((ext) =>
+      (transExt) =>
+          transExt.url ==
+              FhirUri('http://hl7.org/fhir/StructureDefinition/translation') &&
+          transExt.extension_?.firstWhereOrNull(
+                (ext) =>
                     (ext.url == FhirUri('lang')) &&
-                    (ext.valueCode?.value == locale.languageCode)) !=
-                null);
+                    (ext.valueCode?.value == locale.languageCode),
+              ) !=
+              null,
+    );
 
     if (translationExtension != null) {
       final contentString = translationExtension.extension_
@@ -183,9 +188,11 @@ extension FDashCodeableConceptExtension on CodeableConcept {
   }
 
   bool containsCoding(String? system, String code) {
-    return coding?.firstWhereOrNull((_coding) =>
-            (_coding.code?.toString() == code) &&
-            (_coding.system?.toString() == system)) !=
+    return coding?.firstWhereOrNull(
+          (_coding) =>
+              (_coding.code?.toString() == code) &&
+              (_coding.system?.toString() == system),
+        ) !=
         null;
   }
 }
@@ -233,8 +240,11 @@ extension FDashListFhirExtensionExtension on List<FhirExtension> {
       });
       return (index != -1) ? removeAt(index) : null;
     } else {
-      throw ArgumentError.value(key, 'key',
-          'Only FhirExtension, String and FhirUri are supported as key.');
+      throw ArgumentError.value(
+        key,
+        'key',
+        'Only FhirExtension, String and FhirUri are supported as key.',
+      );
     }
   }
 
@@ -269,7 +279,10 @@ extension FDashListFhirExtensionExtension on List<FhirExtension> {
       });
     } else {
       throw ArgumentError.value(
-          key, 'key', 'Only String and FhirUri are supported as key.');
+        key,
+        'key',
+        'Only String and FhirUri are supported as key.',
+      );
     }
   }
 }

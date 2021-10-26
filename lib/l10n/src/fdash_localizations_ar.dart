@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_escaping_inner_quotes
+// ignore_for_file: avoid_escaping_inner_quotes, unnecessary_brace_in_string_interps, unnecessary_string_escapes
 
 import 'package:intl/intl.dart' as intl;
 import 'fdash_localizations.g.dart';
@@ -155,4 +155,12 @@ class FDashLocalizationsAr extends FDashLocalizations {
 
   @override
   String get aggregationTotalScoreTitle => 'Total Score';
+
+  @override
+  String get fillerOpenCodingOtherLabel => 'Other';
+
+  @override
+  String fillerAddAnotherItemLabel(Object itemLabel) {
+    return 'Add another \"$itemLabel\"';
+  }
 }

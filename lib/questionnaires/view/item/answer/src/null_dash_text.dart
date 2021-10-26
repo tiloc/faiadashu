@@ -8,9 +8,10 @@ class NullDashText extends StatelessWidget {
     return Text(
       '   ',
       style: Theme.of(context).textTheme.bodyText2?.copyWith(
-          decoration: TextDecoration.lineThrough,
-          color:
-              Theme.of(context).textTheme.bodyText1!.color!.withOpacity(0.54)),
+            decoration: TextDecoration.lineThrough,
+            color:
+                Theme.of(context).textTheme.bodyText1!.color!.withOpacity(0.54),
+          ),
     );
   }
 }

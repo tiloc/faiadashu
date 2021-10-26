@@ -10,6 +10,6 @@ mkdir -p doc/png
 #nomnoml -i doc/nomnoml/classes-all.noml -o doc/png/classes-all.png
 #open doc/png/classes-all.png
 
-dart run ../dcdg.dart/bin/dcdg.dart --package=`dirname $0`/.. --verbose --exclude-private=all --exclude="^fhir" --exclude="^flutter" > build/doc/plantuml/classes-all.puml
+dart run ../dcdg.dart/bin/dcdg.dart --package="$(dirname "$0")/.." --verbose --exclude-private=all --exclude="^fhir" --exclude="^flutter" > build/doc/plantuml/classes-all.puml
 plantuml -i build/doc/plantuml/classes-all.puml -o ../../../doc/png/classes-all.png
 open doc/png/classes-all.png

@@ -59,10 +59,14 @@ class _QuestionnaireCompleteButtonState
       label:
           (QuestionnaireFiller.of(context).questionnaireModel.responseStatus !=
                   QuestionnaireResponseStatus.completed)
-              ? Text(FDashLocalizations.of(context)
-                  .responseStatusToCompleteButtonLabel)
-              : Text(FDashLocalizations.of(context)
-                  .responseStatusToInProgressButtonLabel),
+              ? Text(
+                  FDashLocalizations.of(context)
+                      .responseStatusToCompleteButtonLabel,
+                )
+              : Text(
+                  FDashLocalizations.of(context)
+                      .responseStatusToInProgressButtonLabel,
+                ),
     );
   }
 }

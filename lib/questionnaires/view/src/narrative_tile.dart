@@ -40,13 +40,14 @@ class _NarrativeTileState extends State<NarrativeTile> {
         child: SingleChildScrollView(
           controller: _narrativeScrollController,
           child: HTML.toRichText(
-              context,
-              questionnaireModel
-                      .aggregator<NarrativeAggregator>()
-                      .aggregate()
-                      ?.div ??
-                  NarrativeAggregator.emptyNarrative.div,
-              defaultTextStyle: Theme.of(context).textTheme.bodyText1),
+            context,
+            questionnaireModel
+                    .aggregator<NarrativeAggregator>()
+                    .aggregate()
+                    ?.div ??
+                NarrativeAggregator.emptyNarrative.div,
+            defaultTextStyle: Theme.of(context).textTheme.bodyText1,
+          ),
         ),
       ),
     );

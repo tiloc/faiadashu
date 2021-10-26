@@ -6,15 +6,16 @@ import '../../../../questionnaires.dart';
 
 /// Filler for an individual [QuestionnaireResponseAnswer].
 abstract class QuestionnaireAnswerFiller extends StatefulWidget {
-//  static final _logger = Logger(QuestionnaireAnswerFiller);
   final QuestionnaireResponseFillerState responseFillerState;
   final int answerIndex;
   final QuestionnaireItemModel itemModel;
   final QuestionnaireTheme questionnaireTheme;
 
-  QuestionnaireAnswerFiller(this.responseFillerState, this.answerIndex,
-      {Key? key})
-      : itemModel = responseFillerState.responseModel.itemModel,
+  QuestionnaireAnswerFiller(
+    this.responseFillerState,
+    this.answerIndex, {
+    Key? key,
+  })  : itemModel = responseFillerState.responseModel.itemModel,
         questionnaireTheme = responseFillerState
             .widget.itemFiller.questionnaireFiller.questionnaireTheme,
         super(key: key);
@@ -52,15 +53,17 @@ abstract class QuestionnaireAnswerFillerState<
       answerModelError = null;
 
       firstFocusNode = FocusNode(
-          debugLabel:
-              'AnswerFiller firstFocusNode: ${widget.itemModel.linkId}');
+        debugLabel: 'AnswerFiller firstFocusNode: ${widget.itemModel.linkId}',
+      );
 
       widget.itemModel.questionnaireModel.addListener(_forceRebuild);
 
       postInitState();
     } catch (exception) {
-      _abstractLogger.warn('Could not initialize model for ${itemModel.linkId}',
-          error: exception);
+      _abstractLogger.warn(
+        'Could not initialize model for ${itemModel.linkId}',
+        error: exception,
+      );
       answerModelError = exception;
     }
   }
@@ -126,7 +129,9 @@ abstract class QuestionnaireAnswerFillerState<
 
       if (answerModel.hasCodingAnswers) {
         widget.responseFillerState.onAnswered(
-            answerModel.filledCodingAnswers, answerModel.answerIndex);
+          answerModel.filledCodingAnswers,
+          answerModel.answerIndex,
+        );
       } else {
         widget.responseFillerState
             .onAnswered([answerModel.filledAnswer], answerModel.answerIndex);

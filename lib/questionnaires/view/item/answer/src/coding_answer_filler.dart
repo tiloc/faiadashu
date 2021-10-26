@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:faiadashu/faiadashu.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
@@ -12,9 +13,10 @@ import '../../../../questionnaires.dart';
 /// Future R5 releases of the FHIR standard will likely have a `coding` item type.
 class CodingAnswerFiller extends QuestionnaireAnswerFiller {
   CodingAnswerFiller(
-      QuestionnaireResponseFillerState responseFillerState, int answerIndex,
-      {Key? key})
-      : super(responseFillerState, answerIndex, key: key);
+    QuestionnaireResponseFillerState responseFillerState,
+    int answerIndex, {
+    Key? key,
+  }) : super(responseFillerState, answerIndex, key: key);
   @override
   State<StatefulWidget> createState() => _CodingAnswerState();
 }
@@ -62,33 +64,36 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
       if (isShowingNull) {
         choices.add(
           RadioListTile<String?>(
-              title: const NullDashText(),
-              value: null,
-              groupValue: answerModel.toChoiceString(value),
-              onChanged: (answerModel.isEnabled)
-                  ? (String? newValue) {
-                      value = answerModel.fromChoiceString(newValue);
-                    }
-                  : null),
+            title: const NullDashText(),
+            value: null,
+            groupValue: answerModel.toChoiceString(value),
+            onChanged: (answerModel.isEnabled)
+                ? (String? newValue) {
+                    value = answerModel.fromChoiceString(newValue);
+                  }
+                : null,
+          ),
         );
       }
     }
     for (final choice in answerModel.answerOptions.values) {
       final optionPrefix = choice.extension_
           ?.extensionOrNull(
-              'http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix')
+            'http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix',
+          )
           ?.valueString;
       final optionPrefixDisplay =
           (optionPrefix != null) ? '$optionPrefix ' : '';
       final optionTitle =
           '$optionPrefixDisplay${choice.localizedDisplay(locale)}';
       final styledOptionTitle = Xhtml.toWidget(
-          context,
-          answerModel.questionnaireModel,
-          optionTitle,
-          choice.valueStringElement?.extension_,
-          width: 100,
-          height: 100);
+        context,
+        answerModel.questionnaireModel,
+        optionTitle,
+        choice.valueStringElement?.extension_,
+        width: 100,
+        height: 100,
+      );
 
       choices.add(
         isMultipleChoice
@@ -98,8 +103,10 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
                       title: styledOptionTitle,
                       groupValue: choice.optionCode,
                       value: value?.coding
-                              ?.firstWhereOrNull((coding) =>
-                                  coding.code?.value == choice.optionCode)
+                              ?.firstWhereOrNull(
+                                (coding) =>
+                                    coding.code?.value == choice.optionCode,
+                              )
                               ?.code
                               ?.value ??
                           '',
@@ -107,7 +114,9 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
                           ? (_) {
                               Focus.of(context).requestFocus();
                               final newValue = answerModel.toggleValue(
-                                  value, choice.optionCode);
+                                value,
+                                choice.optionCode,
+                              );
                               _errorText = answerModel.validateInput(newValue);
                               value = newValue;
                             }
@@ -116,34 +125,38 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
                   )
                 : Focus(
                     child: CheckboxListTile(
-                        title: styledOptionTitle,
-                        value: value?.coding?.firstWhereOrNull((coding) =>
-                                coding.code?.value == choice.optionCode) !=
-                            null,
-                        onChanged: (answerModel.isEnabled)
-                            ? (bool? newValue) {
-                                Focus.of(context).requestFocus();
-                                final newValue = answerModel.toggleValue(
-                                    value, choice.optionCode);
-                                _errorText =
-                                    answerModel.validateInput(newValue);
-                                value = newValue;
-                              }
-                            : null),
+                      title: styledOptionTitle,
+                      value: value?.coding?.firstWhereOrNull(
+                            (coding) => coding.code?.value == choice.optionCode,
+                          ) !=
+                          null,
+                      onChanged: (answerModel.isEnabled)
+                          ? (bool? newValue) {
+                              Focus.of(context).requestFocus();
+                              final newValue = answerModel.toggleValue(
+                                value,
+                                choice.optionCode,
+                              );
+                              _errorText = answerModel.validateInput(newValue);
+                              value = newValue;
+                            }
+                          : null,
+                    ),
                   )
             : Focus(
                 child: RadioListTile<String>(
-                    title: styledOptionTitle,
-                    value: choice.optionCode,
-                    // allows value to be set to null on repeat tap
-                    toggleable: true,
-                    groupValue: answerModel.toChoiceString(value),
-                    onChanged: (answerModel.isEnabled)
-                        ? (String? newValue) {
-                            Focus.of(context).requestFocus();
-                            value = answerModel.fromChoiceString(newValue);
-                          }
-                        : null),
+                  title: styledOptionTitle,
+                  value: choice.optionCode,
+                  // allows value to be set to null on repeat tap
+                  toggleable: true,
+                  groupValue: answerModel.toChoiceString(value),
+                  onChanged: (answerModel.isEnabled)
+                      ? (String? newValue) {
+                          Focus.of(context).requestFocus();
+                          value = answerModel.fromChoiceString(newValue);
+                        }
+                      : null,
+                ),
               ),
       );
     }
@@ -157,9 +170,12 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
             onChanged: (answerModel.isEnabled)
                 ? (String? newValue) {
                     Focus.of(context).requestFocus();
-                    value = CodeableConcept(coding: [
-                      Coding(code: Code(CodingAnswerModel.openChoiceOther))
-                    ], text: _otherChoiceController!.text);
+                    value = CodeableConcept(
+                      coding: [
+                        Coding(code: Code(CodingAnswerModel.openChoiceOther))
+                      ],
+                      text: _otherChoiceController!.text,
+                    );
                   }
                 : null,
             title: TextFormField(
@@ -168,12 +184,16 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
               onChanged: (newText) {
                 value = (newText.isEmpty)
                     ? null
-                    : CodeableConcept(coding: [
-                        Coding(code: Code(CodingAnswerModel.openChoiceOther))
-                      ], text: _otherChoiceController!.text);
+                    : CodeableConcept(
+                        coding: [
+                          Coding(code: Code(CodingAnswerModel.openChoiceOther))
+                        ],
+                        text: _otherChoiceController!.text,
+                      );
               },
             ),
-            secondary: const Text('Other'),
+            secondary:
+                Text(FDashLocalizations.of(context).fillerOpenCodingOtherLabel),
           ),
         ),
       );
@@ -182,67 +202,73 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
     if (answerModel.isHorizontal && MediaQuery.of(context).size.width > 750) {
       // TODO: This should use LayoutBuilder
       return Column(
-          // Horizontal layout
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Focus(
-              focusNode: firstFocusNode,
-              child: Card(
-                shape: (firstFocusNode.hasFocus)
-                    ? RoundedRectangleBorder(
-                        side: BorderSide(
-                            color: Theme.of(context).colorScheme.secondary,
-                            width: 2.0),
-                        borderRadius: BorderRadius.circular(4.0))
-                    : null,
-                margin: const EdgeInsets.only(top: 8, bottom: 8),
-                child: Table(children: [TableRow(children: choices)]),
-              ),
+        // Horizontal layout
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Focus(
+            focusNode: firstFocusNode,
+            child: Card(
+              shape: (firstFocusNode.hasFocus)
+                  ? RoundedRectangleBorder(
+                      side: BorderSide(
+                        color: Theme.of(context).colorScheme.secondary,
+                        width: 2.0,
+                      ),
+                      borderRadius: BorderRadius.circular(4.0),
+                    )
+                  : null,
+              margin: const EdgeInsets.only(top: 8, bottom: 8),
+              child: Table(children: [TableRow(children: choices)]),
             ),
-            if (errorText != null)
-              Text(
-                errorText!,
-                style: Theme.of(context)
-                    .textTheme
-                    .caption!
-                    .copyWith(color: Theme.of(context).errorColor),
-              )
-          ]);
+          ),
+          if (errorText != null)
+            Text(
+              errorText!,
+              style: Theme.of(context)
+                  .textTheme
+                  .caption!
+                  .copyWith(color: Theme.of(context).errorColor),
+            )
+        ],
+      );
     } else {
       // Vertical layout
       return Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Focus(
-              focusNode: firstFocusNode,
-              child: Card(
-                shape: (firstFocusNode.hasFocus && answerModel.isEnabled)
-                    ? RoundedRectangleBorder(
-                        side: BorderSide(
-                            color: (errorText == null)
-                                ? Theme.of(context).colorScheme.secondary
-                                : Theme.of(context).colorScheme.error,
-                            width: 2.0),
-                        borderRadius: BorderRadius.circular(4.0))
-                    : null,
-                margin: const EdgeInsets.only(top: 8, bottom: 8),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: choices,
-                ),
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Focus(
+            focusNode: firstFocusNode,
+            child: Card(
+              shape: (firstFocusNode.hasFocus && answerModel.isEnabled)
+                  ? RoundedRectangleBorder(
+                      side: BorderSide(
+                        color: (errorText == null)
+                            ? Theme.of(context).colorScheme.secondary
+                            : Theme.of(context).colorScheme.error,
+                        width: 2.0,
+                      ),
+                      borderRadius: BorderRadius.circular(4.0),
+                    )
+                  : null,
+              margin: const EdgeInsets.only(top: 8, bottom: 8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: choices,
               ),
             ),
-            if (errorText != null)
-              Text(
-                errorText!,
-                style: Theme.of(context)
-                    .textTheme
-                    .caption!
-                    .copyWith(color: Theme.of(context).errorColor),
-              )
-          ]);
+          ),
+          if (errorText != null)
+            Text(
+              errorText!,
+              style: Theme.of(context)
+                  .textTheme
+                  .caption!
+                  .copyWith(color: Theme.of(context).errorColor),
+            )
+        ],
+      );
     }
   }
 

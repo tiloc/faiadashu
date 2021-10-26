@@ -9,9 +9,10 @@ class QuestionnaireLoadingIndicator extends StatelessWidget {
   final Object? detail;
   final bool hasError;
 
-  QuestionnaireLoadingIndicator(AsyncSnapshot<QuestionnaireModel> snapshot,
-      {Key? key})
-      : state = snapshot.connectionState,
+  QuestionnaireLoadingIndicator(
+    AsyncSnapshot<QuestionnaireModel> snapshot, {
+    Key? key,
+  })  : state = snapshot.connectionState,
         hasError = snapshot.hasError,
         detail = (snapshot.hasData) ? snapshot.data?.linkId : snapshot.error,
         super(key: key);
@@ -21,8 +22,10 @@ class QuestionnaireLoadingIndicator extends StatelessWidget {
     const shortAxis = 50.0;
 
     return Card(
-        color: hasError ? Colors.amber : null,
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      color: hasError ? Colors.amber : null,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
           if (hasError)
             const Icon(
               Icons.error,
@@ -30,12 +33,13 @@ class QuestionnaireLoadingIndicator extends StatelessWidget {
             )
           else
             SizedBox(
-                width: shortAxis,
-                height: shortAxis,
-                child: CircularProgressIndicator(
-                  semanticsLabel: FDashLocalizations.of(context)
-                      .progressQuestionnaireLoading,
-                )),
+              width: shortAxis,
+              height: shortAxis,
+              child: CircularProgressIndicator(
+                semanticsLabel:
+                    FDashLocalizations.of(context).progressQuestionnaireLoading,
+              ),
+            ),
           const SizedBox(
             height: 16,
           ),
@@ -44,6 +48,8 @@ class QuestionnaireLoadingIndicator extends StatelessWidget {
               detail.toString(),
               style: Theme.of(context).textTheme.subtitle1,
             ),
-        ]));
+        ],
+      ),
+    );
   }
 }

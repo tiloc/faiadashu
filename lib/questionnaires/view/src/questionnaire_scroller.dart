@@ -30,22 +30,24 @@ class QuestionnaireScroller extends StatefulWidget {
   final List<Widget>? frontMatter;
   final List<Widget>? backMatter;
   final FhirResourceProvider fhirResourceProvider;
+  final LaunchContext launchContext;
   final List<Aggregator<dynamic>>? aggregators;
   final void Function(BuildContext context, Uri url)? onLinkTap;
   final QuestionnairePageScaffoldBuilder scaffoldBuilder;
-  final QuestionnaireTheme? questionnaireTheme;
+  final QuestionnaireTheme questionnaireTheme;
 
-  const QuestionnaireScroller(
-      {this.locale,
-      required this.scaffoldBuilder,
-      required this.fhirResourceProvider,
-      this.frontMatter,
-      this.backMatter,
-      this.aggregators,
-      this.onLinkTap,
-      this.questionnaireTheme,
-      Key? key})
-      : super(key: key);
+  const QuestionnaireScroller({
+    this.locale,
+    required this.scaffoldBuilder,
+    required this.fhirResourceProvider,
+    required this.launchContext,
+    this.frontMatter,
+    this.backMatter,
+    this.aggregators,
+    this.onLinkTap,
+    this.questionnaireTheme = const QuestionnaireTheme(),
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _QuestionnaireScrollerState();
@@ -90,7 +92,8 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
   void scrollToErrorFlag(QuestionnaireErrorFlag errorFlag) {
     if (_questionnaireModel == null) {
       _logger.info(
-          'Trying to scroll before QuestionnaireModel is loaded. Ignoring.');
+        'Trying to scroll before QuestionnaireModel is loaded. Ignoring.',
+      );
       return;
     }
 
@@ -111,7 +114,8 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
   void scrollTo(int index) {
     if (!_listScrollController.isAttached) {
       _logger.info(
-          'Trying to scroll before ListScrollController is attached. Ignoring.');
+        'Trying to scroll before ListScrollController is attached. Ignoring.',
+      );
       return;
     }
 
@@ -134,11 +138,11 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
     final milliseconds = (distance < 10) ? 1000 : 1000 + (distance - 10) * 100;
 
     _listScrollController.scrollTo(
-        index: index,
-        duration: Duration(milliseconds: milliseconds),
-        curve: Curves.easeInOutCubic,
-        alignment:
-            0.3); // Scroll the item's top-edge into the top 30% of the screen.
+      index: index,
+      duration: Duration(milliseconds: milliseconds),
+      curve: Curves.easeInOutCubic,
+      alignment: 0.3,
+    ); // Scroll the item's top-edge into the top 30% of the screen.
   }
 
   @override
@@ -147,6 +151,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
 
     return QuestionnaireFiller(
       fhirResourceProvider: widget.fhirResourceProvider,
+      launchContext: widget.launchContext,
       locale: locale,
       questionnaireTheme: widget.questionnaireTheme,
       builder: (BuildContext context) {
@@ -161,7 +166,8 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
             frontMatterLength + mainMatterLength + backMatterLength;
 
         _logger.trace(
-            'Scroll position: ${_itemPositionsListener.itemPositions.value}');
+          'Scroll position: ${_itemPositionsListener.itemPositions.value}',
+        );
 
         return Localizations.override(
           context: context,
@@ -172,33 +178,34 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
               setState(fn);
             },
             child: ScrollablePositionedList.builder(
-                itemScrollController: _listScrollController,
-                itemPositionsListener: _itemPositionsListener,
-                itemCount: totalLength,
-                padding: const EdgeInsets.all(8),
-                minCacheExtent: 200, // Allow tabbing to prev/next items
-                itemBuilder: (BuildContext context, int i) {
-                  final frontMatterIndex = (i < frontMatterLength) ? i : -1;
-                  final mainMatterIndex = (i >= frontMatterLength &&
-                          i < (frontMatterLength + mainMatterLength))
-                      ? (i - frontMatterLength)
-                      : -1;
-                  final backMatterIndex =
-                      (i >= (frontMatterLength + mainMatterLength) &&
-                              i < totalLength)
-                          ? (i - (frontMatterLength + mainMatterLength))
-                          : -1;
-                  if (mainMatterIndex != -1) {
-                    return QuestionnaireFiller.of(context)
-                        .itemFillerAt(mainMatterIndex);
-                  } else if (backMatterIndex != -1) {
-                    return widget.backMatter![backMatterIndex];
-                  } else if (frontMatterIndex != -1) {
-                    return widget.frontMatter![frontMatterIndex];
-                  } else {
-                    throw StateError('ListView index out of bounds: $i');
-                  }
-                }),
+              itemScrollController: _listScrollController,
+              itemPositionsListener: _itemPositionsListener,
+              itemCount: totalLength,
+              padding: const EdgeInsets.all(8),
+              minCacheExtent: 200, // Allow tabbing to prev/next items
+              itemBuilder: (BuildContext context, int i) {
+                final frontMatterIndex = (i < frontMatterLength) ? i : -1;
+                final mainMatterIndex = (i >= frontMatterLength &&
+                        i < (frontMatterLength + mainMatterLength))
+                    ? (i - frontMatterLength)
+                    : -1;
+                final backMatterIndex =
+                    (i >= (frontMatterLength + mainMatterLength) &&
+                            i < totalLength)
+                        ? (i - (frontMatterLength + mainMatterLength))
+                        : -1;
+                if (mainMatterIndex != -1) {
+                  return QuestionnaireFiller.of(context)
+                      .itemFillerAt(mainMatterIndex);
+                } else if (backMatterIndex != -1) {
+                  return widget.backMatter![backMatterIndex];
+                } else if (frontMatterIndex != -1) {
+                  return widget.frontMatter![frontMatterIndex];
+                } else {
+                  throw StateError('ListView index out of bounds: $i');
+                }
+              },
+            ),
           ),
         );
       },
@@ -236,7 +243,8 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
         }
 
         _logger.debug(
-            'Focussing item# $_focusIndex - ${questionnaireModel.itemModelAt(_focusIndex)}');
+          'Focussing item# $_focusIndex - ${questionnaireModel.itemModelAt(_focusIndex)}',
+        );
 
         _itemPositionsListener.itemPositions
             .addListener(_initialPositionListener);
@@ -251,15 +259,17 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
         .removeListener(_initialPositionListener);
 
     _logger.trace(
-        'Scroll positions are: ${_itemPositionsListener.itemPositions.value}');
+      'Scroll positions are: ${_itemPositionsListener.itemPositions.value}',
+    );
 
     _isPositioned = true;
 
     // Item could be visible, but in an undesirable position, e.g.
     // at the bottom of the display. Make sure it is in the top third of screen.
     final isItemVisible = _itemPositionsListener.itemPositions.value.any(
-        (element) =>
-            element.index == _focusIndex && element.itemLeadingEdge < 0.35);
+      (element) =>
+          element.index == _focusIndex && element.itemLeadingEdge < 0.35,
+    );
 
     _logger.debug('Item $_focusIndex already visible: $isItemVisible');
 
@@ -283,7 +293,8 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
   /// Listens to item visibility until focus item is visible, then focuses it.
   void _focusWhileScrollingPositionListener() {
     _logger.trace(
-        'Focussing - Scroll positions are: ${_itemPositionsListener.itemPositions.value}');
+      'Focussing - Scroll positions are: ${_itemPositionsListener.itemPositions.value}',
+    );
 
     final isItemVisible = _itemPositionsListener.itemPositions.value
         .any((element) => element.index == _focusIndex);
@@ -318,31 +329,42 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
 ///
 /// Fills up the entire page, provides default navigation, help button.
 class QuestionnaireScrollerPage extends QuestionnaireScroller {
-  QuestionnaireScrollerPage(
-      {Locale? locale,
-      required FhirResourceProvider fhirResourceProvider,
-      Widget? floatingActionButton,
-      List<Widget>? persistentFooterButtons,
-      List<Widget>? frontMatter,
-      List<Widget>? backMatter = const [
-        SizedBox(
-          height: 80,
-        )
-      ],
-      List<Aggregator<dynamic>>? aggregators,
-      void Function(BuildContext context, Uri url)? onLinkTap,
-      QuestionnaireTheme? questionnaireTheme,
-      Key? key})
-      : super(
-            locale: locale,
-            scaffoldBuilder: DefaultQuestionnairePageScaffoldBuilder(
-                floatingActionButton: floatingActionButton,
-                persistentFooterButtons: persistentFooterButtons),
-            fhirResourceProvider: fhirResourceProvider,
-            frontMatter: frontMatter,
-            backMatter: backMatter,
-            aggregators: aggregators,
-            onLinkTap: onLinkTap,
-            questionnaireTheme: questionnaireTheme,
-            key: key);
+  QuestionnaireScrollerPage({
+    Locale? locale,
+    required FhirResourceProvider fhirResourceProvider,
+    required LaunchContext launchContext,
+    Widget? floatingActionButton,
+    List<Widget>? persistentFooterButtons,
+    List<Widget>? frontMatter,
+    List<Widget>? backMatter = const [
+      SizedBox(
+        height: 80,
+      )
+    ],
+    List<Aggregator<dynamic>>? aggregators,
+    void Function(BuildContext context, Uri url)? onLinkTap,
+    QuestionnaireTheme questionnaireTheme = const QuestionnaireTheme(),
+    Key? key,
+  }) : super(
+          locale: locale,
+          scaffoldBuilder: DefaultQuestionnairePageScaffoldBuilder(
+            // Progress can only be shown instead of a FAB
+            floatingActionButton: floatingActionButton ??
+                (questionnaireTheme.showProgress
+                    ? Builder(
+                        builder: (context) =>
+                            const QuestionnaireFillerCircularProgress(),
+                      )
+                    : null),
+            persistentFooterButtons: persistentFooterButtons,
+          ),
+          fhirResourceProvider: fhirResourceProvider,
+          launchContext: launchContext,
+          frontMatter: frontMatter,
+          backMatter: backMatter,
+          aggregators: aggregators,
+          onLinkTap: onLinkTap,
+          questionnaireTheme: questionnaireTheme,
+          key: key,
+        );
 }

@@ -6,25 +6,26 @@ Information on Structured Data Capture can be found here:
 * [YT Video from FHIR DevDays](https://www.youtube.com/watch?v=WPudaF4S7Bk)
 * There is a chat channel at https://chat.fhir.org stream `#questionnaire`.
 
-  
-
-
 **Click this video to watch the capabilities in action**
 
 [![Walk-through of the capabilities](https://img.youtube.com/vi/k9vEy9Z_L18/hqdefault.jpg)](https://www.youtube.com/watch?v=k9vEy9Z_L18 "Walk-through of the Capabilities")
 
-### Argonaut
-[Argonaut](http://fhir.org/guides/argonaut/questionnaire/index.html) is a subset of SDC and based on FHIR R3. The Form Filler is based on FHIR R4, which inherently makes it non-conformant
-to Argonaut. It does fill all the corresponding mandatory fields in the R4 QuestionnaireResponse.
+### Advanced Behavior
+#### Expressions
+Only expressions of type `text/fhirpath` are supported.
+> FHIRPath support in Faiadashu is *highly experimental* and uses [fhir_path](https://pub.dev/packages/fhir_path) as its
+> underlying implementation. See the [fhir_path documentation](https://pub.dev/packages/fhir_path) for capabilities and
+> limitations.
 
-### FHIR Clinical Guidelines (CPG IG)
-[CPG](http://build.fhir.org/ig/HL7/cqf-recommendations/index.html) is generally not supported by this Form Filler. 
+#### Variables
+Limited support for variables is available. 
+The general concept is described here: https://www.hl7.org/fhir/extension-variable.html
 
-It does support select extensions for visual control:
-#### itemImage
-An image to display as a visual accompaniment to the question being asked.
+Variables can only be used on the Questionnaire level.
+They are currently not supported on individual items.
 
-This extension can be applied to question items.
+Variables' `calculatedExpression` cannot refer to other variables. 
+`calculatedExpression` on items can refer to any variable, though.
 
 ### Advanced Rendering
 #### rendering-style
@@ -56,27 +57,32 @@ The filler never chooses to omit a field from display.
 #### hidden
 Supported
 
+#### shortText
+Supported
 
-### Item types: Grouping
+### Item category: Group
 #### group
 Supported, but no support for item-control.
 
-### Item types: Static display
+### Item category: Display
 ### display
 Supported for styled static output.
 
-### Item types: Questions
+### Item category: Question
 #### All types
 ##### required
 Supported. Renders a '*' after the label
 
 ##### repeats
-Only supported for `choice`
+Supported. Renders a multi-selection for items of type `choice`. Not supported for `open-choice`. 
+Renders UI elements to add/remove repeating answers for all other item types.
+
+The label of the UI element uses the `shortText` as a description for a single item.
 
 ##### readOnly
 Supported.
 
-#### enableWhen
+##### enableWhen
 Support for all behaviors: `any`, `all`
 
 Limited support for operators:
@@ -84,11 +90,19 @@ Limited support for operators:
 * `exists` on all types
 * All other operators: always return true, as to not prevent filling of the questionnaire.
 
+##### enableWhenExpression
+Supported.
+
+Reference:
+[sdc-questionnaire-enableWhenExpression](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-enableWhenExpression.html)
+
+---
 #### boolean
 Comprehensive support, incl. tri-state for "not answered"
 
 See: http://build.fhir.org/questionnaire.html#booleans for a discussion of tri-state.
 
+---
 #### quantity
 Comprehensive support.
 
@@ -106,10 +120,13 @@ Quantity requires the declaration of units. It does not support free-text entry 
 - unitValueSet
 - unit
 
+
+---
 #### decimal
 Comprehensive support.
 
-Special support for read-only display of total score.
+Special support for read-only display of total score - see [Scoring](#scoring)
+
 ##### Extensions
 - entryFormat
 - minValue
@@ -118,11 +135,13 @@ Special support for read-only display of total score.
 - questionnaire-itemControl: slider
 - sliderStepValue
 - unit
+- calculatedExpression
 
+---
 #### integer
 Comprehensive support
 
-Special support for read-only display of total score.
+Special support for read-only display of total score - see [Scoring](#scoring)
 
 Special support for 🇩🇰 Danish specification on patient feedback.
 
@@ -135,28 +154,35 @@ Special support for 🇩🇰 Danish specification on patient feedback.
 - unit
 - http://ehealth.sundhed.dk/fhir/StructureDefinition/ehealth-questionnaire-feedback
 
+---
 #### date
 Comprehensive support. Date picker with localized format.
-##### Extensions
-- sdc-questionnaire-initialExpression: only recognizes literally `today()`
 
+##### Extensions
+- (none)
+
+---
 #### dateTime
 Comprehensive support. Date/Time picker with localized format.
+
 ##### Extensions
-- sdc-questionnaire-initialExpression: only recognizes literally `today()`
+- sdc-questionnaire-initialExpression
 
 #### time
 Comprehensive support. Time picker with localized format.
 
 #### string, text 
-Comprehensive support
+Comprehensive support. Keyboard type can be hinted.
+
 ##### Extensions
 - entryFormat (use regular expressions, *not the "ANA NAN" format as seen in some examples.*)
 - minLength  
 - maxLength
 - regex  
 - questionnaire-itemControl: text-box 
+- sdc-questionnaire-keyboard: email, phone, number
 
+---
 #### choice
 Comprehensive support, incl. optionChoice and choices from ValueSets.
 Support for multiple choice (item.repeats = true) and autocomplete from ValueSets (triggered automatically by large # of choices).
@@ -181,32 +207,39 @@ See: http://build.fhir.org/questionnaire.html#valuesets
 - minOccurs
 - maxOccurs
 
+---
 #### open-choice 
 Same as `choice` with the following differences:
 - repeats is not supported
 - a single text input field labeled 'Other' is presented below the selections
 
+---
 #### url
 Supported (accepts http, https, ftp, and sftp)
 
+---
 #### attachment, reference
 Not supported
 
 
+---
 ### Scoring
-Ability to add up the ordinalValue or iso21090-CO-value of all choice questions into a total score.
+The ordinalValue or iso21090-CO-value of all choice questions can be summed up into a total score.
 
-![total_score](images/total_score.png)
-
-Total score will be entered into any field which meets one of the following:
-- has extension `sdc-questionnaire-calculatedExpression` with valueExpression.expression = `answers().sum(value.ordinal())`.
+The total score will be entered into a field which meets one of the following characteristics:
 - is readOnly and has extension `http://hl7.org/fhir/StructureDefinition/questionnaire-unit` with *display* value = `{score}`
+- has a calculatedExpression with name 'score'
 
-> The well-known [NLM Form Builder](https://lhcformbuilder.nlm.nih.gov) will set the `questionnaire-unit` extension 
+> The well-known [NLM Form Builder](https://lhcformbuilder.nlm.nih.gov) will set the `questionnaire-unit` extension
 > to `{score}`, but will not set the item to `readOnly`. Setting this manually to `true` will result in a questionnaire
 > with fully functioning scoring.
 
-**No true support for FHIRPath is provided.**
+A total score field will be visualized with a "Total Score" heading and a large number.
+
+![total_score](images/total_score.png)
+
+It will also evaluate and visualize the Danish http://ehealth.sundhed.dk/fhir/StructureDefinition/ehealth-questionnaire-feedback extension
+for patient feedback.
 
 ### Response creation
 
@@ -216,7 +249,7 @@ A canonical reference to the questionnaire will be generated, including a versio
 The optional `http://hl7.org/fhir/StructureDefinition/display` extension will be set when the questionnaire has a title.
 
 #### Status
-Status can be set to any of the supported values. Setting the status to complete does currently not have impact on items affected by enableWhen (they should be discarded).
+Status can be set to any of the supported values. Setting the status to `complete` discards items which are not enabled.
 
 #### Authored
 Will be set to the current time.
@@ -284,3 +317,18 @@ Choice answers will be marked as "user selected".
   ]
 }
 ```
+
+## Support for other Implementation Guides
+### Argonaut
+[Argonaut](http://fhir.org/guides/argonaut/questionnaire/index.html) is a subset of SDC and based on FHIR R3. The Form Filler is based on FHIR R4, which inherently makes it non-conformant
+to Argonaut. It does fill all the corresponding mandatory fields in the R4 QuestionnaireResponse.
+
+### FHIR Clinical Guidelines (CPG IG)
+[CPG](http://build.fhir.org/ig/HL7/cqf-recommendations/index.html) is generally not supported by this Form Filler.
+
+It does support select extensions for visual control:
+#### itemImage
+An image to display as a visual accompaniment to the question being asked.
+
+This extension can be applied to question items.
+
