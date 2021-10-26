@@ -332,8 +332,9 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
       unit: unitCoding?.localizedDisplay(locale),
       system: unitCoding?.system,
       code: unitCoding?.code,
-      extension_: (qi.type == QuestionnaireItemType.decimal ||
-              qi.type == QuestionnaireItemType.integer)
+      extension_: (unitCoding != null &&
+              (qi.type == QuestionnaireItemType.decimal ||
+                  qi.type == QuestionnaireItemType.integer))
           ? [
               FhirExtension(
                 url: FhirUri(

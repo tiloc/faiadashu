@@ -169,8 +169,10 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     }
 
     // Set up updates for values of questionnaire-level variables
-    questionnaireModel._updateVariables();
-    questionnaireModel.addListener(questionnaireModel._updateVariables);
+    if (questionnaireModel.hasVariables) {
+      questionnaireModel._updateVariables();
+      questionnaireModel.addListener(questionnaireModel._updateVariables);
+    }
 
     // WIP: Set up calculatedExpressions on items
     questionnaireModel._updateCalculations();

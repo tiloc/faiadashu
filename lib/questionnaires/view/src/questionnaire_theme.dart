@@ -62,7 +62,9 @@ class QuestionnaireTheme {
     try {
       final responseModel = responseFiller.responseModel;
 
-      _logger.debug('Creating AnswerFiller for ${responseModel.itemModel}');
+      _logger.debug(
+        'Creating AnswerFiller for ${responseModel.itemModel} index $answerIndex',
+      );
       final answerModel = responseModel.answerModel(answerIndex);
 
       if (responseModel.itemModel.isTotalScore) {
@@ -105,5 +107,30 @@ class QuestionnaireTheme {
   /// Used for consistent styling of all text fields in the filler.
   InputDecoration createDecoration() {
     return const InputDecoration(filled: true);
+  }
+
+  /// Returns a UI element to add another answer to a repeating item
+  ///
+  /// Will be disabled if [callback] is null.
+  Widget createAddRepetition(
+    QuestionnaireResponseFillerState responseFiller,
+    VoidCallback? callback, {
+    Key? key,
+  }) {
+    final responseModel = responseFiller.responseModel;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ElevatedButton.icon(
+          onPressed: callback,
+          key: key,
+          // TODO: Make translatable
+          label: Text('Add another "${responseModel.itemModel.titleText}"'),
+          icon: const Icon(Icons.add),
+        ),
+        const SizedBox(height: 8.0),
+      ],
+    );
   }
 }

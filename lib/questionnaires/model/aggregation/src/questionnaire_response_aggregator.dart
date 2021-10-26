@@ -4,6 +4,8 @@ import '../../../../fhir_types/fhir_types.dart';
 import '../../../../logging/logging.dart';
 import '../../../questionnaires.dart';
 
+// TODO: Properly support nested questionnaire items (questions being children of other questions).
+
 /// Aggregates the user's responses into a [QuestionnaireResponse].
 ///
 /// For status = 'complete' the items which are not enabled SHALL be excluded.

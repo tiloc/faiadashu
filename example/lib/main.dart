@@ -332,6 +332,17 @@ class _HomePageState extends State<HomePage> {
                 uploadResponseFunction: uploadResponseFunction,
               ),
               QuestionnaireLaunchTile(
+                title: 'SDC LOINC AHRQ Example',
+                subtitle:
+                    'WIP: Extensive use of ValueSets and a repeating group.',
+                fhirResourceProvider: resourceBundleProvider,
+                launchContext: launchContext,
+                questionnairePath: 'assets/instruments/sdc-loinc-ahrq.json',
+                saveResponseFunction: _saveResponse,
+                restoreResponseFunction: _restoreResponse,
+                uploadResponseFunction: uploadResponseFunction,
+              ),
+              QuestionnaireLaunchTile(
                 title: 'SDC Profile Example Render',
                 subtitle:
                     'The reference questionnaire for SDC render features.',

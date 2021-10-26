@@ -48,7 +48,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
     bool returnValue = false;
 
     if (item.text != null) {
-      if (itemModel.questionnaireItem.type == QuestionnaireItemType.group) {
+      if (itemModel.isGroup) {
         div.write('<h2>${item.text}</h2>');
       } else {
         div.write('<h3>${item.text}</h3>');
@@ -76,37 +76,48 @@ class NarrativeAggregator extends Aggregator<Narrative> {
       returnValue = true;
     } else {
       if (item.answer != null) {
+        final repeatPrefix = (item.answer!.isNotEmpty) ? '• ' : '';
         for (final answer in item.answer!) {
           if (answer.valueString != null) {
-            div.write('<p>${answer.valueString}</p>');
+            div.write('<p>$repeatPrefix${answer.valueString}</p>');
           } else if (answer.valueDecimal != null) {
             if (itemModel.isTotalScore) {
               div.write('<h3>${answer.valueDecimal!.format(locale)}</h3>');
             } else {
-              div.write('<p>${answer.valueDecimal!.format(locale)}</p>');
+              div.write(
+                '<p>$repeatPrefix${answer.valueDecimal!.format(locale)}</p>',
+              );
             }
           } else if (answer.valueQuantity != null) {
-            div.write('<p>${answer.valueQuantity!.format(locale)}</p>');
+            div.write(
+              '<p>$repeatPrefix${answer.valueQuantity!.format(locale)}</p>',
+            );
           } else if (answer.valueInteger != null) {
-            div.write('<p>${answer.valueInteger!.value}</p>');
+            div.write('<p>$repeatPrefix${answer.valueInteger!.value}</p>');
           } else if (answer.valueCoding != null) {
             div.write(
               '<p>- ${answer.valueCoding!.localizedDisplay(locale)}</p>',
             );
           } else if (answer.valueDateTime != null) {
-            div.write('<p>${answer.valueDateTime!.format(locale)}</p>');
+            div.write(
+              '<p>$repeatPrefix${answer.valueDateTime!.format(locale)}</p>',
+            );
           } else if (answer.valueDate != null) {
-            div.write('<p>${answer.valueDate!.format(locale)}</p>');
+            div.write(
+              '<p>$repeatPrefix${answer.valueDate!.format(locale)}</p>',
+            );
           } else if (answer.valueTime != null) {
-            div.write('<p>${answer.valueTime!.format(locale)}</p>');
+            div.write(
+              '<p>$repeatPrefix${answer.valueTime!.format(locale)}</p>',
+            );
           } else if (answer.valueBoolean != null) {
             div.write(
-              '<p>${(answer.valueBoolean!.value!) ? '[X]' : '[ ]'}</p>',
+              '<p>$repeatPrefix${(answer.valueBoolean!.value!) ? '[X]' : '[ ]'}</p>',
             );
           } else if (answer.valueUri != null) {
-            div.write('<p>${answer.valueUri.toString()}</p>');
+            div.write('<p>$repeatPrefix${answer.valueUri.toString()}</p>');
           } else {
-            div.write('<p>${answer.toString()}</p>');
+            div.write('<p>$repeatPrefix${answer.toString()}</p>');
           }
           returnValue = true;
         }

@@ -385,6 +385,15 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     return _responseModel ??= ResponseModel(this);
   }
 
+  /// Returns whether the item allows repetition.
+  ///
+  /// This will not return `true` for repeating `choice` or `open-choice` items,
+  /// as these are multiple choice, rather than truly repeating.
+  bool get isRepeating =>
+      questionnaireItem.repeats == Boolean(true) &&
+      questionnaireItem.type != QuestionnaireItemType.choice &&
+      questionnaireItem.type != QuestionnaireItemType.open_choice;
+
   bool get isRequired => questionnaireItem.required_ == Boolean(true);
 
   /// Can the item be answered?
@@ -463,6 +472,8 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     return responseModel.isComplete;
   }
 
+  bool get hasVariables => (_variables != null) && _variables!.isNotEmpty;
+
   /// Returns the evaluation result of a FHIRPath expression
   List<dynamic> evaluateFhirPathExpression(
     String fhirPathExpression, {
@@ -486,7 +497,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     }
 
     // Calculated variables
-    final calculatedVariables = (_variables != null)
+    final calculatedVariables = hasVariables
         ? Map.fromEntries(
             _variables!.map<MapEntry<String, dynamic>>(
               (variable) => MapEntry('%${variable.name}', variable.value),
@@ -837,6 +848,7 @@ class QuestionnaireItemModel extends ChangeNotifier with Diagnosticable {
     this.level,
   ) {
     _questionnaireModel = questionnaireModel;
+
     // WIP: Implement support for item-level variables.
     _variables = (questionnaireModel == null)
         ? VariableModel.variables(questionnaire, null)

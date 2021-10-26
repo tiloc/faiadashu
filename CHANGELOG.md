@@ -1,3 +1,7 @@
+## 0.5.4-dev.6
+* Fix bug with unit extension
+* WIP: repeating question items
+
 ## 0.5.4-dev.5
 * [Breaking] Updated dependencies (Dart 2.14, Flutter 2.5, the latest FHIR and FHIRPath)
 * [Breaking] New mandatory parameter `launchContext` to provide patient into questionnaire filler, rather
