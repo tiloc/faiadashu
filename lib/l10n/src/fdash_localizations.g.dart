@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_escaping_inner_quotes
+// ignore_for_file: avoid_escaping_inner_quotes, unnecessary_brace_in_string_interps, unnecessary_string_escapes
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
