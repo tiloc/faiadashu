@@ -40,15 +40,6 @@ class FDashLocalizationsDe extends FDashLocalizations {
   }
 
   @override
-  String get validatorDate => 'Gültiges Datum eingeben.';
-
-  @override
-  String get validatorTime => 'Gültige Uhrzeit eingeben.';
-
-  @override
-  String get validatorDateTime => 'Gültiges Datum/Zeit eingeben.';
-
-  @override
   String get validatorNan => 'Gültige Zahl eingeben.';
 
   @override
@@ -60,6 +51,30 @@ class FDashLocalizationsDe extends FDashLocalizations {
   String validatorMaxValue(String maxValue) {
     return 'Eine Zahl bis $maxValue eingeben.';
   }
+
+  @override
+  String get dataAbsentReasonAskedDeclined => 'Ich möchte nicht antworten.';
+
+  @override
+  String get narrativePageTitle => 'Freitext';
+
+  @override
+  String get questionnaireGenericTitle => 'Fragebogen';
+
+  @override
+  String get questionnaireUnknownTitle => '(ohne Titel)';
+
+  @override
+  String get questionnaireUnknownPublisher => '(unbekannte Quelle)';
+
+  @override
+  String get validatorDate => 'Gültiges Datum eingeben.';
+
+  @override
+  String get validatorTime => 'Gültige Uhrzeit eingeben.';
+
+  @override
+  String get validatorDateTime => 'Gültiges Datum/Zeit eingeben.';
 
   @override
   String validatorMinOccurs(int minOccurs) {
@@ -92,18 +107,6 @@ class FDashLocalizationsDe extends FDashLocalizations {
   String get dataAbsentReasonAsTextOutput => '[FREITEXT]';
 
   @override
-  String get narrativePageTitle => 'Freitext';
-
-  @override
-  String get questionnaireGenericTitle => 'Fragebogen';
-
-  @override
-  String get questionnaireUnknownTitle => '(ohne Titel)';
-
-  @override
-  String get questionnaireUnknownPublisher => '(unbekannte Quelle)';
-
-  @override
   String get autoCompleteSearchTermInput => 'Suchbegriff eingeben…';
 
   @override
@@ -119,16 +122,10 @@ class FDashLocalizationsDe extends FDashLocalizations {
   String get handlingSaveButtonLabel => 'Speichern';
 
   @override
-  String get handlingSaved => 'Bogen gespeichert.';
-
-  @override
   String get handlingUploadButtonLabel => 'Hochladen';
 
   @override
   String get handlingUploading => 'Bogen hochladen…';
-
-  @override
-  String get handlingUploaded => 'Bogen hochgeladen.';
 
   @override
   String get loginStatusLoggingIn => 'Anmelden…';
@@ -149,6 +146,12 @@ class FDashLocalizationsDe extends FDashLocalizations {
   String get loginStatusError => 'Etwas ist schief gelaufen.';
 
   @override
+  String get handlingSaved => 'Bogen gespeichert.';
+
+  @override
+  String get handlingUploaded => 'Bogen hochgeladen.';
+
+  @override
   String aggregationScore(Object score) {
     return 'Punkte: $score';
   }
@@ -157,10 +160,10 @@ class FDashLocalizationsDe extends FDashLocalizations {
   String get aggregationTotalScoreTitle => 'Gesamtpunktzahl';
 
   @override
-  String get fillerOpenCodingOtherLabel => 'Other';
+  String get fillerOpenCodingOtherLabel => 'sonstiges';
 
   @override
   String fillerAddAnotherItemLabel(Object itemLabel) {
-    return 'Add another \"$itemLabel\"';
+    return '\"$itemLabel\" hinzufügen';
   }
 }

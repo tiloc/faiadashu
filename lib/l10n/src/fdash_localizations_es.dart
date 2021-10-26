@@ -42,15 +42,6 @@ class FDashLocalizationsEs extends FDashLocalizations {
   }
 
   @override
-  String get validatorDate => 'Enter a valid date.';
-
-  @override
-  String get validatorTime => 'Enter a valid time.';
-
-  @override
-  String get validatorDateTime => 'Enter a valid date and time.';
-
-  @override
   String get validatorNan => 'Introduzca un número válido.';
 
   @override
@@ -62,6 +53,30 @@ class FDashLocalizationsEs extends FDashLocalizations {
   String validatorMaxValue(String maxValue) {
     return 'Introduzca un número hasta $maxValue.';
   }
+
+  @override
+  String get dataAbsentReasonAskedDeclined => 'He decidido no responder.';
+
+  @override
+  String get narrativePageTitle => 'Narrativa';
+
+  @override
+  String get questionnaireGenericTitle => 'Encuesta';
+
+  @override
+  String get questionnaireUnknownTitle => 'Sin título';
+
+  @override
+  String get questionnaireUnknownPublisher => 'Editor desconocido';
+
+  @override
+  String get validatorDate => 'Enter a valid date.';
+
+  @override
+  String get validatorTime => 'Enter a valid time.';
+
+  @override
+  String get validatorDateTime => 'Enter a valid date and time.';
 
   @override
   String validatorMinOccurs(int minOccurs) {
@@ -94,18 +109,6 @@ class FDashLocalizationsEs extends FDashLocalizations {
   String get dataAbsentReasonAsTextOutput => '[AS TEXT]';
 
   @override
-  String get narrativePageTitle => 'Narrativa';
-
-  @override
-  String get questionnaireGenericTitle => 'Encuesta';
-
-  @override
-  String get questionnaireUnknownTitle => 'Sin título';
-
-  @override
-  String get questionnaireUnknownPublisher => 'Editor desconocido';
-
-  @override
   String get autoCompleteSearchTermInput => 'Enter search term…';
 
   @override
@@ -121,16 +124,10 @@ class FDashLocalizationsEs extends FDashLocalizations {
   String get handlingSaveButtonLabel => 'Save';
 
   @override
-  String get handlingSaved => 'Survey saved.';
-
-  @override
   String get handlingUploadButtonLabel => 'Upload';
 
   @override
   String get handlingUploading => 'Uploading survey…';
-
-  @override
-  String get handlingUploaded => 'Survey uploaded.';
 
   @override
   String get loginStatusLoggingIn => 'Signing in…';
@@ -149,6 +146,12 @@ class FDashLocalizationsEs extends FDashLocalizations {
 
   @override
   String get loginStatusError => 'Something went wrong.';
+
+  @override
+  String get handlingSaved => 'Survey saved.';
+
+  @override
+  String get handlingUploaded => 'Survey uploaded.';
 
   @override
   String aggregationScore(Object score) {

@@ -41,15 +41,6 @@ class FDashLocalizationsJa extends FDashLocalizations {
   }
 
   @override
-  String get validatorDate => '有効な日付を入力してください。';
-
-  @override
-  String get validatorTime => '有効な時間を入力してください。';
-
-  @override
-  String get validatorDateTime => '有効な日付と時刻を入力してください。';
-
-  @override
   String get validatorNan => '有効な数字を入力してください。';
 
   @override
@@ -61,6 +52,30 @@ class FDashLocalizationsJa extends FDashLocalizations {
   String validatorMaxValue(String maxValue) {
     return '$maxValueまでの数値を入力してください。';
   }
+
+  @override
+  String get dataAbsentReasonAskedDeclined => '私は答えないことにしている。';
+
+  @override
+  String get narrativePageTitle => 'ナラティブ';
+
+  @override
+  String get questionnaireGenericTitle => '調査';
+
+  @override
+  String get questionnaireUnknownTitle => '無題';
+
+  @override
+  String get questionnaireUnknownPublisher => '出版社不明';
+
+  @override
+  String get validatorDate => '有効な日付を入力してください。';
+
+  @override
+  String get validatorTime => '有効な時間を入力してください。';
+
+  @override
+  String get validatorDateTime => '有効な日付と時刻を入力してください。';
 
   @override
   String validatorMinOccurs(int minOccurs) {
@@ -96,18 +111,6 @@ class FDashLocalizationsJa extends FDashLocalizations {
   String get dataAbsentReasonAsTextOutput => '[フリーテキスト]';
 
   @override
-  String get narrativePageTitle => 'ナラティブ';
-
-  @override
-  String get questionnaireGenericTitle => '調査';
-
-  @override
-  String get questionnaireUnknownTitle => '無題';
-
-  @override
-  String get questionnaireUnknownPublisher => '出版社不明';
-
-  @override
   String get autoCompleteSearchTermInput => '検索語を入力...';
 
   @override
@@ -123,16 +126,10 @@ class FDashLocalizationsJa extends FDashLocalizations {
   String get handlingSaveButtonLabel => '保存';
 
   @override
-  String get handlingSaved => 'アンケートは保存しました。';
-
-  @override
   String get handlingUploadButtonLabel => 'アップロード';
 
   @override
   String get handlingUploading => 'アンケートのアップロード...';
-
-  @override
-  String get handlingUploaded => 'アンケートをアップしました。';
 
   @override
   String get loginStatusLoggingIn => 'サインインすると...';
@@ -151,6 +148,12 @@ class FDashLocalizationsJa extends FDashLocalizations {
 
   @override
   String get loginStatusError => '何かが間違っていた。';
+
+  @override
+  String get handlingSaved => 'アンケートは保存しました。';
+
+  @override
+  String get handlingUploaded => 'アンケートをアップしました。';
 
   @override
   String aggregationScore(Object score) {

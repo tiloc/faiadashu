@@ -139,24 +139,6 @@ abstract class FDashLocalizations {
   /// **'Enter in format {entryFormat}.'**
   String validatorEntryFormat(String entryFormat);
 
-  /// No description provided for @validatorDate.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter a valid date.'**
-  String get validatorDate;
-
-  /// No description provided for @validatorTime.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter a valid time.'**
-  String get validatorTime;
-
-  /// No description provided for @validatorDateTime.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter a valid date and time.'**
-  String get validatorDateTime;
-
   /// No description provided for @validatorNan.
   ///
   /// In en, this message translates to:
@@ -174,6 +156,54 @@ abstract class FDashLocalizations {
   /// In en, this message translates to:
   /// **'Enter a number up to {maxValue}.'**
   String validatorMaxValue(String maxValue);
+
+  /// No description provided for @dataAbsentReasonAskedDeclined.
+  ///
+  /// In en, this message translates to:
+  /// **'I choose not to answer.'**
+  String get dataAbsentReasonAskedDeclined;
+
+  /// No description provided for @narrativePageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Narrative'**
+  String get narrativePageTitle;
+
+  /// No description provided for @questionnaireGenericTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Survey'**
+  String get questionnaireGenericTitle;
+
+  /// No description provided for @questionnaireUnknownTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Untitled'**
+  String get questionnaireUnknownTitle;
+
+  /// No description provided for @questionnaireUnknownPublisher.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown publisher'**
+  String get questionnaireUnknownPublisher;
+
+  /// No description provided for @validatorDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid date.'**
+  String get validatorDate;
+
+  /// No description provided for @validatorTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid time.'**
+  String get validatorTime;
+
+  /// No description provided for @validatorDateTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid date and time.'**
+  String get validatorDateTime;
 
   /// No description provided for @validatorMinOccurs.
   ///
@@ -205,30 +235,6 @@ abstract class FDashLocalizations {
   /// **'[AS TEXT]'**
   String get dataAbsentReasonAsTextOutput;
 
-  /// No description provided for @narrativePageTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Narrative'**
-  String get narrativePageTitle;
-
-  /// No description provided for @questionnaireGenericTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Survey'**
-  String get questionnaireGenericTitle;
-
-  /// No description provided for @questionnaireUnknownTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Untitled'**
-  String get questionnaireUnknownTitle;
-
-  /// No description provided for @questionnaireUnknownPublisher.
-  ///
-  /// In en, this message translates to:
-  /// **'Unknown publisher'**
-  String get questionnaireUnknownPublisher;
-
   /// No description provided for @autoCompleteSearchTermInput.
   ///
   /// In en, this message translates to:
@@ -259,12 +265,6 @@ abstract class FDashLocalizations {
   /// **'Save'**
   String get handlingSaveButtonLabel;
 
-  /// No description provided for @handlingSaved.
-  ///
-  /// In en, this message translates to:
-  /// **'Survey saved.'**
-  String get handlingSaved;
-
   /// No description provided for @handlingUploadButtonLabel.
   ///
   /// In en, this message translates to:
@@ -276,12 +276,6 @@ abstract class FDashLocalizations {
   /// In en, this message translates to:
   /// **'Uploading survey…'**
   String get handlingUploading;
-
-  /// No description provided for @handlingUploaded.
-  ///
-  /// In en, this message translates to:
-  /// **'Survey uploaded.'**
-  String get handlingUploaded;
 
   /// No description provided for @loginStatusLoggingIn.
   ///
@@ -318,6 +312,18 @@ abstract class FDashLocalizations {
   /// In en, this message translates to:
   /// **'Something went wrong.'**
   String get loginStatusError;
+
+  /// No description provided for @handlingSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Survey saved.'**
+  String get handlingSaved;
+
+  /// No description provided for @handlingUploaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Survey uploaded.'**
+  String get handlingUploaded;
 
   /// No description provided for @aggregationScore.
   ///
