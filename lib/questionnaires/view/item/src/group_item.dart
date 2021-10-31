@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 
 import '../../../questionnaires.dart';
 
-/// A pseudo-filler for items of type "group".
-class GroupItem extends QuestionnaireAnswerFiller {
+/// A view for filler items of type "group".
+class GroupItem extends ResponseItemFiller {
   GroupItem(
-    QuestionnaireResponseFillerState responseFillerState,
-    int answerIndex, {
-    Key? key,
-  }) : super(responseFillerState, answerIndex, key: key);
+    QuestionnaireFillerData questionnaireFiller,
+    int index,
+    ResponseItemModel responseItemModel,
+  ) : super(questionnaireFiller, index, responseItemModel);
+
   @override
   State<StatefulWidget> createState() => _GroupItemState();
 }
@@ -18,9 +19,12 @@ class _GroupItemState extends State<GroupItem> {
 
   @override
   Widget build(BuildContext context) {
-    final errorText = widget.itemModel.questionnaireModel
-        .errorFlagForLinkId(widget.itemModel.linkId)
-        ?.errorText;
+// FIXME: Restore functionality
+    const String? errorText = null;
+    /*    final errorText = widget.questionnaireItemModel.questionnaireModel
+        .errorFlagForLinkId(widget.questionnaireItemModel.linkId)
+       ?.errorText;
+       */
     return Column(
       children: [
         if (errorText != null)

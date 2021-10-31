@@ -13,10 +13,10 @@ import '../../../questionnaires.dart';
 /// sundhed.dk questionnaire-feedback extension.
 class TotalScoreItem extends QuestionnaireAnswerFiller {
   TotalScoreItem(
-    QuestionnaireResponseFillerState responseFillerState,
+    QuestionResponseItemFillerState responseItemFillerState,
     int answerIndex, {
     Key? key,
-  }) : super(responseFillerState, answerIndex, key: key);
+  }) : super(responseItemFillerState, answerIndex, key: key);
   @override
   State<StatefulWidget> createState() => _TotalScoreItemState();
 }
@@ -33,35 +33,39 @@ class _TotalScoreItemState extends State<TotalScoreItem> {
     super.initState();
 
     // TODO: This should go into a model.
-    calcResult =
-        widget.itemModel.responseItem?.answer?.firstOrNull?.valueDecimal ??
-            widget.itemModel.responseItem?.answer?.first.valueQuantity?.value;
+    calcResult = widget.responseItemModel.responseItem?.answer?.firstOrNull
+            ?.valueDecimal ??
+        widget
+            .responseItemModel.responseItem?.answer?.first.valueQuantity?.value;
 
-    if (widget.itemModel.isCalculated) {
+    if (widget.questionnaireItemModel.isCalculated) {
       _logger.debug(
-        'Adding listener to ${widget.itemModel} for calculated expression',
+        'Adding listener to ${widget.questionnaireItemModel} for calculated expression',
       );
-      widget.itemModel.questionnaireModel.addListener(_questionnaireChanged);
+      widget.responseItemModel.questionnaireResponseModel
+          .addListener(_questionnaireChanged);
     }
   }
 
   @override
   void dispose() {
-    widget.itemModel.questionnaireModel.removeListener(_questionnaireChanged);
+    widget.responseItemModel.questionnaireResponseModel
+        .removeListener(_questionnaireChanged);
     super.dispose();
   }
 
   void _questionnaireChanged() {
-    _logger.debug('questionnaireChanged(): ${widget.itemModel.responseItem}');
+    _logger.debug(
+        'questionnaireChanged(): ${widget.responseItemModel.responseItem}');
     if (!mounted) {
       return;
     }
-    if (widget.itemModel.responseItem != null) {
+    if (widget.responseItemModel.responseItem != null) {
       setState(() {
-        calcResult =
-            widget.itemModel.responseItem!.answer?.firstOrNull?.valueDecimal ??
-                widget.itemModel.responseItem!.answer?.firstOrNull
-                    ?.valueQuantity?.value;
+        calcResult = widget.responseItemModel.responseItem!.answer?.firstOrNull
+                ?.valueDecimal ??
+            widget.responseItemModel.responseItem!.answer?.firstOrNull
+                ?.valueQuantity?.value;
       });
       _logger.debug('calculated result: $calcResult');
     }
@@ -75,7 +79,7 @@ class _TotalScoreItemState extends State<TotalScoreItem> {
       return null;
     }
     final matchExtension =
-        widget.itemModel.questionnaireItem.extension_?.firstWhere(
+        widget.questionnaireItemModel.questionnaireItem.extension_?.firstWhere(
       (ext) {
         return (ext.url?.value.toString() ==
                 'http://ehealth.sundhed.dk/fhir/StructureDefinition/ehealth-questionnaire-feedback') &&
@@ -96,7 +100,7 @@ class _TotalScoreItemState extends State<TotalScoreItem> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.itemModel.isTotalScore) {
+    if (widget.questionnaireItemModel.isTotalScore) {
       final score = calcResult?.value?.round();
       final scoreText = score?.toString() ?? AnswerModel.nullText;
       final feedback = findDanishFeedback(score);

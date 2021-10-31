@@ -11,7 +11,7 @@ import '../../../../../l10n/l10n.dart';
 import '../../../model.dart';
 
 class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
-  DateTimeAnswerModel(ResponseModel responseModel, int answerIndex)
+  DateTimeAnswerModel(QuestionResponseItemModel responseModel, int answerIndex)
       : super(responseModel, answerIndex) {
     value = answer?.valueDateTime ??
         ((answer?.valueDate != null) ? FhirDateTime(answer?.valueDate) : null);

@@ -1,6 +1,6 @@
-import 'package:faiadashu/faiadashu.dart';
 import 'package:flutter/material.dart';
 
+import '../../../l10n/l10n.dart';
 import '../../../logging/logging.dart';
 import '../../questionnaires.dart';
 
@@ -32,45 +32,63 @@ class QuestionnaireTheme {
   /// Used by [QuestionnaireFiller].
   QuestionnaireItemFiller createQuestionnaireItemFiller(
     QuestionnaireFillerData questionnaireFiller,
-    int index, {
+    int index,
+    FillerItemModel fillerItemModel, {
     Key? key,
   }) {
-    return QuestionnaireItemFiller.fromQuestionnaireFiller(
-      questionnaireFiller,
-      index,
-      key: key,
-    );
-  }
-
-  /// Returns a [QuestionnaireResponseFiller] for a given [QuestionnaireItemFiller].
-  ///
-  /// Used by [QuestionnaireItemFiller].
-  QuestionnaireResponseFiller createQuestionnaireResponseFiller(
-    QuestionnaireItemFiller itemFiller, {
-    Key? key,
-  }) {
-    return QuestionnaireResponseFiller.fromQuestionnaireItemFiller(itemFiller);
+    if (fillerItemModel is QuestionResponseItemModel) {
+      return QuestionResponseItemFiller(
+        questionnaireFiller,
+        index,
+        fillerItemModel,
+//      key: key,  // TODO: What should be the key handling?
+      );
+    } else if (fillerItemModel is GroupResponseItemModel) {
+      return GroupItem(
+        questionnaireFiller,
+        index,
+        fillerItemModel,
+//      key: key,  // TODO: What should be the key handling?
+      );
+    } else {
+      throw UnsupportedError('Cannot generate filler for $fillerItemModel');
+    }
   }
 
   /// Returns a [QuestionnaireAnswerFiller] for a given [QuestionnaireResponseFiller].
   ///
   /// Can be overridden through inheritance of [QuestionnaireTheme].
   QuestionnaireAnswerFiller createAnswerFiller(
-    QuestionnaireResponseFillerState responseFiller,
+    QuestionResponseItemFillerState responseFiller,
     int answerIndex, {
     Key? key,
   }) {
     try {
-      final responseModel = responseFiller.responseModel;
+      final responseModel = responseFiller.responseItemModel;
 
       _logger.debug(
-        'Creating AnswerFiller for ${responseModel.itemModel} index $answerIndex',
+        'Creating AnswerFiller for ${responseModel.questionnaireItemModel} index $answerIndex',
       );
-      final answerModel = responseModel.answerModel(answerIndex);
 
-      if (responseModel.itemModel.isTotalScore) {
+      if (responseModel.questionnaireItemModel.isDisplay) {
+        throw UnsupportedError(
+          'Cannot generate an answer filler on a display item.',
+        );
+      }
+
+      if (responseModel.questionnaireItemModel.isGroup) {
+        throw UnsupportedError(
+          'Cannot generate an answer filler on a group item.',
+        );
+      }
+
+      if (responseModel.questionnaireItemModel.isTotalScore) {
         return TotalScoreItem(responseFiller, answerIndex, key: key);
-      } else if (answerModel is NumericalAnswerModel) {
+      }
+
+      final answerModel =
+          (responseModel as QuestionResponseItemModel).answerModel(answerIndex);
+      if (answerModel is NumericalAnswerModel) {
         return NumericalAnswerFiller(responseFiller, answerIndex, key: key);
       } else if (answerModel is StringAnswerModel) {
         return StringAnswerFiller(responseFiller, answerIndex, key: key);
@@ -80,14 +98,10 @@ class QuestionnaireTheme {
         return CodingAnswerFiller(responseFiller, answerIndex, key: key);
       } else if (answerModel is BooleanAnswerModel) {
         return BooleanAnswerFiller(responseFiller, answerIndex, key: key);
-      } else if (answerModel is DisplayAnswerModel) {
-        return DisplayItem(responseFiller, answerIndex, key: key);
-      } else if (answerModel is GroupAnswerModel) {
-        return GroupItem(responseFiller, answerIndex, key: key);
       } else if (answerModel is UnsupportedAnswerModel) {
         throw QuestionnaireFormatException(
           'Unsupported item type: ${answerModel.qi.type}',
-          answerModel.itemModel.linkId,
+          answerModel.questionnaireItemModel.linkId,
         );
       } else {
         throw QuestionnaireFormatException('Unknown AnswerModel: $answerModel');
@@ -115,11 +129,11 @@ class QuestionnaireTheme {
   /// Will be disabled if [callback] is null.
   Widget buildAddRepetition(
     BuildContext context,
-    QuestionnaireResponseFillerState responseFiller,
+    QuestionResponseItemFillerState responseFiller,
     VoidCallback? callback, {
     Key? key,
   }) {
-    final responseModel = responseFiller.responseModel;
+    final responseModel = responseFiller.responseItemModel;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -129,8 +143,8 @@ class QuestionnaireTheme {
           key: key,
           label: Text(
             FDashLocalizations.of(context).fillerAddAnotherItemLabel(
-              responseModel.itemModel.shortText ??
-                  responseModel.itemModel.titleText ??
+              responseModel.questionnaireItemModel.shortText ??
+                  responseModel.questionnaireItemModel.titleText ??
                   '',
             ),
           ),

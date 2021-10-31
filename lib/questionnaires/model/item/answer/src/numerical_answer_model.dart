@@ -72,13 +72,15 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
     return keyForUnitChoice(coding);
   }
 
-  NumericalAnswerModel(ResponseModel responseModel, int answerIndex)
+  NumericalAnswerModel(QuestionResponseItemModel responseModel, int answerIndex)
       : super(responseModel, answerIndex) {
-    _isSliding = itemModel.questionnaireItem.isItemControl('slider');
+    _isSliding =
+        questionnaireItemModel.questionnaireItem.isItemControl('slider');
 
     final minValueExtension = qi.extension_
         ?.extensionOrNull('http://hl7.org/fhir/StructureDefinition/minValue');
-    final maxValueExtension = itemModel.questionnaireItem.extension_
+    final maxValueExtension = questionnaireItemModel
+        .questionnaireItem.extension_
         ?.extensionOrNull('http://hl7.org/fhir/StructureDefinition/maxValue');
     _minValue = minValueExtension?.valueDecimal?.value ??
         minValueExtension?.valueInteger?.value?.toDouble() ??
@@ -128,7 +130,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
     _numberPattern = '$maxIntegerDigits$maxFractionDigits';
 
     _logger.debug(
-      'input format for ${itemModel.linkId}: "$_numberPattern"',
+      'input format for ${questionnaireItemModel.linkId}: "$_numberPattern"',
     );
 
     _numberFormat = NumberFormat(
@@ -146,7 +148,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
         ?.valueCanonical
         .toString();
     if (unitsUri != null) {
-      itemModel.questionnaireModel.forEachInValueSet(
+      questionnaireItemModel.questionnaireModel.forEachInValueSet(
         unitsUri,
         (coding) {
           _units[keyForUnitChoice(coding)] = coding;
@@ -158,7 +160,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
     }
 
     Quantity? existingValue;
-    final firstAnswer = itemModel.responseItem?.answer?.firstOrNull;
+    final firstAnswer = responseItemModel.responseItem?.answer?.firstOrNull;
     if (firstAnswer != null) {
       existingValue = firstAnswer.valueQuantity ??
           ((firstAnswer.valueDecimal != null &&
@@ -346,6 +348,6 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
           : null,
     );
 
-    responseModel.answers = [filledAnswer];
+    responseItemModel.answers = [filledAnswer];
   }
 }

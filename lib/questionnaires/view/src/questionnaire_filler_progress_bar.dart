@@ -1,15 +1,16 @@
-import 'package:faiadashu/questionnaires/model/model.dart';
 import 'package:flutter/material.dart';
 
-/// A progress bar for the filling of a [QuestionnaireModel].
+import '../../model/model.dart';
+
+/// A progress bar for the filling of a [QuestionnaireResponseModel].
 class QuestionnaireFillerProgressBar extends StatefulWidget {
-  final QuestionnaireItemModel questionnaireItemModel;
+  final QuestionnaireResponseModel questionnaireResponseModel;
   final double? height;
   final Color? answeredColor;
   final Color? unansweredColor;
 
   const QuestionnaireFillerProgressBar(
-    this.questionnaireItemModel, {
+    this.questionnaireResponseModel, {
     this.height,
     this.answeredColor,
     this.unansweredColor,
@@ -26,14 +27,12 @@ class _QuestionnaireFillerProgressBarState
   @override
   void initState() {
     super.initState();
-    widget.questionnaireItemModel.questionnaireModel
-        .addListener(_updateProgress);
+    widget.questionnaireResponseModel.addListener(_updateProgress);
   }
 
   @override
   void dispose() {
-    widget.questionnaireItemModel.questionnaireModel
-        .removeListener(_updateProgress);
+    widget.questionnaireResponseModel.removeListener(_updateProgress);
     super.dispose();
   }
 
@@ -48,13 +47,13 @@ class _QuestionnaireFillerProgressBarState
   @override
   Widget build(BuildContext context) {
     return Row(
-      children: widget.questionnaireItemModel
-          .orderedQuestionnaireItemModels()
-          .where((qim) => qim.isAnswerable)
-          .map<Widget>((qim) {
+      children: widget.questionnaireResponseModel
+          .orderedResponseItemModels()
+          .where((rim) => rim.isAnswerable)
+          .map<Widget>((rim) {
         final theme = Theme.of(context);
         final height = widget.height ?? 4.0;
-        final box = (qim.isAnswered)
+        final box = (rim.isAnswered)
             ? Container(
                 height: height,
                 color: widget.answeredColor ?? theme.colorScheme.secondary,

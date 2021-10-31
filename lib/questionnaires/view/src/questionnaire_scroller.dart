@@ -54,7 +54,7 @@ class QuestionnaireScroller extends StatefulWidget {
 }
 
 class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
-  QuestionnaireModel? _questionnaireModel;
+  QuestionnaireResponseModel? _questionnaireResponseModel;
   final ItemScrollController _listScrollController = ItemScrollController();
   final ItemPositionsListener _itemPositionsListener =
       ItemPositionsListener.create();
@@ -90,14 +90,15 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
   ///
   /// The item will also be focussed.
   void scrollToErrorFlag(QuestionnaireErrorFlag errorFlag) {
-    if (_questionnaireModel == null) {
+    if (_questionnaireResponseModel == null) {
       _logger.info(
         'Trying to scroll before QuestionnaireModel is loaded. Ignoring.',
       );
       return;
     }
 
-    final index =
+    // FIXME: Restore functionality
+/*    final index =
         _questionnaireModel!.indexOf((qim) => qim.linkId == errorFlag.linkId);
 
     if (index == -1) {
@@ -105,7 +106,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
       return;
     }
 
-    scrollTo(index!);
+    scrollTo(index!); */
   }
 
   /// Scrolls to a position as conveyed by an [index].
@@ -158,8 +159,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
         _belowFillerContext = context;
         final questionnaireFiller = QuestionnaireFiller.of(context);
 
-        final mainMatterLength =
-            questionnaireFiller.questionnaireItemModels.length;
+        final mainMatterLength = questionnaireFiller.fillerItemModels.length;
         final frontMatterLength = widget.frontMatter?.length ?? 0;
         final backMatterLength = widget.backMatter?.length ?? 0;
         final totalLength =
@@ -210,7 +210,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
         );
       },
       aggregators: widget.aggregators,
-      onDataAvailable: (questionnaireModel) {
+      onDataAvailable: (questionnaireResponseModel) {
         if (_isPositioned) {
           return;
         }
@@ -219,22 +219,24 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
         if (!_isLoaded) {
           _isLoaded = true;
 
-          _questionnaireModel = questionnaireModel;
+          _questionnaireResponseModel = questionnaireResponseModel;
 
           // Listen for new error flags and then scroll to the first one.
-          questionnaireModel.errorFlags.addListener(() {
-            final markers = questionnaireModel.errorFlags.value;
+          questionnaireResponseModel.errorFlags.addListener(() {
+            final markers = questionnaireResponseModel.errorFlags.value;
             if (markers != null) {
               scrollToErrorFlag(markers.first);
             }
           });
 
-          _focusIndex = questionnaireModel
-              .indexOf((qim) => qim.isUnanswered || qim.isInvalid)!;
+          _focusIndex = questionnaireResponseModel.indexOfFillerItem((fim) =>
+              fim is QuestionResponseItemModel &&
+              (fim.isUnanswered || fim.isInvalid))!;
 
           if (_focusIndex == -1) {
             // When all questions are answered then focus on the first field that can be filled by a human.
-            _focusIndex = questionnaireModel.indexOf((qim) => !qim.isReadOnly)!;
+            _focusIndex = questionnaireResponseModel.indexOfFillerItem(
+                (fim) => !fim.questionnaireItemModel.isReadOnly)!;
           }
         }
 
@@ -242,10 +244,11 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
           return;
         }
 
-        _logger.debug(
-          'Focussing item# $_focusIndex - ${questionnaireModel.itemModelAt(_focusIndex)}',
+// FIXME: Restore full debug info
+/*        _logger.debug(
+          'Focussing item# $_focusIndex - ${questionnaireResponseModel.itemFillerModelAt(_focusIndex)}',
         );
-
+*/
         _itemPositionsListener.itemPositions
             .addListener(_initialPositionListener);
       },

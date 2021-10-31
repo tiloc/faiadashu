@@ -9,7 +9,7 @@ import 'numerical_input_formatter.dart';
 /// Filler for answers of type [Integer], [Decimal], and [Quantity].
 class NumericalAnswerFiller extends QuestionnaireAnswerFiller {
   NumericalAnswerFiller(
-    QuestionnaireResponseFillerState responseFillerState,
+    QuestionResponseItemFillerState responseFillerState,
     int answerIndex, {
     Key? key,
   }) : super(responseFillerState, answerIndex, key: key);
@@ -128,9 +128,10 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
                     decoration: questionnaireTheme.createDecoration().copyWith(
                           errorText: answerModel.errorText,
                           hintText: answerModel.entryFormat,
-                          prefixIcon: answerModel.itemModel.isCalculated
-                              ? const Icon(Icons.calculate)
-                              : null,
+                          prefixIcon:
+                              answerModel.questionnaireItemModel.isCalculated
+                                  ? const Icon(Icons.calculate)
+                                  : null,
                           suffixIcon: (answerModel.hasUnitChoices)
                               ? SizedBox(
                                   height: 16,

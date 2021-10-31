@@ -41,7 +41,8 @@ class DefaultQuestionnairePageScaffoldBuilder
     final theLocale = locale ?? Localizations.localeOf(context);
 
     final questionnaireFiller = QuestionnaireFiller.of(context);
-    final questionnaire = questionnaireFiller.questionnaireModel.questionnaire;
+    final questionnaire = questionnaireFiller
+        .questionnaireResponseModel.questionnaireModel.questionnaire;
 
     return Scaffold(
       appBar: AppBar(

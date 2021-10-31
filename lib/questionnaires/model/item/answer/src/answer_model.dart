@@ -9,21 +9,23 @@ abstract class AnswerModel<I, V> {
   /// Textual depiction of an unanswered question.
   static const nullText = '—';
 
-  final ResponseModel responseModel;
+  final QuestionResponseItemModel responseItemModel;
   final int answerIndex;
   V? value;
 
-  QuestionnaireItemModel get itemModel => responseModel.itemModel;
+  QuestionnaireItemModel get questionnaireItemModel =>
+      responseItemModel.questionnaireItemModel;
 
-  QuestionnaireModel get questionnaireModel => itemModel.questionnaireModel;
+  QuestionnaireResponseModel get questionnaireResponseModel =>
+      responseItemModel.questionnaireResponseModel;
 
-  Locale get locale => questionnaireModel.locale;
+  Locale get locale => questionnaireResponseModel.locale;
 
-  QuestionnaireItem get qi => itemModel.questionnaireItem;
+  QuestionnaireItem get qi => questionnaireItemModel.questionnaireItem;
 
   bool get isEnabled =>
-      !itemModel.isReadOnly &&
-      !(questionnaireModel.responseStatus ==
+      !questionnaireItemModel.isReadOnly &&
+      !(questionnaireResponseModel.responseStatus ==
           QuestionnaireResponseStatus.completed);
 
   /// Returns the human-readable entry format.
@@ -35,14 +37,15 @@ abstract class AnswerModel<I, V> {
         ?.valueString;
   }
 
-  AnswerModel(this.responseModel, this.answerIndex);
+  AnswerModel(this.responseItemModel, this.answerIndex);
 
   /// Returns a human-readable, localized, textual description of the model.
   ///
   /// Returns [nullText] if the question is unanswered.
   String get display;
 
-  QuestionnaireResponseAnswer? get answer => responseModel.answers[answerIndex];
+  QuestionnaireResponseAnswer? get answer =>
+      responseItemModel.answers[answerIndex];
 
   /// Validates a new input value. Does not change the [value].
   ///
@@ -68,7 +71,9 @@ abstract class AnswerModel<I, V> {
   bool get isUnanswered;
 
   String? get errorText {
-    return questionnaireModel.errorFlagForLinkId(itemModel.linkId)?.errorText;
+    return questionnaireResponseModel
+        .errorFlagForLinkId(questionnaireItemModel.linkId)
+        ?.errorText;
   }
 
   /// Returns a [QuestionnaireResponseAnswer] based on the current value.

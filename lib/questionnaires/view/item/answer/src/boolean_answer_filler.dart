@@ -5,7 +5,7 @@ import '../../../../questionnaires.dart';
 
 class BooleanAnswerFiller extends QuestionnaireAnswerFiller {
   BooleanAnswerFiller(
-    QuestionnaireResponseFillerState responseFillerState,
+      QuestionResponseItemFillerState responseFillerState,
     int answerIndex, {
     Key? key,
   }) : super(responseFillerState, answerIndex, key: key);

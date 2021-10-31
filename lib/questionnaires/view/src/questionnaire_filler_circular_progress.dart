@@ -68,19 +68,19 @@ class _ProgressPainter extends CustomPainter {
 
 class _QuestionnaireFillerCircularProgressState
     extends State<QuestionnaireFillerCircularProgress> {
-  late final QuestionnaireItemModel _questionnaireItemModel;
+  late final QuestionnaireResponseModel _questionnaireResponseModel;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _questionnaireItemModel =
-        QuestionnaireFiller.of(context).questionnaireModel;
-    _questionnaireItemModel.questionnaireModel.addListener(_updateProgress);
+    _questionnaireResponseModel =
+        QuestionnaireFiller.of(context).questionnaireResponseModel;
+    _questionnaireResponseModel.addListener(_updateProgress);
   }
 
   @override
   void dispose() {
-    _questionnaireItemModel.questionnaireModel.removeListener(_updateProgress);
+    _questionnaireResponseModel.removeListener(_updateProgress);
     super.dispose();
   }
 
@@ -102,11 +102,11 @@ class _QuestionnaireFillerCircularProgressState
       child: CustomPaint(
         painter: _ProgressPainter(
           radius,
-          colors: _questionnaireItemModel
-              .orderedQuestionnaireItemModels()
-              .where((qim) => qim.isAnswerable)
-              .map<Color?>((qim) {
-            return qim.isAnswered ? Colors.green : null;
+          colors: _questionnaireResponseModel
+              .orderedResponseItemModels()
+              .where((rim) => rim.isAnswerable)
+              .map<Color?>((rim) {
+            return rim.isAnswered ? Colors.green : null;
           }).toList(growable: false),
         ),
       ),

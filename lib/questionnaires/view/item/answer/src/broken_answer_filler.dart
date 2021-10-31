@@ -8,7 +8,7 @@ class BrokenAnswerFiller extends QuestionnaireAnswerFiller {
   final Object exception;
 
   BrokenAnswerFiller(
-    QuestionnaireResponseFillerState responseFillerState,
+      QuestionResponseItemFillerState responseFillerState,
     int answerIndex,
     this.exception, {
     Key? key,
@@ -28,7 +28,7 @@ class _BrokenItemState extends State<BrokenAnswerFiller> {
   Widget build(BuildContext context) {
     return BrokenQuestionnaireItem(
       'Could not initialize QuestionnaireAnswerFiller',
-      widget.itemModel.questionnaireItem,
+      widget.questionnaireItemModel.questionnaireItem,
       widget.exception,
     );
   }

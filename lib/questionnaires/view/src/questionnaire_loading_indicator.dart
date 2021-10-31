@@ -10,11 +10,13 @@ class QuestionnaireLoadingIndicator extends StatelessWidget {
   final bool hasError;
 
   QuestionnaireLoadingIndicator(
-    AsyncSnapshot<QuestionnaireModel> snapshot, {
+    AsyncSnapshot<QuestionnaireResponseModel> snapshot, {
     Key? key,
   })  : state = snapshot.connectionState,
         hasError = snapshot.hasError,
-        detail = (snapshot.hasData) ? snapshot.data?.linkId : snapshot.error,
+        detail = (snapshot.hasData)
+            ? snapshot.data?.questionnaireModel.titleText
+            : snapshot.error,
         super(key: key);
 
   @override

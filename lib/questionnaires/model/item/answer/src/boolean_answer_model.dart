@@ -3,7 +3,7 @@ import 'package:fhir/r4.dart';
 import '../../../model.dart';
 
 class BooleanAnswerModel extends AnswerModel<Boolean, Boolean> {
-  BooleanAnswerModel(ResponseModel responseModel, int answerIndex)
+  BooleanAnswerModel(QuestionResponseItemModel responseModel, int answerIndex)
       : super(responseModel, answerIndex) {
     value = answer?.valueBoolean;
   }

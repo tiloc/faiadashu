@@ -39,7 +39,7 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
       questionnaireTheme: widget.questionnaireTheme,
       builder: (BuildContext context) {
         final questionnaireFiller = QuestionnaireFiller.of(context);
-        final itemCount = questionnaireFiller.questionnaireItemModels.length;
+        final itemCount = questionnaireFiller.fillerItemModels.length;
         return widget.scaffoldBuilder.build(
           context,
           setStateCallback: (fn) => setState(fn),
@@ -95,7 +95,7 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
                         ),
                         if (widget.questionnaireTheme.showProgress)
                           QuestionnaireFillerProgressBar(
-                            questionnaireFiller.questionnaireModel,
+                            questionnaireFiller.questionnaireResponseModel,
                           ),
                       ],
                     ),

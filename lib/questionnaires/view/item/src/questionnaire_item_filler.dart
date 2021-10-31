@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_html_css/simple_html_css.dart';
 
@@ -8,63 +7,44 @@ import '../../../../fhir_types/fhir_types.dart';
 import '../../../../logging/logging.dart';
 import '../../../questionnaires.dart';
 
-class QuestionnaireItemFiller extends StatefulWidget {
-  final QuestionnaireItemModel itemModel;
+abstract class QuestionnaireItemFiller extends StatefulWidget {
   final QuestionnaireFillerData questionnaireFiller;
   final int index;
+  final FillerItemModel fillerItemModel;
 
-  factory QuestionnaireItemFiller.fromQuestionnaireFiller(
-    QuestionnaireFillerData questionnaireFiller,
-    int index, {
-    Key? key,
-  }) {
-    return QuestionnaireItemFiller._(
-      questionnaireFiller: questionnaireFiller,
-      itemModel: questionnaireFiller.questionnaireModel.itemModelAt(index),
-      index: index,
-      key: key,
-    );
-  }
-
-  const QuestionnaireItemFiller._({
-    required this.questionnaireFiller,
-    required this.itemModel,
-    required this.index,
+  const QuestionnaireItemFiller(
+    this.questionnaireFiller,
+    this.index,
+    this.fillerItemModel, {
     Key? key,
   }) : super(key: key);
-
-  @override
-  State<StatefulWidget> createState() => QuestionnaireItemFillerState();
 }
 
-class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
+abstract class QuestionnaireItemFillerState<W extends QuestionnaireItemFiller>
+    extends State<W> {
   static final _logger = Logger(QuestionnaireItemFillerState);
   late final Widget? _titleWidget;
-  late final QuestionnaireResponseFiller _responseFiller;
+  Widget? get titleWidget => _titleWidget;
+
   late final QuestionnaireFillerData _questionnaireFiller;
   late final QuestionnaireTheme questionnaireTheme;
 
   late final FocusNode _focusNode;
-
-  String get linkId => widget.itemModel.linkId;
+  FocusNode get focusNode => _focusNode;
 
   @override
   void initState() {
     super.initState();
-    _focusNode = FocusNode(debugLabel: linkId, skipTraversal: true);
+    // FIXME: Restore a debugLabel
+    _focusNode = FocusNode(skipTraversal: true);
 
     questionnaireTheme = widget.questionnaireFiller.questionnaireTheme;
 
-    _titleWidget = QuestionnaireItemFillerTitle.fromQuestionnaireItemModel(
-      itemModel: widget.itemModel,
+    _titleWidget = QuestionnaireItemFillerTitle.fromFillerItem(
+      fillerItem: widget.fillerItemModel,
       questionnaireTheme: questionnaireTheme,
       index: widget.index,
     );
-
-    _responseFiller = widget.questionnaireFiller.questionnaireTheme
-        .createQuestionnaireResponseFiller(widget);
-
-    widget.itemModel.questionnaireModel.addListener(_forceRebuild);
   }
 
   @override
@@ -76,8 +56,6 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
 
   @override
   void dispose() {
-    widget.itemModel.questionnaireModel.removeListener(_forceRebuild);
-
     _questionnaireFiller.unregisterQuestionnaireItemFillerState(this);
 
     _focusNode.dispose();
@@ -89,8 +67,8 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
   /// Triggers a repaint of the filler.
   ///
   /// Required for visual updates on enableWhen changes.
-  void _forceRebuild() {
-    _logger.trace('_forceRebuild()');
+  void forceRebuild() {
+    _logger.trace('forceRebuild()');
     setState(() {
       // Just repaint.
     });
@@ -100,124 +78,59 @@ class QuestionnaireItemFillerState extends State<QuestionnaireItemFiller> {
   void requestFocus() {
     _focusNode.requestFocus();
   }
-
-  @override
-  Widget build(BuildContext context) {
-    _logger.trace(
-      'build $linkId hidden: ${widget.itemModel.isHidden}, enabled: ${widget.itemModel.isEnabled}',
-    );
-
-    return (!widget.itemModel.isHidden)
-        ? Focus(
-            focusNode: _focusNode,
-// Only enable for low-level focus coding
-/*            onFocusChange: (gainedFocus) {
-              debugDumpFocusTree();
-            }, */
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 500),
-              child: widget.itemModel.isEnabled
-                  ? LayoutBuilder(
-                      builder:
-                          (BuildContext context, BoxConstraints constraints) {
-                        // Wide landscape screen: Use horizontal layout
-                        return AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 500),
-                          child: (constraints.maxWidth > 1000)
-                              ? Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    if (_titleWidget != null)
-                                      Expanded(
-                                        child: Container(
-                                          padding: const EdgeInsets.only(
-                                            top: 8,
-                                          ),
-                                          child: _titleWidget,
-                                        ),
-                                      )
-                                    else
-                                      Expanded(child: Container()),
-                                    Expanded(flex: 2, child: _responseFiller)
-                                  ],
-                                )
-                              // Narrow, portrait screen: Use vertical layout
-                              : Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    if (_titleWidget != null)
-                                      Container(
-                                        padding: const EdgeInsets.only(top: 8),
-                                        child: _titleWidget,
-                                      ),
-                                    const SizedBox(width: 8),
-                                    _responseFiller,
-                                  ],
-                                ),
-                        );
-                      },
-                    )
-                  : const SizedBox(),
-            ),
-          )
-        : const SizedBox();
-  }
 }
 
 class QuestionnaireItemFillerTitle extends StatelessWidget {
-  final QuestionnaireItemModel itemModel;
   final Widget? leading;
   final Widget? help;
   final int index;
   final String htmlTitleText;
+  final String semanticsLabel;
   final QuestionnaireTheme questionnaireTheme;
 
   const QuestionnaireItemFillerTitle._({
-    required this.itemModel,
     required this.questionnaireTheme,
     required this.index,
     required this.htmlTitleText,
     this.leading,
     this.help,
+    required this.semanticsLabel,
     Key? key,
   }) : super(key: key);
 
-  static Widget? fromQuestionnaireItemModel({
-    required QuestionnaireItemModel itemModel,
+  static Widget? fromFillerItem({
+    required FillerItemModel fillerItem,
     required QuestionnaireTheme questionnaireTheme,
     required int index,
     Key? key,
   }) {
-    if (itemModel.titleText == null) {
+    final questionnaireItemModel = fillerItem.questionnaireItemModel;
+    final titleText = questionnaireItemModel.titleText;
+
+    if (titleText == null) {
       return null;
     } else {
       final leading =
-          QuestionnaireItemFillerTitleLeading.fromQuestionnaireItem(itemModel);
-      final help = _createHelp(itemModel);
+          QuestionnaireItemFillerTitleLeading.fromFillerItem(fillerItem);
+      final help = _createHelp(questionnaireItemModel);
 
-      final requiredTag = (itemModel.isRequired) ? '*' : '';
+      final requiredTag = (questionnaireItemModel.isRequired) ? '*' : '';
 
-      final openStyleTag =
-          (itemModel.questionnaireItem.type == QuestionnaireItemType.group)
-              ? '<h2>'
-              : '<b>';
+      final openStyleTag = (questionnaireItemModel.isGroup) ? '<h2>' : '<b>';
 
       final closeStyleTag =
-          (itemModel.questionnaireItem.type == QuestionnaireItemType.group)
-              ? '</h2>'
-              : '$requiredTag</b>';
+          (questionnaireItemModel.isGroup) ? '</h2>' : '$requiredTag</b>';
 
       final htmlTitleText =
-          '$openStyleTag${htmlEscape.convert(itemModel.titleText!)}$closeStyleTag';
+          '$openStyleTag${htmlEscape.convert(titleText)}$closeStyleTag';
 
       return QuestionnaireItemFillerTitle._(
-        itemModel: itemModel,
         index: index,
         questionnaireTheme: questionnaireTheme,
         htmlTitleText: htmlTitleText,
         leading: leading,
         help: help,
+        semanticsLabel: titleText,
         key: key,
       );
     }
@@ -225,8 +138,10 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final int questionNumber =
-        itemModel.questionnaireModel.getQuestionNumber(index);
+    // FIXME: Restore functionality
+    const int questionNumber = 1;
+    /*    final int questionNumber =
+        responseItemModel.questionnaireResponseModel.getQuestionNumber(index); */
     final showQuestionNumbers = questionnaireTheme.showQuestionNumbers;
 
     return Container(
@@ -239,22 +154,22 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
             /// All items with the isAnswerable boolean as true will be
             /// counted, starting with 1, and regardless of grouping.
             ///
-            if (showQuestionNumbers && itemModel.isAnswerable)
+// FIXME: Restore functionality
+/*            if (showQuestionNumbers && responseItemModel.isAnswerable)
               HTML.toTextSpan(
                 context,
                 '<b>$questionNumber: <b>',
-              ),
+              ), */
             if (leading != null) WidgetSpan(child: leading!),
-            if (itemModel.titleText != null)
-              HTML.toTextSpan(
-                context,
-                htmlTitleText,
-                defaultTextStyle: Theme.of(context).textTheme.bodyText1,
-              ),
+            HTML.toTextSpan(
+              context,
+              htmlTitleText,
+              defaultTextStyle: Theme.of(context).textTheme.bodyText1,
+            ),
             if (help != null) WidgetSpan(child: help!),
           ],
         ),
-        semanticsLabel: itemModel.titleText,
+        semanticsLabel: semanticsLabel,
       ),
     );
   }
@@ -366,11 +281,11 @@ class QuestionnaireItemFillerTitleLeading extends StatelessWidget {
       : _leadingWidget = leadingWidget,
         super(key: key);
 
-  static Widget? fromQuestionnaireItem(
-    QuestionnaireItemModel itemModel, {
+  static Widget? fromFillerItem(
+    FillerItemModel fillerItemModel, {
     Key? key,
   }) {
-    final displayCategory = itemModel.questionnaireItem.extension_
+    final displayCategory = fillerItemModel.questionnaireItem.extension_
         ?.extensionOrNull(
           'http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory',
         )
@@ -389,8 +304,9 @@ class QuestionnaireItemFillerTitleLeading extends StatelessWidget {
 
       return QuestionnaireItemFillerTitleLeading._(leadingWidget);
     } else {
-      final itemImageWidget =
-          CpgItemImage.fromQuestionnaireItem(itemModel, height: 24.0);
+      final itemImageWidget = CpgItemImage.fromQuestionnaireItem(
+          fillerItemModel.questionnaireItemModel,
+          height: 24.0);
       if (itemImageWidget == null) {
         return null;
       }

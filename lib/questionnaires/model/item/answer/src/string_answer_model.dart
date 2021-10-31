@@ -18,7 +18,7 @@ class StringAnswerModel extends AnswerModel<String, String> {
   late final int? maxLength;
   late final StringAnswerKeyboard keyboard;
 
-  StringAnswerModel(ResponseModel responseModel, int answerIndex)
+  StringAnswerModel(QuestionResponseItemModel responseModel, int answerIndex)
       : super(responseModel, answerIndex) {
     final regexPattern = qi.extension_
         ?.extensionOrNull('http://hl7.org/fhir/StructureDefinition/regex')
@@ -128,7 +128,7 @@ class StringAnswerModel extends AnswerModel<String, String> {
       return null;
     } else {
       return QuestionnaireErrorFlag(
-        responseModel.itemModel.linkId,
+        responseItemModel.linkId,
         answerIndex: answerIndex,
         errorText: valid,
       );
@@ -147,6 +147,6 @@ class StringAnswerModel extends AnswerModel<String, String> {
 
     value = evaluationResult as String?;
 
-    responseModel.answers[answerIndex] = filledAnswer;
+    responseItemModel.answers[answerIndex] = filledAnswer;
   }
 }

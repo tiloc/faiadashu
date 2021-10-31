@@ -26,7 +26,7 @@ class _QuestionnaireCompleteButtonState
     return ElevatedButton.icon(
       onPressed: () {
         final qf = QuestionnaireFiller.of(context);
-        final qm = qf.questionnaireModel;
+        final qm = qf.questionnaireResponseModel;
         final currentResponseStatus = qm.responseStatus;
 
         if (currentResponseStatus != QuestionnaireResponseStatus.completed) {
@@ -51,22 +51,24 @@ class _QuestionnaireCompleteButtonState
           widget.onCompleted?.call();
         }
       },
-      icon:
-          (QuestionnaireFiller.of(context).questionnaireModel.responseStatus !=
-                  QuestionnaireResponseStatus.completed)
-              ? const Icon(Icons.check_circle)
-              : const Icon(Icons.edit),
-      label:
-          (QuestionnaireFiller.of(context).questionnaireModel.responseStatus !=
-                  QuestionnaireResponseStatus.completed)
-              ? Text(
-                  FDashLocalizations.of(context)
-                      .responseStatusToCompleteButtonLabel,
-                )
-              : Text(
-                  FDashLocalizations.of(context)
-                      .responseStatusToInProgressButtonLabel,
-                ),
+      icon: (QuestionnaireFiller.of(context)
+                  .questionnaireResponseModel
+                  .responseStatus !=
+              QuestionnaireResponseStatus.completed)
+          ? const Icon(Icons.check_circle)
+          : const Icon(Icons.edit),
+      label: (QuestionnaireFiller.of(context)
+                  .questionnaireResponseModel
+                  .responseStatus !=
+              QuestionnaireResponseStatus.completed)
+          ? Text(
+              FDashLocalizations.of(context)
+                  .responseStatusToCompleteButtonLabel,
+            )
+          : Text(
+              FDashLocalizations.of(context)
+                  .responseStatusToInProgressButtonLabel,
+            ),
     );
   }
 }

@@ -43,7 +43,7 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
   late final FhirResourceProvider _questionnaireProvider;
   late final Locale _locale;
   late final NumberFormat _percentPattern;
-  late Future<QuestionnaireModel> _modelFuture;
+  late Future<QuestionnaireResponseModel> _modelFuture;
 
   @override
   void initState() {
@@ -54,16 +54,16 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
     );
   }
 
-  Future<QuestionnaireModel> _createModelFuture() {
-    return QuestionnaireModel.fromFhirResourceBundle(
+  Future<QuestionnaireResponseModel> _createModelFuture() {
+    return QuestionnaireResponseModel.fromFhirResourceBundle(
       fhirResourceProvider: _questionnaireProvider,
       launchContext: widget.launchContext,
       locale: _locale,
-    ).then<QuestionnaireModel>((qm) {
-      qm.populate(
+    ).then<QuestionnaireResponseModel>((qrm) {
+      qrm.populate(
         widget.restoreResponseFunction.call(widget.questionnairePath),
       );
-      return qm;
+      return qrm;
     });
   }
 
@@ -79,16 +79,16 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(widget.title),
-      subtitle: FutureBuilder<QuestionnaireModel>(
+      subtitle: FutureBuilder<QuestionnaireResponseModel>(
         future: _modelFuture,
         builder: (context, snapshot) {
           var countString = '';
           if (snapshot.hasData) {
-            final _questionnaireModel = snapshot.data!;
+            final _questionnaireResponseModel = snapshot.data!;
             final _numberCompleted =
-                _questionnaireModel.count((qim) => qim.isAnswered);
+                _questionnaireResponseModel.count((rim) => rim.isAnswered);
             final _totalNumber =
-                _questionnaireModel.count((qim) => qim.isAnswerable);
+                _questionnaireResponseModel.count((rim) => rim.isAnswerable);
             countString = 'Completed: $_numberCompleted / $_totalNumber '
                 '(${_percentPattern.format(_numberCompleted / _totalNumber)})';
           }
@@ -105,14 +105,14 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
           child: IconButton(
             icon: const Icon(Icons.preview),
             onPressed: () async {
-              final questionnaireModel =
-                  await QuestionnaireModel.fromFhirResourceBundle(
+              final questionnaireResponseModel =
+                  await QuestionnaireResponseModel.fromFhirResourceBundle(
                 fhirResourceProvider: _questionnaireProvider,
                 launchContext: widget.launchContext,
                 locale: _locale,
                 aggregators: [NarrativeAggregator()],
               );
-              questionnaireModel.populate(
+              questionnaireResponseModel.populate(
                 widget.restoreResponseFunction.call(widget.questionnairePath),
               );
               if (!mounted) {
@@ -122,7 +122,7 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => NarrativePage(
-                    questionnaireModel: questionnaireModel,
+                    questionnaireResponseModel: questionnaireResponseModel,
                   ),
                 ),
               );

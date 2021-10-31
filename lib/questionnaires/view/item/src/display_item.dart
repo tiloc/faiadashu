@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 
 import '../../../questionnaires.dart';
 
-/// A pseudo-filler for items of type "display".
-class DisplayItem extends QuestionnaireAnswerFiller {
-  DisplayItem(
-    QuestionnaireResponseFillerState responseFillerState,
-    int answerIndex, {
+/// A view for filler items of type "display".
+class DisplayItem extends QuestionnaireItemFiller {
+  const DisplayItem(
+    QuestionnaireFillerData questionnaireFiller,
+    int index,
+    FillerItemModel fillerItem, {
     Key? key,
-  }) : super(responseFillerState, answerIndex, key: key);
+  }) : super(questionnaireFiller, index, fillerItem, key: key);
   @override
   State<StatefulWidget> createState() => _DisplayItemState();
 }

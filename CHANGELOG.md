@@ -1,3 +1,8 @@
+## 0.5.4-dev.7
+* [Breaking] Fix hierarchy of models according to https://chat.fhir.org/#narrow/stream/179255-questionnaire/topic/Questionnaire.20Response.20example
+  * This introduces a strict separation of a questionnaire and its response
+  * This replaces the simplistic 1:1 relationships between items and responses with proper 1:n model
+
 ## 0.5.4-dev.6
 * Fix bug with unit extension
 * WIP: repeating question items

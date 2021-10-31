@@ -10,7 +10,7 @@ import '../../../questionnaires.dart';
 class NarrativeAggregator extends Aggregator<Narrative> {
   static final _logger = Logger(NarrativeAggregator);
 
-  // Generation of questionnaireModel when _narrative was calculated
+  // Generation of QuestionnaireResponseModel when _narrative was calculated
   int _generation = -1;
   // Cached narrative
   Narrative? _narrative;
@@ -24,8 +24,8 @@ class NarrativeAggregator extends Aggregator<Narrative> {
       : super(NarrativeAggregator.emptyNarrative, autoAggregate: false);
 
   @override
-  void init(QuestionnaireModel questionnaireModel) {
-    super.init(questionnaireModel);
+  void init(QuestionnaireResponseModel questionnaireResponseModel) {
+    super.init(questionnaireResponseModel);
 
     _generation = -1;
     _narrative = value;
@@ -33,22 +33,24 @@ class NarrativeAggregator extends Aggregator<Narrative> {
 
   bool _addResponseItemToDiv(
     StringBuffer div,
-    QuestionnaireItemModel itemModel,
+    FillerItemModel fillerItemModel,
   ) {
-    final item = itemModel.responseItem;
+    if (fillerItemModel is! ResponseItemModel) {return false;}
+
+    final item = fillerItemModel.responseItem;
 
     if (item == null) {
       return false;
     }
 
-    if (!itemModel.isEnabled) {
+    if (!fillerItemModel.isEnabled) {
       return false;
     }
 
     bool returnValue = false;
 
     if (item.text != null) {
-      if (itemModel.isGroup) {
+      if (fillerItemModel is GroupResponseItemModel) {
         div.write('<h2>${item.text}</h2>');
       } else {
         div.write('<h3>${item.text}</h3>');
@@ -81,7 +83,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
           if (answer.valueString != null) {
             div.write('<p>$repeatPrefix${answer.valueString}</p>');
           } else if (answer.valueDecimal != null) {
-            if (itemModel.isTotalScore) {
+            if (fillerItemModel.questionnaireItemModel.isTotalScore) {
               div.write('<h3>${answer.valueDecimal!.format(locale)}</h3>');
             } else {
               div.write(
@@ -130,7 +132,8 @@ class NarrativeAggregator extends Aggregator<Narrative> {
     return returnValue;
   }
 
-  Narrative _generateNarrative(QuestionnaireItemModel questionnaireModel) {
+  Narrative _generateNarrative(
+      QuestionnaireResponseModel questionnaireResponseModel) {
     final languageTag = locale.toLanguageTag();
     final div = StringBuffer(
       '<div xmlns="http://www.w3.org/1999/xhtml" lang="$languageTag" xml:lang="$languageTag">',
@@ -139,7 +142,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
     bool generated = false;
 
     for (final itemModel
-        in questionnaireModel.orderedQuestionnaireItemModels()) {
+        in questionnaireResponseModel.orderedFillerItemModels()) {
       generated = generated | _addResponseItemToDiv(div, itemModel);
     }
     div.write('<p>&nbsp;</p>');
@@ -154,18 +157,18 @@ class NarrativeAggregator extends Aggregator<Narrative> {
   @override
   Narrative? aggregate({bool notifyListeners = false}) {
     _logger.debug(
-      '$this.aggregate (Model Generation: ${questionnaireModel.generation}, Narrative Generation: $_generation)',
+      '$this.aggregate (Model Generation: ${questionnaireResponseModel.generation}, Narrative Generation: $_generation)',
     );
-    if (questionnaireModel.generation == _generation) {
+    if (questionnaireResponseModel.generation == _generation) {
       _logger.debug('Regurgitating narrative generation $_generation');
       return _narrative;
     }
     // Manually invoke the update, because the order matters and enableWhen calcs need to come after answer value updates.
-    questionnaireModel.updateEnabledItems(
+    questionnaireResponseModel.updateEnabledItems(
       notifyListeners: false,
     ); // Setting this to true might result in endless refresh and stack overflow
-    _narrative = _generateNarrative(questionnaireModel);
-    _generation = questionnaireModel.generation;
+    _narrative = _generateNarrative(questionnaireResponseModel);
+    _generation = questionnaireResponseModel.generation;
     if (notifyListeners) {
       value = _narrative!;
     }

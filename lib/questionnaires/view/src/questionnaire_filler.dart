@@ -18,19 +18,20 @@ class QuestionnaireFiller extends StatefulWidget {
   final WidgetBuilder builder;
   final List<Aggregator<dynamic>>? aggregators;
   final void Function(BuildContext context, Uri url)? onLinkTap;
-  final void Function(QuestionnaireModel)? onDataAvailable;
+  final void Function(QuestionnaireResponseModel)? onDataAvailable;
   final QuestionnaireTheme questionnaireTheme;
 
   final FhirResourceProvider fhirResourceProvider;
   final LaunchContext launchContext;
 
-  Future<QuestionnaireModel> _createQuestionnaireModel() async =>
-      QuestionnaireModel.fromFhirResourceBundle(
-        locale: locale,
-        aggregators: aggregators,
-        fhirResourceProvider: fhirResourceProvider,
-        launchContext: launchContext,
-      );
+  Future<QuestionnaireResponseModel>
+      _createQuestionnaireResponseModel() async =>
+          QuestionnaireResponseModel.fromFhirResourceBundle(
+            locale: locale,
+            aggregators: aggregators,
+            fhirResourceProvider: fhirResourceProvider,
+            launchContext: launchContext,
+          );
 
   const QuestionnaireFiller({
     Key? key,
@@ -58,27 +59,27 @@ class QuestionnaireFiller extends StatefulWidget {
 class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
   static final _logger = Logger(_QuestionnaireFillerState);
 
-  late final Future<QuestionnaireModel> builderFuture;
-  QuestionnaireModel? _questionnaireModel;
-  VoidCallback? _onQuestionnaireModelChangeListenerFunction;
+  late final Future<QuestionnaireResponseModel> builderFuture;
+  QuestionnaireResponseModel? _questionnaireResponseModel;
+  VoidCallback? _onQuestionnaireResponseModelChangeListenerFunction;
   late final QuestionnaireFillerData _questionnaireFillerData;
 
   @override
   void initState() {
     super.initState();
-    builderFuture = widget._createQuestionnaireModel();
+    builderFuture = widget._createQuestionnaireResponseModel();
   }
 
   @override
   void dispose() {
     _logger.trace('dispose');
 
-    if (_onQuestionnaireModelChangeListenerFunction != null &&
-        _questionnaireModel != null) {
-      _questionnaireModel!
-          .removeListener(_onQuestionnaireModelChangeListenerFunction!);
-      _questionnaireModel = null;
-      _onQuestionnaireModelChangeListenerFunction = null;
+    if (_onQuestionnaireResponseModelChangeListenerFunction != null &&
+        _questionnaireResponseModel != null) {
+      _questionnaireResponseModel!
+          .removeListener(_onQuestionnaireResponseModelChangeListenerFunction!);
+      _questionnaireResponseModel = null;
+      _onQuestionnaireResponseModelChangeListenerFunction = null;
     }
     super.dispose();
   }
@@ -93,7 +94,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
   @override
   Widget build(BuildContext context) {
     _logger.trace('Enter build()');
-    return FutureBuilder<QuestionnaireModel>(
+    return FutureBuilder<QuestionnaireResponseModel>(
       future: builderFuture,
       builder: (context, snapshot) {
         switch (snapshot.connectionState) {
@@ -113,17 +114,17 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
             }
             if (snapshot.hasData) {
               _logger.debug('FutureBuilder hasData');
-              _questionnaireModel = snapshot.data;
+              _questionnaireResponseModel = snapshot.data;
               // OPTIMIZE: There has got to be a more elegant way? Goal is to register the listener exactly once, after the future has completed.
-              if (_onQuestionnaireModelChangeListenerFunction == null) {
-                _onQuestionnaireModelChangeListenerFunction =
+              if (_onQuestionnaireResponseModelChangeListenerFunction == null) {
+                _onQuestionnaireResponseModelChangeListenerFunction =
                     () => _onQuestionnaireModelChange();
-                _questionnaireModel!.addListener(
-                  _onQuestionnaireModelChangeListenerFunction!,
+                _questionnaireResponseModel!.addListener(
+                  _onQuestionnaireResponseModelChangeListenerFunction!,
                 );
 
                 _questionnaireFillerData = QuestionnaireFillerData._(
-                  _questionnaireModel!,
+                  _questionnaireResponseModel!,
                   locale: widget.locale,
                   builder: widget.builder,
                   onLinkTap: widget.onLinkTap,
@@ -142,59 +143,61 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
   }
 }
 
-// OPTIMIZE: Would there be any benefit in making this an InheritedNotifier, listening to the QuestionnaireModel?
-
 class QuestionnaireFillerData extends InheritedWidget {
   static final _logger = Logger(QuestionnaireFillerData);
 
   final Locale locale;
-  final QuestionnaireModel questionnaireModel;
-  final Iterable<QuestionnaireItemModel> questionnaireItemModels;
+  final QuestionnaireResponseModel questionnaireResponseModel;
+  final Iterable<FillerItemModel> fillerItemModels;
   final void Function(BuildContext context, Uri url)? onLinkTap;
-  final void Function(QuestionnaireModel)? onDataAvailable;
+  final void Function(QuestionnaireResponseModel)? onDataAvailable;
   final QuestionnaireTheme questionnaireTheme;
   late final List<QuestionnaireItemFiller?> _itemFillers;
   final Map<int, QuestionnaireItemFillerState> _itemFillerStates = {};
   late final int _generation;
 
   QuestionnaireFillerData._(
-    this.questionnaireModel, {
+    this.questionnaireResponseModel, {
     Key? key,
     required this.locale,
     this.onDataAvailable,
     this.onLinkTap,
     required this.questionnaireTheme,
     required WidgetBuilder builder,
-  })  : _generation = questionnaireModel.generation,
-        questionnaireItemModels =
-            questionnaireModel.orderedQuestionnaireItemModels(),
+  })  : _generation = questionnaireResponseModel.generation,
+        fillerItemModels = questionnaireResponseModel.orderedFillerItemModels(),
         _itemFillers = List<QuestionnaireItemFiller?>.filled(
-          questionnaireModel.orderedQuestionnaireItemModels().length,
+          questionnaireResponseModel.orderedFillerItemModels().length,
           null,
         ),
         super(key: key, child: Builder(builder: builder)) {
     _logger.trace('constructor _');
-    onDataAvailable?.call(questionnaireModel);
+    onDataAvailable?.call(questionnaireResponseModel);
   }
 
   /// INTERNAL USE ONLY: Register a [QuestionnaireItemFillerState].
   void registerQuestionnaireItemFillerState(QuestionnaireItemFillerState qifs) {
-    _itemFillerStates[_indexOfLinkId(qifs.linkId)] = qifs;
+// FIXME: Restore functionality
+    //    _itemFillerStates[_indexOfLinkId(qifs.linkId)] = qifs;
   }
 
   /// INTERNAL USE ONLY: Unregister a [QuestionnaireItemFillerState].
   void unregisterQuestionnaireItemFillerState(
     QuestionnaireItemFillerState qifs,
   ) {
-    _itemFillerStates.remove(_indexOfLinkId(qifs.linkId));
+// FIXME: Restore functionality
+//    _itemFillerStates.remove(_indexOfLinkId(qifs.linkId));
   }
 
-  int _indexOfLinkId(String linkId) {
-    return _itemFillers.indexWhere((qif) => qif?.itemModel.linkId == linkId);
+  // FIXME: linkId is not unique!
+/*  int _indexOfLinkId(String linkId) {
+    return _itemFillers
+        .indexWhere((qif) => qif?.responseItemModel.linkId == linkId);
   }
+*/
 
   T aggregator<T extends Aggregator>() {
-    return questionnaireModel.aggregator<T>();
+    return questionnaireResponseModel.aggregator<T>();
   }
 
   /// Requests focus on a [QuestionnaireItemFiller].
@@ -223,8 +226,10 @@ class QuestionnaireFillerData extends InheritedWidget {
       _itemFillers[index] = questionnaireTheme.createQuestionnaireItemFiller(
         this,
         index,
+        fillerItemModels.elementAt(index),
         key: ValueKey<String>(
-          'item-filler-${questionnaireItemModels.elementAt(index).linkId}',
+          // FIXME: linkId is not unique
+          'item-filler-${fillerItemModels.elementAt(index).linkId}',
         ),
       );
     } else {

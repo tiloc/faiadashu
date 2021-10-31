@@ -13,7 +13,7 @@ import '../../../../questionnaires.dart';
 /// Future R5 releases of the FHIR standard will likely have a `coding` item type.
 class CodingAnswerFiller extends QuestionnaireAnswerFiller {
   CodingAnswerFiller(
-    QuestionnaireResponseFillerState responseFillerState,
+    QuestionResponseItemFillerState responseFillerState,
     int answerIndex, {
     Key? key,
   }) : super(responseFillerState, answerIndex, key: key);
@@ -88,7 +88,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
           '$optionPrefixDisplay${choice.localizedDisplay(locale)}';
       final styledOptionTitle = Xhtml.toWidget(
         context,
-        answerModel.questionnaireModel,
+        answerModel.responseItemModel.questionnaireItemModel.questionnaireModel,
         optionTitle,
         choice.valueStringElement?.extension_,
         width: 100,

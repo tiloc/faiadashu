@@ -202,7 +202,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
         );
       }
 
-      itemModel.questionnaireModel
+      questionnaireItemModel.questionnaireModel
           .forEachInValueSet(key, _addAnswerOption, context: qi);
     } else {
       if (qi.answerOption != null) {
@@ -232,7 +232,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
   late final int minOccurs;
   late final int? maxOccurs;
 
-  CodingAnswerModel(ResponseModel responseModel, int answerIndex)
+  CodingAnswerModel(QuestionResponseItemModel responseModel, int answerIndex)
       : super(responseModel, answerIndex) {
     _createAnswerOptions();
 
@@ -251,10 +251,10 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
         ?.valueInteger
         ?.value;
 
-    if (itemModel.responseItem != null) {
-      value = (itemModel.responseItem!.answer != null)
+    if (responseItemModel.responseItem != null) {
+      value = (responseItemModel.responseItem!.answer != null)
           ? CodeableConcept(
-              coding: itemModel.responseItem!.answer
+              coding: responseItemModel.responseItem!.answer
                   ?.map(
                     (answer) => answerOptions[
                             choiceStringFromCoding(answer.valueCoding)]!
@@ -339,7 +339,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
   QuestionnaireErrorFlag? get isComplete {
     if (value == null && minOccurs > 0) {
       return QuestionnaireErrorFlag(
-        itemModel.linkId,
+        questionnaireItemModel.linkId,
         answerIndex: answerIndex,
         errorText:
             lookupFDashLocalizations(locale).validatorMinOccurs(minOccurs),
@@ -350,7 +350,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
     return (validationText == null)
         ? null
         : QuestionnaireErrorFlag(
-            itemModel.linkId,
+            questionnaireItemModel.linkId,
             answerIndex: answerIndex,
             errorText: validationText,
           );

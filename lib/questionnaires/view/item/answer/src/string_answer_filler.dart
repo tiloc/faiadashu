@@ -6,7 +6,7 @@ import 'questionnaire_answer_filler.dart';
 
 class StringAnswerFiller extends QuestionnaireAnswerFiller {
   StringAnswerFiller(
-    QuestionnaireResponseFillerState responseFillerState,
+    QuestionResponseItemFillerState responseFillerState,
     int answerIndex, {
     Key? key,
   }) : super(responseFillerState, answerIndex, key: key);

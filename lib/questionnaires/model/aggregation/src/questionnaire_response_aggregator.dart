@@ -20,12 +20,12 @@ class QuestionnaireResponseAggregator
 
   /// Initialize the aggregator.
   @override
-  void init(QuestionnaireModel questionnaireModel) {
-    super.init(questionnaireModel);
+  void init(QuestionnaireResponseModel questionnaireResponseModel) {
+    super.init(questionnaireResponseModel);
   }
 
   QuestionnaireResponseItem? _fromGroupItem(
-    QuestionnaireItemModel itemModel,
+    GroupResponseItemModel itemModel,
     QuestionnaireResponseStatus responseStatus,
   ) {
     if (responseStatus == QuestionnaireResponseStatus.completed &&
@@ -33,6 +33,9 @@ class QuestionnaireResponseAggregator
       return null;
     }
 
+    // FIXME: Restore functionality
+    return null;
+/*
     final nestedItems = <QuestionnaireResponseItem>[];
 
     for (final nestedItem in itemModel.children) {
@@ -48,6 +51,7 @@ class QuestionnaireResponseAggregator
       }
     }
 
+    // TODO: Should this be done by the group model itself?
     if (nestedItems.isNotEmpty) {
       return QuestionnaireResponseItem(
         linkId: itemModel.linkId,
@@ -56,7 +60,7 @@ class QuestionnaireResponseAggregator
       );
     } else {
       return null;
-    }
+    } */
   }
 
   @override
@@ -70,11 +74,13 @@ class QuestionnaireResponseAggregator
     // Are all minimum fields for SDC profile present?
     bool isValidSdc = true;
 
-    responseStatus ??= questionnaireModel.responseStatus;
+    responseStatus ??= questionnaireResponseModel.responseStatus;
 
     final responseItems = <QuestionnaireResponseItem>[];
 
-    for (final itemModel in questionnaireModel.siblings) {
+    // FIXME: Restore functionality
+    /*
+    for (final itemModel in questionnaireResponseModel.siblings) {
       if (itemModel.isGroup) {
         final groupItem = _fromGroupItem(itemModel, responseStatus);
         if (groupItem != null) {
@@ -88,23 +94,28 @@ class QuestionnaireResponseAggregator
         }
       }
     }
+*/
 
     final narrativeAggregator =
-        questionnaireModel.aggregator<NarrativeAggregator>();
+        questionnaireResponseModel.aggregator<NarrativeAggregator>();
 
-    final questionnaireUrl = questionnaireModel.questionnaire.url?.toString();
-    final questionnaireVersion = questionnaireModel.questionnaire.version;
+    final questionnaireUrl = questionnaireResponseModel
+        .questionnaireModel.questionnaire.url
+        ?.toString();
+    final questionnaireVersion =
+        questionnaireResponseModel.questionnaireModel.questionnaire.version;
     final questionnaireCanonical = (questionnaireUrl != null)
         ? Canonical(
             "$questionnaireUrl${(questionnaireVersion != null) ? '|$questionnaireVersion' : ''}",
           )
         : null;
 
-    final questionnaireTitle = questionnaireModel.questionnaire.title;
+    final questionnaireTitle =
+        questionnaireResponseModel.questionnaireModel.questionnaire.title;
 
     final contained = <Resource>[];
 
-    final subject = questionnaireModel.launchContext.patient;
+    final subject = questionnaireResponseModel.launchContext.patient;
 
     Reference? subjectReference;
     if (subject != null) {
@@ -160,7 +171,8 @@ class QuestionnaireResponseAggregator
                   url: FhirUri(
                     'http://hl7.org/fhir/StructureDefinition/display',
                   ),
-                  valueString: questionnaireModel.questionnaire.title,
+                  valueString: questionnaireResponseModel
+                      .questionnaireModel.questionnaire.title,
                 )
               ],
             )

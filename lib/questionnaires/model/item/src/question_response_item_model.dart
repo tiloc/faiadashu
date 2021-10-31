@@ -3,26 +3,46 @@ import 'dart:math';
 import 'package:fhir/r4.dart';
 
 import '../../../../coding/coding.dart';
+import '../../../../fhir_types/fhir_types.dart';
+import '../../../../logging/logging.dart';
 import '../../../questionnaires.dart';
 
-// TODO: Properly model nested and repeating responses: https://chat.fhir.org/#narrow/stream/179255-questionnaire
+/// Model a response item to a question.
+///
+/// A single response might reference multiple answers.
+class QuestionResponseItemModel extends ResponseItemModel {
+  static final _qrimLogger = Logger(QuestionResponseItemModel);
 
-/// Model a response item, which might consist of multiple answers.
-class ResponseModel {
-  /// The individual answers to this questionnaire item.
+  /// The individual FHIR domain answers to this questionnaire item.
   List<QuestionnaireResponseAnswer?> answers = [];
+
+  /// The FHIR domain QuestionnaireResponseItem
+  QuestionnaireResponseItem? _questionnaireResponseItem;
+
+  /// Returns the associated [QuestionnaireResponseItem].
+  @override
+  QuestionnaireResponseItem? get responseItem => _questionnaireResponseItem;
+
+  /// Sets the associated [QuestionnaireResponseItem].
+  set responseItem(QuestionnaireResponseItem? questionnaireResponseItem) {
+    _qrimLogger.debug('set responseItem $questionnaireResponseItem');
+    if (questionnaireResponseItem != _questionnaireResponseItem) {
+      _questionnaireResponseItem = questionnaireResponseItem;
+      questionnaireResponseModel.nextGeneration();
+      // This notifies aggregators on changes to individual items
+      notifyListeners();
+    }
+  }
 
   /// Reason why this response is empty.
   ///
   /// see [DataAbsentReason]
   Code? dataAbsentReason;
-  final QuestionnaireItemModel itemModel;
 
-  QuestionnaireResponseItem? get responseItem => itemModel.responseItem;
-  set responseItem(QuestionnaireResponseItem? ri) =>
-      itemModel.responseItem = ri;
-
-  ResponseModel(this.itemModel) {
+  QuestionResponseItemModel(
+    QuestionnaireResponseModel questionnaireResponseModel,
+    QuestionnaireItemModel itemModel,
+  ) : super(questionnaireResponseModel, itemModel) {
     final int answerCount = responseItem?.answer?.length ?? 0;
     if (answerCount > 0) {
       answers = responseItem!.answer!;
@@ -46,11 +66,11 @@ class ResponseModel {
         .map<QuestionnaireResponseAnswer>((answer) => answer!)
         .toList(growable: false);
 
-    itemModel.responseItem = (filledAnswers.isEmpty && dataAbsentReason == null)
+    responseItem = (filledAnswers.isEmpty && dataAbsentReason == null)
         ? null
         : QuestionnaireResponseItem(
-            linkId: itemModel.linkId,
-            text: itemModel.questionnaireItem.text,
+            linkId: linkId,
+            text: questionnaireItemModel.questionnaireItem.text,
             extension_: (dataAbsentReason != null)
                 ? [
                     FhirExtension(
@@ -67,7 +87,9 @@ class ResponseModel {
   /// Is this response invalid?
   ///
   /// This is currently entirely based on the [dataAbsentReason].
+  @override
   bool get isInvalid {
+    _qrimLogger.trace('isInvalid $linkId');
     return dataAbsentReason == dataAbsentReasonAsTextCode;
   }
 
@@ -81,6 +103,10 @@ class ResponseModel {
     _ensureAnswerModel();
 
     final markers = <QuestionnaireErrorFlag>[];
+    final rimMarkers = super.isComplete;
+    if (rimMarkers != null) {
+      markers.addAll(rimMarkers);
+    }
 
     for (final am in _cachedAnswerModels.values) {
       final marker = am.isComplete;
@@ -92,6 +118,7 @@ class ResponseModel {
     return (markers.isNotEmpty) ? markers : null;
   }
 
+  // FIXME: Clarify between this and response item model
   bool get isUnanswered {
     _ensureAnswerModel();
 
@@ -128,7 +155,7 @@ class ResponseModel {
 
     final AnswerModel? answerModel;
 
-    switch (itemModel.questionnaireItem.type) {
+    switch (questionnaireItemModel.questionnaireItem.type) {
       case QuestionnaireItemType.choice:
       case QuestionnaireItemType.open_choice:
         answerModel = CodingAnswerModel(this, answerIndex);
@@ -152,11 +179,9 @@ class ResponseModel {
         answerModel = BooleanAnswerModel(this, answerIndex);
         break;
       case QuestionnaireItemType.display:
-        answerModel = DisplayAnswerModel(this, answerIndex);
-        break;
+        throw UnsupportedError("Items of type 'display' do not have answers.");
       case QuestionnaireItemType.group:
-        answerModel = GroupAnswerModel(this, answerIndex);
-        break;
+        throw UnsupportedError("Items of type 'group' do not have answers.");
       case QuestionnaireItemType.attachment:
       case QuestionnaireItemType.unknown:
       case QuestionnaireItemType.reference:
@@ -167,5 +192,64 @@ class ResponseModel {
     _cachedAnswerModels[answerIndex] = answerModel;
 
     return answerModel;
+  }
+
+  void populateInitialValue() {
+    _qrimLogger.debug('populateInitialValue: $linkId');
+    if (questionnaireItemModel.hasInitialExpression) {
+      final initialEvaluationResult = evaluateInitialExpression();
+      answerModel(0).populateFromExpression(initialEvaluationResult);
+    } else {
+      // initial.value[x]
+      // TODO: Implement
+    }
+  }
+
+  /// Returns the value of the initialExpression.
+  ///
+  /// Returns null if the item does not have an initialExpression,
+  /// or it evaluates to an empty list.
+  dynamic evaluateInitialExpression() {
+    final fhirPathExpression =
+        questionnaireItemModel.questionnaireItem.extension_
+            ?.extensionOrNull(
+              'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression',
+            )
+            ?.valueExpression
+            ?.expression;
+
+    if (fhirPathExpression == null) {
+      return null;
+    }
+
+    final evaluationResult = evaluateFhirPathExpression(
+      fhirPathExpression,
+      requiresQuestionnaireResponse: false,
+    );
+
+    if (evaluationResult.isEmpty) {
+      return null;
+    }
+
+    return evaluationResult.first;
+  }
+
+  void updateCalculatedExpression() {
+    final fhirPathExpression = questionnaireItemModel.calculatedExpression;
+    if (fhirPathExpression == null) {
+      return;
+    }
+
+    final rawEvaluationResult = evaluateFhirPathExpression(
+      fhirPathExpression,
+    );
+
+    final evaluationResult =
+        (rawEvaluationResult.isNotEmpty) ? rawEvaluationResult.first : null;
+
+    // Write the value back to the answer model
+    answerModel(0).populateFromExpression(evaluationResult);
+    // ... and make sure the world will know about it
+    updateResponse();
   }
 }
