@@ -30,8 +30,6 @@ class QuestionnaireItemModel with Diagnosticable {
 
   QuestionnaireModel get questionnaireModel => _questionnaireModel!;
 
-  LinkedHashMap<String, QuestionnaireItemModel>? _orderedItems;
-
   /// Returns whether the item has an initial value.
   ///
   /// True if either initial.value[x] or initialExpression are present.
@@ -224,6 +222,8 @@ class QuestionnaireItemModel with Diagnosticable {
 
   bool get isDisplay => questionnaireItem.type == QuestionnaireItemType.display;
 
+  bool get isQuestion => !isDisplay && !isGroup;
+
   /// Is this item not changeable by end-users?
   ///
   /// Read-only items might still hold a value, such as a calculated value.
@@ -290,58 +290,6 @@ class QuestionnaireItemModel with Diagnosticable {
         ?.valueString;
   }
 
-  LinkedHashMap<String, QuestionnaireItemModel> _addChildren() {
-    _qimLogger.trace('_addChildren $linkId');
-    final LinkedHashMap<String, QuestionnaireItemModel> itemModelMap =
-        LinkedHashMap<String, QuestionnaireItemModel>();
-    if (itemModelMap.containsKey(linkId)) {
-      throw QuestionnaireFormatException('Duplicate linkId: $linkId', this);
-    }
-    itemModelMap[linkId] = this;
-    if (hasChildren) {
-      for (final child in children) {
-        itemModelMap.addAll(child._addChildren());
-      }
-    }
-
-    return itemModelMap;
-  }
-
-  void _ensureOrderedItems() {
-    if (_orderedItems == null) {
-      final LinkedHashMap<String, QuestionnaireItemModel> itemModelMap =
-          LinkedHashMap<String, QuestionnaireItemModel>();
-      itemModelMap.addAll(_addChildren());
-      QuestionnaireItemModel currentSibling = this;
-      while (currentSibling.hasNextSibling) {
-        currentSibling = currentSibling.nextSibling;
-        if (itemModelMap.containsKey(currentSibling.linkId)) {
-          throw QuestionnaireFormatException(
-            'Duplicate linkId $linkId',
-            currentSibling,
-          );
-        } else {
-          itemModelMap.addAll(currentSibling._addChildren());
-        }
-      }
-      _orderedItems = itemModelMap;
-    }
-  }
-
-  /// Returns an [Iterable] of [QuestionnaireItemModel]s in "pre-order".
-  ///
-  /// see: https://en.wikipedia.org/wiki/Tree_traversal
-  Iterable<QuestionnaireItemModel> orderedQuestionnaireItemModels() {
-    _ensureOrderedItems();
-    return _orderedItems!.values;
-  }
-
-  /// Returns a single [QuestionnaireItemModel] by [index].
-  ///
-  /// The order of the items is the same as with [orderedQuestionnaireItemModels].
-  QuestionnaireItemModel itemModelAt(int index) {
-    return orderedQuestionnaireItemModels().elementAt(index);
-  }
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -364,8 +312,8 @@ class QuestionnaireItemModel with Diagnosticable {
     this.siblingIndex,
     this.level,
   ) {
-    _questionnaireModel = questionnaireModel;
-  }
+      _questionnaireModel = questionnaireModel;
+    }
 
   factory QuestionnaireItemModel._cached(
     Questionnaire questionnaire,

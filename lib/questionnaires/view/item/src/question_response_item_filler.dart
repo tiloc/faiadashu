@@ -4,25 +4,18 @@ import 'package:flutter/material.dart';
 import '../../../../coding/coding.dart';
 import '../../../../fhir_types/fhir_types.dart';
 import '../../../../l10n/l10n.dart';
+import '../../../../logging/src/logger.dart';
 import '../../../questionnaires.dart';
 
 /// Filler for a [QuestionnaireResponseItem].
 class QuestionResponseItemFiller extends ResponseItemFiller {
-  final QuestionResponseItemModel questionResponseItemModel;
+  final QuestionItemModel questionResponseItemModel;
 
   QuestionResponseItemFiller(
     QuestionnaireFillerData questionnaireFiller,
     int index,
     this.questionResponseItemModel,
-  ) : super(
-          questionnaireFiller,
-          index,
-          questionResponseItemModel,
-// FIXME: Restore key handling
-/*          key: ValueKey<String>(
-            responseItemModel.linkId,
-          ), */
-        ); // FIXME: linkId is not unique
+  ) : super(questionnaireFiller, index, questionResponseItemModel);
 
   @override
   State<StatefulWidget> createState() => QuestionResponseItemFillerState();
@@ -30,7 +23,9 @@ class QuestionResponseItemFiller extends ResponseItemFiller {
 
 class QuestionResponseItemFillerState
     extends ResponseItemFillerState<QuestionResponseItemFiller> {
-  late final QuestionResponseItemModel questionResponseItemModel;
+  static final _qrimLogger = Logger(QuestionResponseItemFillerState);
+
+  late final QuestionItemModel questionResponseItemModel;
 
   List<QuestionnaireAnswerFiller> _answerFillers = [];
 
@@ -44,10 +39,9 @@ class QuestionResponseItemFillerState
 
     questionResponseItemModel = widget.questionResponseItemModel;
 
-    // FIXME: LinkId is not unique
     _skipSwitchFocusNode = FocusNode(
       skipTraversal: true,
-      debugLabel: 'SkipSwitch ${responseItemModel.linkId}',
+      debugLabel: 'SkipSwitch ${responseItemModel.responseUid}',
     );
 
     _createAnswerFillers();
@@ -109,11 +103,9 @@ class QuestionResponseItemFillerState
 
   @override
   Widget build(BuildContext context) {
-// FIXME: Restore tracing
-    /*    _logger.trace(
-     'build $linkId hidden: ${widget.responseItemModel.questionnaireItemModel.isHidden}, enabled: ${widget.responseItemModel.isEnabled}',
+    _qrimLogger.trace(
+      'build ${widget.responseItemModel.responseUid} hidden: ${widget.responseItemModel.questionnaireItemModel.isHidden}, enabled: ${widget.responseItemModel.isEnabled}',
     );
-*/
     return (!widget.responseItemModel.questionnaireItemModel.isHidden)
         ? Focus(
             focusNode: focusNode,
@@ -146,8 +138,9 @@ class QuestionResponseItemFillerState
                                     else
                                       Expanded(child: Container()),
                                     Expanded(
-                                        flex: 2,
-                                        child: _buildAnswerFillers(context))
+                                      flex: 2,
+                                      child: _buildAnswerFillers(context),
+                                    )
                                   ],
                                 )
                               // Narrow, portrait screen: Use vertical layout

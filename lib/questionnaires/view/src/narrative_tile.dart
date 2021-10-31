@@ -8,7 +8,8 @@ import 'questionnaire_filler.dart';
 class NarrativeTile extends StatefulWidget {
   final QuestionnaireResponseModel? questionnaireResponseModel;
 
-  const NarrativeTile({this.questionnaireResponseModel, Key? key}) : super(key: key);
+  const NarrativeTile({this.questionnaireResponseModel, Key? key})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _NarrativeTileState();

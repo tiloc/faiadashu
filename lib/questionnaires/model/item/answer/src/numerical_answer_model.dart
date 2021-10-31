@@ -72,7 +72,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
     return keyForUnitChoice(coding);
   }
 
-  NumericalAnswerModel(QuestionResponseItemModel responseModel, int answerIndex)
+  NumericalAnswerModel(QuestionItemModel responseModel, int answerIndex)
       : super(responseModel, answerIndex) {
     _isSliding =
         questionnaireItemModel.questionnaireItem.isItemControl('slider');

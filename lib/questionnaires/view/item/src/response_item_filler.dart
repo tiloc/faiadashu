@@ -18,9 +18,9 @@ abstract class ResponseItemFiller extends QuestionnaireItemFiller {
           index,
           responseItemModel,
           key: ValueKey<String>(
-            responseItemModel.linkId,
+            responseItemModel.responseUid,
           ),
-        ); // FIXME: linkId is not unique
+        );
 }
 
 abstract class ResponseItemFillerState<W extends ResponseItemFiller>

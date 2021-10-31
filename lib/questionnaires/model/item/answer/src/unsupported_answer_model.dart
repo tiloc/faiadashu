@@ -4,7 +4,7 @@ import '../../../model.dart';
 
 /// A pseudo-model for a questionnaire item of an unsupported type.
 class UnsupportedAnswerModel extends AnswerModel<Object, Object> {
-  UnsupportedAnswerModel(QuestionResponseItemModel responseModel, int answerIndex)
+  UnsupportedAnswerModel(QuestionItemModel responseModel, int answerIndex)
       : super(responseModel, answerIndex);
 
   @override

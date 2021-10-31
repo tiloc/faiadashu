@@ -8,7 +8,7 @@ class BrokenAnswerFiller extends QuestionnaireAnswerFiller {
   final Object exception;
 
   BrokenAnswerFiller(
-      QuestionResponseItemFillerState responseFillerState,
+    QuestionResponseItemFillerState responseFillerState,
     int answerIndex,
     this.exception, {
     Key? key,

@@ -17,6 +17,9 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   List<QuestionnaireItemModel>? _itemsWithEnableWhen;
   List<QuestionnaireItemModel>? _itemsWithEnableWhenExpression;
 
+  final LinkedHashMap<String, QuestionnaireItemModel> _orderedItems =
+      LinkedHashMap<String, QuestionnaireItemModel>();
+
   /// Direct access to [FhirResourceProvider]s for special use-cases.
   ///
   /// see: [getResource] for the preferred access method.
@@ -36,8 +39,8 @@ class QuestionnaireModel extends QuestionnaireItemModel {
           0,
         ) {
     _questionnaireModel = this;
-    // This will set up the traversal order and fill up the cache.
-    _ensureOrderedItems();
+    // TODO: If I cleanly split questionnaire / questionnaire item then this special handling can be eliminated
+    _buildOrderedItems();
 
     // Set up conventional enableWhen feature
     for (final itemModel in orderedQuestionnaireItemModels()) {
@@ -98,6 +101,48 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     await questionnaireModel.fhirResourceProvider.init();
 
     return questionnaireModel;
+  }
+
+  LinkedHashMap<String, QuestionnaireItemModel> _addChildren(
+      QuestionnaireItemModel qim) {
+    _logger.trace('_addChildren $qim');
+    final LinkedHashMap<String, QuestionnaireItemModel> itemModelMap =
+        LinkedHashMap<String, QuestionnaireItemModel>();
+    if (itemModelMap.containsKey(qim.linkId)) {
+      throw QuestionnaireFormatException(
+          'Duplicate linkId: ${qim.linkId}', qim);
+    }
+    itemModelMap[qim.linkId] = qim;
+    if (qim.hasChildren) {
+      for (final child in qim.children) {
+        itemModelMap.addAll(_addChildren(child));
+      }
+    }
+
+    return itemModelMap;
+  }
+
+  void _buildOrderedItems() {
+    _orderedItems.addAll(_addChildren(this));
+    QuestionnaireItemModel currentSibling = this;
+    while (currentSibling.hasNextSibling) {
+      currentSibling = currentSibling.nextSibling;
+      if (_orderedItems.containsKey(currentSibling.linkId)) {
+        throw QuestionnaireFormatException(
+          'Duplicate linkId $linkId',
+          currentSibling,
+        );
+      } else {
+        _orderedItems.addAll(_addChildren(currentSibling));
+      }
+    }
+  }
+
+  /// Returns an [Iterable] of [QuestionnaireItemModel]s in "pre-order".
+  ///
+  /// see: https://en.wikipedia.org/wiki/Tree_traversal
+  Iterable<QuestionnaireItemModel> orderedQuestionnaireItemModels() {
+    return _orderedItems.values;
   }
 
   /// Returns a [Resource] which is referenced in the [Questionnaire].
@@ -275,7 +320,7 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   ///
   /// Throws an [Exception] when no such [QuestionnaireItemModel] exists.
   QuestionnaireItemModel fromLinkId(String linkId) {
-    final result = _orderedItems![linkId];
+    final result = _orderedItems[linkId];
     if (result == null) {
       throw QuestionnaireFormatException("Location '$linkId' not found.");
     } else {

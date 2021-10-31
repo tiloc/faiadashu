@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:ui';
 
 import 'package:fhir/r4/r4.dart';
@@ -22,39 +23,29 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
   int _generation = 1;
 
+  final LinkedHashMap<String, FillerItemModel> _orderedFillerItems =
+      LinkedHashMap<String, FillerItemModel>();
+
   // Questionnaire-level variables
-  late final List<VariableModel>? _variables;
+  List<VariableModel>? _variables;
 
   bool get hasVariables => (_variables != null) && _variables!.isNotEmpty;
 
+  List<VariableModel>? get variables => _variables;
+
   List<VariableModel>? get questionnaireLevelVariables => _variables;
 
+  /// Constructor for empty model.
+  ///
+  /// Only sets up class fields, but does not enable any dynamic behavior.
   QuestionnaireResponseModel._({
     required this.locale,
     required this.questionnaireModel,
     required this.launchContext,
     required List<Aggregator>? aggregators,
   }) : _aggregators = aggregators {
-    if (aggregators != null) {
-      for (final aggregator in aggregators) {
-        aggregator.init(this);
-        // Assumption: aggregators that don't autoAggregate will have their aggregate method invoked manually when it matters.
-        if (aggregator.autoAggregate) {
-          aggregator.aggregate(notifyListeners: true);
-        }
-      }
-    }
-
     _variables =
         VariableModel.variables(questionnaireModel.questionnaire, null);
-
-    // TODO: Should the constructor activate any kind of dynamic behavior?
-    activateEnableBehavior();
-
-    // This ensures screen updates in case of invalid responses.
-    errorFlags.addListener(() {
-      nextGeneration();
-    });
   }
 
   /// Create the model for a [QuestionnaireResponse].
@@ -98,6 +89,8 @@ class QuestionnaireResponseModel extends ChangeNotifier {
       launchContext: launchContext,
     );
 
+    questionnaireResponseModel._addFillerItems(questionnaireModel.siblings);
+
     final response =
         fhirResourceProvider.getResource(questionnaireResponseResourceUri)
             as QuestionnaireResponse?;
@@ -119,12 +112,24 @@ class QuestionnaireResponseModel extends ChangeNotifier {
           .orderedResponseItemModels()
           .where((rim) => rim.questionnaireItemModel.hasInitialValue)
           .forEach((rim) {
-        if (rim is QuestionResponseItemModel) {
+        if (rim is QuestionItemModel) {
           rim.populateInitialValue();
         }
       });
     } else {
       questionnaireResponseModel.populate(response);
+    }
+
+    // Aggregators can only latch onto the model after its initial structure has been created
+    final responseAggregators = questionnaireResponseModel._aggregators;
+    if (responseAggregators != null) {
+      for (final aggregator in responseAggregators) {
+        aggregator.init(questionnaireResponseModel);
+        // Assumption: aggregators that don't autoAggregate will have their aggregate method invoked manually when it matters.
+        if (aggregator.autoAggregate) {
+          aggregator.aggregate(notifyListeners: true);
+        }
+      }
     }
 
     // Set up updates for values of questionnaire-level variables
@@ -134,17 +139,56 @@ class QuestionnaireResponseModel extends ChangeNotifier {
           .addListener(questionnaireResponseModel._updateVariables);
     }
 
-    // WIP: Set up calculatedExpressions on items
+    // Set up calculatedExpressions on items
     questionnaireResponseModel._updateCalculations();
     questionnaireResponseModel
         .addListener(questionnaireResponseModel._updateCalculations);
 
-    // WIP: Set up enableWhen behavior on items
-    // TODO: Move this here from the constructor
+    // Set up enableWhen behavior on items
+    questionnaireResponseModel.activateEnableBehavior();
 
-    // TODO: Move error flagging here from constructor
+    // This ensures screen updates in case of invalid responses.
+    questionnaireResponseModel.errorFlags.addListener(() {
+      questionnaireResponseModel.nextGeneration();
+    });
 
     return questionnaireResponseModel;
+  }
+
+  void _addGroupItem(QuestionnaireItemModel questionnaireItemModel) {
+    _logger.trace('_addGroupItem $questionnaireItemModel');
+    final groupItemModel = GroupItemModel(this, questionnaireItemModel);
+    _orderedFillerItems[groupItemModel.responseUid] = groupItemModel;
+
+    _addFillerItems(questionnaireItemModel.children);
+  }
+
+  void _addQuestionItem(QuestionnaireItemModel questionnaireItemModel) {
+    _logger.trace('_addQuestionItem $questionnaireItemModel');
+    final questionItemModel = QuestionItemModel(this, questionnaireItemModel);
+
+    _orderedFillerItems[questionItemModel.responseUid] = questionItemModel;
+  }
+
+  void _addDisplayItem(QuestionnaireItemModel questionnaireItemModel) {
+    _logger.trace('_addDisplayItem $questionnaireItemModel');
+
+    final displayItemModel = DisplayItemModel(this, questionnaireItemModel);
+
+    _orderedFillerItems[displayItemModel.responseUid] = displayItemModel;
+  }
+
+  void _addFillerItems(List<QuestionnaireItemModel> questionnaireItemModels) {
+    _logger.trace('_addFillerItems');
+    for (final qim in questionnaireItemModels) {
+      if (qim.isGroup) {
+        _addGroupItem(qim);
+      } else if (qim.isQuestion) {
+        _addQuestionItem(qim);
+      } else {
+        _addDisplayItem(qim);
+      }
+    }
   }
 
   /// Returns an [Aggregator] of the given type.
@@ -245,7 +289,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     orderedResponseItemModels()
         .where((rim) => rim.questionnaireItemModel.isCalculatedExpression)
         .forEach((rim) {
-      if (rim is QuestionResponseItemModel) {
+      if (rim is QuestionItemModel) {
         rim.updateCalculatedExpression();
       }
     });
@@ -367,13 +411,11 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   }
 
   Iterable<FillerItemModel> orderedFillerItemModels() {
-    // FIXME: Implement
-    return [];
+    return _orderedFillerItems.values;
   }
 
   Iterable<ResponseItemModel> orderedResponseItemModels() {
-    // FIXME: Implement
-    return [];
+    return _orderedFillerItems.values.whereType<ResponseItemModel>();
   }
 
   /// Returns whether the questionnaire meets all completeness criteria.

@@ -9,7 +9,7 @@ abstract class QuestionnaireAnswerFiller extends StatefulWidget {
   final QuestionResponseItemFillerState responseFillerState;
   final int answerIndex;
   final QuestionnaireItemModel questionnaireItemModel;
-  final QuestionResponseItemModel responseItemModel;
+  final QuestionItemModel responseItemModel;
   final QuestionnaireTheme questionnaireTheme;
 
   QuestionnaireAnswerFiller(

@@ -7,7 +7,7 @@ import '../../model.dart';
 
 /// Model a response item
 ///
-/// This is a base class for either a question or a group response item model.
+/// This is a base class for either a question or a group item model.
 abstract class ResponseItemModel extends FillerItemModel {
   static final _rimLogger = Logger(ResponseItemModel);
 
@@ -48,7 +48,7 @@ abstract class ResponseItemModel extends FillerItemModel {
   /// Static or read-only items cannot be answered.
   /// Items which are not enabled cannot be answered.
   bool get isAnswerable {
-    _rimLogger.trace('isAnswerable $linkId');
+    _rimLogger.trace('isAnswerable $responseUid');
     if (questionnaireItemModel.isReadOnly || !isEnabled) {
       return false;
     }
@@ -61,14 +61,14 @@ abstract class ResponseItemModel extends FillerItemModel {
   /// Static or read-only items are not answered.
   /// Items which are not enabled are not answered.
   bool get isAnswered {
-    _rimLogger.trace('isAnswered $linkId');
+    _rimLogger.trace('isAnswered $responseUid');
     if (!isAnswerable) {
       return false;
     }
 
     if (responseItem != null) {
       _rimLogger.debug('responseItem $responseItem');
-      _rimLogger.debug('$linkId is answered.');
+      _rimLogger.debug('$responseUid is answered.');
       return true;
     }
 
@@ -80,7 +80,7 @@ abstract class ResponseItemModel extends FillerItemModel {
   /// Static or read-only items are not unanswered.
   /// Items which are not enabled are not unanswered.
   bool get isUnanswered {
-    _rimLogger.trace('isUnanswered $linkId');
+    _rimLogger.trace('isUnanswered $responseUid');
     if (!isAnswerable) {
       return false;
     }
@@ -90,7 +90,7 @@ abstract class ResponseItemModel extends FillerItemModel {
       return false;
     }
 
-    _rimLogger.debug('$linkId is unanswered.');
+    _rimLogger.debug('$responseUid is unanswered.');
 
     return true;
   }
@@ -102,7 +102,7 @@ abstract class ResponseItemModel extends FillerItemModel {
     if (questionnaireItemModel.isRequired && !isUnanswered) {
       return [
         QuestionnaireErrorFlag(
-          linkId,
+          responseUid,
           errorText: lookupFDashLocalizations(questionnaireResponseModel.locale)
               .validatorRequiredItem,
         )
@@ -111,8 +111,10 @@ abstract class ResponseItemModel extends FillerItemModel {
 
     if (!isSatisfyingConstraint) {
       return [
-        QuestionnaireErrorFlag(linkId,
-            errorText: questionnaireItemModel.constraintHuman)
+        QuestionnaireErrorFlag(
+          responseUid,
+          errorText: questionnaireItemModel.constraintHuman,
+        )
       ];
     }
 

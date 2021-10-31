@@ -228,8 +228,7 @@ class QuestionnaireFillerData extends InheritedWidget {
         index,
         fillerItemModels.elementAt(index),
         key: ValueKey<String>(
-          // FIXME: linkId is not unique
-          'item-filler-${fillerItemModels.elementAt(index).linkId}',
+          'item-filler-${fillerItemModels.elementAt(index).responseUid}',
         ),
       );
     } else {

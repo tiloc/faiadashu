@@ -36,15 +36,22 @@ class QuestionnaireTheme {
     FillerItemModel fillerItemModel, {
     Key? key,
   }) {
-    if (fillerItemModel is QuestionResponseItemModel) {
+    if (fillerItemModel is QuestionItemModel) {
       return QuestionResponseItemFiller(
         questionnaireFiller,
         index,
         fillerItemModel,
 //      key: key,  // TODO: What should be the key handling?
       );
-    } else if (fillerItemModel is GroupResponseItemModel) {
+    } else if (fillerItemModel is GroupItemModel) {
       return GroupItem(
+        questionnaireFiller,
+        index,
+        fillerItemModel,
+//      key: key,  // TODO: What should be the key handling?
+      );
+    } else if (fillerItemModel is DisplayItemModel) {
+      return DisplayItem(
         questionnaireFiller,
         index,
         fillerItemModel,
@@ -87,7 +94,7 @@ class QuestionnaireTheme {
       }
 
       final answerModel =
-          (responseModel as QuestionResponseItemModel).answerModel(answerIndex);
+          (responseModel as QuestionItemModel).answerModel(answerIndex);
       if (answerModel is NumericalAnswerModel) {
         return NumericalAnswerFiller(responseFiller, answerIndex, key: key);
       } else if (answerModel is StringAnswerModel) {

@@ -229,14 +229,16 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
             }
           });
 
-          _focusIndex = questionnaireResponseModel.indexOfFillerItem((fim) =>
-              fim is QuestionResponseItemModel &&
-              (fim.isUnanswered || fim.isInvalid))!;
+          _focusIndex = questionnaireResponseModel.indexOfFillerItem(
+            (fim) =>
+                fim is QuestionItemModel && (fim.isUnanswered || fim.isInvalid),
+          )!;
 
           if (_focusIndex == -1) {
             // When all questions are answered then focus on the first field that can be filled by a human.
             _focusIndex = questionnaireResponseModel.indexOfFillerItem(
-                (fim) => !fim.questionnaireItemModel.isReadOnly)!;
+              (fim) => !fim.questionnaireItemModel.isReadOnly,
+            )!;
           }
         }
 

@@ -18,7 +18,7 @@ import '../../model.dart';
 class TotalScoreAggregator extends Aggregator<Decimal> {
   static final _logger = Logger(TotalScoreAggregator);
 
-  late final QuestionResponseItemModel? totalScoreItem;
+  late final QuestionItemModel? totalScoreItem;
   TotalScoreAggregator({bool autoAggregate = true})
       : super(Decimal(0), autoAggregate: autoAggregate);
 
@@ -29,7 +29,7 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
     totalScoreItem =
         questionnaireResponseModel.orderedResponseItemModels().firstWhereOrNull(
               (rim) => rim.questionnaireItemModel.isTotalScore,
-            ) as QuestionResponseItemModel?;
+            ) as QuestionItemModel?;
     // if there is no total score item then leave value at 0 indefinitely
     if (autoAggregate) {
       if (totalScoreItem != null) {

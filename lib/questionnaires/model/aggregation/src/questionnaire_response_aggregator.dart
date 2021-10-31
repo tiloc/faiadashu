@@ -25,7 +25,7 @@ class QuestionnaireResponseAggregator
   }
 
   QuestionnaireResponseItem? _fromGroupItem(
-    GroupResponseItemModel itemModel,
+    GroupItemModel itemModel,
     QuestionnaireResponseStatus responseStatus,
   ) {
     if (responseStatus == QuestionnaireResponseStatus.completed &&

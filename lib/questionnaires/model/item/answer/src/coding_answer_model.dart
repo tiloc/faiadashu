@@ -232,7 +232,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
   late final int minOccurs;
   late final int? maxOccurs;
 
-  CodingAnswerModel(QuestionResponseItemModel responseModel, int answerIndex)
+  CodingAnswerModel(QuestionItemModel responseModel, int answerIndex)
       : super(responseModel, answerIndex) {
     _createAnswerOptions();
 

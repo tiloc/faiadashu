@@ -16,14 +16,13 @@ abstract class FillerItemModel extends ChangeNotifier {
   final QuestionnaireResponseModel questionnaireResponseModel;
   final QuestionnaireItemModel questionnaireItemModel;
 
-  late final List<VariableModel>? _variables;
+  List<VariableModel>? _variables;
 
   FillerItemModel(this.questionnaireResponseModel, this.questionnaireItemModel);
 
-  /// Returns the linkId of the item
-  ///
-  /// The linkId is NOT unique in a tree of responses!
-  String get linkId => questionnaireItemModel.linkId;
+  /// Returns a unique id that identifies this item in a tree of responses.
+  String get responseUid =>
+      questionnaireItemModel.linkId; // FIXME: return something really unique
 
   QuestionnaireItem get questionnaireItem =>
       questionnaireItemModel.questionnaireItem;
@@ -193,13 +192,18 @@ abstract class FillerItemModel extends ChangeNotifier {
     }
 
     // Calculated variables
-    final calculatedVariables = hasVariables
+
+    // Questionnaire-level variables
+    final calculatedVariables = questionnaireResponseModel.hasVariables
         ? Map.fromEntries(
-            _variables!.map<MapEntry<String, dynamic>>(
+            questionnaireResponseModel.variables!
+                .map<MapEntry<String, dynamic>>(
               (variable) => MapEntry('%${variable.name}', variable.value),
             ),
           )
         : null;
+
+    // TODO: Add item-level variables
 
     // SDC variables
     // TODO: %qitem, etc.
@@ -218,7 +222,7 @@ abstract class FillerItemModel extends ChangeNotifier {
     );
 
     _fimLogger.debug(
-      'evaluateFhirPathExpression on $linkId: $fhirPathExpression = $fhirPathResult',
+      'evaluateFhirPathExpression on $responseUid: $fhirPathExpression = $fhirPathResult',
     );
 
     return fhirPathResult;
@@ -235,7 +239,8 @@ abstract class FillerItemModel extends ChangeNotifier {
       return unknownValue;
     } else if (fhirPathResult.first is! bool) {
       _fimLogger.warn(
-          'Questionnaire design issue: "$fhirPathExpression" at $linkId results in $fhirPathResult. Expected a bool.');
+        'Questionnaire design issue: "$fhirPathExpression" at $responseUid results in $fhirPathResult. Expected a bool.',
+      );
       return fhirPathResult.first != null;
     } else {
       return fhirPathResult.first as bool;

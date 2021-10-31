@@ -305,8 +305,9 @@ class QuestionnaireItemFillerTitleLeading extends StatelessWidget {
       return QuestionnaireItemFillerTitleLeading._(leadingWidget);
     } else {
       final itemImageWidget = CpgItemImage.fromQuestionnaireItem(
-          fillerItemModel.questionnaireItemModel,
-          height: 24.0);
+        fillerItemModel.questionnaireItemModel,
+        height: 24.0,
+      );
       if (itemImageWidget == null) {
         return null;
       }

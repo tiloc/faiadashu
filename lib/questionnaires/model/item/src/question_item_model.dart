@@ -10,8 +10,8 @@ import '../../../questionnaires.dart';
 /// Model a response item to a question.
 ///
 /// A single response might reference multiple answers.
-class QuestionResponseItemModel extends ResponseItemModel {
-  static final _qrimLogger = Logger(QuestionResponseItemModel);
+class QuestionItemModel extends ResponseItemModel {
+  static final _qrimLogger = Logger(QuestionItemModel);
 
   /// The individual FHIR domain answers to this questionnaire item.
   List<QuestionnaireResponseAnswer?> answers = [];
@@ -39,7 +39,7 @@ class QuestionResponseItemModel extends ResponseItemModel {
   /// see [DataAbsentReason]
   Code? dataAbsentReason;
 
-  QuestionResponseItemModel(
+  QuestionItemModel(
     QuestionnaireResponseModel questionnaireResponseModel,
     QuestionnaireItemModel itemModel,
   ) : super(questionnaireResponseModel, itemModel) {
@@ -69,7 +69,7 @@ class QuestionResponseItemModel extends ResponseItemModel {
     responseItem = (filledAnswers.isEmpty && dataAbsentReason == null)
         ? null
         : QuestionnaireResponseItem(
-            linkId: linkId,
+            linkId: questionnaireItemModel.linkId,
             text: questionnaireItemModel.questionnaireItem.text,
             extension_: (dataAbsentReason != null)
                 ? [
@@ -89,7 +89,7 @@ class QuestionResponseItemModel extends ResponseItemModel {
   /// This is currently entirely based on the [dataAbsentReason].
   @override
   bool get isInvalid {
-    _qrimLogger.trace('isInvalid $linkId');
+    _qrimLogger.trace('isInvalid $responseUid');
     return dataAbsentReason == dataAbsentReasonAsTextCode;
   }
 
@@ -195,7 +195,7 @@ class QuestionResponseItemModel extends ResponseItemModel {
   }
 
   void populateInitialValue() {
-    _qrimLogger.debug('populateInitialValue: $linkId');
+    _qrimLogger.debug('populateInitialValue: $responseUid');
     if (questionnaireItemModel.hasInitialExpression) {
       final initialEvaluationResult = evaluateInitialExpression();
       answerModel(0).populateFromExpression(initialEvaluationResult);
@@ -247,6 +247,7 @@ class QuestionResponseItemModel extends ResponseItemModel {
     final evaluationResult =
         (rawEvaluationResult.isNotEmpty) ? rawEvaluationResult.first : null;
 
+    // TODO: should this be able to populate multiple answers?
     // Write the value back to the answer model
     answerModel(0).populateFromExpression(evaluationResult);
     // ... and make sure the world will know about it

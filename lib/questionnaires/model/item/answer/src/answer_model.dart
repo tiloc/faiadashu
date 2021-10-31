@@ -9,7 +9,7 @@ abstract class AnswerModel<I, V> {
   /// Textual depiction of an unanswered question.
   static const nullText = '—';
 
-  final QuestionResponseItemModel responseItemModel;
+  final QuestionItemModel responseItemModel;
   final int answerIndex;
   V? value;
 

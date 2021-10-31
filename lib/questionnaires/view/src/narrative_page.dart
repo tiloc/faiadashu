@@ -17,7 +17,8 @@ class NarrativePage extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(8.0),
           child: NarrativeTile(
-              questionnaireResponseModel: questionnaireResponseModel),
+            questionnaireResponseModel: questionnaireResponseModel,
+          ),
         ),
       ),
     );

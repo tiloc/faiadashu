@@ -35,7 +35,9 @@ class NarrativeAggregator extends Aggregator<Narrative> {
     StringBuffer div,
     FillerItemModel fillerItemModel,
   ) {
-    if (fillerItemModel is! ResponseItemModel) {return false;}
+    if (fillerItemModel is! ResponseItemModel) {
+      return false;
+    }
 
     final item = fillerItemModel.responseItem;
 
@@ -50,7 +52,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
     bool returnValue = false;
 
     if (item.text != null) {
-      if (fillerItemModel is GroupResponseItemModel) {
+      if (fillerItemModel is GroupItemModel) {
         div.write('<h2>${item.text}</h2>');
       } else {
         div.write('<h3>${item.text}</h3>');
@@ -133,7 +135,8 @@ class NarrativeAggregator extends Aggregator<Narrative> {
   }
 
   Narrative _generateNarrative(
-      QuestionnaireResponseModel questionnaireResponseModel) {
+    QuestionnaireResponseModel questionnaireResponseModel,
+  ) {
     final languageTag = locale.toLanguageTag();
     final div = StringBuffer(
       '<div xmlns="http://www.w3.org/1999/xhtml" lang="$languageTag" xml:lang="$languageTag">',
