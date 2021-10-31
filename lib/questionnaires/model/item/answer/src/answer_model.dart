@@ -72,7 +72,7 @@ abstract class AnswerModel<I, V> {
 
   String? get errorText {
     return questionnaireResponseModel
-        .errorFlagForLinkId(questionnaireItemModel.linkId)
+        .errorFlagForResponseUid(questionnaireItemModel.linkId)
         ?.errorText;
   }
 

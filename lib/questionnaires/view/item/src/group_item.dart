@@ -19,12 +19,10 @@ class _GroupItemState extends State<GroupItem> {
 
   @override
   Widget build(BuildContext context) {
-// FIXME: Restore functionality
-    const String? errorText = null;
-    /*    final errorText = widget.questionnaireItemModel.questionnaireModel
-        .errorFlagForLinkId(widget.questionnaireItemModel.linkId)
-       ?.errorText;
-       */
+    final errorText = widget.responseItemModel.questionnaireResponseModel
+        .errorFlagForResponseUid(widget.responseItemModel.responseUid)
+        ?.errorText;
+
     return Column(
       children: [
         if (errorText != null)

@@ -119,11 +119,11 @@ class QuestionItemModel extends ResponseItemModel {
   }
 
   // FIXME: Clarify between this and response item model
-  bool get isUnanswered {
+/*  bool get isUnanswered {
     _ensureAnswerModel();
 
     return _cachedAnswerModels.values.any((am) => !am.isUnanswered);
-  }
+  }*/
 
   final Map<int, AnswerModel> _cachedAnswerModels = <int, AnswerModel>{};
 

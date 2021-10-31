@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:ui';
 
+import 'package:collection/collection.dart';
 import 'package:fhir/r4/r4.dart';
 import 'package:flutter/foundation.dart';
 
@@ -396,6 +397,13 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     return notFound;
   }
 
+  /// Returns the n-th item from the [orderedFillerItemModels].
+  ///
+  /// Items at indices can change, and this should not be cached.
+  FillerItemModel itemFillerModelAt(int index) {
+    return orderedFillerItemModels().toList().elementAt(index);
+  }
+
   /// Returns the count of [ResponseItemModel]s which match the predicate function.
   ///
   /// Considers the item models returned by [orderedResponseItemModels].
@@ -410,10 +418,12 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     return count;
   }
 
+  /// Items can change, and this should not be cached.
   Iterable<FillerItemModel> orderedFillerItemModels() {
     return _orderedFillerItems.values;
   }
 
+  /// Items can change, and this should not be cached.
   Iterable<ResponseItemModel> orderedResponseItemModels() {
     return _orderedFillerItems.values.whereType<ResponseItemModel>();
   }
@@ -445,10 +455,8 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
   final errorFlags = ValueNotifier<Iterable<QuestionnaireErrorFlag>?>(null);
 
-  /// Returns the [QuestionnaireErrorFlag] for an item with [linkId].
-  QuestionnaireErrorFlag? errorFlagForLinkId(String linkId) {
-    // FIXME: Restore functionality
-/*    return questionnaireModel.errorFlags.value
-        ?.firstWhereOrNull((qm) => qm.linkId == linkId); */
+  /// Returns the [QuestionnaireErrorFlag] for an item with [responseUid].
+  QuestionnaireErrorFlag? errorFlagForResponseUid(String responseUid) {
+    return errorFlags.value?.firstWhereOrNull((ef) => ef.responseUid == responseUid);
   }
 }

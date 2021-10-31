@@ -97,16 +97,16 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
       return;
     }
 
-    // FIXME: Restore functionality
-/*    final index =
-        _questionnaireModel!.indexOf((qim) => qim.linkId == errorFlag.linkId);
+    final index = _questionnaireResponseModel!
+        .indexOfFillerItem((fim) => fim.responseUid == errorFlag.responseUid);
 
     if (index == -1) {
-      _logger.warn('Error Flag with invalid linkId: ${errorFlag.linkId}');
+      _logger.warn(
+          'Error Flag with invalid responseUId: ${errorFlag.responseUid}');
       return;
     }
 
-    scrollTo(index!); */
+    scrollTo(index!);
   }
 
   /// Scrolls to a position as conveyed by an [index].
@@ -246,11 +246,10 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
           return;
         }
 
-// FIXME: Restore full debug info
-/*        _logger.debug(
+        _logger.debug(
           'Focussing item# $_focusIndex - ${questionnaireResponseModel.itemFillerModelAt(_focusIndex)}',
         );
-*/
+
         _itemPositionsListener.itemPositions
             .addListener(_initialPositionListener);
       },

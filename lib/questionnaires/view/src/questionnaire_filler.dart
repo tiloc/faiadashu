@@ -177,24 +177,19 @@ class QuestionnaireFillerData extends InheritedWidget {
 
   /// INTERNAL USE ONLY: Register a [QuestionnaireItemFillerState].
   void registerQuestionnaireItemFillerState(QuestionnaireItemFillerState qifs) {
-// FIXME: Restore functionality
-    //    _itemFillerStates[_indexOfLinkId(qifs.linkId)] = qifs;
+    _itemFillerStates[_indexOfResponseUid(qifs.responseUid)] = qifs;
   }
 
   /// INTERNAL USE ONLY: Unregister a [QuestionnaireItemFillerState].
   void unregisterQuestionnaireItemFillerState(
     QuestionnaireItemFillerState qifs,
   ) {
-// FIXME: Restore functionality
-//    _itemFillerStates.remove(_indexOfLinkId(qifs.linkId));
+    _itemFillerStates.remove(_indexOfResponseUid(qifs.responseUid));
   }
 
-  // FIXME: linkId is not unique!
-/*  int _indexOfLinkId(String linkId) {
-    return _itemFillers
-        .indexWhere((qif) => qif?.responseItemModel.linkId == linkId);
+  int _indexOfResponseUid(String responseUid) {
+    return _itemFillers.indexWhere((qif) => qif?.responseUid == responseUid);
   }
-*/
 
   T aggregator<T extends Aggregator>() {
     return questionnaireResponseModel.aggregator<T>();

@@ -12,6 +12,8 @@ abstract class QuestionnaireItemFiller extends StatefulWidget {
   final int index;
   final FillerItemModel fillerItemModel;
 
+  String get responseUid => fillerItemModel.responseUid;
+
   const QuestionnaireItemFiller(
     this.questionnaireFiller,
     this.index,
@@ -32,11 +34,12 @@ abstract class QuestionnaireItemFillerState<W extends QuestionnaireItemFiller>
   late final FocusNode _focusNode;
   FocusNode get focusNode => _focusNode;
 
+  String get responseUid => widget.responseUid;
+
   @override
   void initState() {
     super.initState();
-    // FIXME: Restore a debugLabel
-    _focusNode = FocusNode(skipTraversal: true);
+    _focusNode = FocusNode(debugLabel: responseUid, skipTraversal: true);
 
     questionnaireTheme = widget.questionnaireFiller.questionnaireTheme;
 
