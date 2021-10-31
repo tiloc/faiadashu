@@ -10,7 +10,7 @@ import '../../../questionnaires.dart';
 ///
 /// This is a common base-class for items that can generate responses (questions, groups),
 /// and those that don't (display).
-abstract class FillerItemModel extends ChangeNotifier {
+abstract class FillerItemModel extends ChangeNotifier with Diagnosticable {
   static final _fimLogger = Logger(FillerItemModel);
 
   final QuestionnaireResponseModel questionnaireResponseModel;
@@ -260,5 +260,12 @@ abstract class FillerItemModel extends ChangeNotifier {
     } else {
       return fhirPathResult.first as bool;
     }
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+
+    properties.add(StringProperty('responseUid', responseUid));
   }
 }

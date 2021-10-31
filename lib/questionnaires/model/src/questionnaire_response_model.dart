@@ -91,7 +91,10 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     );
 
     questionnaireResponseModel._addFillerItems(
-        null, null, questionnaireModel.siblings);
+      null,
+      null,
+      questionnaireModel.items,
+    );
 
     final response =
         fhirResourceProvider.getResource(questionnaireResponseResourceUri)
@@ -164,7 +167,11 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   ) {
     _logger.trace('_addGroupItem $questionnaireItemModel');
     final groupItemModel = GroupItemModel(
-        parentItem, parentAnswerIndex, this, questionnaireItemModel);
+      parentItem,
+      parentAnswerIndex,
+      this,
+      questionnaireItemModel,
+    );
     _orderedFillerItems[groupItemModel.responseUid] = groupItemModel;
 
     _addFillerItems(groupItemModel, null, questionnaireItemModel.children);
@@ -177,7 +184,11 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   ) {
     _logger.trace('_addQuestionItem $questionnaireItemModel');
     final questionItemModel = QuestionItemModel(
-        parentItem, parentAnswerIndex, this, questionnaireItemModel);
+      parentItem,
+      parentAnswerIndex,
+      this,
+      questionnaireItemModel,
+    );
 
     _orderedFillerItems[questionItemModel.responseUid] = questionItemModel;
   }
@@ -190,13 +201,20 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     _logger.trace('_addDisplayItem $questionnaireItemModel');
 
     final displayItemModel = DisplayItemModel(
-        parentItem, parentAnswerIndex, this, questionnaireItemModel);
+      parentItem,
+      parentAnswerIndex,
+      this,
+      questionnaireItemModel,
+    );
 
     _orderedFillerItems[displayItemModel.responseUid] = displayItemModel;
   }
 
-  void _addFillerItems(FillerItemModel? parentItem, int? parentAnswerIndex,
-      List<QuestionnaireItemModel> questionnaireItemModels) {
+  void _addFillerItems(
+    FillerItemModel? parentItem,
+    int? parentAnswerIndex,
+    List<QuestionnaireItemModel> questionnaireItemModels,
+  ) {
     _logger.trace('_addFillerItems');
     for (final qim in questionnaireItemModels) {
       if (qim.isGroup) {
@@ -264,21 +282,65 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   }
 
   void _populateItems(
+    ResponseItemModel? parentItem,
+    int? parentAnswerIndex,
+    Iterable<ResponseItemModel> responseItemModels,
     List<QuestionnaireResponseItem>? questionnaireResponseItems,
   ) {
+    _logger.trace('_populateItems');
+
     if (questionnaireResponseItems == null) {
       return;
     }
-// FIXME: Restore functionality
-    /*    for (final item in questionnaireResponseItems) {
-      fromLinkId(item.linkId!).responseItem = item;
-      _populateItems(item.item);
-      if (item.answer != null) {
-        for (final answer in item.answer!) {
-          _populateItems(answer.item);
+
+    for (final item in questionnaireResponseItems) {
+      final linkId = item.linkId!;
+      final qim = questionnaireModel.fromLinkId(linkId);
+      final rim = responseItemModels.firstWhereOrNull(
+        (rim) => rim.questionnaireItemModel.linkId == linkId,
+      );
+      if (qim.isGroup) {
+        if (rim != null) {
+          _logger.debug('Populating group $linkId into existing item $rim.');
+          // Nothing to really populate for group
+          // Populate children
+          _populateItems(
+            rim,
+            null,
+            orderedResponseItemModels()
+                .where((otherRim) => otherRim.parentItem == rim),
+            item.item,
+          );
+        } else {
+          _logger.debug('Group $linkId not found');
+          if (parentItem != null) {
+            _logger.debug('Creating group $linkId.');
+            // TODO: Create missing group and then populate.
+          } else {
+            _logger.warn('Top-level group $linkId does not exist. Data loss!');
+          }
+        }
+      } else {
+        // Individual question
+        if (rim != null) {
+          final qrim = rim as QuestionItemModel;
+          _logger.debug(
+            'Populating question response $linkId into existing item $qrim.',
+          );
+          qrim.responseItem = item;
+        } else {
+          _logger.debug('Question response $linkId not found');
+          if (parentItem != null) {
+            _logger.debug('Creating question response $linkId.');
+            // TODO: Create missing question response and then populate.
+          } else {
+            _logger.warn(
+              'Top-level question response $linkId does not exist. Data loss!',
+            );
+          }
         }
       }
-    } */
+    }
   }
 
   /// Populate the answers in the questionnaire with the answers from a response.
@@ -297,7 +359,12 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
     // OPTIMIZE: What is the best notification strategy?
     // Assumption: It would be better to first set all responses in bulk and then recalc.
-    _populateItems(questionnaireResponse.item);
+    _populateItems(
+      null,
+      null,
+      orderedResponseItemModels().where((rim) => rim.parentItem == null),
+      questionnaireResponse.item,
+    );
 
     responseStatus =
         questionnaireResponse.status ?? QuestionnaireResponseStatus.in_progress;

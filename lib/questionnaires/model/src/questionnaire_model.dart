@@ -11,9 +11,13 @@ part of 'questionnaire_item_model.dart';
 /// Properties and functions that affect an individual item are in [QuestionnaireItemModel].
 ///
 /// [QuestionnaireModel] provides direct access to any [QuestionnaireItemModel] through linkId.
+///
+/// Responses and all dynamic behaviors are modeled through [QuestionnaireResponseModel].
+///
 class QuestionnaireModel extends QuestionnaireItemModel {
   final Map<String, QuestionnaireItemModel> _cachedItems = {};
 
+  // OPTIMIZE: Can this be moved to response model, to encapsulate all dynamic behavior there?
   List<QuestionnaireItemModel>? _itemsWithEnableWhen;
   List<QuestionnaireItemModel>? _itemsWithEnableWhenExpression;
 
@@ -107,6 +111,9 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     return questionnaireModel;
   }
 
+  /// Returns the questionnaire items of this questionnaire.
+  List<QuestionnaireItemModel> get items => siblings;
+
   LinkedHashMap<String, QuestionnaireItemModel> _addChildren(
     QuestionnaireItemModel qim,
   ) {
@@ -115,7 +122,9 @@ class QuestionnaireModel extends QuestionnaireItemModel {
         LinkedHashMap<String, QuestionnaireItemModel>();
     if (itemModelMap.containsKey(qim.linkId)) {
       throw QuestionnaireFormatException(
-          'Duplicate linkId: ${qim.linkId}', qim);
+        'Duplicate linkId: ${qim.linkId}',
+        qim,
+      );
     }
     itemModelMap[qim.linkId] = qim;
     if (qim.hasChildren) {
