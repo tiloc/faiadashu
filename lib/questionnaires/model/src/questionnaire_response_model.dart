@@ -90,7 +90,8 @@ class QuestionnaireResponseModel extends ChangeNotifier {
       launchContext: launchContext,
     );
 
-    questionnaireResponseModel._addFillerItems(questionnaireModel.siblings);
+    questionnaireResponseModel._addFillerItems(
+        null, null, questionnaireModel.siblings);
 
     final response =
         fhirResourceProvider.getResource(questionnaireResponseResourceUri)
@@ -156,38 +157,54 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     return questionnaireResponseModel;
   }
 
-  void _addGroupItem(QuestionnaireItemModel questionnaireItemModel) {
+  void _addGroupItem(
+    FillerItemModel? parentItem,
+    int? parentAnswerIndex,
+    QuestionnaireItemModel questionnaireItemModel,
+  ) {
     _logger.trace('_addGroupItem $questionnaireItemModel');
-    final groupItemModel = GroupItemModel(this, questionnaireItemModel);
+    final groupItemModel = GroupItemModel(
+        parentItem, parentAnswerIndex, this, questionnaireItemModel);
     _orderedFillerItems[groupItemModel.responseUid] = groupItemModel;
 
-    _addFillerItems(questionnaireItemModel.children);
+    _addFillerItems(groupItemModel, null, questionnaireItemModel.children);
   }
 
-  void _addQuestionItem(QuestionnaireItemModel questionnaireItemModel) {
+  void _addQuestionItem(
+    FillerItemModel? parentItem,
+    int? parentAnswerIndex,
+    QuestionnaireItemModel questionnaireItemModel,
+  ) {
     _logger.trace('_addQuestionItem $questionnaireItemModel');
-    final questionItemModel = QuestionItemModel(this, questionnaireItemModel);
+    final questionItemModel = QuestionItemModel(
+        parentItem, parentAnswerIndex, this, questionnaireItemModel);
 
     _orderedFillerItems[questionItemModel.responseUid] = questionItemModel;
   }
 
-  void _addDisplayItem(QuestionnaireItemModel questionnaireItemModel) {
+  void _addDisplayItem(
+    FillerItemModel? parentItem,
+    int? parentAnswerIndex,
+    QuestionnaireItemModel questionnaireItemModel,
+  ) {
     _logger.trace('_addDisplayItem $questionnaireItemModel');
 
-    final displayItemModel = DisplayItemModel(this, questionnaireItemModel);
+    final displayItemModel = DisplayItemModel(
+        parentItem, parentAnswerIndex, this, questionnaireItemModel);
 
     _orderedFillerItems[displayItemModel.responseUid] = displayItemModel;
   }
 
-  void _addFillerItems(List<QuestionnaireItemModel> questionnaireItemModels) {
+  void _addFillerItems(FillerItemModel? parentItem, int? parentAnswerIndex,
+      List<QuestionnaireItemModel> questionnaireItemModels) {
     _logger.trace('_addFillerItems');
     for (final qim in questionnaireItemModels) {
       if (qim.isGroup) {
-        _addGroupItem(qim);
+        _addGroupItem(parentItem, parentAnswerIndex, qim);
       } else if (qim.isQuestion) {
-        _addQuestionItem(qim);
+        _addQuestionItem(parentItem, parentAnswerIndex, qim);
       } else {
-        _addDisplayItem(qim);
+        _addDisplayItem(parentItem, parentAnswerIndex, qim);
       }
     }
   }
@@ -317,10 +334,8 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     }
 
     _updateEnabledGeneration = _generation;
-// FIXME: Restore functionality
-    /*
-    if (_itemsWithEnableWhen == null &&
-        _itemsWithEnableWhenExpression == null) {
+    if (questionnaireModel.itemsWithEnableWhen == null &&
+        questionnaireModel.itemsWithEnableWhenExpression == null) {
       _logger.debug(
         'updateEnabledItems: no conditionally enabled items',
       );
@@ -333,15 +348,23 @@ class QuestionnaireResponseModel extends ChangeNotifier {
       itemModel.enable();
     }
 
-    if (_itemsWithEnableWhen != null) {
-      for (final itemModel in _itemsWithEnableWhen!) {
-        itemModel._updateEnabled();
+    // OPTIMIZE: This feels hacky
+    if (questionnaireModel.itemsWithEnableWhen != null) {
+      for (final qim in questionnaireModel.itemsWithEnableWhen!) {
+        for (final fim in orderedFillerItemModels()
+            .where((fim) => fim.questionnaireItemModel.linkId == qim.linkId)) {
+          fim.updateEnabled();
+        }
       }
     }
 
-    if (_itemsWithEnableWhenExpression != null) {
-      for (final itemModel in _itemsWithEnableWhenExpression!) {
-        itemModel._updateEnabled();
+    // OPTIMIZE: This feels hacky
+    if (questionnaireModel.itemsWithEnableWhenExpression != null) {
+      for (final qim in questionnaireModel.itemsWithEnableWhenExpression!) {
+        for (final fim in orderedFillerItemModels()
+            .where((fim) => fim.questionnaireItemModel.linkId == qim.linkId)) {
+          fim.updateEnabled();
+        }
       }
     }
 
@@ -352,7 +375,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
       nextGeneration(notifyListeners: notifyListeners);
     } else {
       _logger.debug('Enabled items unchanged.');
-    } */
+    }
   }
 
   /// Activate the enable behavior.
@@ -360,19 +383,20 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   /// Adds the required listeners to evaluate enableWhen and
   /// enableWhenExpression as items are changed.
   void activateEnableBehavior() {
-// FIXME: Repair the functionality
-    /*    if (_itemsWithEnableWhenExpression != null) {
+    if (questionnaireModel.itemsWithEnableWhenExpression != null) {
       // When enableWhenExpression is involved we need to add listeners to every
       // non-static item, as we have no way to find out which items are referenced
       // by the FHIR Path expression.
       addListener(() => updateEnabledItems());
     } else {
-      for (final itemModel in orderedQuestionnaireItemModels()) {
-        itemModel.forEnableWhens((qew) {
-          fromLinkId(qew.question!).addListener(() => updateEnabledItems());
+      for (final itemModel in orderedResponseItemModels()) {
+        itemModel.questionnaireItemModel.forEnableWhens((qew) {
+          itemModel
+              .fromLinkId(qew.question!)
+              .addListener(() => updateEnabledItems());
         });
       }
-    } */
+    }
 
     updateEnabledItems();
   }
@@ -457,6 +481,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
   /// Returns the [QuestionnaireErrorFlag] for an item with [responseUid].
   QuestionnaireErrorFlag? errorFlagForResponseUid(String responseUid) {
-    return errorFlags.value?.firstWhereOrNull((ef) => ef.responseUid == responseUid);
+    return errorFlags.value
+        ?.firstWhereOrNull((ef) => ef.responseUid == responseUid);
   }
 }

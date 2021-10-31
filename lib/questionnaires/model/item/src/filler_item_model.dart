@@ -15,14 +15,22 @@ abstract class FillerItemModel extends ChangeNotifier {
 
   final QuestionnaireResponseModel questionnaireResponseModel;
   final QuestionnaireItemModel questionnaireItemModel;
+  final FillerItemModel? parentItem;
+  final int? parentAnswerIndex;
 
   List<VariableModel>? _variables;
+  final String _responseUid;
 
-  FillerItemModel(this.questionnaireResponseModel, this.questionnaireItemModel);
+  FillerItemModel(
+    this.parentItem,
+    this.parentAnswerIndex,
+    this.questionnaireResponseModel,
+    this.questionnaireItemModel,
+  ) : _responseUid =
+            "${(parentItem != null) ? parentItem.questionnaireItemModel.linkId : ''}${(parentAnswerIndex != null) ? '[$parentAnswerIndex]' : ''}/${questionnaireItemModel.linkId}";
 
   /// Returns a unique id that identifies this item in a tree of responses.
-  String get responseUid =>
-      questionnaireItemModel.linkId; // FIXME: return something really unique
+  String get responseUid => _responseUid;
 
   QuestionnaireItem get questionnaireItem =>
       questionnaireItemModel.questionnaireItem;
@@ -32,8 +40,8 @@ abstract class FillerItemModel extends ChangeNotifier {
   /// Determines the applicable method (enableWhen / enableWhenExpression).
   ///
   /// Sets the [isEnabled] property
-  void _updateEnabled() {
-    _fimLogger.trace('Enter _updateEnabled()');
+  void updateEnabled() {
+    _fimLogger.trace('Enter updateEnabled()');
 
     if (questionnaireItemModel.isEnabledWhen) {
       _updateEnabledByEnableWhen();
@@ -75,11 +83,20 @@ abstract class FillerItemModel extends ChangeNotifier {
   }
 
   void _disableWithChildren() {
-    // FIXME: Restore functionality
-/*    _isEnabled = false;
-    for (final child in children) {
+    _isEnabled = false;
+    for (final child in questionnaireResponseModel
+        .orderedFillerItemModels()
+        .where((fim) => fim.parentItem == this)) {
       child._disableWithChildren();
-    } */
+    }
+  }
+
+  ResponseItemModel fromLinkId(String linkId) {
+    // FIXME: This makes a crude assumption about 1:1 relationship question/response
+    return questionnaireResponseModel
+        .orderedResponseItemModels()
+        .where((rim) => rim.questionnaireItemModel.linkId == linkId)
+        .first;
   }
 
   /// Updates the current enablement status of this item, based on enabledWhen.
@@ -88,16 +105,15 @@ abstract class FillerItemModel extends ChangeNotifier {
   void _updateEnabledByEnableWhen() {
     _fimLogger.trace('Enter _updateEnabledByEnableWhen()');
 
-    // FIXME: Restore functionality
-/*    bool anyTrigger = false;
+    bool anyTrigger = false;
     int allTriggered = 0;
     int allCount = 0;
 
-    forEnableWhens((qew) {
+    questionnaireItemModel.forEnableWhens((qew) {
       allCount++;
       switch (qew.operator_) {
         case QuestionnaireEnableWhenOperator.exists:
-          if (questionnaireModel.fromLinkId(qew.question!).isAnswered ==
+          if (fromLinkId(qew.question!).isAnswered ==
               qew.answerBoolean!.value) {
             anyTrigger = true;
             allTriggered++;
@@ -105,8 +121,7 @@ abstract class FillerItemModel extends ChangeNotifier {
           break;
         case QuestionnaireEnableWhenOperator.eq:
         case QuestionnaireEnableWhenOperator.ne:
-          final responseCoding = questionnaireModel
-              .fromLinkId(qew.question!)
+          final responseCoding = fromLinkId(qew.question!)
               .responseItem
               ?.answer
               ?.firstOrNull
@@ -156,7 +171,7 @@ abstract class FillerItemModel extends ChangeNotifier {
           'enableWhen with unknown enableBehavior: ${questionnaireItem.enableBehavior}',
           questionnaireItem,
         );
-    } */
+    }
   }
 
   /// INTERNAL USE: Enable the item.

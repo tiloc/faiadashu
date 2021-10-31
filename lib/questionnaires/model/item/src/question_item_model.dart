@@ -40,9 +40,16 @@ class QuestionItemModel extends ResponseItemModel {
   Code? dataAbsentReason;
 
   QuestionItemModel(
+    FillerItemModel? parentItem,
+    int? parentAnswerIndex,
     QuestionnaireResponseModel questionnaireResponseModel,
     QuestionnaireItemModel itemModel,
-  ) : super(questionnaireResponseModel, itemModel) {
+  ) : super(
+          parentItem,
+          parentAnswerIndex,
+          questionnaireResponseModel,
+          itemModel,
+        ) {
     final int answerCount = responseItem?.answer?.length ?? 0;
     if (answerCount > 0) {
       answers = responseItem!.answer!;
@@ -98,6 +105,7 @@ class QuestionItemModel extends ResponseItemModel {
     answerModel(0);
   }
 
+  // FIXME: Clarify between this and response item model
   Iterable<QuestionnaireErrorFlag>? get isComplete {
     // Non-existent answer models can be incomplete, e.g. if minOccurs is not met.
     _ensureAnswerModel();

@@ -12,9 +12,16 @@ abstract class ResponseItemModel extends FillerItemModel {
   static final _rimLogger = Logger(ResponseItemModel);
 
   ResponseItemModel(
+    FillerItemModel? parentItem,
+    int? parentAnswerIndex,
     QuestionnaireResponseModel questionnaireResponseModel,
     QuestionnaireItemModel questionnaireItemModel,
-  ) : super(questionnaireResponseModel, questionnaireItemModel);
+  ) : super(
+          parentItem,
+          parentAnswerIndex,
+          questionnaireResponseModel,
+          questionnaireItemModel,
+        );
 
   QuestionnaireResponseItem? get responseItem;
 

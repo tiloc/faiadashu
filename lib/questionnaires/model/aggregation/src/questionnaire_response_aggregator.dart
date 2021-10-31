@@ -33,14 +33,14 @@ class QuestionnaireResponseAggregator
       return null;
     }
 
-    // FIXME: Restore functionality
-    return null;
-/*
     final nestedItems = <QuestionnaireResponseItem>[];
 
-    for (final nestedItem in itemModel.children) {
-      if (nestedItem.isGroup) {
-        final groupItem = _fromGroupItem(nestedItem, responseStatus);
+    for (final nestedItem in questionnaireResponseModel
+        .orderedResponseItemModels()
+        .where((rim) => rim.parentItem == itemModel)) {
+      if (nestedItem.questionnaireItemModel.isGroup) {
+        final groupItem =
+            _fromGroupItem(nestedItem as GroupItemModel, responseStatus);
         if (groupItem != null) {
           nestedItems.add(groupItem);
         }
@@ -54,13 +54,13 @@ class QuestionnaireResponseAggregator
     // TODO: Should this be done by the group model itself?
     if (nestedItems.isNotEmpty) {
       return QuestionnaireResponseItem(
-        linkId: itemModel.linkId,
-        text: itemModel.titleText,
+        linkId: itemModel.questionnaireItemModel.linkId,
+        text: itemModel.questionnaireItemModel.titleText,
         item: nestedItems,
       );
     } else {
       return null;
-    } */
+    }
   }
 
   @override
@@ -78,11 +78,12 @@ class QuestionnaireResponseAggregator
 
     final responseItems = <QuestionnaireResponseItem>[];
 
-    // FIXME: Restore functionality
-    /*
-    for (final itemModel in questionnaireResponseModel.siblings) {
-      if (itemModel.isGroup) {
-        final groupItem = _fromGroupItem(itemModel, responseStatus);
+    for (final itemModel in questionnaireResponseModel
+        .orderedResponseItemModels()
+        .where((rim) => rim.parentItem == null)) {
+      if (itemModel.questionnaireItemModel.isGroup) {
+        final groupItem =
+            _fromGroupItem(itemModel as GroupItemModel, responseStatus);
         if (groupItem != null) {
           responseItems.add(groupItem);
         }
@@ -94,7 +95,6 @@ class QuestionnaireResponseAggregator
         }
       }
     }
-*/
 
     final narrativeAggregator =
         questionnaireResponseModel.aggregator<NarrativeAggregator>();

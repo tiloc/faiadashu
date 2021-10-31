@@ -4,9 +4,16 @@ import '../../../questionnaires.dart';
 
 class GroupItemModel extends ResponseItemModel {
   GroupItemModel(
+    FillerItemModel? parentItem,
+    int? parentAnswerIndex,
     QuestionnaireResponseModel questionnaireResponseModel,
     QuestionnaireItemModel itemModel,
-  ) : super(questionnaireResponseModel, itemModel);
+  ) : super(
+          parentItem,
+          parentAnswerIndex,
+          questionnaireResponseModel,
+          itemModel,
+        );
 
   @override
   QuestionnaireResponseItem? get responseItem => null;

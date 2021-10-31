@@ -17,6 +17,10 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   List<QuestionnaireItemModel>? _itemsWithEnableWhen;
   List<QuestionnaireItemModel>? _itemsWithEnableWhenExpression;
 
+  List<QuestionnaireItemModel>? get itemsWithEnableWhen => _itemsWithEnableWhen;
+  List<QuestionnaireItemModel>? get itemsWithEnableWhenExpression =>
+      _itemsWithEnableWhenExpression;
+
   final LinkedHashMap<String, QuestionnaireItemModel> _orderedItems =
       LinkedHashMap<String, QuestionnaireItemModel>();
 
@@ -104,7 +108,8 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   }
 
   LinkedHashMap<String, QuestionnaireItemModel> _addChildren(
-      QuestionnaireItemModel qim) {
+    QuestionnaireItemModel qim,
+  ) {
     _logger.trace('_addChildren $qim');
     final LinkedHashMap<String, QuestionnaireItemModel> itemModelMap =
         LinkedHashMap<String, QuestionnaireItemModel>();

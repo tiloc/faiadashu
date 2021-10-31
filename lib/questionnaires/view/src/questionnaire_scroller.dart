@@ -102,7 +102,8 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
 
     if (index == -1) {
       _logger.warn(
-          'Error Flag with invalid responseUId: ${errorFlag.responseUid}');
+        'Error Flag with invalid responseUId: ${errorFlag.responseUid}',
+      );
       return;
     }
 

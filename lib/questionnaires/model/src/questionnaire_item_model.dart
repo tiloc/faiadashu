@@ -26,7 +26,7 @@ class QuestionnaireItemModel with Diagnosticable {
   late QuestionnaireModel? _questionnaireModel;
   final int siblingIndex;
   final int level;
-  static final _qimLogger = Logger(QuestionnaireItemModel);
+//  static final _qimLogger = Logger(QuestionnaireItemModel);
 
   QuestionnaireModel get questionnaireModel => _questionnaireModel!;
 
@@ -290,7 +290,6 @@ class QuestionnaireItemModel with Diagnosticable {
         ?.valueString;
   }
 
-
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
@@ -312,8 +311,8 @@ class QuestionnaireItemModel with Diagnosticable {
     this.siblingIndex,
     this.level,
   ) {
-      _questionnaireModel = questionnaireModel;
-    }
+    _questionnaireModel = questionnaireModel;
+  }
 
   factory QuestionnaireItemModel._cached(
     Questionnaire questionnaire,

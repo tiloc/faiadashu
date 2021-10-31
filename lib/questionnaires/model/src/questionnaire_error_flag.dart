@@ -7,6 +7,9 @@ class QuestionnaireErrorFlag {
   final int? answerIndex;
   final String? errorText;
 
-  const QuestionnaireErrorFlag(this.responseUid,
-      {this.answerIndex, this.errorText});
+  const QuestionnaireErrorFlag(
+    this.responseUid, {
+    this.answerIndex,
+    this.errorText,
+  });
 }
