@@ -50,7 +50,8 @@ class _GroupItemState extends ResponseItemFillerState<GroupItem> {
                                   .textTheme
                                   .subtitle1!
                                   .copyWith(
-                                      color: Theme.of(context).errorColor),
+                                    color: Theme.of(context).errorColor,
+                                  ),
                             ),
                           ),
                         const SizedBox(

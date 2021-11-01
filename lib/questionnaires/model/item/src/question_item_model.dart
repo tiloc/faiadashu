@@ -16,6 +16,7 @@ class QuestionItemModel extends ResponseItemModel {
   // FIXME: Having this in addition to the actual questionnaireResponseItem
   // can lead to all kinds of consistency problems.
   /// The individual FHIR domain answers to this questionnaire item.
+  @Deprecated("Replace with direct access to questionnaireResponseItem")
   List<QuestionnaireResponseAnswer?> answers = [];
 
   /// The FHIR domain QuestionnaireResponseItem
@@ -27,12 +28,64 @@ class QuestionItemModel extends ResponseItemModel {
 
   /// Sets the associated [QuestionnaireResponseItem].
   set responseItem(QuestionnaireResponseItem? questionnaireResponseItem) {
-    _qrimLogger.debug('set responseItem $questionnaireResponseItem');
-    if (questionnaireResponseItem != _questionnaireResponseItem) {
-      _questionnaireResponseItem = questionnaireResponseItem;
-      questionnaireResponseModel.nextGeneration();
-      // This notifies aggregators on changes to individual items
-      notifyListeners();
+    final parentAnswerIndex = this.parentAnswerIndex;
+    _qrimLogger
+        .debug('set responseItem $questionnaireResponseItem at $responseUid');
+    if (parentAnswerIndex == null) {
+      if (questionnaireResponseItem != _questionnaireResponseItem) {
+        _questionnaireResponseItem = questionnaireResponseItem;
+        questionnaireResponseModel.nextGeneration();
+        // This notifies aggregators on changes to individual items
+        notifyListeners();
+      }
+    } else {
+      final parentQuestion = parentItem! as QuestionItemModel;
+      final siblingIndex = questionnaireItemModel.siblingIndex;
+
+      _qrimLogger.debug(
+        'setting response for nested question at $parentQuestion index $parentAnswerIndex.',
+      );
+
+      final parentResponseItem =
+          ArgumentError.checkNotNull(parentQuestion.responseItem);
+      final parentResponseAnswers =
+          ArgumentError.checkNotNull(parentResponseItem.answer);
+      final parentResponseAnswer = ArgumentError.checkNotNull(
+        parentResponseAnswers.elementAt(parentAnswerIndex),
+      );
+      final parentResponseAnswerItems = ArgumentError.checkNotNull(
+        parentResponseAnswer.item,
+      );
+
+      final currentResponseItem =
+          parentResponseAnswerItems.elementAt(siblingIndex);
+      _qrimLogger.debug('current item: $currentResponseItem');
+      if (currentResponseItem != questionnaireResponseItem) {
+        // ++ Celebrate an orgy of copyWith ++
+        final newAnswers = <QuestionnaireResponseAnswer>[
+          ...parentResponseAnswers
+        ];
+
+        final newItems = <QuestionnaireResponseItem>[
+          ...parentResponseAnswerItems
+        ];
+        // TODO: What if questionnaireResponseItem is null? Should this result in a response with no answers?
+        newItems[siblingIndex] = questionnaireResponseItem!;
+
+        final newResponseAnswer = parentResponseAnswer.copyWith(item: newItems);
+
+        newAnswers[parentAnswerIndex] = newResponseAnswer;
+
+        final newResponseItem = parentResponseItem.copyWith(answer: newAnswers);
+
+        parentQuestion.responseItem = newResponseItem;
+
+        questionnaireResponseModel.nextGeneration();
+        // This notifies aggregators on changes to individual items
+        parentQuestion
+            .notifyListeners(); // TODO: Should listeners of parent also be notified?
+        notifyListeners();
+      }
     }
   }
 

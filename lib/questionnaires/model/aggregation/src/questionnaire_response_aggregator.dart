@@ -45,8 +45,12 @@ class QuestionnaireResponseAggregator
           nestedItems.add(groupItem);
         }
       } else {
+        // isQuestion
         if (nestedItem.responseItem != null) {
-          nestedItems.add(nestedItem.responseItem!);
+          // response items of nested questions are already contained in response item of parent question
+          if (nestedItem.questionnaireItemModel.parent?.isQuestion != true) {
+            nestedItems.add(nestedItem.responseItem!);
+          }
         }
       }
     }
@@ -88,6 +92,7 @@ class QuestionnaireResponseAggregator
           responseItems.add(groupItem);
         }
       } else {
+        // isQuestion
         if (itemModel.responseItem != null &&
             (responseStatus != QuestionnaireResponseStatus.completed ||
                 itemModel.isEnabled)) {

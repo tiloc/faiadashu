@@ -1,4 +1,3 @@
-import 'dart:collection';
 import 'dart:ui';
 
 import 'package:collection/collection.dart';
@@ -24,8 +23,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
   int _generation = 1;
 
-  final LinkedHashMap<String, FillerItemModel> _orderedFillerItems =
-      LinkedHashMap<String, FillerItemModel>();
+  final List<FillerItemModel> _fillerItems = [];
 
   // Questionnaire-level variables
   List<VariableModel>? _variables;
@@ -90,7 +88,10 @@ class QuestionnaireResponseModel extends ChangeNotifier {
       launchContext: launchContext,
     );
 
+    // Create the parts of the model that have no dependency on answers.
+    // Groups, nested groups, and the first level of questions and display items.
     questionnaireResponseModel._addFillerItems(
+      questionnaireResponseModel._fillerItems,
       null,
       null,
       questionnaireModel.items,
@@ -110,8 +111,6 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     // ================================================================
 
     // Populate initial values if response == null
-    // This cannot happen in the constructor, as only this method has the
-    // extra information to populate variables.
     if (response == null) {
       questionnaireResponseModel
           .orderedResponseItemModels()
@@ -161,6 +160,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   }
 
   void _addGroupItem(
+    List<FillerItemModel> fillerItemList,
     FillerItemModel? parentItem,
     int? parentAnswerIndex,
     QuestionnaireItemModel questionnaireItemModel,
@@ -172,12 +172,18 @@ class QuestionnaireResponseModel extends ChangeNotifier {
       this,
       questionnaireItemModel,
     );
-    _orderedFillerItems[groupItemModel.responseUid] = groupItemModel;
+    fillerItemList.add(groupItemModel);
 
-    _addFillerItems(groupItemModel, null, questionnaireItemModel.children);
+    _addFillerItems(
+      fillerItemList,
+      groupItemModel,
+      null,
+      questionnaireItemModel.children,
+    );
   }
 
   void _addQuestionItem(
+    List<FillerItemModel> fillerItemList,
     FillerItemModel? parentItem,
     int? parentAnswerIndex,
     QuestionnaireItemModel questionnaireItemModel,
@@ -190,10 +196,11 @@ class QuestionnaireResponseModel extends ChangeNotifier {
       questionnaireItemModel,
     );
 
-    _orderedFillerItems[questionItemModel.responseUid] = questionItemModel;
+    fillerItemList.add(questionItemModel);
   }
 
   void _addDisplayItem(
+    List<FillerItemModel> fillerItemList,
     FillerItemModel? parentItem,
     int? parentAnswerIndex,
     QuestionnaireItemModel questionnaireItemModel,
@@ -207,10 +214,11 @@ class QuestionnaireResponseModel extends ChangeNotifier {
       questionnaireItemModel,
     );
 
-    _orderedFillerItems[displayItemModel.responseUid] = displayItemModel;
+    fillerItemList.add(displayItemModel);
   }
 
   void _addFillerItems(
+    List<FillerItemModel> fillerItemList,
     FillerItemModel? parentItem,
     int? parentAnswerIndex,
     List<QuestionnaireItemModel> questionnaireItemModels,
@@ -218,11 +226,11 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     _logger.trace('_addFillerItems');
     for (final qim in questionnaireItemModels) {
       if (qim.isGroup) {
-        _addGroupItem(parentItem, parentAnswerIndex, qim);
+        _addGroupItem(fillerItemList, parentItem, parentAnswerIndex, qim);
       } else if (qim.isQuestion) {
-        _addQuestionItem(parentItem, parentAnswerIndex, qim);
+        _addQuestionItem(fillerItemList, parentItem, parentAnswerIndex, qim);
       } else {
-        _addDisplayItem(parentItem, parentAnswerIndex, qim);
+        _addDisplayItem(fillerItemList, parentItem, parentAnswerIndex, qim);
       }
     }
   }
@@ -287,7 +295,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     Iterable<ResponseItemModel> responseItemModels,
     List<QuestionnaireResponseItem>? questionnaireResponseItems,
   ) {
-    _logger.trace('_populateItems');
+    _logger.trace('_populateItems parent ${parentItem?.responseUid}');
 
     if (questionnaireResponseItems == null) {
       return;
@@ -328,16 +336,44 @@ class QuestionnaireResponseModel extends ChangeNotifier {
             'Populating question response $linkId into existing item $qrim.',
           );
           qrim.responseItem = item;
-        } else {
-          _logger.debug('Question response $linkId not found');
-          if (parentItem != null) {
-            _logger.debug('Creating question response $linkId.');
-            // TODO: Create missing question response and then populate.
-          } else {
-            _logger.warn(
-              'Top-level question response $linkId does not exist. Data loss!',
+
+          final itemAnswers = item.answer;
+          if (itemAnswers != null && itemAnswers.isNotEmpty) {
+            _logger.debug(
+              'Populating answers under ${qrim.responseUid}.',
             );
+            itemAnswers.forEachIndexed((answerIndex, answer) {
+              final answerResponseItems = answer.item;
+              if (answerResponseItems != null &&
+                  answerResponseItems.isNotEmpty) {
+                final List<FillerItemModel> descendantFillerItems = [];
+                _addFillerItems(
+                  descendantFillerItems,
+                  qrim,
+                  answerIndex,
+                  qrim.questionnaireItemModel.children,
+                );
+
+                _populateItems(
+                  qrim,
+                  answerIndex,
+                  descendantFillerItems.whereType<ResponseItemModel>(),
+                  answerResponseItems,
+                );
+
+                _logger
+                    .debug('Inserting new descendants: $descendantFillerItems');
+                _fillerItems.insertAll(
+                  _fillerItems.indexOf(qrim) + 1,
+                  descendantFillerItems,
+                );
+              }
+            });
           }
+        } else {
+          // This should never happen! Items should have been created when
+          // previous fields have been populated.
+          _logger.warn('Question response $linkId not found. Data loss!');
         }
       }
     }
@@ -511,12 +547,12 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
   /// Items can change, and this should not be cached.
   Iterable<FillerItemModel> orderedFillerItemModels() {
-    return _orderedFillerItems.values;
+    return _fillerItems;
   }
 
   /// Items can change, and this should not be cached.
   Iterable<ResponseItemModel> orderedResponseItemModels() {
-    return _orderedFillerItems.values.whereType<ResponseItemModel>();
+    return _fillerItems.whereType<ResponseItemModel>();
   }
 
   /// Returns whether the questionnaire meets all completeness criteria.
