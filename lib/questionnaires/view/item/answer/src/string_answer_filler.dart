@@ -16,20 +16,27 @@ class StringAnswerFiller extends QuestionnaireAnswerFiller {
 
 class _StringAnswerState extends QuestionnaireAnswerFillerState<String,
     StringAnswerFiller, StringAnswerModel> {
-  final _controller = TextEditingController();
+  final _editingController = TextEditingController();
   late final TextInputType _keyboardType;
 
   _StringAnswerState();
 
   @override
   void dispose() {
-    _controller.dispose();
+    _editingController.dispose();
     super.dispose();
   }
 
   @override
   void postInitState() {
-    _controller.text = value ?? '';
+    final initialValue = value ?? '';
+
+    _editingController.value = TextEditingValue(
+      text: initialValue,
+      selection: TextSelection.fromPosition(
+        TextPosition(offset: initialValue.length),
+      ),
+    );
 
     _keyboardType = const {
       StringAnswerKeyboard.plain: TextInputType.text,
@@ -49,7 +56,7 @@ class _StringAnswerState extends QuestionnaireAnswerFillerState<String,
         focusNode: firstFocusNode,
         enabled: answerModel.isEnabled,
         keyboardType: _keyboardType,
-        controller: _controller,
+        controller: _editingController,
         maxLines: (qi.type == QuestionnaireItemType.text) ? 4 : 1,
         decoration: questionnaireTheme.createDecoration().copyWith(
               errorText: answerModel.errorText,

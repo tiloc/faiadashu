@@ -92,7 +92,10 @@ abstract class FillerItemModel extends ChangeNotifier with Diagnosticable {
   }
 
   ResponseItemModel fromLinkId(String linkId) {
-    // FIXME: This makes a crude assumption about 1:1 relationship question/response
+    // TODO: This makes a crude assumption about 1:1 relationship question/response
+    // Expected behavior according to spec:
+    // If multiple question occurrences are present for the same question (same linkId), then this refers to the nearest question occurrence reachable by tracing first the "ancestor" axis and then the "preceding" axis and then the "following" axis. If there are multiple items with the same linkId and all are equadistant (e.g. a question references a question that appears in a separate repeating group), that is an error. (Consider using the enableWhenExpression extension to define logic to handle such a situation.)
+    // https://stackoverflow.com/questions/22455959/xpath-difference-between-preceding-and-ancestor/22456251
     return questionnaireResponseModel
         .orderedResponseItemModels()
         .where((rim) => rim.questionnaireItemModel.linkId == linkId)
@@ -110,6 +113,7 @@ abstract class FillerItemModel extends ChangeNotifier with Diagnosticable {
     int allCount = 0;
 
     questionnaireItemModel.forEnableWhens((qew) {
+      // TODO: implement the following rule: If enableWhen logic depends on an item that is disabled, the logic should proceed as though the item is not valued - even if a default value or other value might be retained in memory in the event of the item being re-enabled.
       allCount++;
       switch (qew.operator_) {
         case QuestionnaireEnableWhenOperator.exists:

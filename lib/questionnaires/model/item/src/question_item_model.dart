@@ -13,6 +13,8 @@ import '../../../questionnaires.dart';
 class QuestionItemModel extends ResponseItemModel {
   static final _qrimLogger = Logger(QuestionItemModel);
 
+  // FIXME: Having this in addition to the actual questionnaireResponseItem
+  // can lead to all kinds of consistency problems.
   /// The individual FHIR domain answers to this questionnaire item.
   List<QuestionnaireResponseAnswer?> answers = [];
 

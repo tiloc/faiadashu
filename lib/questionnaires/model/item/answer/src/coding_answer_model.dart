@@ -251,10 +251,12 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
         ?.valueInteger
         ?.value;
 
-    if (responseItemModel.responseItem != null) {
-      value = (responseItemModel.responseItem!.answer != null)
+    final responseItem = responseItemModel.responseItem;
+
+    if (responseItem != null) {
+      value = (responseItem.answer != null)
           ? CodeableConcept(
-              coding: responseItemModel.responseItem!.answer
+              coding: responseItem.answer
                   ?.map(
                     (answer) => answerOptions[
                             choiceStringFromCoding(answer.valueCoding)]!

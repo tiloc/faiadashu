@@ -57,7 +57,7 @@ abstract class QuestionnaireAnswerFillerState<
 
       firstFocusNode = FocusNode(
         debugLabel:
-            'AnswerFiller firstFocusNode: ${widget.questionnaireItemModel.linkId}',
+            'AnswerFiller firstFocusNode: ${widget.responseItemModel.responseUid}',
       );
 
       widget.responseItemModel.questionnaireResponseModel

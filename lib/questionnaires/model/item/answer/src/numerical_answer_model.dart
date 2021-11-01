@@ -160,17 +160,14 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
     }
 
     Quantity? existingValue;
-    final firstAnswer = responseItemModel.responseItem?.answer?.firstOrNull;
-    if (firstAnswer != null) {
-      existingValue = firstAnswer.valueQuantity ??
-          ((firstAnswer.valueDecimal != null &&
-                  firstAnswer.valueDecimal!.isValid)
-              ? Quantity(value: firstAnswer.valueDecimal)
-              : (firstAnswer.valueInteger != null &&
-                      firstAnswer.valueInteger!.isValid)
+    final answer = this.answer;
+    if (answer != null) {
+      existingValue = answer.valueQuantity ??
+          ((answer.valueDecimal != null && answer.valueDecimal!.isValid)
+              ? Quantity(value: answer.valueDecimal)
+              : (answer.valueInteger != null && answer.valueInteger!.isValid)
                   ? Quantity(
-                      value:
-                          Decimal(firstAnswer.valueInteger!.value!.toDouble()),
+                      value: Decimal(answer.valueInteger!.value!.toDouble()),
                     )
                   : null);
     }

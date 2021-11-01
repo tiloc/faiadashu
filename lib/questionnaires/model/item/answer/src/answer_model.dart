@@ -45,7 +45,7 @@ abstract class AnswerModel<I, V> {
   String get display;
 
   QuestionnaireResponseAnswer? get answer =>
-      responseItemModel.answers[answerIndex];
+      responseItemModel.responseItem?.answer?.elementAt(answerIndex);
 
   /// Validates a new input value. Does not change the [value].
   ///
