@@ -118,7 +118,9 @@ abstract class FillerItemModel extends ChangeNotifier with Diagnosticable {
       final questionLinkId = qew.question;
       if (questionLinkId == null) {
         throw QuestionnaireFormatException(
-            'enableWhen with unspecified linkId.', qew);
+          'enableWhen with unspecified linkId.',
+          qew,
+        );
       }
 
       allCount++;
@@ -151,7 +153,8 @@ abstract class FillerItemModel extends ChangeNotifier with Diagnosticable {
               // TODO: More sophistication- System, cardinality, etc.
               if (responseCoding?.code == qew.answerCoding?.code) {
                 _fimLogger.debug(
-                    'enableWhen: $responseCoding == ${qew.answerCoding}');
+                  'enableWhen: $responseCoding == ${qew.answerCoding}',
+                );
                 if (qew.operator_ == QuestionnaireEnableWhenOperator.eq) {
                   anyTrigger = true;
                   allTriggered++;
@@ -167,7 +170,8 @@ abstract class FillerItemModel extends ChangeNotifier with Diagnosticable {
               }
             } else {
               _fimLogger.warn(
-                  'Unsupported: Item with linkId is not a code question: $questionLinkId.');
+                'Unsupported: Item with linkId is not a code question: $questionLinkId.',
+              );
               // Err on the side of caution: Enable fields when enableWhen cannot be evaluated.
               // See http://hl7.org/fhir/uv/sdc/2019May/expressions.html#missing-information for specification
               anyTrigger = true;

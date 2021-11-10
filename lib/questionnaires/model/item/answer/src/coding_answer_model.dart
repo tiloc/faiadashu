@@ -324,7 +324,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
   QuestionnaireErrorFlag? get isComplete {
     if (value == null && minOccurs > 0) {
       return QuestionnaireErrorFlag(
-        questionnaireItemModel.linkId,
+        responseItemModel.responseUid,
         errorText:
             lookupFDashLocalizations(locale).validatorMinOccurs(minOccurs),
       );
@@ -334,7 +334,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
     return (validationText == null)
         ? null
         : QuestionnaireErrorFlag(
-            questionnaireItemModel.linkId,
+            responseItemModel.responseUid,
             errorText: validationText,
           );
   }
@@ -344,21 +344,21 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
 
   @override
   void populate(QuestionnaireResponseAnswer answer) {
-    // FIXME: Enable population from multiple answers
-/*    final responseItem = responseItemModel.responseItem;
+    throw UnimplementedError('populate not implemented.');
+  }
 
-    if (responseItem != null) {
-      value = (responseItem.answer != null)
-          ? CodeableConcept(
-        coding: responseItem.answer
-            ?.map(
-              (answer) => answerOptions[
-          choiceStringFromCoding(answer.valueCoding)]!
-              .valueCoding!,
-        )
-            .toList(),
-      )
-          : null;
-    } */
+  @override
+  void populateCodingAnswers(List<QuestionnaireResponseAnswer>? answers) {
+    value = (answers != null)
+        ? CodeableConcept(
+            coding: answers
+                .map(
+                  (answer) =>
+                      answerOptions[choiceStringFromCoding(answer.valueCoding)]!
+                          .valueCoding!,
+                )
+                .toList(),
+          )
+        : null;
   }
 }

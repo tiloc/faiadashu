@@ -118,7 +118,7 @@ class QuestionItemModel extends ResponseItemModel {
     _answerModel(0);
   }
 
-  // FIXME: Clarify between this and response item model
+  @override
   Iterable<QuestionnaireErrorFlag>? get isComplete {
     // Non-existent answer models can be incomplete, e.g. if minOccurs is not met.
     _ensureAnswerModel();

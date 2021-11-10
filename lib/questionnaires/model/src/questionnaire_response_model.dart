@@ -343,8 +343,16 @@ class QuestionnaireResponseModel extends ChangeNotifier {
             );
             itemAnswers.forEachIndexed((answerIndex, answer) {
               // Populate the answer models
-              final addedAnswerModel = qrim.addAnswerModel();
-              addedAnswerModel.populate(answer);
+              if (qrim.questionnaireItemModel.isCodingType) {
+                // TODO: This is hacky!
+                if (answerIndex == 0) {
+                  final addedAnswerModel = qrim.addAnswerModel();
+                  addedAnswerModel.populateCodingAnswers(itemAnswers);
+                }
+              } else {
+                final addedAnswerModel = qrim.addAnswerModel();
+                addedAnswerModel.populate(answer);
+              }
 
               // If the answer had any nested items, then first ensure that the
               // required structures exist, then populate them as well.
@@ -589,10 +597,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   }
 
   void resetMarkers() {
-    if (errorFlags.value != null) {
-      errorFlags.value = null;
-      nextGeneration();
-    }
+    errorFlags.value = null;
   }
 
   final errorFlags = ValueNotifier<Iterable<QuestionnaireErrorFlag>?>(null);

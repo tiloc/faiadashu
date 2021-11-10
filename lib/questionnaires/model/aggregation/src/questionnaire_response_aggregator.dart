@@ -31,11 +31,7 @@ class QuestionnaireResponseAggregator
       return null;
     }
 
-    final questionType =
-        itemModel.questionnaireItemModel.questionnaireItem.type;
-
-    final isCodingAnswers = questionType == QuestionnaireItemType.choice ||
-        questionType == QuestionnaireItemType.open_choice;
+    final isCodingAnswers = itemModel.questionnaireItemModel.isCodingType;
 
     final answeredAnswerModels = itemModel.answeredAnswerModels;
 

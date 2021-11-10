@@ -43,6 +43,7 @@
       "linkId": "123523.35235",
       "type": "string",
       "text": "Enter your Name",
+      "required": true,
       "maxLength": 50,
       "extension": [
         {

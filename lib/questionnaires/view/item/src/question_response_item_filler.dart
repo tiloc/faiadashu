@@ -56,7 +56,8 @@ class QuestionResponseItemFillerState
     final fillableAnswerModels = questionResponseItemModel.fillableAnswerModels;
     _answerFillers = fillableAnswerModels
         .map<QuestionnaireAnswerFiller>(
-            (am) => questionnaireTheme.createAnswerFiller(this, am))
+          (am) => questionnaireTheme.createAnswerFiller(this, am),
+        )
         .toList();
   }
 

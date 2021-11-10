@@ -131,9 +131,7 @@ class QuestionnaireItemModel with Diagnosticable {
   /// This will not return `true` for repeating `choice` or `open-choice` items,
   /// as these are multiple choice, rather than truly repeating.
   bool get isRepeating =>
-      questionnaireItem.repeats == Boolean(true) &&
-      questionnaireItem.type != QuestionnaireItemType.choice &&
-      questionnaireItem.type != QuestionnaireItemType.open_choice;
+      questionnaireItem.repeats == Boolean(true) && !isCodingType;
 
   bool get isRequired => questionnaireItem.required_ == Boolean(true);
 
@@ -223,6 +221,11 @@ class QuestionnaireItemModel with Diagnosticable {
   bool get isDisplay => questionnaireItem.type == QuestionnaireItemType.display;
 
   bool get isQuestion => !isDisplay && !isGroup;
+
+  bool get isCodingType {
+    return questionnaireItem.type == QuestionnaireItemType.choice ||
+        questionnaireItem.type == QuestionnaireItemType.open_choice;
+  }
 
   /// Is this item not changeable by end-users?
   ///

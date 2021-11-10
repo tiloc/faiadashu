@@ -100,6 +100,11 @@ abstract class AnswerModel<I, V> {
   /// Populate an answer model with a value from the FHIR domain model.
   void populate(QuestionnaireResponseAnswer answer);
 
+  /// Populate an answer model with a multiple-choice answer from the FHIR domain model.
+  void populateCodingAnswers(List<QuestionnaireResponseAnswer>? answers) {
+    throw UnimplementedError('populateCodingAnswers not implemented.');
+  }
+
   /// Populates the answer from the result of a FHIRPath expression.
   ///
   /// This function is designed for a very specific internal purpose and should
