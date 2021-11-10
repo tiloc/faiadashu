@@ -18,8 +18,7 @@ class StringAnswerModel extends AnswerModel<String, String> {
   late final int? maxLength;
   late final StringAnswerKeyboard keyboard;
 
-  StringAnswerModel(QuestionItemModel responseModel, int answerIndex)
-      : super(responseModel, answerIndex) {
+  StringAnswerModel(QuestionItemModel responseModel) : super(responseModel) {
     final regexPattern = qi.extension_
         ?.extensionOrNull('http://hl7.org/fhir/StructureDefinition/regex')
         ?.valueString;
@@ -55,8 +54,6 @@ class StringAnswerModel extends AnswerModel<String, String> {
                     : (keyboardExtension == 'number')
                         ? StringAnswerKeyboard.number
                         : StringAnswerKeyboard.plain;
-
-    value = answer?.valueString;
   }
 
   @override
@@ -129,7 +126,6 @@ class StringAnswerModel extends AnswerModel<String, String> {
     } else {
       return QuestionnaireErrorFlag(
         responseItemModel.responseUid,
-        answerIndex: answerIndex,
         errorText: valid,
       );
     }
@@ -146,7 +142,10 @@ class StringAnswerModel extends AnswerModel<String, String> {
     }
 
     value = evaluationResult as String?;
+  }
 
-    responseItemModel.answers[answerIndex] = filledAnswer;
+  @override
+  void populate(QuestionnaireResponseAnswer answer) {
+    value = answer.valueString;
   }
 }

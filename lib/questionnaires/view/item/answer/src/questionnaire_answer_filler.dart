@@ -7,14 +7,14 @@ import '../../../../questionnaires.dart';
 /// Filler for an individual [QuestionnaireResponseAnswer].
 abstract class QuestionnaireAnswerFiller extends StatefulWidget {
   final QuestionResponseItemFillerState responseFillerState;
-  final int answerIndex;
+  final AnswerModel answerModel;
   final QuestionnaireItemModel questionnaireItemModel;
   final QuestionItemModel responseItemModel;
   final QuestionnaireTheme questionnaireTheme;
 
   QuestionnaireAnswerFiller(
     this.responseFillerState,
-    this.answerIndex, {
+    this.answerModel, {
     Key? key,
   })  : responseItemModel = responseFillerState.questionResponseItemModel,
         questionnaireItemModel =
@@ -28,7 +28,7 @@ abstract class QuestionnaireAnswerFillerState<
     W extends QuestionnaireAnswerFiller,
     M extends AnswerModel<Object, V>> extends State<W> {
   static final _abstractLogger = Logger(QuestionnaireAnswerFillerState);
-  late final M answerModel;
+  M get answerModel => widget.answerModel as M;
 
   late final Object? answerModelError;
 
@@ -50,9 +50,6 @@ abstract class QuestionnaireAnswerFillerState<
     super.initState();
 
     try {
-      answerModel =
-          widget.responseItemModel.answerModel(widget.answerIndex) as M;
-
       answerModelError = null;
 
       firstFocusNode = FocusNode(
@@ -129,20 +126,10 @@ abstract class QuestionnaireAnswerFillerState<
   set value(V? newValue) {
     if (mounted) {
       setState(() {
-        // TODO: Should filling a single answer reset all error markers?
+        // Updating a single answer resets all error markers
         widget.responseItemModel.questionnaireResponseModel.resetMarkers();
         answerModel.value = newValue;
       });
-
-      if (answerModel.hasCodingAnswers) {
-        widget.responseFillerState.onAnswered(
-          answerModel.filledCodingAnswers,
-          answerModel.answerIndex,
-        );
-      } else {
-        widget.responseFillerState
-            .onAnswered([answerModel.filledAnswer], answerModel.answerIndex);
-      }
     }
   }
 

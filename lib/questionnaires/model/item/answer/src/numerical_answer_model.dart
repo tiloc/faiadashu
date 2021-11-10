@@ -72,8 +72,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
     return keyForUnitChoice(coding);
   }
 
-  NumericalAnswerModel(QuestionItemModel responseModel, int answerIndex)
-      : super(responseModel, answerIndex) {
+  NumericalAnswerModel(QuestionItemModel responseModel) : super(responseModel) {
     _isSliding =
         questionnaireItemModel.questionnaireItem.isItemControl('slider');
 
@@ -158,24 +157,6 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
     } else if (unit != null) {
       _units[keyForUnitChoice(unit)] = unit;
     }
-
-    Quantity? existingValue;
-    final answer = this.answer;
-    if (answer != null) {
-      existingValue = answer.valueQuantity ??
-          ((answer.valueDecimal != null && answer.valueDecimal!.isValid)
-              ? Quantity(value: answer.valueDecimal)
-              : (answer.valueInteger != null && answer.valueInteger!.isValid)
-                  ? Quantity(
-                      value: Decimal(answer.valueInteger!.value!.toDouble()),
-                    )
-                  : null);
-    }
-    value = (existingValue == null && isSliding)
-        ? Quantity(
-            value: Decimal((maxValue - minValue) / 2.0),
-          ) // Slider needs a guaranteed value
-        : existingValue;
   }
 
   @override
@@ -344,7 +325,17 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
             ]
           : null,
     );
+  }
 
-    responseItemModel.answers = [filledAnswer];
+  @override
+  void populate(QuestionnaireResponseAnswer answer) {
+    value = answer.valueQuantity ??
+        ((answer.valueDecimal != null && answer.valueDecimal!.isValid)
+            ? Quantity(value: answer.valueDecimal)
+            : (answer.valueInteger != null && answer.valueInteger!.isValid)
+                ? Quantity(
+                    value: Decimal(answer.valueInteger!.value!.toDouble()),
+                  )
+                : null);
   }
 }

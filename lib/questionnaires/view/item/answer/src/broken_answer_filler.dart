@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../model/item/answer/src/answer_model.dart';
 import '../../../view.dart';
 import 'questionnaire_answer_filler.dart';
 
@@ -9,10 +10,10 @@ class BrokenAnswerFiller extends QuestionnaireAnswerFiller {
 
   BrokenAnswerFiller(
     QuestionResponseItemFillerState responseFillerState,
-    int answerIndex,
+    AnswerModel answerModel,
     this.exception, {
     Key? key,
-  }) : super(responseFillerState, answerIndex, key: key);
+  }) : super(responseFillerState, answerModel, key: key);
 
   @override
   State<StatefulWidget> createState() => _BrokenItemState();

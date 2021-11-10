@@ -1,7 +1,6 @@
 import 'package:fhir/r4.dart';
 
 import '../../../../coding/coding.dart';
-import '../../../../fhir_types/fhir_types.dart';
 import '../../../../l10n/l10n.dart';
 import '../../../../logging/logging.dart';
 import '../../../questionnaires.dart';
@@ -31,37 +30,48 @@ class NarrativeAggregator extends Aggregator<Narrative> {
     _narrative = value;
   }
 
-  bool _addResponseItemToDiv(
+  bool _addFillerItemToDiv(
     StringBuffer div,
-    FillerItemModel fillerItemModel,
+    FillerItemModel itemModel,
   ) {
-    if (fillerItemModel is! ResponseItemModel) {
+    if (itemModel.questionnaireItemModel.isHidden || !itemModel.isEnabled) {
       return false;
     }
 
-    final item = fillerItemModel.responseItem;
+    final itemText = itemModel.questionnaireItemModel.titleText;
 
-    if (item == null) {
-      return false;
-    }
-
-    if (!fillerItemModel.isEnabled) {
-      return false;
-    }
-
-    bool returnValue = false;
-
-    if (item.text != null) {
-      if (fillerItemModel is GroupItemModel) {
-        div.write('<h2>${item.text}</h2>');
+    if (itemModel is GroupItemModel) {
+      // TODO: Group model should also check for whether any item in the group is answered.
+      if (itemText != null) {
+        div.write('<h2>$itemText</h2>');
+        return true;
       } else {
-        div.write('<h3>${item.text}</h3>');
+        return false;
       }
-      returnValue = true;
+    } else if (itemModel is DisplayItemModel) {
+      if (itemText != null) {
+        div.write('<h3>$itemText</h3>');
+        return true;
+      } else {
+        return false;
+      }
     }
 
-    final invalid =
-        item.extension_?.dataAbsentReason == dataAbsentReasonAsTextCode;
+    if (itemModel is! QuestionItemModel) {
+      throw ArgumentError('Expecting QuestionItemModel', 'itemModel');
+    }
+
+    if (itemModel.isUnanswered) {
+      return false;
+    }
+
+    if (itemText != null) {
+      div.write('<h3>$itemText</h3>');
+    }
+
+    final dataAbsentReason = itemModel.dataAbsentReason;
+
+    final invalid = dataAbsentReason == dataAbsentReasonAsTextCode;
 
     if (invalid) {
       div.write(
@@ -69,61 +79,30 @@ class NarrativeAggregator extends Aggregator<Narrative> {
       );
     }
 
-    final dataAbsentReason = item.extension_?.dataAbsentReason;
     if (dataAbsentReason == dataAbsentReasonMaskedCode) {
       div.write('<p>***</p>');
-      returnValue = true;
     } else if (dataAbsentReason == dataAbsentReasonAskedButDeclinedCode) {
       div.write(
         '<p><i><span style="color:red">X </span>${lookupFDashLocalizations(locale).dataAbsentReasonAskedDeclinedOutput}</i></p>',
       );
-      returnValue = true;
     } else {
-      if (item.answer != null) {
-        final repeatPrefix = (item.answer!.isNotEmpty) ? '• ' : '';
-        for (final answer in item.answer!) {
-          if (answer.valueString != null) {
-            div.write('<p>$repeatPrefix${answer.valueString}</p>');
-          } else if (answer.valueDecimal != null) {
-            if (fillerItemModel.questionnaireItemModel.isTotalScore) {
-              div.write('<h3>${answer.valueDecimal!.format(locale)}</h3>');
-            } else {
-              div.write(
-                '<p>$repeatPrefix${answer.valueDecimal!.format(locale)}</p>',
-              );
-            }
-          } else if (answer.valueQuantity != null) {
-            div.write(
-              '<p>$repeatPrefix${answer.valueQuantity!.format(locale)}</p>',
-            );
-          } else if (answer.valueInteger != null) {
-            div.write('<p>$repeatPrefix${answer.valueInteger!.value}</p>');
-          } else if (answer.valueCoding != null) {
-            div.write(
-              '<p>- ${answer.valueCoding!.localizedDisplay(locale)}</p>',
-            );
-          } else if (answer.valueDateTime != null) {
-            div.write(
-              '<p>$repeatPrefix${answer.valueDateTime!.format(locale)}</p>',
-            );
-          } else if (answer.valueDate != null) {
-            div.write(
-              '<p>$repeatPrefix${answer.valueDate!.format(locale)}</p>',
-            );
-          } else if (answer.valueTime != null) {
-            div.write(
-              '<p>$repeatPrefix${answer.valueTime!.format(locale)}</p>',
-            );
-          } else if (answer.valueBoolean != null) {
-            div.write(
-              '<p>$repeatPrefix${(answer.valueBoolean!.value!) ? '[X]' : '[ ]'}</p>',
-            );
-          } else if (answer.valueUri != null) {
-            div.write('<p>$repeatPrefix${answer.valueUri.toString()}</p>');
+      final filledAnswers = itemModel.answeredAnswerModels;
+
+      final repeatPrefix =
+          itemModel.questionnaireItemModel.isRepeating ? '• ' : '';
+      for (final answerModel in filledAnswers) {
+        if (answerModel is NumericalAnswerModel) {
+          if (itemModel.questionnaireItemModel.isTotalScore) {
+            div.write('<h3>${answerModel.display}</h3>');
           } else {
-            div.write('<p>$repeatPrefix${answer.toString()}</p>');
+            div.write(
+              '<p>$repeatPrefix${answerModel.display}</p>',
+            );
           }
-          returnValue = true;
+        } else {
+          div.write(
+            '<p>$repeatPrefix${answerModel.display}</p>',
+          );
         }
       }
     }
@@ -131,7 +110,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
       div.write('</span>');
     }
 
-    return returnValue;
+    return true;
   }
 
   Narrative _generateNarrative(
@@ -146,7 +125,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
 
     for (final itemModel
         in questionnaireResponseModel.orderedFillerItemModels()) {
-      generated = generated | _addResponseItemToDiv(div, itemModel);
+      generated = generated | _addFillerItemToDiv(div, itemModel);
     }
     div.write('<p>&nbsp;</p>');
     div.write('</div>');

@@ -4,14 +4,22 @@ import 'package:flutter/material.dart';
 import '../../../../../fhir_types/fhir_types.dart';
 import '../../../model.dart';
 
-/// Models an answer within a [QuestionnaireResponseItem].
+/// Models a single answer within a [QuestionItemModel].
 abstract class AnswerModel<I, V> {
   /// Textual depiction of an unanswered question.
   static const nullText = '—';
 
   final QuestionItemModel responseItemModel;
-  final int answerIndex;
-  V? value;
+  V? _value;
+
+  V? get value => _value;
+  set value(V? newValue) {
+    if (newValue != _value) {
+      _value = newValue;
+      // TODO: Should this be modeled as a proper notifier-relationship?
+      responseItemModel.nextGeneration();
+    }
+  }
 
   QuestionnaireItemModel get questionnaireItemModel =>
       responseItemModel.questionnaireItemModel;
@@ -37,15 +45,13 @@ abstract class AnswerModel<I, V> {
         ?.valueString;
   }
 
-  AnswerModel(this.responseItemModel, this.answerIndex);
+  /// Construct a new, unpopulated answer model.
+  AnswerModel(this.responseItemModel);
 
   /// Returns a human-readable, localized, textual description of the model.
   ///
   /// Returns [nullText] if the question is unanswered.
   String get display;
-
-  QuestionnaireResponseAnswer? get answer =>
-      responseItemModel.responseItem?.answer?.elementAt(answerIndex);
 
   /// Validates a new input value. Does not change the [value].
   ///
@@ -67,6 +73,9 @@ abstract class AnswerModel<I, V> {
   /// when it is not.
   QuestionnaireErrorFlag? get isComplete;
 
+  /// Returns whether any answer (valid or invalid) has been provided.
+  bool get isAnswered => !isUnanswered;
+
   /// Returns whether this question is unanswered.
   bool get isUnanswered;
 
@@ -87,6 +96,9 @@ abstract class AnswerModel<I, V> {
   }
 
   bool get hasCodingAnswers => false;
+
+  /// Populate an answer model with a value from the FHIR domain model.
+  void populate(QuestionnaireResponseAnswer answer);
 
   /// Populates the answer from the result of a FHIRPath expression.
   ///

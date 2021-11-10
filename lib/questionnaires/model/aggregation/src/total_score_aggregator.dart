@@ -4,8 +4,6 @@ import 'package:fhir/r4.dart';
 import '../../../../logging/logging.dart';
 import '../../model.dart';
 
-// TODO: Reduce code with calculatedExpression code
-
 /// Aggregate answers into a total score.
 ///
 /// The score is the sum of the ordinalValue of all answers.
@@ -52,7 +50,7 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
 
     _logger.trace('totalScore.aggregate');
     final sum =
-        questionnaireResponseModel.orderedResponseItemModels().fold<double>(
+        questionnaireResponseModel.orderedQuestionItemModels().fold<double>(
               0.0,
               (previousValue, element) =>
                   previousValue + (element.ordinalValue?.value ?? 0.0),
@@ -64,8 +62,7 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
       value = result;
     }
 
-    totalScoreItem.answerModel(0).populateFromExpression(result);
-    totalScoreItem.updateResponse();
+    totalScoreItem.firstAnswerModel.populateFromExpression(result);
 
     return result;
   }

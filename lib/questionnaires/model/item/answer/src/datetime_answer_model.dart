@@ -11,11 +11,7 @@ import '../../../../../l10n/l10n.dart';
 import '../../../model.dart';
 
 class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
-  DateTimeAnswerModel(QuestionItemModel responseModel, int answerIndex)
-      : super(responseModel, answerIndex) {
-    value = answer?.valueDateTime ??
-        ((answer?.valueDate != null) ? FhirDateTime(answer?.valueDate) : null);
-  }
+  DateTimeAnswerModel(QuestionItemModel responseModel) : super(responseModel);
 
   @override
   String get display => value?.format(locale) ?? AnswerModel.nullText;
@@ -69,5 +65,11 @@ class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
     }
 
     value = FhirDateTime(evaluationResult);
+  }
+
+  @override
+  void populate(QuestionnaireResponseAnswer answer) {
+    value = answer.valueDateTime ??
+        ((answer.valueDate != null) ? FhirDateTime(answer.valueDate) : null);
   }
 }

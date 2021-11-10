@@ -1,3 +1,4 @@
+import 'package:collection/src/iterable_extensions.dart';
 import 'package:fhir/r4.dart';
 import 'package:fhir_path/run_fhir_path.dart';
 import 'package:flutter/foundation.dart';
@@ -114,6 +115,12 @@ abstract class FillerItemModel extends ChangeNotifier with Diagnosticable {
 
     questionnaireItemModel.forEnableWhens((qew) {
       // TODO: implement the following rule: If enableWhen logic depends on an item that is disabled, the logic should proceed as though the item is not valued - even if a default value or other value might be retained in memory in the event of the item being re-enabled.
+      final questionLinkId = qew.question;
+      if (questionLinkId == null) {
+        throw QuestionnaireFormatException(
+            'enableWhen with unspecified linkId.', qew);
+      }
+
       allCount++;
       switch (qew.operator_) {
         case QuestionnaireEnableWhenOperator.exists:
@@ -125,27 +132,54 @@ abstract class FillerItemModel extends ChangeNotifier with Diagnosticable {
           break;
         case QuestionnaireEnableWhenOperator.eq:
         case QuestionnaireEnableWhenOperator.ne:
-          final responseCoding = fromLinkId(qew.question!)
-              .responseItem
-              ?.answer
-              ?.firstOrNull
-              ?.valueCoding;
-          // TODO: More sophistication- System, cardinality, etc.
-          if (responseCoding?.code == qew.answerCoding?.code) {
-            _fimLogger
-                .debug('enableWhen: $responseCoding == ${qew.answerCoding}');
-            if (qew.operator_ == QuestionnaireEnableWhenOperator.eq) {
+          final question = fromLinkId(questionLinkId);
+          if (question is QuestionItemModel) {
+            final firstAnswer =
+                (fromLinkId(questionLinkId) as QuestionItemModel)
+                    .answeredAnswerModels
+                    .firstOrNull;
+
+            if (firstAnswer == null) {
+              // null equals nothing
+              if (qew.operator_ == QuestionnaireEnableWhenOperator.ne) {
+                anyTrigger = true;
+                allTriggered++;
+              }
+            } else if (firstAnswer is CodingAnswerModel) {
+              final responseCoding = firstAnswer.value?.coding?.firstOrNull;
+
+              // TODO: More sophistication- System, cardinality, etc.
+              if (responseCoding?.code == qew.answerCoding?.code) {
+                _fimLogger.debug(
+                    'enableWhen: $responseCoding == ${qew.answerCoding}');
+                if (qew.operator_ == QuestionnaireEnableWhenOperator.eq) {
+                  anyTrigger = true;
+                  allTriggered++;
+                }
+              } else {
+                _fimLogger.debug(
+                  'enableWhen: $responseCoding != ${qew.answerCoding}',
+                );
+                if (qew.operator_ == QuestionnaireEnableWhenOperator.ne) {
+                  anyTrigger = true;
+                  allTriggered++;
+                }
+              }
+            } else {
+              _fimLogger.warn(
+                  'Unsupported: Item with linkId is not a code question: $questionLinkId.');
+              // Err on the side of caution: Enable fields when enableWhen cannot be evaluated.
+              // See http://hl7.org/fhir/uv/sdc/2019May/expressions.html#missing-information for specification
               anyTrigger = true;
               allTriggered++;
             }
           } else {
-            _fimLogger.debug(
-              'enableWhen: $responseCoding != ${qew.answerCoding}',
-            );
-            if (qew.operator_ == QuestionnaireEnableWhenOperator.ne) {
-              anyTrigger = true;
-              allTriggered++;
-            }
+            _fimLogger
+                .warn('linkId refers to non-question item: $questionLinkId.');
+            // Err on the side of caution: Enable fields when enableWhen cannot be evaluated.
+            // See http://hl7.org/fhir/uv/sdc/2019May/expressions.html#missing-information for specification
+            anyTrigger = true;
+            allTriggered++;
           }
           break;
         default:

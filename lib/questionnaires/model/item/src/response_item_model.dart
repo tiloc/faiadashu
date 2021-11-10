@@ -1,6 +1,3 @@
-import 'package:fhir/r4.dart';
-
-import '../../../../fhir_types/fhir_types.dart';
 import '../../../../l10n/l10n.dart';
 import '../../../../logging/logging.dart';
 import '../../model.dart';
@@ -23,33 +20,6 @@ abstract class ResponseItemModel extends FillerItemModel {
           questionnaireItemModel,
         );
 
-  QuestionnaireResponseItem? get responseItem;
-
-  /// Returns a [Decimal] value which can be added to a score.
-  ///
-  /// Returns null if not applicable (either question unanswered, or wrong type)
-  Decimal? get ordinalValue {
-    if (responseItem == null) {
-      return null;
-    }
-
-    // Find ordinal value in extensions
-    final ordinalExtension = responseItem
-            ?.answer?.firstOrNull?.valueCoding?.extension_
-            ?.extensionOrNull(
-          'http://hl7.org/fhir/StructureDefinition/iso21090-CO-value',
-        ) ??
-        responseItem?.answer?.firstOrNull?.valueCoding?.extension_
-            ?.extensionOrNull(
-          'http://hl7.org/fhir/StructureDefinition/ordinalValue',
-        );
-    if (ordinalExtension == null) {
-      return null;
-    }
-
-    return ordinalExtension.valueDecimal;
-  }
-
   /// Can the item be answered?
   ///
   /// Static or read-only items cannot be answered.
@@ -67,40 +37,13 @@ abstract class ResponseItemModel extends FillerItemModel {
   ///
   /// Static or read-only items are not answered.
   /// Items which are not enabled are not answered.
-  bool get isAnswered {
-    _rimLogger.trace('isAnswered $responseUid');
-    if (!isAnswerable) {
-      return false;
-    }
-
-    if (responseItem != null) {
-      _rimLogger.debug('responseItem $responseItem');
-      _rimLogger.debug('$responseUid is answered.');
-      return true;
-    }
-
-    return false;
-  }
+  bool get isAnswered;
 
   /// Is the item unanswered?
   ///
   /// Static or read-only items are not unanswered.
   /// Items which are not enabled are not unanswered.
-  bool get isUnanswered {
-    _rimLogger.trace('isUnanswered $responseUid');
-    if (!isAnswerable) {
-      return false;
-    }
-
-    if (responseItem != null) {
-      _rimLogger.debug('responseItem $responseItem');
-      return false;
-    }
-
-    _rimLogger.debug('$responseUid is unanswered.');
-
-    return true;
-  }
+  bool get isUnanswered;
 
   /// Is the item invalid?
   bool get isInvalid;

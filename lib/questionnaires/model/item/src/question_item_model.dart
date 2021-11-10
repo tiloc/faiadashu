@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:fhir/r4.dart';
 
 import '../../../../coding/coding.dart';
@@ -13,86 +11,19 @@ import '../../../questionnaires.dart';
 class QuestionItemModel extends ResponseItemModel {
   static final _qrimLogger = Logger(QuestionItemModel);
 
-  // FIXME: Having this in addition to the actual questionnaireResponseItem
-  // can lead to all kinds of consistency problems.
-  /// The individual FHIR domain answers to this questionnaire item.
-  @Deprecated("Replace with direct access to questionnaireResponseItem")
-  List<QuestionnaireResponseAnswer?> answers = [];
-
-  /// The FHIR domain QuestionnaireResponseItem
-  QuestionnaireResponseItem? _questionnaireResponseItem;
-
-  /// Returns the associated [QuestionnaireResponseItem].
-  @override
-  QuestionnaireResponseItem? get responseItem => _questionnaireResponseItem;
-
-  /// Sets the associated [QuestionnaireResponseItem].
-  set responseItem(QuestionnaireResponseItem? questionnaireResponseItem) {
-    final parentAnswerIndex = this.parentAnswerIndex;
-    _qrimLogger
-        .debug('set responseItem $questionnaireResponseItem at $responseUid');
-    if (parentAnswerIndex == null) {
-      if (questionnaireResponseItem != _questionnaireResponseItem) {
-        _questionnaireResponseItem = questionnaireResponseItem;
-        questionnaireResponseModel.nextGeneration();
-        // This notifies aggregators on changes to individual items
-        notifyListeners();
-      }
-    } else {
-      final parentQuestion = parentItem! as QuestionItemModel;
-      final siblingIndex = questionnaireItemModel.siblingIndex;
-
-      _qrimLogger.debug(
-        'setting response for nested question at $parentQuestion index $parentAnswerIndex.',
-      );
-
-      final parentResponseItem =
-          ArgumentError.checkNotNull(parentQuestion.responseItem);
-      final parentResponseAnswers =
-          ArgumentError.checkNotNull(parentResponseItem.answer);
-      final parentResponseAnswer = ArgumentError.checkNotNull(
-        parentResponseAnswers.elementAt(parentAnswerIndex),
-      );
-      final parentResponseAnswerItems = ArgumentError.checkNotNull(
-        parentResponseAnswer.item,
-      );
-
-      final currentResponseItem =
-          parentResponseAnswerItems.elementAt(siblingIndex);
-      _qrimLogger.debug('current item: $currentResponseItem');
-      if (currentResponseItem != questionnaireResponseItem) {
-        // ++ Celebrate an orgy of copyWith ++
-        final newAnswers = <QuestionnaireResponseAnswer>[
-          ...parentResponseAnswers
-        ];
-
-        final newItems = <QuestionnaireResponseItem>[
-          ...parentResponseAnswerItems
-        ];
-        // TODO: What if questionnaireResponseItem is null? Should this result in a response with no answers?
-        newItems[siblingIndex] = questionnaireResponseItem!;
-
-        final newResponseAnswer = parentResponseAnswer.copyWith(item: newItems);
-
-        newAnswers[parentAnswerIndex] = newResponseAnswer;
-
-        final newResponseItem = parentResponseItem.copyWith(answer: newAnswers);
-
-        parentQuestion.responseItem = newResponseItem;
-
-        questionnaireResponseModel.nextGeneration();
-        // This notifies aggregators on changes to individual items
-        parentQuestion
-            .notifyListeners(); // TODO: Should listeners of parent also be notified?
-        notifyListeners();
-      }
-    }
-  }
+  Code? _dataAbsentReason;
 
   /// Reason why this response is empty.
   ///
   /// see [DataAbsentReason]
-  Code? dataAbsentReason;
+  Code? get dataAbsentReason => _dataAbsentReason;
+
+  set dataAbsentReason(Code? newDataAbsentReason) {
+    if (_dataAbsentReason != newDataAbsentReason) {
+      _dataAbsentReason = newDataAbsentReason;
+      nextGeneration();
+    }
+  }
 
   QuestionItemModel(
     FillerItemModel? parentItem,
@@ -105,24 +36,24 @@ class QuestionItemModel extends ResponseItemModel {
           questionnaireResponseModel,
           itemModel,
         ) {
-    final int answerCount = responseItem?.answer?.length ?? 0;
-    if (answerCount > 0) {
-      answers = responseItem!.answer!;
-    } else {
-      answers = [null];
-    }
-
-    dataAbsentReason = responseItem?.extension_?.dataAbsentReason;
+    // FIXME: Should this be populated here? Or better a separate populate method?
+/*    dataAbsentReason = responseItem?.extension_?.dataAbsentReason; */
   }
 
   /// Is the response 'asked but declined'
   bool get isAskedButDeclined =>
       dataAbsentReason == dataAbsentReasonAskedButDeclinedCode;
 
-  /// Update the response with all the answers which are not null.
+  /// Changes the generation and notifies all listeners.
   ///
-  /// Sets the response in the related [QuestionnaireItemModel].
-  void updateResponse() {
+  /// Each generation is unique during a run of the application.
+  void nextGeneration() {
+    questionnaireResponseModel.nextGeneration();
+    // This notifies aggregators on changes to individual items
+    notifyListeners();
+
+    // FIXME: Move output of data-absent-reason over to response aggregator
+/*
     final filledAnswers = answers
         .where((answer) => answer != null)
         .map<QuestionnaireResponseAnswer>((answer) => answer!)
@@ -143,7 +74,7 @@ class QuestionItemModel extends ResponseItemModel {
                 : null,
             // FHIR cannot have empty arrays.
             answer: filledAnswers.isEmpty ? null : filledAnswers,
-          );
+          ); */
   }
 
   /// Is this response invalid?
@@ -155,9 +86,36 @@ class QuestionItemModel extends ResponseItemModel {
     return dataAbsentReason == dataAbsentReasonAsTextCode;
   }
 
+  /// Returns a [Decimal] value which can be added to a score.
+  ///
+  /// Returns null if not applicable (either question unanswered, or wrong type)
+  Decimal? get ordinalValue {
+    // TODO: This is expensive and hacky. The codinganswermodel should have a property for its own current ordinalvalue.
+    final answerModel = firstAnswerModel;
+
+    if (answerModel.isAnswered && answerModel is CodingAnswerModel) {
+      final answers = answerModel.filledCodingAnswers;
+      // Find ordinal value in extensions
+      final ordinalExtension =
+          answers?.firstOrNull?.valueCoding?.extension_?.extensionOrNull(
+                'http://hl7.org/fhir/StructureDefinition/iso21090-CO-value',
+              ) ??
+              answers?.firstOrNull?.valueCoding?.extension_?.extensionOrNull(
+                'http://hl7.org/fhir/StructureDefinition/ordinalValue',
+              );
+      if (ordinalExtension == null) {
+        return null;
+      }
+
+      return ordinalExtension.valueDecimal;
+    } else {
+      return null;
+    }
+  }
+
   // Ensures at least a single answer model exists.
   void _ensureAnswerModel() {
-    answerModel(0);
+    _answerModel(0);
   }
 
   // FIXME: Clarify between this and response item model
@@ -181,12 +139,25 @@ class QuestionItemModel extends ResponseItemModel {
     return (markers.isNotEmpty) ? markers : null;
   }
 
-  // FIXME: Clarify between this and response item model
-/*  bool get isUnanswered {
-    _ensureAnswerModel();
+  @override
+  bool get isAnswered {
+    _qrimLogger.trace('isAnswered $responseUid');
+    if (!isAnswerable) {
+      return false;
+    }
 
-    return _cachedAnswerModels.values.any((am) => !am.isUnanswered);
-  }*/
+    return _cachedAnswerModels.values.any((am) => am.isAnswered);
+  }
+
+  @override
+  bool get isUnanswered {
+    _qrimLogger.trace('isUnanswered $responseUid');
+    if (!isAnswerable) {
+      return false;
+    }
+
+    return _cachedAnswerModels.values.every((am) => am.isUnanswered);
+  }
 
   final Map<int, AnswerModel> _cachedAnswerModels = <int, AnswerModel>{};
 
@@ -194,26 +165,42 @@ class QuestionItemModel extends ResponseItemModel {
   ///
   /// Returns the newly added [AnswerModel].
   AnswerModel addAnswerModel() {
-    return answerModel(numberOfAnswers);
+    return _answerModel(_cachedAnswerModels.length);
   }
 
-  /// Returns the number of answers in the response model.
-  ///
-  /// Includes unanswered answers, and thus the minimum value is 1.
-  int get numberOfAnswers => max(answers.length, 1);
+  /// Returns the [AnswerModel] which has been added last.
+  AnswerModel get latestAnswerModel {
+    _ensureAnswerModel();
+
+    return _cachedAnswerModels.values.last;
+  }
+
+  /// Returns the [AnswerModel] which has been added first.
+  AnswerModel get firstAnswerModel {
+    _ensureAnswerModel();
+
+    return _cachedAnswerModels.values.first;
+  }
+
+  /// Returns the [AnswerModel]s which have been answered.
+  Iterable<AnswerModel> get answeredAnswerModels {
+    return _cachedAnswerModels.values.where((am) => am.isAnswered);
+  }
+
+  /// Returns the [AnswerModel]s which have been answered,
+  /// plus potentially one extra empty one.
+  Iterable<AnswerModel> get fillableAnswerModels {
+    _ensureAnswerModel();
+
+    final latestAnswerModel = this.latestAnswerModel;
+    return _cachedAnswerModels.values
+        .where((am) => am.isAnswered || am == latestAnswerModel);
+  }
 
   /// Returns an [AnswerModel] for the nth answer to an overall response.
-  AnswerModel answerModel(int answerIndex) {
+  AnswerModel _answerModel(int answerIndex) {
     if (_cachedAnswerModels.containsKey(answerIndex)) {
       return _cachedAnswerModels[answerIndex]!;
-    }
-
-    // Prepare slots in the underlying FHIR domain model.
-    if (answers.length <= answerIndex) {
-      final List<QuestionnaireResponseAnswer?> additionalSlots =
-          List.filled((answerIndex - answers.length) + 1, null);
-      // + operator on List crashes due to incompatible types.
-      answers = [...answers, ...additionalSlots];
     }
 
     final AnswerModel? answerModel;
@@ -221,25 +208,25 @@ class QuestionItemModel extends ResponseItemModel {
     switch (questionnaireItemModel.questionnaireItem.type) {
       case QuestionnaireItemType.choice:
       case QuestionnaireItemType.open_choice:
-        answerModel = CodingAnswerModel(this, answerIndex);
+        answerModel = CodingAnswerModel(this);
         break;
       case QuestionnaireItemType.quantity:
       case QuestionnaireItemType.decimal:
       case QuestionnaireItemType.integer:
-        answerModel = NumericalAnswerModel(this, answerIndex);
+        answerModel = NumericalAnswerModel(this);
         break;
       case QuestionnaireItemType.string:
       case QuestionnaireItemType.text:
       case QuestionnaireItemType.url:
-        answerModel = StringAnswerModel(this, answerIndex);
+        answerModel = StringAnswerModel(this);
         break;
       case QuestionnaireItemType.date:
       case QuestionnaireItemType.datetime:
       case QuestionnaireItemType.time:
-        answerModel = DateTimeAnswerModel(this, answerIndex);
+        answerModel = DateTimeAnswerModel(this);
         break;
       case QuestionnaireItemType.boolean:
-        answerModel = BooleanAnswerModel(this, answerIndex);
+        answerModel = BooleanAnswerModel(this);
         break;
       case QuestionnaireItemType.display:
         throw UnsupportedError("Items of type 'display' do not have answers.");
@@ -249,7 +236,7 @@ class QuestionItemModel extends ResponseItemModel {
       case QuestionnaireItemType.unknown:
       case QuestionnaireItemType.reference:
         // Throwing an exception here would lead to breakage of filler.
-        answerModel = UnsupportedAnswerModel(this, answerIndex);
+        answerModel = UnsupportedAnswerModel(this);
     }
 
     _cachedAnswerModels[answerIndex] = answerModel;
@@ -261,7 +248,7 @@ class QuestionItemModel extends ResponseItemModel {
     _qrimLogger.debug('populateInitialValue: $responseUid');
     if (questionnaireItemModel.hasInitialExpression) {
       final initialEvaluationResult = evaluateInitialExpression();
-      answerModel(0).populateFromExpression(initialEvaluationResult);
+      _answerModel(0).populateFromExpression(initialEvaluationResult);
     } else {
       // initial.value[x]
       // TODO: Implement
@@ -312,8 +299,6 @@ class QuestionItemModel extends ResponseItemModel {
 
     // TODO: should this be able to populate multiple answers?
     // Write the value back to the answer model
-    answerModel(0).populateFromExpression(evaluationResult);
-    // ... and make sure the world will know about it
-    updateResponse();
+    _answerModel(0).populateFromExpression(evaluationResult);
   }
 }

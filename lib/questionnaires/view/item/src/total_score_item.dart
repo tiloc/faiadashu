@@ -14,9 +14,9 @@ import '../../../questionnaires.dart';
 class TotalScoreItem extends QuestionnaireAnswerFiller {
   TotalScoreItem(
     QuestionResponseItemFillerState responseItemFillerState,
-    int answerIndex, {
+    AnswerModel answerModel, {
     Key? key,
-  }) : super(responseItemFillerState, answerIndex, key: key);
+  }) : super(responseItemFillerState, answerModel, key: key);
   @override
   State<StatefulWidget> createState() => _TotalScoreItemState();
 }
@@ -28,15 +28,18 @@ class _TotalScoreItemState extends State<TotalScoreItem> {
 
   _TotalScoreItemState();
 
+  void _updateCalcResult() {
+    calcResult =
+        (widget.responseItemModel.firstAnswerModel as NumericalAnswerModel)
+            .value
+            ?.value;
+  }
+
   @override
   void initState() {
     super.initState();
 
-    // TODO: This should go into a model.
-    calcResult = widget.responseItemModel.responseItem?.answer?.firstOrNull
-            ?.valueDecimal ??
-        widget
-            .responseItemModel.responseItem?.answer?.first.valueQuantity?.value;
+    _updateCalcResult();
 
     if (widget.questionnaireItemModel.isCalculated) {
       _logger.debug(
@@ -56,20 +59,16 @@ class _TotalScoreItemState extends State<TotalScoreItem> {
 
   void _questionnaireChanged() {
     _logger.debug(
-      'questionnaireChanged(): ${widget.responseItemModel.responseItem}',
+      'questionnaireChanged(): ${widget.responseItemModel.responseUid}',
     );
     if (!mounted) {
       return;
     }
-    if (widget.responseItemModel.responseItem != null) {
-      setState(() {
-        calcResult = widget.responseItemModel.responseItem!.answer?.firstOrNull
-                ?.valueDecimal ??
-            widget.responseItemModel.responseItem!.answer?.firstOrNull
-                ?.valueQuantity?.value;
-      });
-      _logger.debug('calculated result: $calcResult');
-    }
+
+    setState(() {
+      _updateCalcResult();
+    });
+    _logger.debug('calculated result: $calcResult');
   }
 
   final _nullExtension = FhirExtension();
@@ -121,7 +120,18 @@ class _TotalScoreItemState extends State<TotalScoreItem> {
                 style: Theme.of(context).textTheme.headline1,
               ),
             ),
-            if (feedback != null) HTML.toRichText(context, feedback),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 500),
+              child: (feedback != null)
+                  ? Container(
+                      key: ValueKey<String>(feedback),
+                      child: HTML.toRichText(context, feedback),
+                    )
+                  : const SizedBox(
+                      height: 16.0,
+                      key: ValueKey<String>('no-feedback'),
+                    ),
+            ),
           ],
         ),
       );

@@ -232,8 +232,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
   late final int minOccurs;
   late final int? maxOccurs;
 
-  CodingAnswerModel(QuestionItemModel responseModel, int answerIndex)
-      : super(responseModel, answerIndex) {
+  CodingAnswerModel(QuestionItemModel responseModel) : super(responseModel) {
     _createAnswerOptions();
 
     minOccurs = qi.extension_
@@ -250,22 +249,6 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
         )
         ?.valueInteger
         ?.value;
-
-    final responseItem = responseItemModel.responseItem;
-
-    if (responseItem != null) {
-      value = (responseItem.answer != null)
-          ? CodeableConcept(
-              coding: responseItem.answer
-                  ?.map(
-                    (answer) => answerOptions[
-                            choiceStringFromCoding(answer.valueCoding)]!
-                        .valueCoding!,
-                  )
-                  .toList(),
-            )
-          : null;
-    }
   }
 
   @override
@@ -342,7 +325,6 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
     if (value == null && minOccurs > 0) {
       return QuestionnaireErrorFlag(
         questionnaireItemModel.linkId,
-        answerIndex: answerIndex,
         errorText:
             lookupFDashLocalizations(locale).validatorMinOccurs(minOccurs),
       );
@@ -353,11 +335,30 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
         ? null
         : QuestionnaireErrorFlag(
             questionnaireItemModel.linkId,
-            answerIndex: answerIndex,
             errorText: validationText,
           );
   }
 
   @override
   bool get isUnanswered => value == null;
+
+  @override
+  void populate(QuestionnaireResponseAnswer answer) {
+    // FIXME: Enable population from multiple answers
+/*    final responseItem = responseItemModel.responseItem;
+
+    if (responseItem != null) {
+      value = (responseItem.answer != null)
+          ? CodeableConcept(
+        coding: responseItem.answer
+            ?.map(
+              (answer) => answerOptions[
+          choiceStringFromCoding(answer.valueCoding)]!
+              .valueCoding!,
+        )
+            .toList(),
+      )
+          : null;
+    } */
+  }
 }

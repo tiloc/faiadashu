@@ -25,6 +25,8 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
   final List<FillerItemModel> _fillerItems = [];
 
+  // TODO: Clarify item level variables vs. questionnaire level.
+
   // Questionnaire-level variables
   List<VariableModel>? _variables;
 
@@ -60,7 +62,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   /// The [fhirResourceProvider] is used for access to any required resources,
   /// such as ValueSets, Subject, or Encounter.
   ///
-  /// If no [QuestionnaireResponse] has been provided here, it can still later
+  /// If no [QuestionnaireResponse] has been provided here, it can still
   /// be provided through the [populate] function.
   static Future<QuestionnaireResponseModel> fromFhirResourceBundle({
     required Locale locale,
@@ -291,7 +293,6 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
   void _populateItems(
     ResponseItemModel? parentItem,
-    int? parentAnswerIndex,
     Iterable<ResponseItemModel> responseItemModels,
     List<QuestionnaireResponseItem>? questionnaireResponseItems,
   ) {
@@ -314,7 +315,6 @@ class QuestionnaireResponseModel extends ChangeNotifier {
           // Populate children
           _populateItems(
             rim,
-            null,
             orderedResponseItemModels()
                 .where((otherRim) => otherRim.parentItem == rim),
             item.item,
@@ -335,7 +335,6 @@ class QuestionnaireResponseModel extends ChangeNotifier {
           _logger.debug(
             'Populating question response $linkId into existing item $qrim.',
           );
-          qrim.responseItem = item;
 
           final itemAnswers = item.answer;
           if (itemAnswers != null && itemAnswers.isNotEmpty) {
@@ -343,6 +342,12 @@ class QuestionnaireResponseModel extends ChangeNotifier {
               'Populating answers under ${qrim.responseUid}.',
             );
             itemAnswers.forEachIndexed((answerIndex, answer) {
+              // Populate the answer models
+              final addedAnswerModel = qrim.addAnswerModel();
+              addedAnswerModel.populate(answer);
+
+              // If the answer had any nested items, then first ensure that the
+              // required structures exist, then populate them as well.
               final answerResponseItems = answer.item;
               if (answerResponseItems != null &&
                   answerResponseItems.isNotEmpty) {
@@ -356,7 +361,6 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
                 _populateItems(
                   qrim,
-                  answerIndex,
                   descendantFillerItems.whereType<ResponseItemModel>(),
                   answerResponseItems,
                 );
@@ -382,14 +386,18 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   /// Populate the answers in the questionnaire with the answers from a response.
   ///
   /// Does nothing if [questionnaireResponse] is null.
+  ///
+  /// This should only be invoked a single time, and only before the first UI build.
   void populate(QuestionnaireResponse? questionnaireResponse) {
     _logger.debug('Populating with $questionnaireResponse');
     if (questionnaireResponse == null) {
       return;
     }
 
-    if (questionnaireResponse.item == null ||
-        questionnaireResponse.item!.isEmpty) {
+    final questionnaireResponseItems = questionnaireResponse.item;
+
+    if (questionnaireResponseItems == null ||
+        questionnaireResponseItems.isEmpty) {
       return;
     }
 
@@ -397,9 +405,8 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     // Assumption: It would be better to first set all responses in bulk and then recalc.
     _populateItems(
       null,
-      null,
       orderedResponseItemModels().where((rim) => rim.parentItem == null),
-      questionnaireResponse.item,
+      questionnaireResponseItems,
     );
 
     responseStatus =
@@ -555,6 +562,11 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     return _fillerItems.whereType<ResponseItemModel>();
   }
 
+  /// Items can change, and this should not be cached.
+  Iterable<QuestionItemModel> orderedQuestionItemModels() {
+    return _fillerItems.whereType<QuestionItemModel>();
+  }
+
   /// Returns whether the questionnaire meets all completeness criteria.
   ///
   /// Completeness criteria include:
@@ -577,7 +589,10 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   }
 
   void resetMarkers() {
-    errorFlags.value = null;
+    if (errorFlags.value != null) {
+      errorFlags.value = null;
+      nextGeneration();
+    }
   }
 
   final errorFlags = ValueNotifier<Iterable<QuestionnaireErrorFlag>?>(null);

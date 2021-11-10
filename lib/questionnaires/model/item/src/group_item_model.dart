@@ -1,5 +1,3 @@
-import 'package:fhir/r4/resource_types/clinical/diagnostics/diagnostics.dart';
-
 import '../../../questionnaires.dart';
 
 class GroupItemModel extends ResponseItemModel {
@@ -16,8 +14,11 @@ class GroupItemModel extends ResponseItemModel {
         );
 
   @override
-  QuestionnaireResponseItem? get responseItem => null;
+  bool get isInvalid => false;
 
   @override
-  bool get isInvalid => false;
+  bool get isAnswered => false;
+
+  @override
+  bool get isUnanswered => false;
 }

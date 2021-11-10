@@ -67,14 +67,14 @@ class QuestionnaireTheme {
   /// Can be overridden through inheritance of [QuestionnaireTheme].
   QuestionnaireAnswerFiller createAnswerFiller(
     QuestionResponseItemFillerState responseFiller,
-    int answerIndex, {
+    AnswerModel answerModel, {
     Key? key,
   }) {
     try {
       final responseModel = responseFiller.responseItemModel;
 
       _logger.debug(
-        'Creating AnswerFiller for ${responseModel.questionnaireItemModel} index $answerIndex',
+        'Creating AnswerFiller for ${responseModel.questionnaireItemModel} - $answerModel',
       );
 
       if (responseModel.questionnaireItemModel.isDisplay) {
@@ -90,21 +90,19 @@ class QuestionnaireTheme {
       }
 
       if (responseModel.questionnaireItemModel.isTotalScore) {
-        return TotalScoreItem(responseFiller, answerIndex, key: key);
+        return TotalScoreItem(responseFiller, answerModel, key: key);
       }
 
-      final answerModel =
-          (responseModel as QuestionItemModel).answerModel(answerIndex);
       if (answerModel is NumericalAnswerModel) {
-        return NumericalAnswerFiller(responseFiller, answerIndex, key: key);
+        return NumericalAnswerFiller(responseFiller, answerModel, key: key);
       } else if (answerModel is StringAnswerModel) {
-        return StringAnswerFiller(responseFiller, answerIndex, key: key);
+        return StringAnswerFiller(responseFiller, answerModel, key: key);
       } else if (answerModel is DateTimeAnswerModel) {
-        return DateTimeAnswerFiller(responseFiller, answerIndex, key: key);
+        return DateTimeAnswerFiller(responseFiller, answerModel, key: key);
       } else if (answerModel is CodingAnswerModel) {
-        return CodingAnswerFiller(responseFiller, answerIndex, key: key);
+        return CodingAnswerFiller(responseFiller, answerModel, key: key);
       } else if (answerModel is BooleanAnswerModel) {
-        return BooleanAnswerFiller(responseFiller, answerIndex, key: key);
+        return BooleanAnswerFiller(responseFiller, answerModel, key: key);
       } else if (answerModel is UnsupportedAnswerModel) {
         throw QuestionnaireFormatException(
           'Unsupported item type: ${answerModel.qi.type}',
@@ -117,7 +115,7 @@ class QuestionnaireTheme {
       _logger.warn('Cannot create answer filler:', error: exception);
       return BrokenAnswerFiller(
         responseFiller,
-        answerIndex,
+        answerModel,
         exception,
         key: key,
       );

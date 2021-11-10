@@ -3,10 +3,7 @@ import 'package:fhir/r4.dart';
 import '../../../model.dart';
 
 class BooleanAnswerModel extends AnswerModel<Boolean, Boolean> {
-  BooleanAnswerModel(QuestionItemModel responseModel, int answerIndex)
-      : super(responseModel, answerIndex) {
-    value = answer?.valueBoolean;
-  }
+  BooleanAnswerModel(QuestionItemModel responseModel) : super(responseModel);
 
   @override
   QuestionnaireResponseAnswer? get filledAnswer =>
@@ -29,4 +26,9 @@ class BooleanAnswerModel extends AnswerModel<Boolean, Boolean> {
 
   @override
   bool get isUnanswered => value == null;
+
+  @override
+  void populate(QuestionnaireResponseAnswer answer) {
+    value = answer.valueBoolean;
+  }
 }

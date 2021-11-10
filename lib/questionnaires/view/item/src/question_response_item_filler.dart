@@ -2,7 +2,6 @@ import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../coding/coding.dart';
-import '../../../../fhir_types/fhir_types.dart';
 import '../../../../l10n/l10n.dart';
 import '../../../../logging/src/logger.dart';
 import '../../../questionnaires.dart';
@@ -54,40 +53,11 @@ class QuestionResponseItemFillerState
   }
 
   void _createAnswerFillers() {
-    // OPTIMIZE: Reuse existing fillers
-    _answerFillers = List.generate(
-      questionResponseItemModel.numberOfAnswers,
-      (index) => questionnaireTheme.createAnswerFiller(this, index),
-    );
-  }
-
-  void onAnswered(
-    List<QuestionnaireResponseAnswer?>? answers,
-    int answerIndex,
-  ) {
-    // TODO: Should the responsemodel be updated in model code and then
-    // setState() be invoked afterwards?
-    if (mounted) {
-      setState(() {
-        if (questionResponseItemModel
-                    .questionnaireItemModel.questionnaireItem.type ==
-                QuestionnaireItemType.choice ||
-            questionResponseItemModel
-                    .questionnaireItemModel.questionnaireItem.type ==
-                QuestionnaireItemType.open_choice) {
-          questionResponseItemModel.answers = answers ?? [];
-        } else {
-          questionResponseItemModel.answers[answerIndex] = answers?.firstOrNull;
-        }
-        // This assumes all answers having the same dataAbsentReason.
-        final newDataAbsentReason =
-            answers?.firstOrNull?.extension_?.dataAbsentReason;
-        questionResponseItemModel.dataAbsentReason = newDataAbsentReason;
-      });
-    }
-
-    // Report the response up the model hierarchy
-    questionResponseItemModel.updateResponse();
+    final fillableAnswerModels = questionResponseItemModel.fillableAnswerModels;
+    _answerFillers = fillableAnswerModels
+        .map<QuestionnaireAnswerFiller>(
+            (am) => questionnaireTheme.createAnswerFiller(this, am))
+        .toList();
   }
 
   void _setDataAbsentReason(Code? dataAbsentReason) {
@@ -96,9 +66,6 @@ class QuestionResponseItemFillerState
         questionResponseItemModel.dataAbsentReason = dataAbsentReason;
       });
     }
-
-    // Bubble up the response
-    questionResponseItemModel.updateResponse();
   }
 
   @override
@@ -182,9 +149,7 @@ class QuestionResponseItemFillerState
           questionnaireTheme.buildAddRepetition(
             context,
             this,
-            (!questionResponseItemModel
-                    .answerModel(questionResponseItemModel.numberOfAnswers - 1)
-                    .isUnanswered)
+            (!questionResponseItemModel.latestAnswerModel.isUnanswered)
                 ? () {
                     setState(() {
                       questionResponseItemModel.addAnswerModel();

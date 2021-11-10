@@ -4,8 +4,6 @@ import '../../../../fhir_types/fhir_types.dart';
 import '../../../../logging/logging.dart';
 import '../../../questionnaires.dart';
 
-// TODO: Properly support nested questionnaire items (questions being children of other questions).
-
 /// Aggregates the user's responses into a [QuestionnaireResponse].
 ///
 /// For status = 'complete' the items which are not enabled SHALL be excluded.
@@ -22,6 +20,43 @@ class QuestionnaireResponseAggregator
   @override
   void init(QuestionnaireResponseModel questionnaireResponseModel) {
     super.init(questionnaireResponseModel);
+  }
+
+  QuestionnaireResponseItem? _fromQuestionItem(
+    QuestionItemModel itemModel,
+    QuestionnaireResponseStatus responseStatus,
+  ) {
+    if (responseStatus == QuestionnaireResponseStatus.completed &&
+        !itemModel.isEnabled) {
+      return null;
+    }
+
+    final questionType =
+        itemModel.questionnaireItemModel.questionnaireItem.type;
+
+    final isCodingAnswers = questionType == QuestionnaireItemType.choice ||
+        questionType == QuestionnaireItemType.open_choice;
+
+    final answeredAnswerModels = itemModel.answeredAnswerModels;
+
+    // Don't care, if it is read-only, calculated, etc. If it exists: emit it!
+    if (answeredAnswerModels.isEmpty) {
+      return null;
+    }
+
+    final answers = isCodingAnswers
+        ? answeredAnswerModels.first.filledCodingAnswers!
+        : answeredAnswerModels
+            .map((am) => am.filledAnswer!)
+            .toList(growable: false);
+
+    // TODO: Evaluate nested items
+
+    return QuestionnaireResponseItem(
+      linkId: itemModel.questionnaireItemModel.linkId,
+      text: itemModel.questionnaireItemModel.titleText,
+      answer: answers,
+    );
   }
 
   QuestionnaireResponseItem? _fromGroupItem(
@@ -46,16 +81,14 @@ class QuestionnaireResponseAggregator
         }
       } else {
         // isQuestion
-        if (nestedItem.responseItem != null) {
-          // response items of nested questions are already contained in response item of parent question
-          if (nestedItem.questionnaireItemModel.parent?.isQuestion != true) {
-            nestedItems.add(nestedItem.responseItem!);
-          }
+        final questionItem =
+            _fromQuestionItem(nestedItem as QuestionItemModel, responseStatus);
+        if (questionItem != null) {
+          nestedItems.add(questionItem);
         }
       }
     }
 
-    // TODO: Should this be done by the group model itself?
     if (nestedItems.isNotEmpty) {
       return QuestionnaireResponseItem(
         linkId: itemModel.questionnaireItemModel.linkId,
@@ -93,10 +126,10 @@ class QuestionnaireResponseAggregator
         }
       } else {
         // isQuestion
-        if (itemModel.responseItem != null &&
-            (responseStatus != QuestionnaireResponseStatus.completed ||
-                itemModel.isEnabled)) {
-          responseItems.add(itemModel.responseItem!);
+        final questionItem =
+            _fromQuestionItem(itemModel as QuestionItemModel, responseStatus);
+        if (questionItem != null) {
+          responseItems.add(questionItem);
         }
       }
     }
@@ -146,10 +179,6 @@ class QuestionnaireResponseAggregator
       if (isValidSdc)
         Canonical(
           'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaireresponse',
-        ),
-      if (isValidSdc)
-        Canonical(
-          'http://fhir.org/guides/argonaut/questionnaire/StructureDefinition/argo-questionnaireresponse',
         ),
     ];
 

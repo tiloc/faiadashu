@@ -10,9 +10,9 @@ import 'numerical_input_formatter.dart';
 class NumericalAnswerFiller extends QuestionnaireAnswerFiller {
   NumericalAnswerFiller(
     QuestionResponseItemFillerState responseFillerState,
-    int answerIndex, {
+    AnswerModel answerModel, {
     Key? key,
-  }) : super(responseFillerState, answerIndex, key: key);
+  }) : super(responseFillerState, answerModel, key: key);
 
   @override
   State<NumericalAnswerFiller> createState() => _NumericalAnswerState();
@@ -102,7 +102,9 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
             min: answerModel.minValue,
             max: answerModel.maxValue,
             divisions: answerModel.sliderDivisions,
-            value: value!.value!.value!, // Yay, triple value!
+            value: (value != null)
+                ? value!.value!.value!
+                : (answerModel.maxValue - answerModel.minValue) / 2.0,
             label: answerModel.display,
             onChanged: answerModel.isEnabled
                 ? (sliderValue) {
