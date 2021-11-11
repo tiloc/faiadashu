@@ -151,12 +151,15 @@ class QuestionItemModel extends ResponseItemModel {
 
   @override
   bool get isUnanswered {
-    _qrimLogger.trace('isUnanswered $responseUid');
     if (!isAnswerable) {
       return false;
     }
 
-    return _cachedAnswerModels.values.every((am) => am.isUnanswered);
+    final returnValue =
+        _cachedAnswerModels.values.every((am) => am.isUnanswered);
+    _qrimLogger.debug('isUnanswered $responseUid: $returnValue');
+
+    return returnValue;
   }
 
   final Map<int, AnswerModel> _cachedAnswerModels = <int, AnswerModel>{};

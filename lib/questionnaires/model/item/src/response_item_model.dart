@@ -25,12 +25,10 @@ abstract class ResponseItemModel extends FillerItemModel {
   /// Static or read-only items cannot be answered.
   /// Items which are not enabled cannot be answered.
   bool get isAnswerable {
-    _rimLogger.trace('isAnswerable $responseUid');
-    if (questionnaireItemModel.isReadOnly || !isEnabled) {
-      return false;
-    }
+    final returnValue = !(questionnaireItemModel.isReadOnly || !isEnabled);
 
-    return true;
+    _rimLogger.debug('isAnswerable $responseUid: $returnValue');
+    return returnValue;
   }
 
   /// Is the item answered?
@@ -49,7 +47,7 @@ abstract class ResponseItemModel extends FillerItemModel {
   bool get isInvalid;
 
   Iterable<QuestionnaireErrorFlag>? get isComplete {
-    if (questionnaireItemModel.isRequired && !isUnanswered) {
+    if (questionnaireItemModel.isRequired && isUnanswered) {
       return [
         QuestionnaireErrorFlag(
           responseUid,
