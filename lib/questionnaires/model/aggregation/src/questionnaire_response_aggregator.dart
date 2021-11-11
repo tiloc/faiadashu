@@ -43,11 +43,14 @@ class QuestionnaireResponseAggregator
       return null;
     }
 
-    final answers = isCodingAnswers
-        ? answeredAnswerModels.first.filledCodingAnswers!
-        : answeredAnswerModels
-            .map((am) => am.filledAnswer!)
-            .toList(growable: false);
+    // FHIR cannot have empty arrays.
+    final answers = (answeredAnswerModels.isNotEmpty)
+        ? isCodingAnswers
+            ? answeredAnswerModels.first.filledCodingAnswers!
+            : answeredAnswerModels
+                .map((am) => am.filledAnswer!)
+                .toList(growable: false)
+        : null;
 
     // TODO: Evaluate nested items
 
@@ -62,8 +65,7 @@ class QuestionnaireResponseAggregator
               )
             ]
           : null,
-      // FHIR cannot have empty arrays.
-      answer: (answeredAnswerModels.isNotEmpty) ? answers : null,
+      answer: answers,
     );
   }
 
