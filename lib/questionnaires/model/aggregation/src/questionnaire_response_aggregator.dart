@@ -1,3 +1,4 @@
+import 'package:faiadashu/coding/coding.dart';
 import 'package:fhir/r4.dart';
 
 import '../../../../fhir_types/fhir_types.dart';
@@ -35,8 +36,10 @@ class QuestionnaireResponseAggregator
 
     final answeredAnswerModels = itemModel.answeredAnswerModels;
 
+    final dataAbsentReason = itemModel.dataAbsentReason;
+
     // Don't care, if it is read-only, calculated, etc. If it exists: emit it!
-    if (answeredAnswerModels.isEmpty) {
+    if (answeredAnswerModels.isEmpty && dataAbsentReason == null) {
       return null;
     }
 
@@ -51,7 +54,16 @@ class QuestionnaireResponseAggregator
     return QuestionnaireResponseItem(
       linkId: itemModel.questionnaireItemModel.linkId,
       text: itemModel.questionnaireItemModel.titleText,
-      answer: answers,
+      extension_: (dataAbsentReason != null)
+          ? [
+              FhirExtension(
+                url: dataAbsentReasonExtensionUrl,
+                valueCode: dataAbsentReason,
+              )
+            ]
+          : null,
+      // FHIR cannot have empty arrays.
+      answer: (answeredAnswerModels.isNotEmpty) ? answers : null,
     );
   }
 

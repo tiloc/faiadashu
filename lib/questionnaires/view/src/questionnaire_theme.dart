@@ -15,7 +15,7 @@ class QuestionnaireTheme {
   final bool showNullAnswerOption;
 
   /// Returns whether each question will be preceded by its own ID.
-  final bool showQuestionNumbers;
+  final bool showQuestionNumerals;
 
   /// Returns whether a progress bar/circle is displayed while filling
   final bool showProgress;
@@ -23,7 +23,7 @@ class QuestionnaireTheme {
   const QuestionnaireTheme({
     this.canSkipQuestions = false,
     this.showNullAnswerOption = true,
-    this.showQuestionNumbers = false,
+    this.showQuestionNumerals = false,
     this.showProgress = true,
   });
 
@@ -32,28 +32,24 @@ class QuestionnaireTheme {
   /// Used by [QuestionnaireFiller].
   QuestionnaireItemFiller createQuestionnaireItemFiller(
     QuestionnaireFillerData questionnaireFiller,
-    int index,
     FillerItemModel fillerItemModel, {
     Key? key,
   }) {
     if (fillerItemModel is QuestionItemModel) {
       return QuestionResponseItemFiller(
         questionnaireFiller,
-        index,
         fillerItemModel,
 //      key: key,  // TODO: What should be the key handling?
       );
     } else if (fillerItemModel is GroupItemModel) {
       return GroupItem(
         questionnaireFiller,
-        index,
         fillerItemModel,
 //      key: key,  // TODO: What should be the key handling?
       );
     } else if (fillerItemModel is DisplayItemModel) {
       return DisplayItem(
         questionnaireFiller,
-        index,
         fillerItemModel,
 //      key: key,  // TODO: What should be the key handling?
       );

@@ -51,30 +51,6 @@ class QuestionItemModel extends ResponseItemModel {
     questionnaireResponseModel.nextGeneration();
     // This notifies aggregators on changes to individual items
     notifyListeners();
-
-    // FIXME: Move output of data-absent-reason over to response aggregator
-/*
-    final filledAnswers = answers
-        .where((answer) => answer != null)
-        .map<QuestionnaireResponseAnswer>((answer) => answer!)
-        .toList(growable: false);
-
-    responseItem = (filledAnswers.isEmpty && dataAbsentReason == null)
-        ? null
-        : QuestionnaireResponseItem(
-            linkId: questionnaireItemModel.linkId,
-            text: questionnaireItemModel.questionnaireItem.text,
-            extension_: (dataAbsentReason != null)
-                ? [
-                    FhirExtension(
-                      url: dataAbsentReasonExtensionUrl,
-                      valueCode: dataAbsentReason,
-                    )
-                  ]
-                : null,
-            // FHIR cannot have empty arrays.
-            answer: filledAnswers.isEmpty ? null : filledAnswers,
-          ); */
   }
 
   /// Is this response invalid?
@@ -303,5 +279,18 @@ class QuestionItemModel extends ResponseItemModel {
     // TODO: should this be able to populate multiple answers?
     // Write the value back to the answer model
     _answerModel(0).populateFromExpression(evaluationResult);
+  }
+
+  /// Returns an integer, starting with 1, that provides the number
+  /// of this [QuestionItemModel] within the ordered sequence of [QuestionItemModels].
+  ///
+  /// Returns null if this model is not answerable.
+  int? get questionNumeral {
+    final thisQuestionIndex = questionnaireResponseModel
+        .orderedQuestionItemModels()
+        .where((qim) => qim.isAnswerable)
+        .toList()
+        .indexOf(this);
+    return (thisQuestionIndex != -1) ? thisQuestionIndex + 1 : null;
   }
 }

@@ -10,12 +10,10 @@ abstract class ResponseItemFiller extends QuestionnaireItemFiller {
 
   ResponseItemFiller(
     QuestionnaireFillerData questionnaireFiller,
-    int index,
     this.responseItemModel,
   )   : questionnaireItemModel = responseItemModel.questionnaireItemModel,
         super(
           questionnaireFiller,
-          index,
           responseItemModel,
           key: ValueKey<String>(
             responseItemModel.responseUid,

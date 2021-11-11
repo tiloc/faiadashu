@@ -12,9 +12,8 @@ class QuestionResponseItemFiller extends ResponseItemFiller {
 
   QuestionResponseItemFiller(
     QuestionnaireFillerData questionnaireFiller,
-    int index,
     this.questionResponseItemModel,
-  ) : super(questionnaireFiller, index, questionResponseItemModel);
+  ) : super(questionnaireFiller, questionResponseItemModel);
 
   @override
   State<StatefulWidget> createState() => QuestionResponseItemFillerState();

@@ -7,9 +7,8 @@ import '../../../questionnaires.dart';
 class GroupItem extends ResponseItemFiller {
   GroupItem(
     QuestionnaireFillerData questionnaireFiller,
-    int index,
     ResponseItemModel responseItemModel,
-  ) : super(questionnaireFiller, index, responseItemModel);
+  ) : super(questionnaireFiller, responseItemModel);
 
   @override
   State<StatefulWidget> createState() => _GroupItemState();

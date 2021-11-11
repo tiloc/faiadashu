@@ -460,7 +460,7 @@ class _HomePageState extends State<HomePage> {
                         questionnaireTheme: const QuestionnaireTheme(
                           canSkipQuestions: true,
                           showNullAnswerOption: false,
-                          showQuestionNumbers: true,
+                          showQuestionNumerals: true,
                         ),
                       ),
                     ),

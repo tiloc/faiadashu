@@ -9,14 +9,12 @@ import '../../../questionnaires.dart';
 
 abstract class QuestionnaireItemFiller extends StatefulWidget {
   final QuestionnaireFillerData questionnaireFiller;
-  final int index;
   final FillerItemModel fillerItemModel;
 
   String get responseUid => fillerItemModel.responseUid;
 
   const QuestionnaireItemFiller(
     this.questionnaireFiller,
-    this.index,
     this.fillerItemModel, {
     Key? key,
   }) : super(key: key);
@@ -46,7 +44,6 @@ abstract class QuestionnaireItemFillerState<W extends QuestionnaireItemFiller>
     _titleWidget = QuestionnaireItemFillerTitle.fromFillerItem(
       fillerItem: widget.fillerItemModel,
       questionnaireTheme: questionnaireTheme,
-      index: widget.index,
     );
   }
 
@@ -85,16 +82,16 @@ abstract class QuestionnaireItemFillerState<W extends QuestionnaireItemFiller>
 
 class QuestionnaireItemFillerTitle extends StatelessWidget {
   final Widget? leading;
+  final String? questionNumeral;
   final Widget? help;
-  final int index;
   final String htmlTitleText;
   final String semanticsLabel;
   final QuestionnaireTheme questionnaireTheme;
 
   const QuestionnaireItemFillerTitle._({
     required this.questionnaireTheme,
-    required this.index,
     required this.htmlTitleText,
+    this.questionNumeral,
     this.leading,
     this.help,
     required this.semanticsLabel,
@@ -104,7 +101,6 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
   static Widget? fromFillerItem({
     required FillerItemModel fillerItem,
     required QuestionnaireTheme questionnaireTheme,
-    required int index,
     Key? key,
   }) {
     final questionnaireItemModel = fillerItem.questionnaireItemModel;
@@ -127,11 +123,20 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
       final htmlTitleText =
           '$openStyleTag${htmlEscape.convert(titleText)}$closeStyleTag';
 
+      // TODO: Do I need a refresh strategy? isAnswerable can change.
+      final showQuestionNumerals = questionnaireTheme.showQuestionNumerals;
+      final questionNumeral =
+          (fillerItem is QuestionItemModel) ? fillerItem.questionNumeral : null;
+      final htmlQuestionNumeral =
+          (showQuestionNumerals && questionNumeral != null)
+              ? '<b>$questionNumeral: <b>'
+              : null;
+
       return QuestionnaireItemFillerTitle._(
-        index: index,
         questionnaireTheme: questionnaireTheme,
         htmlTitleText: htmlTitleText,
         leading: leading,
+        questionNumeral: htmlQuestionNumeral,
         help: help,
         semanticsLabel: titleText,
         key: key,
@@ -141,12 +146,6 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // FIXME: Restore functionality
-    const int questionNumber = 1;
-    /*    final int questionNumber =
-        responseItemModel.questionnaireResponseModel.getQuestionNumber(index); */
-    final showQuestionNumbers = questionnaireTheme.showQuestionNumbers;
-
     return Container(
       alignment: AlignmentDirectional.centerStart,
       padding: const EdgeInsets.only(top: 8.0),
@@ -157,12 +156,11 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
             /// All items with the isAnswerable boolean as true will be
             /// counted, starting with 1, and regardless of grouping.
             ///
-// FIXME: Restore functionality
-/*            if (showQuestionNumbers && responseItemModel.isAnswerable)
+            if (questionNumeral != null)
               HTML.toTextSpan(
                 context,
-                '<b>$questionNumber: <b>',
-              ), */
+                questionNumeral!,
+              ),
             if (leading != null) WidgetSpan(child: leading!),
             HTML.toTextSpan(
               context,

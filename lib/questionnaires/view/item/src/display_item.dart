@@ -7,10 +7,9 @@ import '../../../questionnaires.dart';
 class DisplayItem extends QuestionnaireItemFiller {
   const DisplayItem(
     QuestionnaireFillerData questionnaireFiller,
-    int index,
     FillerItemModel fillerItem, {
     Key? key,
-  }) : super(questionnaireFiller, index, fillerItem, key: key);
+  }) : super(questionnaireFiller, fillerItem, key: key);
   @override
   State<StatefulWidget> createState() => _DisplayItemState();
 }
@@ -45,6 +44,8 @@ class _DisplayItemState extends QuestionnaireItemFillerState<DisplayItem> {
                   : const SizedBox(),
             ),
           )
-        : const SizedBox(height: 16.0,);
+        : const SizedBox(
+            height: 16.0,
+          );
   }
 }

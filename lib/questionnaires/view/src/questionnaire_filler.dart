@@ -220,7 +220,6 @@ class QuestionnaireFillerData extends InheritedWidget {
       _logger.debug('itemFillerAt $index will be created.');
       _itemFillers[index] = questionnaireTheme.createQuestionnaireItemFiller(
         this,
-        index,
         fillerItemModels.elementAt(index),
         key: ValueKey<String>(
           'item-filler-${fillerItemModels.elementAt(index).responseUid}',
