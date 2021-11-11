@@ -56,14 +56,14 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.5.4-dev.5"
+    version: "0.6.0-dev.1"
   faiadashu_online:
     dependency: "direct main"
     description:
       path: "../faiadashu_online"
       relative: true
     source: path
-    version: "0.5.4-dev.5"
+    version: "0.6.0-dev.1"
   fhir:
     dependency: "direct main"
     description:
