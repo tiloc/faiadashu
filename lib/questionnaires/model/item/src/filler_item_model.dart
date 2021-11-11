@@ -1,4 +1,4 @@
-import 'package:collection/src/iterable_extensions.dart';
+import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
 import 'package:fhir_path/run_fhir_path.dart';
 import 'package:flutter/foundation.dart';
