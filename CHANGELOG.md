@@ -1,9 +1,12 @@
-## 0.5.4-dev.7
+## 0.6.0-dev.1
 * [Breaking] Fix hierarchy of models according to https://chat.fhir.org/#narrow/stream/179255-questionnaire/topic/Questionnaire.20Response.20example
   * This introduces a strict separation of a questionnaire and its response
     * QuestionnaireModel contains all static descriptions of the questionnaire
     * QuestionnaireResponseModel contains the result of filling a questionnaire and all dynamic behavior
   * This replaces the simplistic 1:1 relationships between items and responses with proper 1:n model
+  * Clarified the relationship between FHIR and Presentation Model. The QuestionnaireResponse is used during
+model creation to populate the presentation model, and it is created by the aggregator from the presentation model.
+But it is not used in between anymore. This is resolving a lot of inconsistencies and uncertainties.
 
 > You should not experience any breakage if you are merely using the questionnaire filler components.
 > You will see numerous API changes which will require fixes if you have forked/modified.
