@@ -1,10 +1,14 @@
 ## 0.6.0-dev.1
 * [Breaking] Fix hierarchy of models according to https://chat.fhir.org/#narrow/stream/179255-questionnaire/topic/Questionnaire.20Response.20example
-  * This introduces a strict separation of a questionnaire and its response
-    * QuestionnaireModel contains all static descriptions of the questionnaire
+  * This introduces a strict separation of a questionnaire' structure and its response
+    * QuestionnaireModel contains all static, structural descriptions of the questionnaire
     * QuestionnaireResponseModel contains the result of filling a questionnaire and all dynamic behavior
-  * This replaces the simplistic 1:1 relationships between items and responses with proper 1:n model
-    * Answers can have nested responses now 
+  * This replaces the previous, simplistic 1:1 relationships between items and responses with proper 1:n model
+    * WIP: Answers can have nested responses now
+      * working during initial population of response
+      * Model gets updated when answering questions with nested items
+      * >this is not updating the view yet
+      * >no dynamic behaviors (enableWhen, initialValue, ...) activated for subsequently added nested questions yet
   * Clarified the relationship between FHIR and Presentation Model. The QuestionnaireResponse is used during
 model creation to populate the presentation model, and it is created by the aggregator from the presentation model.
 But it is not used in between anymore. This is resolving a lot of inconsistencies and uncertainties.
