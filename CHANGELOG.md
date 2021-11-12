@@ -1,9 +1,9 @@
 ## 0.6.0-dev.1
 * [Breaking] Fix hierarchy of models according to https://chat.fhir.org/#narrow/stream/179255-questionnaire/topic/Questionnaire.20Response.20example
-  * This introduces a strict separation of a questionnaire' structure and its response
+  * This introduces a strict separation of a questionnaire's structure and a response to this questionnaire
     * QuestionnaireModel contains all static, structural descriptions of the questionnaire
     * QuestionnaireResponseModel contains the result of filling a questionnaire and all dynamic behavior
-  * This replaces the previous, simplistic 1:1 relationships between items and responses with proper 1:n model
+  * This replaces the previous, simplistic 1:1 relationships between items and responses with proper nested 1:n model
     * WIP: Answers can have nested responses now
       * working during initial population of response
       * Model gets updated when answering questions with nested items
