@@ -9,13 +9,11 @@ abstract class ResponseItemModel extends FillerItemModel {
   static final _rimLogger = Logger(ResponseItemModel);
 
   ResponseItemModel(
-    FillerItemModel? parentItem,
-    int? parentAnswerIndex,
+    ResponseNode? parentNode,
     QuestionnaireResponseModel questionnaireResponseModel,
     QuestionnaireItemModel questionnaireItemModel,
   ) : super(
-          parentItem,
-          parentAnswerIndex,
+          parentNode,
           questionnaireResponseModel,
           questionnaireItemModel,
         );
@@ -27,7 +25,7 @@ abstract class ResponseItemModel extends FillerItemModel {
   bool get isAnswerable {
     final returnValue = !(questionnaireItemModel.isReadOnly || !isEnabled);
 
-    _rimLogger.debug('isAnswerable $responseUid: $returnValue');
+    _rimLogger.debug('isAnswerable $nodeUid: $returnValue');
     return returnValue;
   }
 
@@ -50,7 +48,7 @@ abstract class ResponseItemModel extends FillerItemModel {
     if (questionnaireItemModel.isRequired && isUnanswered) {
       return [
         QuestionnaireErrorFlag(
-          responseUid,
+          nodeUid,
           errorText: lookupFDashLocalizations(questionnaireResponseModel.locale)
               .validatorRequiredItem,
         )
@@ -60,7 +58,7 @@ abstract class ResponseItemModel extends FillerItemModel {
     if (!isSatisfyingConstraint) {
       return [
         QuestionnaireErrorFlag(
-          responseUid,
+          nodeUid,
           errorText: questionnaireItemModel.constraintHuman,
         )
       ];

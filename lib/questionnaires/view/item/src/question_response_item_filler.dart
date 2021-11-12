@@ -39,7 +39,7 @@ class QuestionResponseItemFillerState
 
     _skipSwitchFocusNode = FocusNode(
       skipTraversal: true,
-      debugLabel: 'SkipSwitch ${responseItemModel.responseUid}',
+      debugLabel: 'SkipSwitch ${responseItemModel.nodeUid}',
     );
 
     _createAnswerFillers();
@@ -71,7 +71,7 @@ class QuestionResponseItemFillerState
   @override
   Widget build(BuildContext context) {
     _qrimLogger.trace(
-      'build ${widget.responseItemModel.responseUid} hidden: ${widget.responseItemModel.questionnaireItemModel.isHidden}, enabled: ${widget.responseItemModel.isEnabled}',
+      'build ${widget.responseItemModel.nodeUid} hidden: ${widget.responseItemModel.questionnaireItemModel.isHidden}, enabled: ${widget.responseItemModel.isEnabled}',
     );
     return (!widget.responseItemModel.questionnaireItemModel.isHidden)
         ? Focus(

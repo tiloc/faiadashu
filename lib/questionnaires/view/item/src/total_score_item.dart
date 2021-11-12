@@ -59,7 +59,7 @@ class _TotalScoreItemState extends State<TotalScoreItem> {
 
   void _questionnaireChanged() {
     _logger.debug(
-      'questionnaireChanged(): ${widget.responseItemModel.responseUid}',
+      'questionnaireChanged(): ${widget.responseItemModel.nodeUid}',
     );
     if (!mounted) {
       return;

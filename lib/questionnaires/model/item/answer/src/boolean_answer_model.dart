@@ -6,8 +6,12 @@ class BooleanAnswerModel extends AnswerModel<Boolean, Boolean> {
   BooleanAnswerModel(QuestionItemModel responseModel) : super(responseModel);
 
   @override
-  QuestionnaireResponseAnswer? get filledAnswer =>
-      (value != null) ? QuestionnaireResponseAnswer(valueBoolean: value) : null;
+  QuestionnaireResponseAnswer? createFhirAnswer(
+    List<QuestionnaireResponseItem>? items,
+  ) =>
+      (value != null)
+          ? QuestionnaireResponseAnswer(valueBoolean: value, item: items)
+          : null;
 
   @override
   String get display => (value == null)

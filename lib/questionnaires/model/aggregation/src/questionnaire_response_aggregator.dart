@@ -43,16 +43,27 @@ class QuestionnaireResponseAggregator
       return null;
     }
 
-    // FHIR cannot have empty arrays.
-    final answers = (answeredAnswerModels.isNotEmpty)
-        ? isCodingAnswers
-            ? answeredAnswerModels.first.filledCodingAnswers!
-            : answeredAnswerModels
-                .map((am) => am.filledAnswer!)
-                .toList(growable: false)
-        : null;
+    List<QuestionnaireResponseAnswer>? answers;
+    if (answeredAnswerModels.isNotEmpty) {
+      if (isCodingAnswers) {
+        // Evaluate nested items from first answer only
+        final firstAnswer = answeredAnswerModels.first;
+        final nestedItems = _fromResponseItems(firstAnswer, responseStatus);
 
-    // TODO: Evaluate nested items
+        answers = firstAnswer.createFhirCodingAnswers(nestedItems);
+      } else {
+        // Evaluate nested items
+        final List<QuestionnaireResponseAnswer> createdAnswers = [];
+        for (final answerModel in answeredAnswerModels) {
+          final nestedItems = _fromResponseItems(answerModel, responseStatus);
+          final fhirAnswer = answerModel.createFhirAnswer(nestedItems);
+          if (fhirAnswer != null) {
+            createdAnswers.add(fhirAnswer);
+          }
+        }
+        answers = (createdAnswers.isNotEmpty) ? createdAnswers : null;
+      }
+    }
 
     return QuestionnaireResponseItem(
       linkId: itemModel.questionnaireItemModel.linkId,
@@ -78,28 +89,9 @@ class QuestionnaireResponseAggregator
       return null;
     }
 
-    final nestedItems = <QuestionnaireResponseItem>[];
+    final nestedItems = _fromResponseItems(itemModel, responseStatus);
 
-    for (final nestedItem in questionnaireResponseModel
-        .orderedResponseItemModels()
-        .where((rim) => rim.parentItem == itemModel)) {
-      if (nestedItem.questionnaireItemModel.isGroup) {
-        final groupItem =
-            _fromGroupItem(nestedItem as GroupItemModel, responseStatus);
-        if (groupItem != null) {
-          nestedItems.add(groupItem);
-        }
-      } else {
-        // isQuestion
-        final questionItem =
-            _fromQuestionItem(nestedItem as QuestionItemModel, responseStatus);
-        if (questionItem != null) {
-          nestedItems.add(questionItem);
-        }
-      }
-    }
-
-    if (nestedItems.isNotEmpty) {
+    if (nestedItems != null) {
       return QuestionnaireResponseItem(
         linkId: itemModel.questionnaireItemModel.linkId,
         text: itemModel.questionnaireItemModel.titleText,
@@ -110,24 +102,14 @@ class QuestionnaireResponseAggregator
     }
   }
 
-  @override
-  QuestionnaireResponse? aggregate({
-    QuestionnaireResponseStatus? responseStatus,
-    bool notifyListeners = false,
-    bool containPatient = false,
-  }) {
-    _logger.trace('QuestionnaireResponse.aggregate');
-
-    // Are all minimum fields for SDC profile present?
-    bool isValidSdc = true;
-
-    responseStatus ??= questionnaireResponseModel.responseStatus;
-
+  List<QuestionnaireResponseItem>? _fromResponseItems(
+    ResponseNode? parentNode,
+    QuestionnaireResponseStatus responseStatus,
+  ) {
     final responseItems = <QuestionnaireResponseItem>[];
 
     for (final itemModel in questionnaireResponseModel
-        .orderedResponseItemModels()
-        .where((rim) => rim.parentItem == null)) {
+        .orderedResponseItemModelsWithParent(parent: parentNode)) {
       if (itemModel.questionnaireItemModel.isGroup) {
         final groupItem =
             _fromGroupItem(itemModel as GroupItemModel, responseStatus);
@@ -143,6 +125,24 @@ class QuestionnaireResponseAggregator
         }
       }
     }
+
+    return (responseItems.isNotEmpty) ? responseItems : null;
+  }
+
+  @override
+  QuestionnaireResponse? aggregate({
+    QuestionnaireResponseStatus? responseStatus,
+    bool notifyListeners = false,
+    bool containPatient = false,
+  }) {
+    _logger.trace('QuestionnaireResponse.aggregate');
+
+    // Are all minimum fields for SDC profile present?
+    bool isValidSdc = true;
+
+    responseStatus ??= questionnaireResponseModel.responseStatus;
+
+    final responseItems = _fromResponseItems(null, responseStatus);
 
     final narrativeAggregator =
         questionnaireResponseModel.aggregator<NarrativeAggregator>();
@@ -203,7 +203,7 @@ class QuestionnaireResponseAggregator
       meta: meta,
       contained: (contained.isNotEmpty) ? contained : null,
       questionnaire: questionnaireCanonical,
-      item: (responseItems.isNotEmpty) ? responseItems : null,
+      item: responseItems,
       authored: FhirDateTime(DateTime.now()),
       text: (narrative?.status == NarrativeStatus.empty) ? null : narrative,
       language: Code(locale.toLanguageTag()),

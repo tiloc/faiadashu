@@ -4,6 +4,7 @@
     * QuestionnaireModel contains all static descriptions of the questionnaire
     * QuestionnaireResponseModel contains the result of filling a questionnaire and all dynamic behavior
   * This replaces the simplistic 1:1 relationships between items and responses with proper 1:n model
+    * Answers can have nested responses now 
   * Clarified the relationship between FHIR and Presentation Model. The QuestionnaireResponse is used during
 model creation to populate the presentation model, and it is created by the aggregator from the presentation model.
 But it is not used in between anymore. This is resolving a lot of inconsistencies and uncertainties.

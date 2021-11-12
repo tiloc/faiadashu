@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:ui';
 
 import 'package:collection/collection.dart';
@@ -24,6 +25,9 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   int _generation = 1;
 
   final List<FillerItemModel> _fillerItems = [];
+
+  // ignore: prefer_collection_literals
+  final _answerModels = LinkedHashMap<String, AnswerModel>();
 
   // TODO: Clarify item level variables vs. questionnaire level.
 
@@ -95,7 +99,6 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     questionnaireResponseModel._addFillerItems(
       questionnaireResponseModel._fillerItems,
       null,
-      null,
       questionnaireModel.items,
     );
 
@@ -163,14 +166,12 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
   void _addGroupItem(
     List<FillerItemModel> fillerItemList,
-    FillerItemModel? parentItem,
-    int? parentAnswerIndex,
+    ResponseNode? parentNode,
     QuestionnaireItemModel questionnaireItemModel,
   ) {
     _logger.trace('_addGroupItem $questionnaireItemModel');
     final groupItemModel = GroupItemModel(
-      parentItem,
-      parentAnswerIndex,
+      parentNode,
       this,
       questionnaireItemModel,
     );
@@ -179,21 +180,18 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     _addFillerItems(
       fillerItemList,
       groupItemModel,
-      null,
       questionnaireItemModel.children,
     );
   }
 
   void _addQuestionItem(
     List<FillerItemModel> fillerItemList,
-    FillerItemModel? parentItem,
-    int? parentAnswerIndex,
+    ResponseNode? parentNode,
     QuestionnaireItemModel questionnaireItemModel,
   ) {
     _logger.trace('_addQuestionItem $questionnaireItemModel');
     final questionItemModel = QuestionItemModel(
-      parentItem,
-      parentAnswerIndex,
+      parentNode,
       this,
       questionnaireItemModel,
     );
@@ -203,15 +201,13 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
   void _addDisplayItem(
     List<FillerItemModel> fillerItemList,
-    FillerItemModel? parentItem,
-    int? parentAnswerIndex,
+    ResponseNode? parentNode,
     QuestionnaireItemModel questionnaireItemModel,
   ) {
     _logger.trace('_addDisplayItem $questionnaireItemModel');
 
     final displayItemModel = DisplayItemModel(
-      parentItem,
-      parentAnswerIndex,
+      parentNode,
       this,
       questionnaireItemModel,
     );
@@ -221,19 +217,58 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
   void _addFillerItems(
     List<FillerItemModel> fillerItemList,
-    FillerItemModel? parentItem,
-    int? parentAnswerIndex,
+    ResponseNode? parentNode,
     List<QuestionnaireItemModel> questionnaireItemModels,
   ) {
     _logger.trace('_addFillerItems');
     for (final qim in questionnaireItemModels) {
       if (qim.isGroup) {
-        _addGroupItem(fillerItemList, parentItem, parentAnswerIndex, qim);
+        _addGroupItem(fillerItemList, parentNode, qim);
       } else if (qim.isQuestion) {
-        _addQuestionItem(fillerItemList, parentItem, parentAnswerIndex, qim);
+        _addQuestionItem(fillerItemList, parentNode, qim);
       } else {
-        _addDisplayItem(fillerItemList, parentItem, parentAnswerIndex, qim);
+        _addDisplayItem(fillerItemList, parentNode, qim);
       }
+    }
+  }
+
+  void insertFillerItemsIfAbsent(
+    ResponseNode parentNode,
+    List<QuestionnaireItemModel> questionnaireItemModels,
+  ) {
+    final List<FillerItemModel> descendantFillerItems = [];
+    _addFillerItems(
+      descendantFillerItems,
+      parentNode,
+      questionnaireItemModels,
+    );
+
+    // If they exist one, they exist all
+    final firstUid = descendantFillerItems.first.nodeUid;
+    final alreadyExists = _fillerItems.any((fim) => fim.nodeUid == firstUid);
+
+    if (alreadyExists) {
+      _logger.debug(
+        'Not inserting descendants: $descendantFillerItems. Already exist.',
+      );
+      return;
+    } else {
+      _logger.debug(
+        'Inserting new descendants: $descendantFillerItems',
+      );
+
+      // TODO: For a really clean solution, each individual answer would
+      // also need to be modelled as a filler.
+      final insertionPredecessor = (parentNode is FillerItemModel)
+          ? parentNode
+          : (parentNode as AnswerModel).responseItemModel;
+
+      final insertionIndex = _fillerItems.indexOf(insertionPredecessor) + 1;
+
+      _fillerItems.insertAll(
+        insertionIndex,
+        descendantFillerItems,
+      );
     }
   }
 
@@ -292,11 +327,11 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   }
 
   void _populateItems(
-    ResponseItemModel? parentItem,
+    ResponseNode? parentNode,
     Iterable<ResponseItemModel> responseItemModels,
     List<QuestionnaireResponseItem>? questionnaireResponseItems,
   ) {
-    _logger.trace('_populateItems parent ${parentItem?.responseUid}');
+    _logger.trace('_populateItems parent ${parentNode?.nodeUid}');
 
     if (questionnaireResponseItems == null) {
       return;
@@ -313,15 +348,16 @@ class QuestionnaireResponseModel extends ChangeNotifier {
           _logger.debug('Populating group $linkId into existing item $rim.');
           // Nothing to really populate for group
           // Populate children
+          final childrenOfRim =
+              orderedResponseItemModelsWithParent(parent: rim);
           _populateItems(
             rim,
-            orderedResponseItemModels()
-                .where((otherRim) => otherRim.parentItem == rim),
+            childrenOfRim,
             item.item,
           );
         } else {
           _logger.debug('Group $linkId not found');
-          if (parentItem != null) {
+          if (parentNode != null) {
             _logger.debug('Creating group $linkId.');
             // TODO: Create missing group and then populate.
           } else {
@@ -339,53 +375,60 @@ class QuestionnaireResponseModel extends ChangeNotifier {
           final itemAnswers = item.answer;
           if (itemAnswers != null && itemAnswers.isNotEmpty) {
             _logger.debug(
-              'Populating answers under ${qrim.responseUid}.',
+              'Populating answers under ${qrim.nodeUid}.',
             );
             itemAnswers.forEachIndexed((answerIndex, answer) {
+              bool newAnswer = false;
+              AnswerModel? addedAnswerModel;
+
               // Populate the answer models
               if (qrim.questionnaireItemModel.isCodingType) {
                 // TODO: This is hacky!
                 if (answerIndex == 0) {
-                  final addedAnswerModel = qrim.addAnswerModel();
+                  addedAnswerModel = qrim.addAnswerModel();
                   addedAnswerModel.populateCodingAnswers(itemAnswers);
+                  newAnswer = true;
                 }
               } else {
-                final addedAnswerModel = qrim.addAnswerModel();
+                addedAnswerModel = qrim.addAnswerModel();
                 addedAnswerModel.populate(answer);
+                newAnswer = true;
               }
 
-              // If the answer had any nested items, then first ensure that the
-              // required structures exist, then populate them as well.
-              final answerResponseItems = answer.item;
-              if (answerResponseItems != null &&
-                  answerResponseItems.isNotEmpty) {
-                final List<FillerItemModel> descendantFillerItems = [];
-                _addFillerItems(
-                  descendantFillerItems,
-                  qrim,
-                  answerIndex,
-                  qrim.questionnaireItemModel.children,
-                );
+              if (newAnswer) {
+                // If the answer had any nested items, then first ensure that the
+                // required structures exist, then populate them as well.
+                final answerResponseItems = answer.item;
+                if (answerResponseItems != null &&
+                    answerResponseItems.isNotEmpty) {
+                  final List<FillerItemModel> descendantFillerItems = [];
+                  _addFillerItems(
+                    descendantFillerItems,
+                    addedAnswerModel,
+                    qrim.questionnaireItemModel.children,
+                  );
 
-                _populateItems(
-                  qrim,
-                  descendantFillerItems.whereType<ResponseItemModel>(),
-                  answerResponseItems,
-                );
+                  _logger.debug(
+                    'Inserting new descendants: $descendantFillerItems',
+                  );
+                  _fillerItems.insertAll(
+                    _fillerItems.indexOf(qrim) + 1,
+                    descendantFillerItems,
+                  );
 
-                _logger
-                    .debug('Inserting new descendants: $descendantFillerItems');
-                _fillerItems.insertAll(
-                  _fillerItems.indexOf(qrim) + 1,
-                  descendantFillerItems,
-                );
+                  _populateItems(
+                    addedAnswerModel,
+                    descendantFillerItems.whereType<ResponseItemModel>(),
+                    answerResponseItems,
+                  );
+                }
               }
             });
           }
         } else {
           // This should never happen! Items should have been created when
           // previous fields have been populated.
-          _logger.warn('Question response $linkId not found. Data loss!');
+          throw StateError('Question response $linkId not found. Data loss!');
         }
       }
     }
@@ -413,7 +456,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     // Assumption: It would be better to first set all responses in bulk and then recalc.
     _populateItems(
       null,
-      orderedResponseItemModels().where((rim) => rim.parentItem == null),
+      orderedResponseItemModelsWithParent(parent: null),
       questionnaireResponseItems,
     );
 
@@ -566,13 +609,43 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   }
 
   /// Items can change, and this should not be cached.
+  Iterable<FillerItemModel> orderedFillerItemModelsWithParent({
+    required ResponseNode? parent,
+  }) {
+    return _fillerItems.where((fim) => fim.parentNode == parent);
+  }
+
+  /// Items can change, and this should not be cached.
   Iterable<ResponseItemModel> orderedResponseItemModels() {
     return _fillerItems.whereType<ResponseItemModel>();
   }
 
   /// Items can change, and this should not be cached.
+  Iterable<ResponseItemModel> orderedResponseItemModelsWithParent({
+    required ResponseNode? parent,
+  }) {
+    return _fillerItems
+        .whereType<ResponseItemModel>()
+        .where((rim) => rim.parentNode == parent);
+  }
+
+  /// Items can change, and this should not be cached.
   Iterable<QuestionItemModel> orderedQuestionItemModels() {
     return _fillerItems.whereType<QuestionItemModel>();
+  }
+
+  /// [AnswerModel]s in the order in which they were previously added
+  /// through [addAnswerModel].
+  Iterable<AnswerModel> orderedAnswerModels(
+    QuestionItemModel questionItemModel,
+  ) {
+    return _answerModels.values
+        .where((am) => am.parentNode == questionItemModel);
+  }
+
+  /// Add an [AnswerModel] to the list of known [AnswerModel]s.
+  void addAnswerModel(AnswerModel answerModel) {
+    _answerModels[answerModel.nodeUid] = answerModel;
   }
 
   /// Returns whether the questionnaire meets all completeness criteria.
@@ -602,9 +675,9 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
   final errorFlags = ValueNotifier<Iterable<QuestionnaireErrorFlag>?>(null);
 
-  /// Returns the [QuestionnaireErrorFlag] for an item with [responseUid].
-  QuestionnaireErrorFlag? errorFlagForResponseUid(String responseUid) {
+  /// Returns the [QuestionnaireErrorFlag] for an item with [nodeUid].
+  QuestionnaireErrorFlag? errorFlagForNodeUid(String responseUid) {
     return errorFlags.value
-        ?.firstWhereOrNull((ef) => ef.responseUid == responseUid);
+        ?.firstWhereOrNull((ef) => ef.nodeUid == responseUid);
   }
 }

@@ -4,6 +4,7 @@ import 'package:fhir/r4.dart'
         FhirDateTime,
         QuestionnaireItemType,
         QuestionnaireResponseAnswer,
+        QuestionnaireResponseItem,
         Time;
 
 import '../../../../../fhir_types/fhir_types.dart';
@@ -17,7 +18,9 @@ class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
   String get display => value?.format(locale) ?? AnswerModel.nullText;
 
   @override
-  QuestionnaireResponseAnswer? get filledAnswer {
+  QuestionnaireResponseAnswer? createFhirAnswer(
+    List<QuestionnaireResponseItem>? items,
+  ) {
     final itemType = qi.type;
 
     if (value?.value == null) {
@@ -25,14 +28,21 @@ class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
     }
 
     if (itemType == QuestionnaireItemType.date) {
-      return QuestionnaireResponseAnswer(valueDate: Date(value!.value));
+      return QuestionnaireResponseAnswer(
+        valueDate: Date(value!.value),
+        item: items,
+      );
     } else if (itemType == QuestionnaireItemType.datetime) {
-      return QuestionnaireResponseAnswer(valueDateTime: value);
+      return QuestionnaireResponseAnswer(
+        valueDateTime: value,
+        item: items,
+      );
     } else if (itemType == QuestionnaireItemType.time) {
       return QuestionnaireResponseAnswer(
         valueTime: Time(
           value!.value!.toIso8601String().substring('yyyy-MM-ddT'.length),
         ),
+        item: items,
       );
     } else {
       throw StateError('Unexpected itemType: $itemType');

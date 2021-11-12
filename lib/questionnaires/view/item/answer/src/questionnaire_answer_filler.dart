@@ -54,7 +54,7 @@ abstract class QuestionnaireAnswerFillerState<
 
       firstFocusNode = FocusNode(
         debugLabel:
-            'AnswerFiller firstFocusNode: ${widget.responseItemModel.responseUid}',
+            'AnswerFiller firstFocusNode: ${widget.responseItemModel.nodeUid}',
       );
 
       widget.responseItemModel.questionnaireResponseModel
@@ -108,6 +108,7 @@ abstract class QuestionnaireAnswerFillerState<
     // Listen to the parent FocusNode and become focussed when it does.
     if (!_isFocusHookedUp) {
       WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+        // FIXME: On very rare occasions, Focus.of can fail with: Looking up a deactivated widget's ancestor is unsafe.
         Focus.of(context).addListener(() {
           if ((firstFocusNode.parent?.hasPrimaryFocus ?? false) &&
               !firstFocusNode.hasPrimaryFocus) {

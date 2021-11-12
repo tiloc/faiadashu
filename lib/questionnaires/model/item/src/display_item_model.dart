@@ -2,13 +2,11 @@ import '../../../questionnaires.dart';
 
 class DisplayItemModel extends FillerItemModel {
   DisplayItemModel(
-    FillerItemModel? parentItem,
-    int? parentAnswerIndex,
+    ResponseNode? parentNode,
     QuestionnaireResponseModel questionnaireResponseModel,
     QuestionnaireItemModel questionnaireItemModel,
   ) : super(
-          parentItem,
-          parentAnswerIndex,
+          parentNode,
           questionnaireResponseModel,
           questionnaireItemModel,
         );

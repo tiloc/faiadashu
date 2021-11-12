@@ -8,8 +8,12 @@ class UnsupportedAnswerModel extends AnswerModel<Object, Object> {
       : super(responseModel);
 
   @override
-  QuestionnaireResponseAnswer? get filledAnswer {
-    throw UnimplementedError('UnsupportedAnswerModel cannot fill an answer.');
+  QuestionnaireResponseAnswer? createFhirAnswer(
+    List<QuestionnaireResponseItem>? items,
+  ) {
+    throw UnimplementedError(
+      'UnsupportedAnswerModel cannot create a FHIR answer.',
+    );
   }
 
   @override

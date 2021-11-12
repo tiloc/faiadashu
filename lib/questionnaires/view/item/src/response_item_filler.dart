@@ -16,7 +16,7 @@ abstract class ResponseItemFiller extends QuestionnaireItemFiller {
           questionnaireFiller,
           responseItemModel,
           key: ValueKey<String>(
-            responseItemModel.responseUid,
+            responseItemModel.nodeUid,
           ),
         );
 }

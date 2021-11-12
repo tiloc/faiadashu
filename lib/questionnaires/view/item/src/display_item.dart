@@ -22,7 +22,7 @@ class _DisplayItemState extends QuestionnaireItemFillerState<DisplayItem> {
   @override
   Widget build(BuildContext context) {
     _dlogger.trace(
-      'build display item ${widget.fillerItemModel.responseUid} hidden: ${widget.fillerItemModel.questionnaireItemModel.isHidden}, enabled: ${widget.fillerItemModel.isEnabled}',
+      'build display item ${widget.fillerItemModel.nodeUid} hidden: ${widget.fillerItemModel.questionnaireItemModel.isHidden}, enabled: ${widget.fillerItemModel.isEnabled}',
     );
 
     final titleWidget = this.titleWidget;

@@ -253,8 +253,10 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
   }
 
   @override
-  QuestionnaireResponseAnswer? get filledAnswer {
-    _logger.debug('filledAnswer: $value');
+  QuestionnaireResponseAnswer? createFhirAnswer(
+    List<QuestionnaireResponseItem>? items,
+  ) {
+    _logger.debug('createFhirAnswer: $value');
     if (value == null) {
       return null;
     }
@@ -265,18 +267,21 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
             ? QuestionnaireResponseAnswer(
                 valueDecimal: value!.value,
                 extension_: value!.extension_,
+                item: items,
               )
             : null;
       case QuestionnaireItemType.quantity:
         return QuestionnaireResponseAnswer(
           valueQuantity: value,
           extension_: value!.extension_,
+          item: items,
         );
       case QuestionnaireItemType.integer:
         return (value!.value != null)
             ? QuestionnaireResponseAnswer(
                 valueInteger: Integer(value!.value!.value!.round()),
                 extension_: value!.extension_,
+                item: items,
               )
             : null;
       default:

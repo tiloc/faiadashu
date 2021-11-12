@@ -2,13 +2,11 @@ import '../../../questionnaires.dart';
 
 class GroupItemModel extends ResponseItemModel {
   GroupItemModel(
-    FillerItemModel? parentItem,
-    int? parentAnswerIndex,
+    ResponseNode? parentNode,
     QuestionnaireResponseModel questionnaireResponseModel,
     QuestionnaireItemModel itemModel,
   ) : super(
-          parentItem,
-          parentAnswerIndex,
+          parentNode,
           questionnaireResponseModel,
           itemModel,
         );

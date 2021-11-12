@@ -5,6 +5,8 @@ import '../../../logging/logging.dart';
 import '../../../resource_provider/resource_provider.dart';
 import '../../questionnaires.dart';
 
+// FIXME: create new item filler views when the underlying response model's filler items change.
+
 /// Fill a [Questionnaire].
 ///
 /// Provides visual components to view and fill a [Questionnaire].
@@ -84,8 +86,8 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
     super.dispose();
   }
 
-  void _onQuestionnaireModelChange() {
-    _logger.trace('_onQuestionnaireModelChange');
+  void _onQuestionnaireResponseModelChange() {
+    _logger.trace('_onQuestionnaireResponseModelChange');
     if (mounted) {
       setState(() {});
     }
@@ -118,7 +120,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
               // OPTIMIZE: There has got to be a more elegant way? Goal is to register the listener exactly once, after the future has completed.
               if (_onQuestionnaireResponseModelChangeListenerFunction == null) {
                 _onQuestionnaireResponseModelChangeListenerFunction =
-                    () => _onQuestionnaireModelChange();
+                    () => _onQuestionnaireResponseModelChange();
                 _questionnaireResponseModel!.addListener(
                   _onQuestionnaireResponseModelChangeListenerFunction!,
                 );
@@ -222,7 +224,7 @@ class QuestionnaireFillerData extends InheritedWidget {
         this,
         fillerItemModels.elementAt(index),
         key: ValueKey<String>(
-          'item-filler-${fillerItemModels.elementAt(index).responseUid}',
+          'item-filler-${fillerItemModels.elementAt(index).nodeUid}',
         ),
       );
     } else {

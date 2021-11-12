@@ -26,13 +26,11 @@ class QuestionItemModel extends ResponseItemModel {
   }
 
   QuestionItemModel(
-    FillerItemModel? parentItem,
-    int? parentAnswerIndex,
+    ResponseNode? parentNode,
     QuestionnaireResponseModel questionnaireResponseModel,
     QuestionnaireItemModel itemModel,
   ) : super(
-          parentItem,
-          parentAnswerIndex,
+          parentNode,
           questionnaireResponseModel,
           itemModel,
         ) {
@@ -43,6 +41,22 @@ class QuestionItemModel extends ResponseItemModel {
   /// Is the response 'asked but declined'
   bool get isAskedButDeclined =>
       dataAbsentReason == dataAbsentReasonAskedButDeclinedCode;
+
+  /// Triggers all required activities when any of the answers have changed.
+  ///
+  /// Creates nested fillers if needed.
+  void onAnswerChanged(AnswerModel answerModel) {
+    if (answerModel.value != null) {
+      // An answer has been provided, check whether a nested filler structure needs to be created.
+      if (questionnaireItemModel.hasChildren) {
+        // Nested structural items exist. Create fillers.
+        questionnaireResponseModel.insertFillerItemsIfAbsent(
+            answerModel, questionnaireItemModel.children);
+      }
+    }
+
+    nextGeneration();
+  }
 
   /// Changes the generation and notifies all listeners.
   ///
@@ -58,7 +72,7 @@ class QuestionItemModel extends ResponseItemModel {
   /// This is currently entirely based on the [dataAbsentReason].
   @override
   bool get isInvalid {
-    _qrimLogger.trace('isInvalid $responseUid');
+    _qrimLogger.trace('isInvalid $nodeUid');
     return dataAbsentReason == dataAbsentReasonAsTextCode;
   }
 
@@ -70,7 +84,7 @@ class QuestionItemModel extends ResponseItemModel {
     final answerModel = firstAnswerModel;
 
     if (answerModel.isAnswered && answerModel is CodingAnswerModel) {
-      final answers = answerModel.filledCodingAnswers;
+      final answers = answerModel.createFhirCodingAnswers(null);
       // Find ordinal value in extensions
       final ordinalExtension =
           answers?.firstOrNull?.valueCoding?.extension_?.extensionOrNull(
@@ -89,9 +103,17 @@ class QuestionItemModel extends ResponseItemModel {
     }
   }
 
+  /// Returns all answers belonging to this question.
+  Iterable<AnswerModel> get answerModels {
+    return questionnaireResponseModel.orderedAnswerModels(this);
+  }
+
   // Ensures at least a single answer model exists.
   void _ensureAnswerModel() {
-    _answerModel(0);
+    final existingAnswers = answerModels;
+    if (existingAnswers.isEmpty) {
+      addAnswerModel();
+    }
   }
 
   @override
@@ -105,7 +127,7 @@ class QuestionItemModel extends ResponseItemModel {
       markers.addAll(rimMarkers);
     }
 
-    for (final am in _cachedAnswerModels.values) {
+    for (final am in answerModels) {
       final marker = am.isComplete;
       if (marker != null) {
         markers.add(marker);
@@ -117,12 +139,12 @@ class QuestionItemModel extends ResponseItemModel {
 
   @override
   bool get isAnswered {
-    _qrimLogger.trace('isAnswered $responseUid');
+    _qrimLogger.trace('isAnswered $nodeUid');
     if (!isAnswerable) {
       return false;
     }
 
-    return _cachedAnswerModels.values.any((am) => am.isAnswered);
+    return answerModels.any((am) => am.isAnswered);
   }
 
   @override
@@ -131,39 +153,38 @@ class QuestionItemModel extends ResponseItemModel {
       return false;
     }
 
-    final returnValue =
-        _cachedAnswerModels.values.every((am) => am.isUnanswered);
-    _qrimLogger.debug('isUnanswered $responseUid: $returnValue');
+    final returnValue = answerModels.every((am) => am.isUnanswered);
+    _qrimLogger.debug('isUnanswered $nodeUid: $returnValue');
 
     return returnValue;
   }
-
-  final Map<int, AnswerModel> _cachedAnswerModels = <int, AnswerModel>{};
 
   /// Add the next answer to this response.
   ///
   /// Returns the newly added [AnswerModel].
   AnswerModel addAnswerModel() {
-    return _answerModel(_cachedAnswerModels.length);
+    final newAnswerModel = _createAnswerModel();
+    questionnaireResponseModel.addAnswerModel(newAnswerModel);
+    return newAnswerModel;
   }
 
   /// Returns the [AnswerModel] which has been added last.
   AnswerModel get latestAnswerModel {
     _ensureAnswerModel();
 
-    return _cachedAnswerModels.values.last;
+    return answerModels.last;
   }
 
   /// Returns the [AnswerModel] which has been added first.
   AnswerModel get firstAnswerModel {
     _ensureAnswerModel();
 
-    return _cachedAnswerModels.values.first;
+    return answerModels.first;
   }
 
   /// Returns the [AnswerModel]s which have been answered.
   Iterable<AnswerModel> get answeredAnswerModels {
-    return _cachedAnswerModels.values.where((am) => am.isAnswered);
+    return answerModels.where((am) => am.isAnswered);
   }
 
   /// Returns the [AnswerModel]s which have been answered,
@@ -172,16 +193,11 @@ class QuestionItemModel extends ResponseItemModel {
     _ensureAnswerModel();
 
     final latestAnswerModel = this.latestAnswerModel;
-    return _cachedAnswerModels.values
-        .where((am) => am.isAnswered || am == latestAnswerModel);
+    return answerModels.where((am) => am.isAnswered || am == latestAnswerModel);
   }
 
-  /// Returns an [AnswerModel] for the nth answer to an overall response.
-  AnswerModel _answerModel(int answerIndex) {
-    if (_cachedAnswerModels.containsKey(answerIndex)) {
-      return _cachedAnswerModels[answerIndex]!;
-    }
-
+  /// Creates a new [AnswerModel] of the type for this question.
+  AnswerModel _createAnswerModel() {
     final AnswerModel? answerModel;
 
     switch (questionnaireItemModel.questionnaireItem.type) {
@@ -217,17 +233,14 @@ class QuestionItemModel extends ResponseItemModel {
         // Throwing an exception here would lead to breakage of filler.
         answerModel = UnsupportedAnswerModel(this);
     }
-
-    _cachedAnswerModels[answerIndex] = answerModel;
-
     return answerModel;
   }
 
   void populateInitialValue() {
-    _qrimLogger.debug('populateInitialValue: $responseUid');
+    _qrimLogger.debug('populateInitialValue: $nodeUid');
     if (questionnaireItemModel.hasInitialExpression) {
       final initialEvaluationResult = evaluateInitialExpression();
-      _answerModel(0).populateFromExpression(initialEvaluationResult);
+      firstAnswerModel.populateFromExpression(initialEvaluationResult);
     } else {
       // initial.value[x]
       // TODO: Implement
@@ -278,7 +291,7 @@ class QuestionItemModel extends ResponseItemModel {
 
     // TODO: should this be able to populate multiple answers?
     // Write the value back to the answer model
-    _answerModel(0).populateFromExpression(evaluationResult);
+    firstAnswerModel.populateFromExpression(evaluationResult);
   }
 
   /// Returns an integer, starting with 1, that provides the number

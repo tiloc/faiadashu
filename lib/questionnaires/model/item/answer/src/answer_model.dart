@@ -5,7 +5,7 @@ import '../../../../../fhir_types/fhir_types.dart';
 import '../../../model.dart';
 
 /// Models a single answer within a [QuestionItemModel].
-abstract class AnswerModel<I, V> {
+abstract class AnswerModel<I, V> extends ResponseNode {
   /// Textual depiction of an unanswered question.
   static const nullText = '—';
 
@@ -16,8 +16,8 @@ abstract class AnswerModel<I, V> {
   set value(V? newValue) {
     if (newValue != _value) {
       _value = newValue;
-      // TODO: Should this be modeled as a proper notifier-relationship?
-      responseItemModel.nextGeneration();
+
+      responseItemModel.onAnswerChanged(this);
     }
   }
 
@@ -46,7 +46,7 @@ abstract class AnswerModel<I, V> {
   }
 
   /// Construct a new, unpopulated answer model.
-  AnswerModel(this.responseItemModel);
+  AnswerModel(this.responseItemModel) : super(responseItemModel);
 
   /// Returns a human-readable, localized, textual description of the model.
   ///
@@ -81,18 +81,24 @@ abstract class AnswerModel<I, V> {
 
   String? get errorText {
     return questionnaireResponseModel
-        .errorFlagForResponseUid(responseItemModel.responseUid)
+        .errorFlagForNodeUid(responseItemModel.nodeUid)
         ?.errorText;
   }
 
   /// Returns a [QuestionnaireResponseAnswer] based on the current value.
   ///
+  /// Can optionally add nested [items].
+  ///
   /// This is the link between the presentation model and the underlying
   /// FHIR domain model.
-  QuestionnaireResponseAnswer? get filledAnswer;
+  QuestionnaireResponseAnswer? createFhirAnswer(
+    List<QuestionnaireResponseItem>? items,
+  );
 
-  List<QuestionnaireResponseAnswer>? get filledCodingAnswers {
-    throw UnimplementedError('filledCodingAnswers not implemented.');
+  List<QuestionnaireResponseAnswer>? createFhirCodingAnswers(
+    List<QuestionnaireResponseItem>? items,
+  ) {
+    throw UnimplementedError('createFhirCodingAnswers not implemented.');
   }
 
   bool get hasCodingAnswers => false;
@@ -111,5 +117,14 @@ abstract class AnswerModel<I, V> {
   /// not be invoked by application code.
   void populateFromExpression(dynamic evaluationResult) {
     throw UnimplementedError('populateFromExpression not implemented.');
+  }
+
+  static int _uidCounter = 0;
+
+  /// INTERNAL USE ONLY - do not invoke!
+  @override
+  String calculateNodeUid() {
+    _uidCounter++;
+    return '${parentNode?.nodeUid}/$_uidCounter';
   }
 }

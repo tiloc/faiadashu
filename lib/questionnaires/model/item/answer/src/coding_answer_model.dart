@@ -283,14 +283,18 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
   }
 
   @override
-  QuestionnaireResponseAnswer? get filledAnswer {
+  QuestionnaireResponseAnswer? createFhirAnswer(
+    List<QuestionnaireResponseItem>? items,
+  ) {
     throw UnsupportedError(
       'CodingAnswerModel will always return coding answers.',
     );
   }
 
   @override
-  List<QuestionnaireResponseAnswer>? get filledCodingAnswers {
+  List<QuestionnaireResponseAnswer>? createFhirCodingAnswers(
+    List<QuestionnaireResponseItem>? items,
+  ) {
     if (value == null) {
       return null;
     }
@@ -302,6 +306,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
         ? [
             QuestionnaireResponseAnswer(
               valueCoding: Coding(display: value!.text),
+              item: items,
             )
           ]
         : value!.coding?.map<QuestionnaireResponseAnswer>((coding) {
@@ -310,8 +315,12 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
                 ? QuestionnaireResponseAnswer(
                     valueCoding: answerOptions[choiceStringFromCoding(coding)]!
                         .valueCoding,
+                    item: items,
                   )
-                : QuestionnaireResponseAnswer(valueCoding: coding);
+                : QuestionnaireResponseAnswer(
+                    valueCoding: coding,
+                    item: items,
+                  );
           }).toList();
 
     return result;
@@ -324,7 +333,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
   QuestionnaireErrorFlag? get isComplete {
     if (value == null && minOccurs > 0) {
       return QuestionnaireErrorFlag(
-        responseItemModel.responseUid,
+        responseItemModel.nodeUid,
         errorText:
             lookupFDashLocalizations(locale).validatorMinOccurs(minOccurs),
       );
@@ -334,7 +343,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
     return (validationText == null)
         ? null
         : QuestionnaireErrorFlag(
-            responseItemModel.responseUid,
+            responseItemModel.nodeUid,
             errorText: validationText,
           );
   }

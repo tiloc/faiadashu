@@ -11,27 +11,24 @@ import '../../../questionnaires.dart';
 ///
 /// This is a common base-class for items that can generate responses (questions, groups),
 /// and those that don't (display).
-abstract class FillerItemModel extends ChangeNotifier with Diagnosticable {
+abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
   static final _fimLogger = Logger(FillerItemModel);
 
   final QuestionnaireResponseModel questionnaireResponseModel;
   final QuestionnaireItemModel questionnaireItemModel;
-  final FillerItemModel? parentItem;
-  final int? parentAnswerIndex;
 
   List<VariableModel>? _variables;
-  final String _responseUid;
+
+  @override
+  String calculateNodeUid() {
+    return "${(parentNode != null) ? parentNode!.nodeUid : ''}/${questionnaireItemModel.linkId}";
+  }
 
   FillerItemModel(
-    this.parentItem,
-    this.parentAnswerIndex,
+    ResponseNode? parentNode,
     this.questionnaireResponseModel,
     this.questionnaireItemModel,
-  ) : _responseUid =
-            "${(parentItem != null) ? parentItem.questionnaireItemModel.linkId : ''}${(parentAnswerIndex != null) ? '[$parentAnswerIndex]' : ''}/${questionnaireItemModel.linkId}";
-
-  /// Returns a unique id that identifies this item in a tree of responses.
-  String get responseUid => _responseUid;
+  ) : super(parentNode);
 
   QuestionnaireItem get questionnaireItem =>
       questionnaireItemModel.questionnaireItem;
@@ -86,8 +83,7 @@ abstract class FillerItemModel extends ChangeNotifier with Diagnosticable {
   void _disableWithChildren() {
     _isEnabled = false;
     for (final child in questionnaireResponseModel
-        .orderedFillerItemModels()
-        .where((fim) => fim.parentItem == this)) {
+        .orderedFillerItemModelsWithParent(parent: this)) {
       child._disableWithChildren();
     }
   }
@@ -279,7 +275,7 @@ abstract class FillerItemModel extends ChangeNotifier with Diagnosticable {
     );
 
     _fimLogger.debug(
-      'evaluateFhirPathExpression on $responseUid: $fhirPathExpression = $fhirPathResult',
+      'evaluateFhirPathExpression on $nodeUid: $fhirPathExpression = $fhirPathResult',
     );
 
     return fhirPathResult;
@@ -296,18 +292,11 @@ abstract class FillerItemModel extends ChangeNotifier with Diagnosticable {
       return unknownValue;
     } else if (fhirPathResult.first is! bool) {
       _fimLogger.warn(
-        'Questionnaire design issue: "$fhirPathExpression" at $responseUid results in $fhirPathResult. Expected a bool.',
+        'Questionnaire design issue: "$fhirPathExpression" at $nodeUid results in $fhirPathResult. Expected a bool.',
       );
       return fhirPathResult.first != null;
     } else {
       return fhirPathResult.first as bool;
     }
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-
-    properties.add(StringProperty('responseUid', responseUid));
   }
 }

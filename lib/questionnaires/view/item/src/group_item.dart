@@ -22,11 +22,11 @@ class _GroupItemState extends ResponseItemFillerState<GroupItem> {
   @override
   Widget build(BuildContext context) {
     _glogger.trace(
-      'build group ${widget.responseItemModel.responseUid} hidden: ${widget.responseItemModel.questionnaireItemModel.isHidden}, enabled: ${widget.responseItemModel.isEnabled}',
+      'build group ${widget.responseItemModel.nodeUid} hidden: ${widget.responseItemModel.questionnaireItemModel.isHidden}, enabled: ${widget.responseItemModel.isEnabled}',
     );
 
     final errorText = widget.responseItemModel.questionnaireResponseModel
-        .errorFlagForResponseUid(widget.responseItemModel.responseUid)
+        .errorFlagForNodeUid(widget.responseItemModel.nodeUid)
         ?.errorText;
 
     final titleWidget = this.titleWidget;

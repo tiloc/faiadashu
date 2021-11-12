@@ -11,7 +11,7 @@ abstract class QuestionnaireItemFiller extends StatefulWidget {
   final QuestionnaireFillerData questionnaireFiller;
   final FillerItemModel fillerItemModel;
 
-  String get responseUid => fillerItemModel.responseUid;
+  String get responseUid => fillerItemModel.nodeUid;
 
   const QuestionnaireItemFiller(
     this.questionnaireFiller,

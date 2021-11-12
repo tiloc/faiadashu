@@ -19,9 +19,11 @@ import '../../questionnaires.dart';
 /// A set of mandatory and optional FHIR resources need to be provided through
 /// the [fhirResourceProvider]:
 /// * (mandatory) [questionnaireResourceUri] - the [Questionnaire]
-/// * (mandatory) [subjectResourceUri] - the [Patient]
 /// * (optional) [questionnaireResponseResourceUri] - the [QuestionnaireResponse].
 /// Will be used to prefill the filler, if present.
+///
+/// The [launchContext] is used to provide:
+/// * (mandatory) - the [Patient]
 ///
 /// See: [QuestionnaireScrollerPage] for a [QuestionnaireScroller] which already
 /// wraps the list in a ready-made [Scaffold], incl. some commonly used buttons.
@@ -98,11 +100,11 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
     }
 
     final index = _questionnaireResponseModel!
-        .indexOfFillerItem((fim) => fim.responseUid == errorFlag.responseUid);
+        .indexOfFillerItem((fim) => fim.nodeUid == errorFlag.nodeUid);
 
     if (index == -1) {
       _logger.warn(
-        'Error Flag with invalid responseUId: ${errorFlag.responseUid}',
+        'Error Flag with invalid responseUId: ${errorFlag.nodeUid}',
       );
       return;
     }

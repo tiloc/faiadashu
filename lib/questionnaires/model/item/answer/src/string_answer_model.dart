@@ -94,7 +94,9 @@ class StringAnswerModel extends AnswerModel<String, String> {
   // TODO: Should the string get trimmed somewhere?
 
   @override
-  QuestionnaireResponseAnswer? get filledAnswer {
+  QuestionnaireResponseAnswer? createFhirAnswer(
+    List<QuestionnaireResponseItem>? items,
+  ) {
     final valid = validateInput(value) == null;
     final dataAbsentReasonExtension = !valid
         ? [
@@ -110,10 +112,12 @@ class StringAnswerModel extends AnswerModel<String, String> {
             ? QuestionnaireResponseAnswer(
                 valueString: value,
                 extension_: dataAbsentReasonExtension,
+                item: items,
               )
             : QuestionnaireResponseAnswer(
                 valueUri: FhirUri(value),
                 extension_: dataAbsentReasonExtension,
+                item: items,
               )
         : null;
   }
@@ -125,7 +129,7 @@ class StringAnswerModel extends AnswerModel<String, String> {
       return null;
     } else {
       return QuestionnaireErrorFlag(
-        responseItemModel.responseUid,
+        responseItemModel.nodeUid,
         errorText: valid,
       );
     }
