@@ -16,7 +16,9 @@ But it is not used in between anymore. This is resolving a lot of inconsistencie
 > You should not experience any breakage if you are merely using the questionnaire filler components.
 > You will see numerous API changes which will require fixes if you have forked/modified.
 
-* Repeating question items: Repeating items can be removed now.
+* Repeating question items: Answers to repeating question items can be added and removed now.
+
+* Updated dependencies
 
 ## 0.5.4-dev.6
 * Fix bug with unit extension
