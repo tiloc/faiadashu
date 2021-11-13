@@ -5,7 +5,7 @@ import '../../../questionnaires.dart';
 
 /// A view for filler items of type "display".
 class DisplayItem extends QuestionnaireItemFiller {
-  const DisplayItem(
+  DisplayItem(
     QuestionnaireFillerData questionnaireFiller,
     FillerItemModel fillerItem, {
     Key? key,

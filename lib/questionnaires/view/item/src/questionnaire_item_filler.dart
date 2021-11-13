@@ -8,16 +8,17 @@ import '../../../../logging/logging.dart';
 import '../../../questionnaires.dart';
 
 abstract class QuestionnaireItemFiller extends StatefulWidget {
-  final QuestionnaireFillerData questionnaireFiller;
+  final QuestionnaireTheme questionnaireTheme;
   final FillerItemModel fillerItemModel;
 
   String get responseUid => fillerItemModel.nodeUid;
 
-  const QuestionnaireItemFiller(
-    this.questionnaireFiller,
+  QuestionnaireItemFiller(
+    QuestionnaireFillerData questionnaireFiller,
     this.fillerItemModel, {
     Key? key,
-  }) : super(key: key);
+  })  : questionnaireTheme = questionnaireFiller.questionnaireTheme,
+        super(key: key);
 }
 
 abstract class QuestionnaireItemFillerState<W extends QuestionnaireItemFiller>
@@ -26,8 +27,8 @@ abstract class QuestionnaireItemFillerState<W extends QuestionnaireItemFiller>
   late final Widget? _titleWidget;
   Widget? get titleWidget => _titleWidget;
 
-  late final QuestionnaireFillerData _questionnaireFiller;
-  late final QuestionnaireTheme questionnaireTheme;
+  QuestionnaireFillerData? _questionnaireFiller;
+  QuestionnaireTheme get questionnaireTheme => widget.questionnaireTheme;
 
   late final FocusNode _focusNode;
   FocusNode get focusNode => _focusNode;
@@ -39,8 +40,6 @@ abstract class QuestionnaireItemFillerState<W extends QuestionnaireItemFiller>
     super.initState();
     _focusNode = FocusNode(debugLabel: responseUid, skipTraversal: true);
 
-    questionnaireTheme = widget.questionnaireFiller.questionnaireTheme;
-
     _titleWidget = QuestionnaireItemFillerTitle.fromFillerItem(
       fillerItem: widget.fillerItemModel,
       questionnaireTheme: questionnaireTheme,
@@ -51,12 +50,12 @@ abstract class QuestionnaireItemFillerState<W extends QuestionnaireItemFiller>
   void didChangeDependencies() {
     super.didChangeDependencies();
     _questionnaireFiller = QuestionnaireFiller.of(context);
-    _questionnaireFiller.registerQuestionnaireItemFillerState(this);
+    _questionnaireFiller?.registerQuestionnaireItemFillerState(this);
   }
 
   @override
   void dispose() {
-    _questionnaireFiller.unregisterQuestionnaireItemFillerState(this);
+    _questionnaireFiller?.unregisterQuestionnaireItemFillerState(this);
 
     _focusNode.dispose();
     super.dispose();

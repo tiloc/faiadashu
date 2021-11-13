@@ -5,9 +5,9 @@
     * QuestionnaireResponseModel contains the result of filling a questionnaire and all dynamic behavior
   * This replaces the previous, simplistic 1:1 relationships between items and responses with proper nested 1:n model
     * WIP: Answers can have nested responses now
-      * working during initial population of response
-      * Model gets updated when answering questions with nested items
-      * >this is not updating the view yet
+      * Nested items are created as needed during the initial population of the model - See Bluebook Vitamin K for example.
+      * Nested items are created as needed during human interaction (question with nested items is being answered for 
+      the first time) - See LOINC AHRQ for example.
       * >no dynamic behaviors (enableWhen, initialValue, ...) activated for subsequently added nested questions yet
   * Clarified the relationship between FHIR and Presentation Model. The QuestionnaireResponse is used during
 model creation to populate the presentation model, and it is created by the aggregator from the presentation model.

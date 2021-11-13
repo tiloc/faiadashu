@@ -68,19 +68,20 @@ class _ProgressPainter extends CustomPainter {
 
 class _QuestionnaireFillerCircularProgressState
     extends State<QuestionnaireFillerCircularProgress> {
-  late final QuestionnaireResponseModel _questionnaireResponseModel;
+  QuestionnaireResponseModel? _questionnaireResponseModel;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _questionnaireResponseModel =
+    final questionnaireResponseModel =
         QuestionnaireFiller.of(context).questionnaireResponseModel;
-    _questionnaireResponseModel.addListener(_updateProgress);
+    _questionnaireResponseModel = questionnaireResponseModel;
+    questionnaireResponseModel.addListener(_updateProgress);
   }
 
   @override
   void dispose() {
-    _questionnaireResponseModel.removeListener(_updateProgress);
+    _questionnaireResponseModel?.removeListener(_updateProgress);
     super.dispose();
   }
 
@@ -94,21 +95,25 @@ class _QuestionnaireFillerCircularProgressState
 
   @override
   Widget build(BuildContext context) {
+    final questionnaireResponseModel = _questionnaireResponseModel;
+
     final radius = widget.radius ?? 36.0;
 
     return SizedBox(
       width: radius,
       height: radius,
       child: CustomPaint(
-        painter: _ProgressPainter(
-          radius,
-          colors: _questionnaireResponseModel
-              .orderedResponseItemModels()
-              .where((rim) => rim.isAnswerable)
-              .map<Color?>((rim) {
-            return rim.isAnswered ? Colors.green : null;
-          }).toList(growable: false),
-        ),
+        painter: (questionnaireResponseModel != null)
+            ? _ProgressPainter(
+                radius,
+                colors: questionnaireResponseModel
+                    .orderedResponseItemModels()
+                    .where((rim) => rim.isAnswerable)
+                    .map<Color?>((rim) {
+                  return rim.isAnswered ? Colors.green : null;
+                }).toList(growable: false),
+              )
+            : _ProgressPainter(radius, colors: [null]),
       ),
     );
   }

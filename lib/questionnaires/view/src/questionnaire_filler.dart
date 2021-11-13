@@ -5,8 +5,6 @@ import '../../../logging/logging.dart';
 import '../../../resource_provider/resource_provider.dart';
 import '../../questionnaires.dart';
 
-// FIXME: create new item filler views when the underlying response model's filler items change.
-
 /// Fill a [Questionnaire].
 ///
 /// Provides visual components to view and fill a [Questionnaire].
@@ -64,7 +62,10 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
   late final Future<QuestionnaireResponseModel> builderFuture;
   QuestionnaireResponseModel? _questionnaireResponseModel;
   VoidCallback? _onQuestionnaireResponseModelChangeListenerFunction;
-  late final QuestionnaireFillerData _questionnaireFillerData;
+  // ignore: use_late_for_private_fields_and_variables
+  QuestionnaireFillerData? _questionnaireFillerData;
+
+  int _fillerItemCount = -1;
 
   @override
   void initState() {
@@ -88,8 +89,27 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
 
   void _onQuestionnaireResponseModelChange() {
     _logger.trace('_onQuestionnaireResponseModelChange');
+
+    final newFillerItems =
+        _questionnaireResponseModel!.orderedFillerItemModels();
+    final newFillerItemCount = newFillerItems.length;
+
     if (mounted) {
-      setState(() {});
+      setState(() {
+        if (_fillerItemCount != newFillerItemCount) {
+          _logger
+              .debug('Filler item count has changed. Updating filler views.');
+          _fillerItemCount = newFillerItemCount;
+          _questionnaireFillerData = QuestionnaireFillerData._(
+            _questionnaireResponseModel!,
+            locale: widget.locale,
+            builder: widget.builder,
+            onLinkTap: widget.onLinkTap,
+            onDataAvailable: widget.onDataAvailable,
+            questionnaireTheme: widget.questionnaireTheme,
+          );
+        }
+      });
     }
   }
 
@@ -117,6 +137,10 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
             if (snapshot.hasData) {
               _logger.debug('FutureBuilder hasData');
               _questionnaireResponseModel = snapshot.data;
+
+              _fillerItemCount =
+                  _questionnaireResponseModel!.orderedFillerItemModels().length;
+
               // OPTIMIZE: There has got to be a more elegant way? Goal is to register the listener exactly once, after the future has completed.
               if (_onQuestionnaireResponseModelChangeListenerFunction == null) {
                 _onQuestionnaireResponseModelChangeListenerFunction =
@@ -134,7 +158,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
                   questionnaireTheme: widget.questionnaireTheme,
                 );
               }
-              return _questionnaireFillerData;
+              return _questionnaireFillerData!;
             }
             throw StateError(
               'FutureBuilder snapshot has unexpected state: $snapshot',
@@ -150,12 +174,14 @@ class QuestionnaireFillerData extends InheritedWidget {
 
   final Locale locale;
   final QuestionnaireResponseModel questionnaireResponseModel;
+  // TODO: Should this copy exist, or just refer to the qrm as the source of truth?
   final Iterable<FillerItemModel> fillerItemModels;
+
   final void Function(BuildContext context, Uri url)? onLinkTap;
   final void Function(QuestionnaireResponseModel)? onDataAvailable;
   final QuestionnaireTheme questionnaireTheme;
   late final List<QuestionnaireItemFiller?> _itemFillers;
-  final Map<int, QuestionnaireItemFillerState> _itemFillerStates = {};
+  final Map<String, QuestionnaireItemFillerState> _itemFillerStates = {};
   late final int _generation;
 
   QuestionnaireFillerData._(
@@ -179,18 +205,14 @@ class QuestionnaireFillerData extends InheritedWidget {
 
   /// INTERNAL USE ONLY: Register a [QuestionnaireItemFillerState].
   void registerQuestionnaireItemFillerState(QuestionnaireItemFillerState qifs) {
-    _itemFillerStates[_indexOfResponseUid(qifs.responseUid)] = qifs;
+    _itemFillerStates[qifs.responseUid] = qifs;
   }
 
   /// INTERNAL USE ONLY: Unregister a [QuestionnaireItemFillerState].
   void unregisterQuestionnaireItemFillerState(
     QuestionnaireItemFillerState qifs,
   ) {
-    _itemFillerStates.remove(_indexOfResponseUid(qifs.responseUid));
-  }
-
-  int _indexOfResponseUid(String responseUid) {
-    return _itemFillers.indexWhere((qif) => qif?.responseUid == responseUid);
+    _itemFillerStates.remove(qifs.responseUid);
   }
 
   T aggregator<T extends Aggregator>() {
@@ -202,7 +224,8 @@ class QuestionnaireFillerData extends InheritedWidget {
   /// The item filler will be determined as by [itemFillerAt].
   void requestFocus(int index) {
     _logger.trace('requestFocus $index');
-    final itemFillerState = _itemFillerStates[index];
+    final fillerUid = fillerItemModels.elementAt(index).nodeUid;
+    final itemFillerState = _itemFillerStates[fillerUid];
     if (itemFillerState == null) {
       _logger.warn('requestFocus $index: itemFillerState == null');
     } else {
