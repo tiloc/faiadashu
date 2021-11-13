@@ -206,6 +206,10 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   ) {
     _logger.trace('_addDisplayItem $questionnaireItemModel');
 
+    if (questionnaireItemModel.isHidden) {
+      return;
+    }
+
     final displayItemModel = DisplayItemModel(
       parentNode,
       this,
@@ -232,7 +236,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     }
   }
 
-  void insertFillerItemsIfAbsent(
+  List<FillerItemModel> insertFillerItemsIfAbsent(
     ResponseNode parentNode,
     List<QuestionnaireItemModel> questionnaireItemModels,
   ) {
@@ -243,6 +247,10 @@ class QuestionnaireResponseModel extends ChangeNotifier {
       questionnaireItemModels,
     );
 
+    if (descendantFillerItems.isEmpty) {
+      return descendantFillerItems;
+    }
+
     // If they exist one, they exist all
     final firstUid = descendantFillerItems.first.nodeUid;
     final alreadyExists = _fillerItems.any((fim) => fim.nodeUid == firstUid);
@@ -251,7 +259,14 @@ class QuestionnaireResponseModel extends ChangeNotifier {
       _logger.debug(
         'Not inserting descendants: $descendantFillerItems. Already exist.',
       );
-      return;
+      final existingFillerItems = <FillerItemModel>[];
+      for (final fim in descendantFillerItems) {
+        existingFillerItems.add(
+          _fillerItems.firstWhere((element) => element.nodeUid == fim.nodeUid),
+        );
+      }
+
+      return existingFillerItems;
     } else {
       _logger.debug(
         'Inserting new descendants: $descendantFillerItems',
@@ -269,6 +284,8 @@ class QuestionnaireResponseModel extends ChangeNotifier {
         insertionIndex,
         descendantFillerItems,
       );
+
+      return descendantFillerItems;
     }
   }
 
@@ -401,19 +418,9 @@ class QuestionnaireResponseModel extends ChangeNotifier {
                 final answerResponseItems = answer.item;
                 if (answerResponseItems != null &&
                     answerResponseItems.isNotEmpty) {
-                  final List<FillerItemModel> descendantFillerItems = [];
-                  _addFillerItems(
-                    descendantFillerItems,
-                    addedAnswerModel,
+                  final descendantFillerItems = insertFillerItemsIfAbsent(
+                    addedAnswerModel!,
                     qrim.questionnaireItemModel.children,
-                  );
-
-                  _logger.debug(
-                    'Inserting new descendants: $descendantFillerItems',
-                  );
-                  _fillerItems.insertAll(
-                    _fillerItems.indexOf(qrim) + 1,
-                    descendantFillerItems,
                   );
 
                   _populateItems(

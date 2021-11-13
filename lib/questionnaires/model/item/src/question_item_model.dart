@@ -51,7 +51,9 @@ class QuestionItemModel extends ResponseItemModel {
       if (questionnaireItemModel.hasChildren) {
         // Nested structural items exist. Create fillers.
         questionnaireResponseModel.insertFillerItemsIfAbsent(
-            answerModel, questionnaireItemModel.children);
+          answerModel,
+          questionnaireItemModel.children,
+        );
       }
     }
 
