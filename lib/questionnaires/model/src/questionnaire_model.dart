@@ -17,14 +17,6 @@ part of 'questionnaire_item_model.dart';
 class QuestionnaireModel extends QuestionnaireItemModel {
   final Map<String, QuestionnaireItemModel> _cachedItems = {};
 
-  // OPTIMIZE: Can this be moved to response model, to encapsulate all dynamic behavior there?
-  List<QuestionnaireItemModel>? _itemsWithEnableWhen;
-  List<QuestionnaireItemModel>? _itemsWithEnableWhenExpression;
-
-  List<QuestionnaireItemModel>? get itemsWithEnableWhen => _itemsWithEnableWhen;
-  List<QuestionnaireItemModel>? get itemsWithEnableWhenExpression =>
-      _itemsWithEnableWhenExpression;
-
   final LinkedHashMap<String, QuestionnaireItemModel> _orderedItems =
       LinkedHashMap<String, QuestionnaireItemModel>();
 
@@ -49,34 +41,6 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     _questionnaireModel = this;
     // TODO: If I cleanly split questionnaire / questionnaire item then this special handling can be eliminated
     _buildOrderedItems();
-
-    // Set up conventional enableWhen feature
-    for (final itemModel in orderedQuestionnaireItemModels()) {
-      if (itemModel.isEnabledWhen) {
-        if (_itemsWithEnableWhen == null) {
-          _itemsWithEnableWhen = [itemModel];
-        } else {
-          _itemsWithEnableWhen!.add(itemModel);
-        }
-      }
-    }
-
-    _logger.debug('_itemsWithEnableWhen: $_itemsWithEnableWhen');
-
-    // Set up FHIRPath based enableWhenExpression feature
-    for (final itemModel in orderedQuestionnaireItemModels()) {
-      if (itemModel.isEnabledWhenExpression) {
-        if (_itemsWithEnableWhenExpression == null) {
-          _itemsWithEnableWhenExpression = [itemModel];
-        } else {
-          _itemsWithEnableWhenExpression!.add(itemModel);
-        }
-      }
-    }
-
-    _logger.debug(
-      '_itemsWithEnableWhenExpression: $_itemsWithEnableWhenExpression',
-    );
   }
 
   /// Create the model for a [Questionnaire].

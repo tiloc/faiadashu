@@ -502,8 +502,12 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     }
 
     _updateEnabledGeneration = _generation;
-    if (questionnaireModel.itemsWithEnableWhen == null &&
-        questionnaireModel.itemsWithEnableWhenExpression == null) {
+
+    if (!orderedFillerItemModels().any(
+      (fim) =>
+          fim.questionnaireItemModel.isEnabledWhen ||
+          fim.questionnaireItemModel.isEnabledWhenExpression,
+    )) {
       _logger.debug(
         'updateEnabledItems: no conditionally enabled items',
       );
@@ -516,24 +520,12 @@ class QuestionnaireResponseModel extends ChangeNotifier {
       itemModel.enable();
     }
 
-    // OPTIMIZE: This feels hacky
-    if (questionnaireModel.itemsWithEnableWhen != null) {
-      for (final qim in questionnaireModel.itemsWithEnableWhen!) {
-        for (final fim in orderedFillerItemModels()
-            .where((fim) => fim.questionnaireItemModel.linkId == qim.linkId)) {
-          fim.updateEnabled();
-        }
-      }
-    }
-
-    // OPTIMIZE: This feels hacky
-    if (questionnaireModel.itemsWithEnableWhenExpression != null) {
-      for (final qim in questionnaireModel.itemsWithEnableWhenExpression!) {
-        for (final fim in orderedFillerItemModels()
-            .where((fim) => fim.questionnaireItemModel.linkId == qim.linkId)) {
-          fim.updateEnabled();
-        }
-      }
+    for (final fim in orderedFillerItemModels().where(
+      (fim) =>
+          fim.questionnaireItemModel.isEnabledWhen ||
+          fim.questionnaireItemModel.isEnabledWhenExpression,
+    )) {
+      fim.updateEnabled();
     }
 
     final nowEnabled = _currentlyEnabledItems;
@@ -551,13 +543,14 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   /// Adds the required listeners to evaluate enableWhen and
   /// enableWhenExpression as items are changed.
   void activateEnableBehavior() {
-    if (questionnaireModel.itemsWithEnableWhenExpression != null) {
+    if (orderedFillerItemModels()
+        .any((fim) => fim.questionnaireItemModel.isEnabledWhenExpression)) {
       // When enableWhenExpression is involved we need to add listeners to every
-      // non-static item, as we have no way to find out which items are referenced
-      // by the FHIR Path expression.
+      // non-static item (or the overall response model), as we have no way to
+      // find out which items are referenced by the FHIR Path expression.
       addListener(() => updateEnabledItems());
     } else {
-      for (final itemModel in orderedResponseItemModels()) {
+      for (final itemModel in orderedFillerItemModels()) {
         itemModel.questionnaireItemModel.forEnableWhens((qew) {
           itemModel
               .fromLinkId(qew.question!)

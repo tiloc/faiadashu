@@ -70,7 +70,7 @@ packages:
       name: fhir
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.5.0-4"
+    version: "0.5.0-6"
   fhir_at_rest:
     dependency: transitive
     description:
@@ -91,7 +91,7 @@ packages:
       name: fhir_path
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.5.0-10"
+    version: "0.5.0-11"
   fhir_yaml:
     dependency: transitive
     description:
