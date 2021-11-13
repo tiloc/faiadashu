@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
@@ -25,7 +27,7 @@ class QuestionResponseItemFillerState
 
   late final QuestionItemModel questionResponseItemModel;
 
-  List<QuestionnaireAnswerFiller> _answerFillers = [];
+  final _answerFillers = LinkedHashMap<String, QuestionnaireAnswerFiller>();
 
   late final FocusNode _skipSwitchFocusNode;
 
@@ -42,7 +44,7 @@ class QuestionResponseItemFillerState
       debugLabel: 'SkipSwitch ${responseItemModel.nodeUid}',
     );
 
-    _createAnswerFillers();
+    _initAnswerFillers();
   }
 
   @override
@@ -51,13 +53,28 @@ class QuestionResponseItemFillerState
     super.dispose();
   }
 
-  void _createAnswerFillers() {
+  void _initAnswerFillers() {
     final fillableAnswerModels = questionResponseItemModel.fillableAnswerModels;
-    _answerFillers = fillableAnswerModels
-        .map<QuestionnaireAnswerFiller>(
-          (am) => questionnaireTheme.createAnswerFiller(this, am),
-        )
-        .toList();
+    for (final answerModel in fillableAnswerModels) {
+      _answerFillers[answerModel.nodeUid] =
+          questionnaireTheme.createAnswerFiller(
+        this,
+        answerModel,
+        key: ValueKey<String>('answer-filler-${answerModel.nodeUid}'),
+      );
+    }
+  }
+
+  QuestionnaireAnswerFiller? _removeAnswerFiller(AnswerModel answerModel) {
+    return _answerFillers.remove(answerModel.nodeUid);
+  }
+
+  void _addAnswerFiller(AnswerModel answerModel) {
+    _answerFillers[answerModel.nodeUid] = questionnaireTheme.createAnswerFiller(
+      this,
+      answerModel,
+      key: ValueKey<String>('answer-filler-${answerModel.nodeUid}'),
+    );
   }
 
   void _setDataAbsentReason(Code? dataAbsentReason) {
@@ -140,7 +157,7 @@ class QuestionResponseItemFillerState
     final hasMoreThanOneAnswer = _answerFillers.length > 1;
 
     final decoratedAnswerFillers = isRepeating
-        ? _answerFillers.map<Widget>(
+        ? _answerFillers.values.map<Widget>(
             (answerFiller) => questionnaireTheme.decorateRepeatingAnswer(
               context,
               answerFiller,
@@ -149,13 +166,17 @@ class QuestionResponseItemFillerState
                       setState(() {
                         questionResponseItemModel
                             .removeAnswerModel(answerFiller.answerModel);
-                        _createAnswerFillers();
+                        final removedAnswerFiller =
+                            _removeAnswerFiller(answerFiller.answerModel);
+                        _qrimLogger.debug(
+                          'Removed answerfiller: $removedAnswerFiller',
+                        );
                       });
                     }
                   : null,
             ),
           )
-        : _answerFillers;
+        : _answerFillers.values;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -173,8 +194,9 @@ class QuestionResponseItemFillerState
             (!questionResponseItemModel.latestAnswerModel.isUnanswered)
                 ? () {
                     setState(() {
-                      questionResponseItemModel.addAnswerModel();
-                      _createAnswerFillers();
+                      final newAnswerModel =
+                          questionResponseItemModel.addAnswerModel();
+                      _addAnswerFiller(newAnswerModel);
                     });
                   }
                 : null,
