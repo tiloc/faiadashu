@@ -136,13 +136,34 @@ class QuestionResponseItemFillerState
   Widget _buildAnswerFillers(BuildContext context) {
     final canSkipQuestions = questionnaireTheme.canSkipQuestions;
 
-    // TODO(tiloc) show a list of answers, and buttons to add/remove if repeat
+    final isRepeating = widget.questionnaireItemModel.isRepeating;
+    final hasMoreThanOneAnswer = _answerFillers.length > 1;
+
+    final decoratedAnswerFillers = isRepeating
+        ? _answerFillers.map<Widget>(
+            (answerFiller) => questionnaireTheme.decorateRepeatingAnswer(
+              context,
+              answerFiller,
+              hasMoreThanOneAnswer
+                  ? () {
+                      setState(() {
+                        questionResponseItemModel
+                            .removeAnswerModel(answerFiller.answerModel);
+                        _createAnswerFillers();
+                      });
+                    }
+                  : null,
+            ),
+          )
+        : _answerFillers;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (!questionResponseItemModel.isAskedButDeclined) ..._answerFillers,
-        if (widget.questionnaireItemModel.isRepeating &&
+        if (!questionResponseItemModel.isAskedButDeclined)
+          ...decoratedAnswerFillers,
+        if (isRepeating &&
             widget.responseItemModel.questionnaireResponseModel
                     .responseStatus ==
                 QuestionnaireResponseStatus.in_progress)

@@ -653,6 +653,12 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   /// Add an [AnswerModel] to the list of known [AnswerModel]s.
   void addAnswerModel(AnswerModel answerModel) {
     _answerModels[answerModel.nodeUid] = answerModel;
+    nextGeneration(notifyListeners: false);
+  }
+
+  void removeAnswerModel(AnswerModel answerModel) {
+    _answerModels.remove(answerModel.nodeUid);
+    nextGeneration(notifyListeners: false);
   }
 
   /// Returns whether the questionnaire meets all completeness criteria.

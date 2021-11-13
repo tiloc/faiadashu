@@ -170,6 +170,10 @@ class QuestionItemModel extends ResponseItemModel {
     return newAnswerModel;
   }
 
+  void removeAnswerModel(AnswerModel answerModel) {
+    questionnaireResponseModel.removeAnswerModel(answerModel);
+  }
+
   /// Returns the [AnswerModel] which has been added last.
   AnswerModel get latestAnswerModel {
     _ensureAnswerModel();

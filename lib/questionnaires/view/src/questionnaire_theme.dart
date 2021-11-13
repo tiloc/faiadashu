@@ -125,6 +125,27 @@ class QuestionnaireTheme {
     return const InputDecoration(filled: true);
   }
 
+  /// Decorate a [QuestionnaireAnswerFiller] with UI elements.
+  ///
+  ///
+  Widget decorateRepeatingAnswer(
+    BuildContext context,
+    QuestionnaireAnswerFiller answerFiller,
+    VoidCallback? removeAnswerCallback, {
+    Key? key,
+  }) {
+    return Row(
+      children: [
+        Expanded(child: answerFiller),
+        IconButton(
+          onPressed:
+              (removeAnswerCallback != null) ? removeAnswerCallback : null,
+          icon: const Icon(Icons.delete),
+        )
+      ],
+    );
+  }
+
   /// Build a UI element to add another answer to a repeating item
   ///
   /// Will be disabled if [callback] is null.
