@@ -13,6 +13,8 @@
 model creation to populate the presentation model, and it is created by the aggregator from the presentation model.
 But it is not used in between anymore. This is resolving a lot of inconsistencies and uncertainties.
 
+* QuestionnaireModel is no longer a QuestionnaireItemModel.
+    
 > You should not experience any breakage if you are merely using the questionnaire filler components.
 > You will see numerous API changes which will require fixes if you have forked/modified.
 
