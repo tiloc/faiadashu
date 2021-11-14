@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
@@ -27,7 +25,7 @@ class QuestionResponseItemFillerState
 
   late final QuestionItemModel questionResponseItemModel;
 
-  final _answerFillers = LinkedHashMap<String, QuestionnaireAnswerFiller>();
+  final _answerFillers = <String, QuestionnaireAnswerFiller>{};
 
   late final FocusNode _skipSwitchFocusNode;
 

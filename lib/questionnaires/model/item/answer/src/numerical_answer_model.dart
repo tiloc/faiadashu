@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:fhir/r4.dart';
 import 'package:intl/intl.dart';
 
@@ -32,7 +30,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
   int get maxDecimal => _maxDecimal;
   NumberFormat get numberFormat => _numberFormat;
 
-  late final LinkedHashMap<String, Coding> _units;
+  late final Map<String, Coding> _units;
 
   bool get hasUnit => value?.hasUnit ?? false;
 
@@ -138,8 +136,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
     ); // TODO: toString or toLanguageTag?
 
     final unit = qi.unit;
-    // ignore: prefer_collection_literals
-    _units = LinkedHashMap<String, Coding>();
+    _units = <String, Coding>{};
     final unitsUri = qi.extension_
         ?.extensionOrNull(
           'http://hl7.org/fhir/StructureDefinition/questionnaire-unitValueSet',

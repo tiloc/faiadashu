@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:fhir/r4.dart';
 
 import '../../../fhir_types/fhir_types.dart';
@@ -19,17 +17,16 @@ import '../../questionnaires.dart';
 ///
 /// Responses and all dynamic behaviors are modeled through [QuestionnaireResponseModel].
 ///
-class QuestionnaireModel /*extends QuestionnaireItemModel*/ {
+class QuestionnaireModel {
   /// The FHIR [Questionnaire]
   final Questionnaire questionnaire;
 
   // OPTIMIZE: Can I get rid of _cachedItems because of _orderedItems?
+  // Careful: _buildOrderedItems uses both to ensure the proper order of items!
 
   /// Maps linkId to [QuestionnaireItemModel]
-  final Map<String, QuestionnaireItemModel> _cachedItems = {};
-
-  final LinkedHashMap<String, QuestionnaireItemModel> _orderedItems =
-      LinkedHashMap<String, QuestionnaireItemModel>();
+  final _cachedItems = <String, QuestionnaireItemModel>{};
+  final _orderedItems = <String, QuestionnaireItemModel>{};
 
   /// Direct access to [FhirResourceProvider]s for special use-cases.
   ///
@@ -90,12 +87,11 @@ class QuestionnaireModel /*extends QuestionnaireItemModel*/ {
       .where((qim) => qim.parent == null)
       .toList(growable: false);
 
-  LinkedHashMap<String, QuestionnaireItemModel> _addChildren(
+  Map<String, QuestionnaireItemModel> _addChildren(
     QuestionnaireItemModel qim,
   ) {
     _logger.trace('_addChildren $qim');
-    final LinkedHashMap<String, QuestionnaireItemModel> itemModelMap =
-        LinkedHashMap<String, QuestionnaireItemModel>();
+    final itemModelMap = <String, QuestionnaireItemModel>{};
     if (itemModelMap.containsKey(qim.linkId)) {
       throw QuestionnaireFormatException(
         'Duplicate linkId: ${qim.linkId}',

@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
 
@@ -10,12 +8,10 @@ import '../../../model.dart';
 
 /// Model answers which are [Coding]s.
 class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
-  // ignore: prefer_collection_literals
-  final _answerOptions = LinkedHashMap<String, QuestionnaireAnswerOption>();
+  final _answerOptions = <String, QuestionnaireAnswerOption>{};
   static final _logger = Logger(CodingAnswerModel);
 
-  LinkedHashMap<String, QuestionnaireAnswerOption> get answerOptions =>
-      _answerOptions;
+  Map<String, QuestionnaireAnswerOption> get answerOptions => _answerOptions;
 
   static const openChoiceOther = 'open-choice-other';
 

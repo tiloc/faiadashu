@@ -1,4 +1,3 @@
-import 'dart:collection';
 import 'dart:ui';
 
 import 'package:collection/collection.dart';
@@ -26,8 +25,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
   final List<FillerItemModel> _fillerItems = [];
 
-  // ignore: prefer_collection_literals
-  final _answerModels = LinkedHashMap<String, AnswerModel>();
+  final _answerModels = <String, AnswerModel>{};
 
   // TODO: Clarify item level variables vs. questionnaire level.
 
