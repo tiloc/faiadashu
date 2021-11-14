@@ -91,11 +91,9 @@ class _TotalScoreItemState extends State<TotalScoreItem> {
       orElse: () => _nullExtension,
     );
 
-    if (matchExtension == _nullExtension) {
-      return null;
-    } else {
-      return matchExtension!.extension_!.extensionOrNull('value')!.valueString;
-    }
+    return (matchExtension == _nullExtension)
+        ? null
+        : matchExtension!.extension_!.extensionOrNull('value')!.valueString;
   }
 
   @override
@@ -104,6 +102,7 @@ class _TotalScoreItemState extends State<TotalScoreItem> {
       final score = calcResult?.value?.round();
       final scoreText = score?.toString() ?? AnswerModel.nullText;
       final feedback = findDanishFeedback(score);
+
       return Center(
         child: Column(
           children: [

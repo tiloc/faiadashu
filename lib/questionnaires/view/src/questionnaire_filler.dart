@@ -49,6 +49,7 @@ class QuestionnaireFiller extends StatefulWidget {
     final result =
         context.dependOnInheritedWidgetOfExactType<QuestionnaireFillerData>();
     assert(result != null, 'No QuestionnaireFillerData found in context');
+
     return result!;
   }
 
@@ -116,6 +117,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
   @override
   Widget build(BuildContext context) {
     _logger.trace('Enter build()');
+
     return FutureBuilder<QuestionnaireResponseModel>(
       future: builderFuture,
       builder: (context, snapshot) {
@@ -132,6 +134,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
           case ConnectionState.done:
             if (snapshot.hasError) {
               _logger.warn('FutureBuilder hasError', error: snapshot.error);
+
               return QuestionnaireLoadingIndicator(snapshot);
             }
             if (snapshot.hasData) {
@@ -158,6 +161,7 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
                   questionnaireTheme: widget.questionnaireTheme,
                 );
               }
+
               return _questionnaireFillerData!;
             }
             throw StateError(
@@ -261,6 +265,7 @@ class QuestionnaireFillerData extends InheritedWidget {
   bool updateShouldNotify(QuestionnaireFillerData oldWidget) {
     final shouldNotify = oldWidget._generation != _generation;
     _logger.debug('updateShouldNotify: $shouldNotify');
+
     return shouldNotify;
   }
 }

@@ -103,7 +103,7 @@ class StringAnswerModel extends AnswerModel<String, String> {
             FhirExtension(
               url: dataAbsentReasonExtensionUrl,
               valueCode: dataAbsentReasonAsTextCode,
-            )
+            ),
           ]
         : null;
 
@@ -125,14 +125,10 @@ class StringAnswerModel extends AnswerModel<String, String> {
   @override
   QuestionnaireErrorFlag? get isComplete {
     final valid = validateInput(value);
-    if (valid == null) {
-      return null;
-    } else {
-      return QuestionnaireErrorFlag(
-        responseItemModel.nodeUid,
-        errorText: valid,
-      );
-    }
+
+    return valid == null
+        ? null
+        : QuestionnaireErrorFlag(responseItemModel.nodeUid, errorText: valid);
   }
 
   @override
@@ -142,6 +138,7 @@ class StringAnswerModel extends AnswerModel<String, String> {
   void populateFromExpression(dynamic evaluationResult) {
     if (evaluationResult == null) {
       value = null;
+
       return;
     }
 

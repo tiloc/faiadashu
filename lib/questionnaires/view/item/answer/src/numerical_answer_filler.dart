@@ -40,45 +40,43 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
   }
 
   Widget _buildDropDownFromUnits(BuildContext context) {
-    if (answerModel.hasSingleUnitChoice) {
-      return Container(
-        alignment: Alignment.topLeft,
-        padding: const EdgeInsets.only(left: 8, top: 10),
-        width: 96,
-        child: Text(
-          answerModel.unitChoices.first.localizedDisplay(locale),
-          style: Theme.of(context).textTheme.subtitle1,
-        ),
-      );
-    } else {
-      return Container(
-        padding: const EdgeInsets.only(left: 8),
-        width: 96,
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<String>(
-            value: answerModel.keyOfUnit,
-            hint: const NullDashText(),
-            onChanged: (answerModel.isEnabled)
-                ? (String? newValue) {
-                    value = answerModel.copyWithUnit(newValue);
-                  }
-                : null,
-            items: [
-              const DropdownMenuItem<String>(
-                child: NullDashText(),
+    const unitWidth = 96.0;
+
+    return answerModel.hasSingleUnitChoice
+        ? Container(
+            alignment: Alignment.topLeft,
+            padding: const EdgeInsets.only(left: 8, top: 10),
+            width: unitWidth,
+            child: Text(
+              answerModel.unitChoices.first.localizedDisplay(locale),
+              style: Theme.of(context).textTheme.subtitle1,
+            ),
+          )
+        : Container(
+            padding: const EdgeInsets.only(left: 8),
+            width: unitWidth,
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: answerModel.keyOfUnit,
+                hint: const NullDashText(),
+                onChanged: (answerModel.isEnabled)
+                    ? (String? newValue) {
+                        value = answerModel.copyWithUnit(newValue);
+                      }
+                    : null,
+                items: [
+                  const DropdownMenuItem<String>(child: NullDashText()),
+                  ...answerModel.unitChoices
+                      .map<DropdownMenuItem<String>>((Coding value) {
+                    return DropdownMenuItem<String>(
+                      value: answerModel.keyForUnitChoice(value),
+                      child: Text(value.localizedDisplay(locale)),
+                    );
+                  }).toList(),
+                ],
               ),
-              ...answerModel.unitChoices
-                  .map<DropdownMenuItem<String>>((Coding value) {
-                return DropdownMenuItem<String>(
-                  value: answerModel.keyForUnitChoice(value),
-                  child: Text(value.localizedDisplay(locale)),
-                );
-              }).toList()
-            ],
-          ),
-        ),
-      );
-    }
+            ),
+          );
   }
 
   @override
@@ -96,6 +94,8 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
       );
     }
 
+    const averageDivisor = 2.0;
+
     return answerModel.isSliding
         ? Slider(
             focusNode: firstFocusNode,
@@ -104,7 +104,8 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
             divisions: answerModel.sliderDivisions,
             value: (value != null)
                 ? value!.value!.value!
-                : (answerModel.maxValue - answerModel.minValue) / 2.0,
+                : (answerModel.maxValue - answerModel.minValue) /
+                    averageDivisor,
             label: answerModel.display,
             onChanged: answerModel.isEnabled
                 ? (sliderValue) {

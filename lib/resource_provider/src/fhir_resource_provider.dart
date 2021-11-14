@@ -30,6 +30,7 @@ abstract class FhirResourceProvider {
 
   Future<Resource?> getAsyncResource(String uri) async {
     await init();
+
     return getResource(uri);
   }
 
@@ -65,6 +66,7 @@ class RegistryFhirResourceProvider extends FhirResourceProvider {
         return resource;
       }
     }
+
     return null;
   }
 
@@ -76,6 +78,7 @@ class RegistryFhirResourceProvider extends FhirResourceProvider {
         return resourceProvider;
       }
     }
+
     return null;
   }
 }
@@ -110,6 +113,7 @@ class AssetResourceProvider extends FhirResourceProvider {
   @override
   Resource? getResource(String uri) {
     _logger.debug('getResource $uri from: ${resources.keys}');
+
     return resources.containsKey(uri) ? resources[uri] : null;
   }
 

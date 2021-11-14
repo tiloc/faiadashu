@@ -65,6 +65,7 @@ class _QuestionnaireFillerProgressBarState
                 height: height,
                 color: widget.unansweredColor,
               );
+
         return Expanded(child: box);
       }).toList(growable: false),
     );

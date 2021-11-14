@@ -112,6 +112,7 @@ class QuestionnaireModel {
     final questionnaireItems = questionnaire.item;
     if (questionnaireItems == null) {
       _logger.warn('Questionnaire has no items');
+
       return;
     }
 

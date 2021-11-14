@@ -75,6 +75,7 @@ class QuestionItemModel extends ResponseItemModel {
   @override
   bool get isInvalid {
     _qrimLogger.trace('isInvalid $nodeUid');
+
     return dataAbsentReason == dataAbsentReasonAsTextCode;
   }
 
@@ -167,6 +168,7 @@ class QuestionItemModel extends ResponseItemModel {
   AnswerModel addAnswerModel() {
     final newAnswerModel = _createAnswerModel();
     questionnaireResponseModel.addAnswerModel(newAnswerModel);
+
     return newAnswerModel;
   }
 
@@ -199,6 +201,7 @@ class QuestionItemModel extends ResponseItemModel {
     _ensureAnswerModel();
 
     final latestAnswerModel = this.latestAnswerModel;
+
     return answerModels.where((am) => am.isAnswered || am == latestAnswerModel);
   }
 
@@ -239,6 +242,7 @@ class QuestionItemModel extends ResponseItemModel {
         // Throwing an exception here would lead to breakage of filler.
         answerModel = UnsupportedAnswerModel(this);
     }
+
     return answerModel;
   }
 
@@ -310,6 +314,7 @@ class QuestionItemModel extends ResponseItemModel {
         .where((qim) => qim.isAnswerable)
         .toList()
         .indexOf(this);
+
     return (thisQuestionIndex != -1) ? thisQuestionIndex + 1 : null;
   }
 }

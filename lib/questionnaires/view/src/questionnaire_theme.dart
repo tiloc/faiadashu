@@ -109,6 +109,7 @@ class QuestionnaireTheme {
       }
     } catch (exception) {
       _logger.warn('Cannot create answer filler:', error: exception);
+
       return BrokenAnswerFiller(
         responseFiller,
         answerModel,
@@ -141,7 +142,7 @@ class QuestionnaireTheme {
           onPressed:
               (removeAnswerCallback != null) ? removeAnswerCallback : null,
           icon: const Icon(Icons.delete),
-        )
+        ),
       ],
     );
   }

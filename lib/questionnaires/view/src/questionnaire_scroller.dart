@@ -96,6 +96,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
       _logger.info(
         'Trying to scroll before QuestionnaireModel is loaded. Ignoring.',
       );
+
       return;
     }
 
@@ -106,6 +107,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
       _logger.warn(
         'Error Flag with invalid responseUId: ${errorFlag.nodeUid}',
       );
+
       return;
     }
 
@@ -120,6 +122,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
       _logger.info(
         'Trying to scroll before ListScrollController is attached. Ignoring.',
       );
+
       return;
     }
 
@@ -282,6 +285,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
 
     if (isItemVisible) {
       _requestFocus();
+
       return;
     }
 
@@ -346,7 +350,7 @@ class QuestionnaireScrollerPage extends QuestionnaireScroller {
     List<Widget>? backMatter = const [
       SizedBox(
         height: 80,
-      )
+      ),
     ],
     List<Aggregator<dynamic>>? aggregators,
     void Function(BuildContext context, Uri url)? onLinkTap,

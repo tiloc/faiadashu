@@ -20,6 +20,7 @@ extension FDashQuestionnaireAnswerOptionExtensions
         this,
       );
     }
+
     return valueString ?? valueCoding!.code.toString();
   }
 

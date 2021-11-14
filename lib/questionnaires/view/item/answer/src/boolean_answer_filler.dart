@@ -51,7 +51,7 @@ class _BooleanItemState extends QuestionnaireAnswerFillerState<Boolean,
                 .textTheme
                 .caption!
                 .copyWith(color: Theme.of(context).errorColor),
-          )
+          ),
       ],
     );
   }

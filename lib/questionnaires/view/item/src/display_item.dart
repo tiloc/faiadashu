@@ -38,7 +38,7 @@ class _DisplayItemState extends QuestionnaireItemFillerState<DisplayItem> {
                         if (titleWidget != null) titleWidget,
                         const SizedBox(
                           height: 16.0,
-                        )
+                        ),
                       ],
                     )
                   : const SizedBox(),

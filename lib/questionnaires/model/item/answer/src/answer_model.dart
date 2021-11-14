@@ -125,6 +125,7 @@ abstract class AnswerModel<I, V> extends ResponseNode {
   @override
   String calculateNodeUid() {
     _uidCounter++;
+
     return '${parentNode?.nodeUid}/$_uidCounter';
   }
 }

@@ -16,6 +16,7 @@ class QuestionnaireInformationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final defaultTextStyle = Theme.of(context).textTheme.subtitle1;
+
     return Column(
       children: [
         HTML.toRichText(

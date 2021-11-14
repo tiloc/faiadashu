@@ -105,9 +105,7 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
   void _updateEnabledByEnableWhen() {
     _fimLogger.trace('Enter _updateEnabledByEnableWhen()');
 
-    bool anyTrigger = false;
-    int allTriggered = 0;
-    int allCount = 0;
+    final enableWhenTrigger = _EnableWhenTrigger();
 
     questionnaireItemModel.forEnableWhens((qew) {
       // TODO: implement the following rule: If enableWhen logic depends on an item that is disabled, the logic should proceed as though the item is not valued - even if a default value or other value might be retained in memory in the event of the item being re-enabled.
@@ -119,75 +117,20 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
         );
       }
 
-      allCount++;
+      enableWhenTrigger.increaseAllConditionCount();
       switch (qew.operator_) {
         case QuestionnaireEnableWhenOperator.exists:
-          if (fromLinkId(qew.question!).isAnswered ==
-              qew.answerBoolean!.value) {
-            anyTrigger = true;
-            allTriggered++;
-          }
+          _evaluateExistsOperator(qew, enableWhenTrigger);
           break;
         case QuestionnaireEnableWhenOperator.eq:
         case QuestionnaireEnableWhenOperator.ne:
-          final question = fromLinkId(questionLinkId);
-          if (question is QuestionItemModel) {
-            final firstAnswer =
-                (fromLinkId(questionLinkId) as QuestionItemModel)
-                    .answeredAnswerModels
-                    .firstOrNull;
-
-            if (firstAnswer == null) {
-              // null equals nothing
-              if (qew.operator_ == QuestionnaireEnableWhenOperator.ne) {
-                anyTrigger = true;
-                allTriggered++;
-              }
-            } else if (firstAnswer is CodingAnswerModel) {
-              final responseCoding = firstAnswer.value?.coding?.firstOrNull;
-
-              // TODO: More sophistication- System, cardinality, etc.
-              if (responseCoding?.code == qew.answerCoding?.code) {
-                _fimLogger.debug(
-                  'enableWhen: $responseCoding == ${qew.answerCoding}',
-                );
-                if (qew.operator_ == QuestionnaireEnableWhenOperator.eq) {
-                  anyTrigger = true;
-                  allTriggered++;
-                }
-              } else {
-                _fimLogger.debug(
-                  'enableWhen: $responseCoding != ${qew.answerCoding}',
-                );
-                if (qew.operator_ == QuestionnaireEnableWhenOperator.ne) {
-                  anyTrigger = true;
-                  allTriggered++;
-                }
-              }
-            } else {
-              _fimLogger.warn(
-                'Unsupported: Item with linkId is not a code question: $questionLinkId.',
-              );
-              // Err on the side of caution: Enable fields when enableWhen cannot be evaluated.
-              // See http://hl7.org/fhir/uv/sdc/2019May/expressions.html#missing-information for specification
-              anyTrigger = true;
-              allTriggered++;
-            }
-          } else {
-            _fimLogger
-                .warn('linkId refers to non-question item: $questionLinkId.');
-            // Err on the side of caution: Enable fields when enableWhen cannot be evaluated.
-            // See http://hl7.org/fhir/uv/sdc/2019May/expressions.html#missing-information for specification
-            anyTrigger = true;
-            allTriggered++;
-          }
+          _evaluateEqualityOperator(questionLinkId, qew, enableWhenTrigger);
           break;
         default:
           _fimLogger.warn('Unsupported operator: ${qew.operator_}.');
           // Err on the side of caution: Enable fields when enableWhen cannot be evaluated.
           // See http://hl7.org/fhir/uv/sdc/2019May/expressions.html#missing-information for specification
-          anyTrigger = true;
-          allTriggered++;
+          enableWhenTrigger.trigger();
       }
     });
 
@@ -195,12 +138,12 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
     switch (questionnaireItem.enableBehavior) {
       case QuestionnaireItemEnableBehavior.any:
       case null:
-        if (!anyTrigger) {
+        if (!enableWhenTrigger.anyTriggered) {
           _disableWithChildren();
         }
         break;
       case QuestionnaireItemEnableBehavior.all:
-        if (allCount != allTriggered) {
+        if (!enableWhenTrigger.allTriggered) {
           _disableWithChildren();
         }
         break;
@@ -209,6 +152,61 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
           'enableWhen with unknown enableBehavior: ${questionnaireItem.enableBehavior}',
           questionnaireItem,
         );
+    }
+  }
+
+  void _evaluateEqualityOperator(String questionLinkId,
+      QuestionnaireEnableWhen qew, _EnableWhenTrigger enableWhenTrigger) {
+    final question = fromLinkId(questionLinkId);
+    if (question is QuestionItemModel) {
+      final firstAnswer = (fromLinkId(questionLinkId) as QuestionItemModel)
+          .answeredAnswerModels
+          .firstOrNull;
+
+      if (firstAnswer == null) {
+        // null equals nothing
+        if (qew.operator_ == QuestionnaireEnableWhenOperator.ne) {
+          enableWhenTrigger.trigger();
+        }
+      } else if (firstAnswer is CodingAnswerModel) {
+        final responseCoding = firstAnswer.value?.coding?.firstOrNull;
+
+        // TODO: More sophistication- System, cardinality, etc.
+        if (responseCoding?.code == qew.answerCoding?.code) {
+          _fimLogger.debug(
+            'enableWhen: $responseCoding == ${qew.answerCoding}',
+          );
+          if (qew.operator_ == QuestionnaireEnableWhenOperator.eq) {
+            enableWhenTrigger.trigger();
+          }
+        } else {
+          _fimLogger.debug(
+            'enableWhen: $responseCoding != ${qew.answerCoding}',
+          );
+          if (qew.operator_ == QuestionnaireEnableWhenOperator.ne) {
+            enableWhenTrigger.trigger();
+          }
+        }
+      } else {
+        _fimLogger.warn(
+          'Unsupported: Item with linkId is not a code question: $questionLinkId.',
+        );
+        // Err on the side of caution: Enable fields when enableWhen cannot be evaluated.
+        // See http://hl7.org/fhir/uv/sdc/2019May/expressions.html#missing-information for specification
+        enableWhenTrigger.trigger();
+      }
+    } else {
+      _fimLogger.warn('linkId refers to non-question item: $questionLinkId.');
+      // Err on the side of caution: Enable fields when enableWhen cannot be evaluated.
+      // See http://hl7.org/fhir/uv/sdc/2019May/expressions.html#missing-information for specification
+      enableWhenTrigger.trigger();
+    }
+  }
+
+  void _evaluateExistsOperator(
+      QuestionnaireEnableWhen qew, _EnableWhenTrigger enableWhenTrigger) {
+    if (fromLinkId(qew.question!).isAnswered == qew.answerBoolean!.value) {
+      enableWhenTrigger.trigger();
     }
   }
 
@@ -239,7 +237,7 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
           MapEntry<String, dynamic>(
             '%patient',
             questionnaireResponseModel.launchContext.patient?.toJson(),
-          )
+          ),
         ],
       );
     }
@@ -294,9 +292,28 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
       _fimLogger.warn(
         'Questionnaire design issue: "$fhirPathExpression" at $nodeUid results in $fhirPathResult. Expected a bool.',
       );
+
       return fhirPathResult.first != null;
     } else {
       return fhirPathResult.first as bool;
     }
   }
+}
+
+class _EnableWhenTrigger {
+  int _allCount = 0;
+  bool _anyTriggered = false;
+  int _allTriggered = 0;
+
+  void increaseAllConditionCount() {
+    _allCount++;
+  }
+
+  void trigger() {
+    _anyTriggered = true;
+    _allTriggered++;
+  }
+
+  bool get anyTriggered => _anyTriggered;
+  bool get allTriggered => _allTriggered == _allCount;
 }

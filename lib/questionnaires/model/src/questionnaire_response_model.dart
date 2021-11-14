@@ -87,7 +87,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
           [
             TotalScoreAggregator(),
             NarrativeAggregator(),
-            QuestionnaireResponseAggregator()
+            QuestionnaireResponseAggregator(),
           ],
       launchContext: launchContext,
     );
@@ -292,6 +292,8 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     if (_aggregators == null) {
       throw StateError('Aggregators have not been specified in constructor.');
     }
+
+    // FIXME: better handle non-existent aggregator of requested type.
     return (_aggregators?.firstWhere((aggregator) => aggregator is T) as T?)!;
   }
 
@@ -496,6 +498,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
       _logger.debug(
         'updateEnabledItems: already updated during this generation',
       );
+
       return;
     }
 
@@ -509,6 +512,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
       _logger.debug(
         'updateEnabledItems: no conditionally enabled items',
       );
+
       return;
     }
 

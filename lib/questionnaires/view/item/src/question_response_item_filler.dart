@@ -88,6 +88,7 @@ class QuestionResponseItemFillerState
     _qrimLogger.trace(
       'build ${widget.responseItemModel.nodeUid} hidden: ${widget.responseItemModel.questionnaireItemModel.isHidden}, enabled: ${widget.responseItemModel.isEnabled}',
     );
+
     return (!widget.responseItemModel.questionnaireItemModel.isHidden)
         ? Focus(
             focusNode: focusNode,
@@ -122,7 +123,7 @@ class QuestionResponseItemFillerState
                                     Expanded(
                                       flex: 2,
                                       child: _buildAnswerFillers(context),
-                                    )
+                                    ),
                                   ],
                                 )
                               // Narrow, portrait screen: Use vertical layout
@@ -216,9 +217,9 @@ class QuestionResponseItemFillerState
                     value ? dataAbsentReasonAskedButDeclinedCode : null,
                   );
                 },
-              )
+              ),
             ],
-          )
+          ),
       ],
     );
   }

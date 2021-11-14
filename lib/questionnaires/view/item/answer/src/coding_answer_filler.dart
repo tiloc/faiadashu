@@ -44,11 +44,9 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
   @override
   Widget buildInputControl(BuildContext context) {
     try {
-      if (answerModel.isAutocomplete) {
-        return _buildAutocompleteAnswers(context);
-      } else {
-        return _buildChoiceAnswers(context);
-      }
+      return answerModel.isAutocomplete
+          ? _buildAutocompleteAnswers(context)
+          : _buildChoiceAnswers(context);
     } catch (exception) {
       return BrokenQuestionnaireItem.fromException(exception);
     }
@@ -56,7 +54,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
 
   Widget _buildChoiceAnswers(BuildContext context) {
     final isCheckBox = qi.isItemControl('check-box');
-    final isMultipleChoice = (qi.repeats?.value ?? isCheckBox) == true;
+    final isMultipleChoice = qi.repeats?.value ?? isCheckBox;
     final isShowingNull = questionnaireTheme.showNullAnswerOption;
 
     final choices = <Widget>[];
@@ -172,7 +170,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
                     Focus.of(context).requestFocus();
                     value = CodeableConcept(
                       coding: [
-                        Coding(code: Code(CodingAnswerModel.openChoiceOther))
+                        Coding(code: Code(CodingAnswerModel.openChoiceOther)),
                       ],
                       text: _otherChoiceController!.text,
                     );
@@ -186,7 +184,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
                     ? null
                     : CodeableConcept(
                         coding: [
-                          Coding(code: Code(CodingAnswerModel.openChoiceOther))
+                          Coding(code: Code(CodingAnswerModel.openChoiceOther)),
                         ],
                         text: _otherChoiceController!.text,
                       );
@@ -199,77 +197,18 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
       );
     }
 
-    if (answerModel.isHorizontal && MediaQuery.of(context).size.width > 750) {
-      // TODO: This should use LayoutBuilder
-      return Column(
-        // Horizontal layout
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Focus(
-            focusNode: firstFocusNode,
-            child: Card(
-              shape: (firstFocusNode.hasFocus)
-                  ? RoundedRectangleBorder(
-                      side: BorderSide(
-                        color: Theme.of(context).colorScheme.secondary,
-                        width: 2.0,
-                      ),
-                      borderRadius: BorderRadius.circular(4.0),
-                    )
-                  : null,
-              margin: const EdgeInsets.only(top: 8, bottom: 8),
-              child: Table(children: [TableRow(children: choices)]),
-            ),
-          ),
-          if (errorText != null)
-            Text(
-              errorText!,
-              style: Theme.of(context)
-                  .textTheme
-                  .caption!
-                  .copyWith(color: Theme.of(context).errorColor),
-            )
-        ],
-      );
-    } else {
-      // Vertical layout
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Focus(
-            focusNode: firstFocusNode,
-            child: Card(
-              shape: (firstFocusNode.hasFocus && answerModel.isEnabled)
-                  ? RoundedRectangleBorder(
-                      side: BorderSide(
-                        color: (errorText == null)
-                            ? Theme.of(context).colorScheme.secondary
-                            : Theme.of(context).colorScheme.error,
-                        width: 2.0,
-                      ),
-                      borderRadius: BorderRadius.circular(4.0),
-                    )
-                  : null,
-              margin: const EdgeInsets.only(top: 8, bottom: 8),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: choices,
-              ),
-            ),
-          ),
-          if (errorText != null)
-            Text(
-              errorText!,
-              style: Theme.of(context)
-                  .textTheme
-                  .caption!
-                  .copyWith(color: Theme.of(context).errorColor),
-            )
-        ],
-      );
-    }
+    return answerModel.isHorizontal && MediaQuery.of(context).size.width > 750
+        ? _HorizontalCodingChoices(
+            firstFocusNode: firstFocusNode,
+            choices: choices,
+            errorText: errorText,
+          )
+        : _VerticalCodingChoices(
+            firstFocusNode: firstFocusNode,
+            answerModel: answerModel,
+            errorText: errorText,
+            choices: choices,
+          );
   }
 
   Widget _buildAutocompleteAnswers(BuildContext context) {
@@ -282,6 +221,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
         if (textEditingValue.text.isEmpty) {
           return const Iterable<QuestionnaireAnswerOption>.empty();
         }
+
         return answerModel.answerOptions.values
             .where((QuestionnaireAnswerOption option) {
           return option
@@ -295,6 +235,107 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
               value = answerModel.fromChoiceString(selectedOption.optionCode);
             }
           : null,
+    );
+  }
+}
+
+class _VerticalCodingChoices extends StatelessWidget {
+  const _VerticalCodingChoices({
+    Key? key,
+    required this.firstFocusNode,
+    required this.answerModel,
+    required this.errorText,
+    required this.choices,
+  }) : super(key: key);
+
+  final FocusNode firstFocusNode;
+  final CodingAnswerModel answerModel;
+  final String? errorText;
+  final List<Widget> choices;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Focus(
+          focusNode: firstFocusNode,
+          child: Card(
+            shape: (firstFocusNode.hasFocus && answerModel.isEnabled)
+                ? RoundedRectangleBorder(
+                    side: BorderSide(
+                      color: (errorText == null)
+                          ? Theme.of(context).colorScheme.secondary
+                          : Theme.of(context).colorScheme.error,
+                      width: 2.0,
+                    ),
+                    borderRadius: BorderRadius.circular(4.0),
+                  )
+                : null,
+            margin: const EdgeInsets.only(top: 8, bottom: 8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: choices,
+            ),
+          ),
+        ),
+        if (errorText != null)
+          Text(
+            errorText!,
+            style: Theme.of(context)
+                .textTheme
+                .caption!
+                .copyWith(color: Theme.of(context).errorColor),
+          ),
+      ],
+    );
+  }
+}
+
+class _HorizontalCodingChoices extends StatelessWidget {
+  const _HorizontalCodingChoices({
+    Key? key,
+    required this.firstFocusNode,
+    required this.choices,
+    required this.errorText,
+  }) : super(key: key);
+
+  final FocusNode firstFocusNode;
+  final List<Widget> choices;
+  final String? errorText;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Focus(
+          focusNode: firstFocusNode,
+          child: Card(
+            shape: (firstFocusNode.hasFocus)
+                ? RoundedRectangleBorder(
+                    side: BorderSide(
+                      color: Theme.of(context).colorScheme.secondary,
+                      width: 2.0,
+                    ),
+                    borderRadius: BorderRadius.circular(4.0),
+                  )
+                : null,
+            margin: const EdgeInsets.only(top: 8, bottom: 8),
+            child: Table(children: [TableRow(children: choices)]),
+          ),
+        ),
+        if (errorText != null)
+          Text(
+            errorText!,
+            style: Theme.of(context)
+                .textTheme
+                .caption!
+                .copyWith(color: Theme.of(context).errorColor),
+          ),
+      ],
     );
   }
 }

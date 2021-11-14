@@ -123,7 +123,7 @@ class _FhirDateTimePickerState extends State<FhirDateTimePicker> {
     final locale = widget.locale ?? Localizations.localeOf(context);
 
     // There is no Locale in initState.
-    if (_fieldInitialized == false) {
+    if (!_fieldInitialized) {
       _dateTimeFieldController.text = _dateTimeValue?.format(locale) ?? '';
       _fieldInitialized = true;
     }
@@ -156,7 +156,7 @@ class _FhirDateTimePickerState extends State<FhirDateTimePicker> {
               widget.onChanged?.call(null);
             },
             icon: const Icon(Icons.clear),
-          )
+          ),
       ],
     );
   }

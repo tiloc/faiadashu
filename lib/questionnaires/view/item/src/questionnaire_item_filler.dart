@@ -311,6 +311,7 @@ class QuestionnaireItemFillerTitleLeading extends StatelessWidget {
       if (itemImageWidget == null) {
         return null;
       }
+
       return QuestionnaireItemFillerTitleLeading._(itemImageWidget);
     }
   }

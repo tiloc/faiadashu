@@ -36,19 +36,22 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
       if (isExclusive(enabledCoding)) {
         _logger.debug('$checkboxValue isExclusive');
         // The newly enabled checkbox is exclusive, kill all others.
+
         return enabledCodeableConcept;
       } else {
         _logger.debug('$checkboxValue is not exclusive');
         // Kill all exclusive ones.
+
         return value.copyWith(
           coding: [
             ...value.coding!.whereNot((coding) => isExclusive(coding)),
-            enabledCoding
+            enabledCoding,
           ],
         );
       }
     } else {
       _logger.debug('$checkboxValue currently selected.');
+
       return CodeableConcept(coding: value.coding!..removeAt(entryIndex));
     }
   }
@@ -77,6 +80,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
 
     // TODO: Can it ever be harmful that this is only looking at the first coding?
     final coding = codings.firstOrNull;
+
     return choiceStringFromCoding(coding);
   }
 
@@ -91,6 +95,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
     if (codeableConcept == null) {
       return null;
     }
+
     return _choiceStringFromCodings(
       ArgumentError.checkNotNull(codeableConcept.coding),
     );
@@ -161,7 +166,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
           codingExtensionBuilder: (inCoding) =>
               _createOrdinalExtension(inCoding.extension_),
         ),
-      )
+      ),
     ]);
   }
 
@@ -303,7 +308,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
             QuestionnaireResponseAnswer(
               valueCoding: Coding(display: value!.text),
               item: items,
-            )
+            ),
           ]
         : value!.coding?.map<QuestionnaireResponseAnswer>((coding) {
             // Some answers may only be a display, not have a code
@@ -336,6 +341,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
     }
 
     final validationText = validateInput(value);
+
     return (validationText == null)
         ? null
         : QuestionnaireErrorFlag(

@@ -32,6 +32,7 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
   @override
   Widget build(BuildContext context) {
     final controller = PageController();
+
     return QuestionnaireFiller(
       locale: widget.locale ?? Localizations.localeOf(context),
       fhirResourceProvider: widget.fhirResourceProvider,
@@ -40,6 +41,7 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
       builder: (BuildContext context) {
         final questionnaireFiller = QuestionnaireFiller.of(context);
         final itemCount = questionnaireFiller.fillerItemModels.length;
+
         return widget.scaffoldBuilder.build(
           context,
           setStateCallback: (fn) => setState(fn),
@@ -80,6 +82,7 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
                             Widget? child,
                           ) {
                             final scoreString = value.value!.round().toString();
+
                             return AnimatedSwitcher(
                               duration: const Duration(milliseconds: 200),
                               child: Text(

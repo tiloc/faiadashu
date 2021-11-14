@@ -26,6 +26,7 @@ abstract class ResponseItemModel extends FillerItemModel {
     final returnValue = !(questionnaireItemModel.isReadOnly || !isEnabled);
 
     _rimLogger.debug('isAnswerable $nodeUid: $returnValue');
+
     return returnValue;
   }
 
@@ -51,7 +52,7 @@ abstract class ResponseItemModel extends FillerItemModel {
           nodeUid,
           errorText: lookupFDashLocalizations(questionnaireResponseModel.locale)
               .validatorRequiredItem,
-        )
+        ),
       ];
     }
 
@@ -60,7 +61,7 @@ abstract class ResponseItemModel extends FillerItemModel {
         QuestionnaireErrorFlag(
           nodeUid,
           errorText: questionnaireItemModel.constraintHuman,
-        )
+        ),
       ];
     }
 

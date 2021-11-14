@@ -84,6 +84,7 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
         builder: (context, snapshot) {
           var countString = '';
           if (snapshot.hasData) {
+            // FIXME: Add error handling (SDC Demo Survey is not showing count)
             final _questionnaireResponseModel = snapshot.data!;
             final _numberCompleted =
                 _questionnaireResponseModel.count((rim) => rim.isAnswered);
@@ -92,6 +93,7 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
             countString = 'Completed: $_numberCompleted / $_totalNumber '
                 '(${_percentPattern.format(_numberCompleted / _totalNumber)})';
           }
+
           return (widget.subtitle != null)
               ? Text('${widget.subtitle!}\n$countString')
               : Text(countString);
@@ -110,7 +112,12 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                 fhirResourceProvider: _questionnaireProvider,
                 launchContext: widget.launchContext,
                 locale: _locale,
-                aggregators: [NarrativeAggregator()],
+                aggregators: [
+                  NarrativeAggregator(),
+                  // FIXME: This is required because responseModel tries to update calculated expressions
+                  // Should there be a flag to disable dynamic behaviors in response model?
+                  QuestionnaireResponseAggregator()
+                ],
               );
               questionnaireResponseModel.populate(
                 widget.restoreResponseFunction.call(widget.questionnairePath),

@@ -224,29 +224,21 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
             FhirExtension(
               url: dataAbsentReasonExtensionUrl,
               valueCode: dataAbsentReasonAsTextCode,
-            )
+            ),
           ]
         : null;
 
-    Quantity? returnValue;
-
-    if (textInput.trim().isEmpty) {
-      returnValue = value?.copyWith(value: null);
-    } else {
-      if (value == null) {
-        returnValue = Quantity(
-          value: Decimal(numberFormat.parse(textInput)),
-          extension_: dataAbsentReasonExtension,
-        );
-      } else {
-        returnValue = value!.copyWith(
-          value: Decimal(numberFormat.parse(textInput)),
-          extension_: dataAbsentReasonExtension,
-        );
-      }
-    }
-
-    return returnValue;
+    return textInput.trim().isEmpty
+        ? value?.copyWith(value: null)
+        : value == null
+            ? Quantity(
+                value: Decimal(numberFormat.parse(textInput)),
+                extension_: dataAbsentReasonExtension,
+              )
+            : value!.copyWith(
+                value: Decimal(numberFormat.parse(textInput)),
+                extension_: dataAbsentReasonExtension,
+              );
   }
 
   @override
@@ -299,6 +291,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
   void populateFromExpression(dynamic evaluationResult) {
     if (evaluationResult == null) {
       value = null;
+
       return;
     }
 
@@ -323,7 +316,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
                   'http://hl7.org/fhir/StructureDefinition/questionnaire-unit',
                 ),
                 valueCoding: unitCoding,
-              )
+              ),
             ]
           : null,
     );

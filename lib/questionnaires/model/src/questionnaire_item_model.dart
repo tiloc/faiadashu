@@ -67,11 +67,10 @@ class QuestionnaireItemModel with Diagnosticable {
   /// All children below the current level as FHIR [QuestionnaireItem].
   /// Returns an empty list when there are no children.
   List<QuestionnaireItem> get childQuestionnaireItems {
-    if ((questionnaireItem.item == null) || (questionnaireItem.item!.isEmpty)) {
-      return <QuestionnaireItem>[];
-    } else {
-      return questionnaireItem.item!;
-    }
+    return ((questionnaireItem.item == null) ||
+            (questionnaireItem.item!.isEmpty))
+        ? <QuestionnaireItem>[]
+        : questionnaireItem.item!;
   }
 
   List<QuestionnaireItemModel> get children {
@@ -165,12 +164,13 @@ class QuestionnaireItemModel with Diagnosticable {
     if (questionnaireItem.extension_?.firstWhereOrNull((ext) {
           return {
             calculatedExpressionExtensionUrl,
-            'http://hl7.org/fhir/StructureDefinition/cqf-expression'
+            'http://hl7.org/fhir/StructureDefinition/cqf-expression',
           }.contains(ext.url?.value.toString());
         }) !=
         null) {
       return true;
     }
+
     return false;
   }
 

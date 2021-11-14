@@ -38,8 +38,10 @@ class ItemMediaImage extends StatelessWidget {
         ?.getImage(itemImageUri, width: width, height: height);
     if (itemImageWidget == null) {
       _logger.warn('Could not find image asset for $itemImageUri.');
+
       return null;
     }
+
     return ItemMediaImage._(itemImageWidget);
   }
 

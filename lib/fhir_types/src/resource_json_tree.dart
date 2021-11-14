@@ -47,6 +47,7 @@ class ResourceJsonTree extends StatefulWidget {
     } else {
       node = _JsonViewerGenericNode(nodeName, nodeValue);
     }
+
     return node;
   }
 
@@ -133,6 +134,7 @@ class _JsonViewerMapNode extends _JsonNode<Map<String, dynamic>> {
     nodeValue.forEach((k, v) {
       result.add(root.buildNode(this, k, v));
     });
+
     return result;
   }
 }
@@ -152,7 +154,7 @@ class _MapNodeState extends _JsonNodeState<_JsonViewerMapNode> {
           Text(
             widget.nodeName,
             style: Theme.of(context).textTheme.bodyText1,
-          )
+          ),
         ],
       ),
     );
@@ -165,7 +167,7 @@ class _MapNodeState extends _JsonNodeState<_JsonViewerMapNode> {
             child: Column(
               children: widget.buildChildren(),
             ),
-          )
+          ),
         ],
       );
     }
@@ -205,6 +207,7 @@ class _JsonViewerListNode extends _JsonNode<List<dynamic>> {
       result.add(root.buildNode(this, "[$i]", entry));
       i++;
     }
+
     return result;
   }
 }
@@ -249,7 +252,7 @@ class _JsonViewerListNodeState extends _JsonNodeState<_JsonViewerListNode> {
             child: Column(
               children: widget.buildChildren(),
             ),
-          )
+          ),
         ],
       );
     }
@@ -275,7 +278,7 @@ class _JsonViewerGenericNode extends StatelessWidget {
     } else {
       switch (nodeValue.runtimeType) {
         case bool:
-          color = (nodeValue as bool) == true
+          color = (nodeValue as bool)
               ? themeData.colorScheme.secondary
               : themeData.errorColor;
           break;

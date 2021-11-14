@@ -32,10 +32,12 @@ class _ProgressPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    const doublePi = pi + pi;
+
     canvas.drawArc(
       Offset.zero & Size(radius - strokeWidth, radius - strokeWidth),
       0,
-      2 * pi,
+      doublePi,
       false,
       _inactive,
     );
@@ -45,7 +47,7 @@ class _ProgressPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth;
 
-    final sweepAngle = 2 * pi / colors.length;
+    final sweepAngle = doublePi / colors.length;
 
     for (int i = 0; i < colors.length; i++) {
       final sweepColor = colors.elementAt(i);

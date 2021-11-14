@@ -44,6 +44,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
       // TODO: Group model should also check for whether any item in the group is answered.
       if (itemText != null) {
         div.write('<h2>$itemText</h2>');
+
         return true;
       } else {
         return false;
@@ -51,6 +52,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
     } else if (itemModel is DisplayItemModel) {
       if (itemText != null) {
         div.write('<h3>$itemText</h3>');
+
         return true;
       } else {
         return false;
@@ -143,6 +145,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
     );
     if (questionnaireResponseModel.generation == _generation) {
       _logger.debug('Regurgitating narrative generation $_generation');
+
       return _narrative;
     }
     // Manually invoke the update, because the order matters and enableWhen calcs need to come after answer value updates.
@@ -154,6 +157,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
     if (notifyListeners) {
       value = _narrative!;
     }
+
     return _narrative;
   }
 }

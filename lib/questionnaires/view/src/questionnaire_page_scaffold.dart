@@ -77,9 +77,9 @@ class DefaultQuestionnairePageScaffoldBuilder
                   setStateCallback.call(() {
                     Navigator.pop(context);
                   });
-                });
+                },);
               },
-            )
+            ),
           ],
         ),
       ),

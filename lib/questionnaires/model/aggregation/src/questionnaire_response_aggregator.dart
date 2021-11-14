@@ -73,7 +73,7 @@ class QuestionnaireResponseAggregator
               FhirExtension(
                 url: dataAbsentReasonExtensionUrl,
                 valueCode: dataAbsentReason,
-              )
+              ),
             ]
           : null,
       answer: answers,
@@ -91,15 +91,13 @@ class QuestionnaireResponseAggregator
 
     final nestedItems = _fromResponseItems(itemModel, responseStatus);
 
-    if (nestedItems != null) {
-      return QuestionnaireResponseItem(
-        linkId: itemModel.questionnaireItemModel.linkId,
-        text: itemModel.questionnaireItemModel.titleText,
-        item: nestedItems,
-      );
-    } else {
-      return null;
-    }
+    return (nestedItems != null)
+        ? QuestionnaireResponseItem(
+            linkId: itemModel.questionnaireItemModel.linkId,
+            text: itemModel.questionnaireItemModel.titleText,
+            item: nestedItems,
+          )
+        : null;
   }
 
   List<QuestionnaireResponseItem>? _fromResponseItems(
@@ -217,7 +215,7 @@ class QuestionnaireResponseAggregator
                   ),
                   valueString: questionnaireResponseModel
                       .questionnaireModel.questionnaire.title,
-                )
+                ),
               ],
             )
           : null,
@@ -226,6 +224,7 @@ class QuestionnaireResponseAggregator
     if (notifyListeners) {
       value = questionnaireResponse;
     }
+
     return questionnaireResponse;
   }
 }
