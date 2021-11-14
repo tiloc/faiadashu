@@ -63,6 +63,14 @@ class NarrativeAggregator extends Aggregator<Narrative> {
       throw ArgumentError('Expecting QuestionItemModel', 'itemModel');
     }
 
+    return _addQuestionItemToDiv(div, itemModel, itemText);
+  }
+
+  bool _addQuestionItemToDiv(
+    StringBuffer div,
+    QuestionItemModel itemModel,
+    String? itemText,
+  ) {
     if (itemModel.isUnanswered) {
       return false;
     }
