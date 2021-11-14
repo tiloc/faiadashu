@@ -155,8 +155,11 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
     }
   }
 
-  void _evaluateEqualityOperator(String questionLinkId,
-      QuestionnaireEnableWhen qew, _EnableWhenTrigger enableWhenTrigger) {
+  void _evaluateEqualityOperator(
+    String questionLinkId,
+    QuestionnaireEnableWhen qew,
+    _EnableWhenTrigger enableWhenTrigger,
+  ) {
     final question = fromLinkId(questionLinkId);
     if (question is QuestionItemModel) {
       final firstAnswer = (fromLinkId(questionLinkId) as QuestionItemModel)
@@ -204,7 +207,9 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
   }
 
   void _evaluateExistsOperator(
-      QuestionnaireEnableWhen qew, _EnableWhenTrigger enableWhenTrigger) {
+    QuestionnaireEnableWhen qew,
+    _EnableWhenTrigger enableWhenTrigger,
+  ) {
     if (fromLinkId(qew.question!).isAnswered == qew.answerBoolean!.value) {
       enableWhenTrigger.trigger();
     }
