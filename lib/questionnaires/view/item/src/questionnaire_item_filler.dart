@@ -304,7 +304,7 @@ class QuestionnaireItemFillerTitleLeading extends StatelessWidget {
 
       return QuestionnaireItemFillerTitleLeading._(leadingWidget);
     } else {
-      final itemImageWidget = CpgItemImage.fromQuestionnaireItem(
+      final itemImageWidget = ItemMediaImage.fromQuestionnaireItem(
         fillerItemModel.questionnaireItemModel,
         height: 24.0,
       );

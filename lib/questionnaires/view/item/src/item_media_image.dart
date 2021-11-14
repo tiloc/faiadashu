@@ -5,13 +5,13 @@ import '../../../../logging/logging.dart';
 import '../../../../resource_provider/resource_provider.dart';
 import '../../../model/model.dart';
 
-/// Image [Widget] for CPG itemImage extension
-class CpgItemImage extends StatelessWidget {
-  static final _logger = Logger(CpgItemImage);
+/// Image [Widget] for itemMedia extension
+class ItemMediaImage extends StatelessWidget {
+  static final _logger = Logger(ItemMediaImage);
 
   final Widget itemImageWidget;
 
-  const CpgItemImage._(this.itemImageWidget, {Key? key}) : super(key: key);
+  const ItemMediaImage._(this.itemImageWidget, {Key? key}) : super(key: key);
 
   /// Returns the itemImage [Widget] for a given [QuestionnaireItemModel].
   ///
@@ -24,7 +24,7 @@ class CpgItemImage extends StatelessWidget {
   }) {
     final itemImageUri = itemModel.questionnaireItem.extension_
         ?.extensionOrNull(
-          'http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-itemImage',
+          'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemMedia',
         )
         ?.valueAttachment
         ?.url
@@ -40,7 +40,7 @@ class CpgItemImage extends StatelessWidget {
       _logger.warn('Could not find image asset for $itemImageUri.');
       return null;
     }
-    return CpgItemImage._(itemImageWidget);
+    return ItemMediaImage._(itemImageWidget);
   }
 
   @override
