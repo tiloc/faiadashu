@@ -1,6 +1,11 @@
-// Going with 'part of' here. 'import' would be preferred, but would force me to
-// expose numerous internal methods to the public.
-part of 'questionnaire_item_model.dart';
+import 'dart:collection';
+
+import 'package:fhir/r4.dart';
+
+import '../../../fhir_types/fhir_types.dart';
+import '../../../logging/logging.dart';
+import '../../../resource_provider/resource_provider.dart';
+import '../../questionnaires.dart';
 
 /// Models a questionnaire.
 ///
@@ -14,7 +19,13 @@ part of 'questionnaire_item_model.dart';
 ///
 /// Responses and all dynamic behaviors are modeled through [QuestionnaireResponseModel].
 ///
-class QuestionnaireModel extends QuestionnaireItemModel {
+class QuestionnaireModel /*extends QuestionnaireItemModel*/ {
+  /// The FHIR [Questionnaire]
+  final Questionnaire questionnaire;
+
+  // OPTIMIZE: Can I get rid of _cachedItems because of _orderedItems?
+
+  /// Maps linkId to [QuestionnaireItemModel]
   final Map<String, QuestionnaireItemModel> _cachedItems = {};
 
   final LinkedHashMap<String, QuestionnaireItemModel> _orderedItems =
@@ -27,19 +38,9 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   static final _logger = Logger(QuestionnaireModel);
 
   QuestionnaireModel._({
-    required Questionnaire questionnaire,
+    required this.questionnaire,
     required this.fhirResourceProvider,
-  }) : super._(
-          questionnaire,
-          null,
-          ArgumentError.checkNotNull(questionnaire.item?.first),
-          ArgumentError.checkNotNull(questionnaire.item?.first.linkId),
-          null,
-          0,
-          0,
-        ) {
-    _questionnaireModel = this;
-    // TODO: If I cleanly split questionnaire / questionnaire item then this special handling can be eliminated
+  }) {
     _buildOrderedItems();
   }
 
@@ -75,8 +76,19 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     return questionnaireModel;
   }
 
+  String? get title {
+    final title = Xhtml.toXhtml(
+      questionnaire.title,
+      questionnaire.titleElement?.extension_,
+    );
+
+    return title;
+  }
+
   /// Returns the questionnaire items of this questionnaire.
-  List<QuestionnaireItemModel> get items => siblings;
+  List<QuestionnaireItemModel> get items => _orderedItems.values
+      .where((qim) => qim.parent == null)
+      .toList(growable: false);
 
   LinkedHashMap<String, QuestionnaireItemModel> _addChildren(
     QuestionnaireItemModel qim,
@@ -101,18 +113,18 @@ class QuestionnaireModel extends QuestionnaireItemModel {
   }
 
   void _buildOrderedItems() {
-    _orderedItems.addAll(_addChildren(this));
-    QuestionnaireItemModel currentSibling = this;
-    while (currentSibling.hasNextSibling) {
-      currentSibling = currentSibling.nextSibling;
-      if (_orderedItems.containsKey(currentSibling.linkId)) {
-        throw QuestionnaireFormatException(
-          'Duplicate linkId $linkId',
-          currentSibling,
-        );
-      } else {
-        _orderedItems.addAll(_addChildren(currentSibling));
-      }
+    final questionnaireItems = questionnaire.item;
+    if (questionnaireItems == null) {
+      _logger.warn('Questionnaire has no items');
+      return;
+    }
+
+    final topLevelItemModels =
+        buildModelsFromItems(questionnaireItems, null, 0);
+
+    for (final topLevelItem in topLevelItemModels) {
+      _orderedItems[topLevelItem.linkId] = topLevelItem;
+      _orderedItems.addAll(_addChildren(topLevelItem));
     }
   }
 
@@ -304,5 +316,45 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     } else {
       return result;
     }
+  }
+
+  QuestionnaireItemModel _createIfAbsent(
+    QuestionnaireItem questionnaireItem,
+    String linkId,
+    QuestionnaireItemModel? parent,
+    int level,
+  ) {
+    return _cachedItems.putIfAbsent(
+      linkId,
+      () => QuestionnaireItemModel(
+        this,
+        questionnaireItem,
+        linkId,
+        parent,
+        level,
+      ),
+    );
+  }
+
+  /// Build list of [QuestionnaireItemModel] from [QuestionnaireItem] and meta-data.
+  List<QuestionnaireItemModel> buildModelsFromItems(
+    List<QuestionnaireItem> items,
+    QuestionnaireItemModel? parent,
+    int level,
+  ) {
+    final itemModelList = <QuestionnaireItemModel>[];
+
+    for (final item in items) {
+      itemModelList.add(
+        _createIfAbsent(
+          item,
+          item.linkId,
+          parent,
+          level,
+        ),
+      );
+    }
+
+    return itemModelList;
   }
 }

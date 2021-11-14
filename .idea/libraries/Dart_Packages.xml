@@ -70,9 +70,8 @@
         <entry key="fhir">
           <value>
             <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir-0.5.0-4/lib" />
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir-0.5.0-3/lib" />
               <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir-0.5.0-6/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir-0.5.0-3/lib" />
             </list>
           </value>
         </entry>
@@ -93,9 +92,8 @@
         <entry key="fhir_path">
           <value>
             <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_path-0.5.0-10/lib" />
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_path-0.5.0-8/lib" />
               <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_path-0.5.0-11/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_path-0.5.0-8/lib" />
             </list>
           </value>
         </entry>
@@ -482,11 +480,9 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/csslib-0.17.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fake_async-1.2.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir-0.5.0-3/lib" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir-0.5.0-4/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir-0.5.0-6/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_at_rest-0.4.5/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_auth-0.4.1/lib" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_path-0.5.0-10/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_path-0.5.0-11/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_path-0.5.0-8/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_yaml-0.5.1/lib" />

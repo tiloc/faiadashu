@@ -15,7 +15,7 @@ class QuestionnaireLoadingIndicator extends StatelessWidget {
   })  : state = snapshot.connectionState,
         hasError = snapshot.hasError,
         detail = (snapshot.hasData)
-            ? snapshot.data?.questionnaireModel.titleText
+            ? snapshot.data?.questionnaireModel.title
             : snapshot.error,
         super(key: key);
 
