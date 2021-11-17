@@ -19,6 +19,8 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
 
   List<VariableModel>? _variables;
 
+  bool _enableWhenActivated = false;
+
   @override
   String calculateNodeUid() {
     return "${(parentNode != null) ? parentNode!.nodeUid : ''}/${questionnaireItemModel.linkId}";
@@ -33,9 +35,31 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
   QuestionnaireItem get questionnaireItem =>
       questionnaireItemModel.questionnaireItem;
 
+  /// Activate the enablement behavior for this item.
+  ///
+  /// Idempotent - does nothing if behavior is already activated.
+  void activateEnableBehavior() {
+    if (!_enableWhenActivated) {
+      questionnaireItemModel.forEnableWhens((qew) {
+        fromLinkId(qew.question!)
+            .addListener(() => questionnaireResponseModel.updateEnabledItems());
+      });
+
+      // Attach individual listeners to parent answers underneath which this item is nested
+      if (questionnaireItemModel.isNestedItem) {
+        // FIXME: This is super-hacky!!!
+        // Update the enable status when the response which owns the parent answer has changed.
+        (parentNode!.parentNode! as ResponseItemModel)
+            .addListener(() => questionnaireResponseModel.updateEnabledItems());
+      }
+
+      _enableWhenActivated = true;
+    }
+  }
+
   /// Updates the current enablement status of this item.
   ///
-  /// Determines the applicable method (enableWhen / enableWhenExpression).
+  /// Determines the applicable method (enableWhen / enableWhenExpression / nesting).
   ///
   /// Sets the [isEnabled] property
   void updateEnabled() {
@@ -45,6 +69,8 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
       _updateEnabledByEnableWhen();
     } else if (questionnaireItemModel.isEnabledWhenExpression) {
       _updateEnabledByEnableWhenExpression();
+    } else if (questionnaireItemModel.isNestedItem) {
+      _updateEnabledByParentAnswer();
     }
   }
 
@@ -212,6 +238,12 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
   ) {
     if (fromLinkId(qew.question!).isAnswered == qew.answerBoolean!.value) {
       enableWhenTrigger.trigger();
+    }
+  }
+
+  void _updateEnabledByParentAnswer() {
+    if ((parentNode! as AnswerModel).isUnanswered) {
+      _disableWithChildren();
     }
   }
 

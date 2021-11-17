@@ -87,6 +87,9 @@ class QuestionnaireModel {
       .where((qim) => qim.parent == null)
       .toList(growable: false);
 
+  bool get hasNestedItems =>
+      _orderedItems.values.any((qim) => qim.isNestedItem);
+
   Map<String, QuestionnaireItemModel> _addChildren(
     QuestionnaireItemModel qim,
   ) {

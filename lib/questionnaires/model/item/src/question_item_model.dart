@@ -50,10 +50,18 @@ class QuestionItemModel extends ResponseItemModel {
       // An answer has been provided, check whether a nested filler structure needs to be created.
       if (questionnaireItemModel.hasChildren) {
         // Nested structural items exist. Create fillers.
-        questionnaireResponseModel.insertFillerItemsIfAbsent(
+        final descendantItems =
+            questionnaireResponseModel.insertFillerItemsIfAbsent(
           answerModel,
           questionnaireItemModel.children,
         );
+
+        // Activate dynamic behavior
+        for (final item in descendantItems) {
+          item.activateEnableBehavior();
+        }
+
+        questionnaireResponseModel.updateEnabledItems();
       }
     }
 
@@ -246,6 +254,10 @@ class QuestionItemModel extends ResponseItemModel {
     return answerModel;
   }
 
+  /// Populates the initial value of the item.
+  /// Does nothing if initial value is not specified.
+  ///
+  /// Currently only supports 'initialExpression'.
   void populateInitialValue() {
     _qrimLogger.debug('populateInitialValue: $nodeUid');
     if (questionnaireItemModel.hasInitialExpression) {

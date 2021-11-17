@@ -63,10 +63,6 @@ class QuestionResponseItemFillerState
     }
   }
 
-  QuestionnaireAnswerFiller? _removeAnswerFiller(AnswerModel answerModel) {
-    return _answerFillers.remove(answerModel.nodeUid);
-  }
-
   void _addAnswerFiller(AnswerModel answerModel) {
     _answerFillers[answerModel.nodeUid] = questionnaireTheme.createAnswerFiller(
       this,
@@ -155,27 +151,8 @@ class QuestionResponseItemFillerState
     final isRepeating = widget.questionnaireItemModel.isRepeating;
     final hasMoreThanOneAnswer = _answerFillers.length > 1;
 
-    final decoratedAnswerFillers = isRepeating
-        ? _answerFillers.values.map<Widget>(
-            (answerFiller) => questionnaireTheme.decorateRepeatingAnswer(
-              context,
-              answerFiller,
-              hasMoreThanOneAnswer
-                  ? () {
-                      setState(() {
-                        questionResponseItemModel
-                            .removeAnswerModel(answerFiller.answerModel);
-                        final removedAnswerFiller =
-                            _removeAnswerFiller(answerFiller.answerModel);
-                        _qrimLogger.debug(
-                          'Removed answerfiller: $removedAnswerFiller',
-                        );
-                      });
-                    }
-                  : null,
-            ),
-          )
-        : _answerFillers.values;
+    final decoratedAnswerFillers =
+        _decorateAnswerFillers(context, isRepeating, hasMoreThanOneAnswer);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -222,5 +199,37 @@ class QuestionResponseItemFillerState
           ),
       ],
     );
+  }
+
+  Iterable<Widget> _decorateAnswerFillers(
+    BuildContext context,
+    bool isRepeating,
+    bool hasMoreThanOneAnswer,
+  ) {
+    return isRepeating
+        ? _answerFillers.values.map<Widget>(
+            (answerFiller) => questionnaireTheme.decorateRepeatingAnswer(
+              context,
+              answerFiller,
+              hasMoreThanOneAnswer
+                  ? () {
+                      _removeAnswerFiller(answerFiller);
+                    }
+                  : null,
+            ),
+          )
+        : _answerFillers.values;
+  }
+
+  void _removeAnswerFiller(QuestionnaireAnswerFiller answerFiller) {
+    final answerModel = answerFiller.answerModel;
+
+    setState(() {
+      questionResponseItemModel.removeAnswerModel(answerModel);
+      final removedAnswerFiller = _answerFillers.remove(answerModel.nodeUid);
+      _qrimLogger.debug(
+        'Removed answerfiller: $removedAnswerFiller',
+      );
+    });
   }
 }

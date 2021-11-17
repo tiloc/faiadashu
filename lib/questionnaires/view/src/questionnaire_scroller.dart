@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:fhir/r4.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -142,14 +144,17 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
         ? index - currentPosition
         : currentPosition - index;
 
-    final milliseconds = (distance < 10) ? 1000 : 1000 + (distance - 10) * 100;
+    final scrollDuration = max(1000, 1000 + (distance - 10) * 100);
+
+    // Scroll the item's top-edge into the top 30% of the screen.
+    const topThirtyPercent = 0.3;
 
     _listScrollController.scrollTo(
       index: index,
-      duration: Duration(milliseconds: milliseconds),
+      duration: Duration(milliseconds: scrollDuration),
       curve: Curves.easeInOutCubic,
-      alignment: 0.3,
-    ); // Scroll the item's top-edge into the top 30% of the screen.
+      alignment: topThirtyPercent,
+    );
   }
 
   @override

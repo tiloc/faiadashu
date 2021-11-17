@@ -38,6 +38,8 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
   List<VariableModel>? get questionnaireLevelVariables => _variables;
 
+  bool _enableWhenExpressionsActivated = false;
+
   /// Constructor for empty model.
   ///
   /// Only sets up class fields, but does not enable any dynamic behavior.
@@ -115,13 +117,8 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
     // Populate initial values if response == null
     if (response == null) {
-      questionnaireResponseModel
-          .orderedResponseItemModels()
-          .where((rim) => rim.questionnaireItemModel.hasInitialValue)
-          .forEach((rim) {
-        if (rim is QuestionItemModel) {
-          rim.populateInitialValue();
-        }
+      questionnaireResponseModel.orderedQuestionItemModels().forEach((qim) {
+        qim.populateInitialValue();
       });
     } else {
       questionnaireResponseModel.populate(response);
@@ -152,7 +149,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
         .addListener(questionnaireResponseModel._updateCalculations);
 
     // Set up enableWhen behavior on items
-    questionnaireResponseModel.activateEnableBehavior();
+    questionnaireResponseModel._activateEnableBehavior();
 
     // This ensures screen updates in case of invalid responses.
     questionnaireResponseModel.errorFlags.addListener(() {
@@ -504,10 +501,12 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
     _updateEnabledGeneration = _generation;
 
+    // OPTIMIZE: Is this check worth it?
     if (!orderedFillerItemModels().any(
       (fim) =>
           fim.questionnaireItemModel.isEnabledWhen ||
-          fim.questionnaireItemModel.isEnabledWhenExpression,
+          fim.questionnaireItemModel.isEnabledWhenExpression ||
+          fim.questionnaireItemModel.isNestedItem,
     )) {
       _logger.debug(
         'updateEnabledItems: no conditionally enabled items',
@@ -525,7 +524,8 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     for (final fim in orderedFillerItemModels().where(
       (fim) =>
           fim.questionnaireItemModel.isEnabledWhen ||
-          fim.questionnaireItemModel.isEnabledWhenExpression,
+          fim.questionnaireItemModel.isEnabledWhenExpression ||
+          fim.questionnaireItemModel.isNestedItem,
     )) {
       fim.updateEnabled();
     }
@@ -544,20 +544,22 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   ///
   /// Adds the required listeners to evaluate enableWhen and
   /// enableWhenExpression as items are changed.
-  void activateEnableBehavior() {
-    if (orderedFillerItemModels()
-        .any((fim) => fim.questionnaireItemModel.isEnabledWhenExpression)) {
+  void _activateEnableBehavior() {
+    final hasEnabledWhenExpressions = orderedFillerItemModels()
+        .any((fim) => fim.questionnaireItemModel.isEnabledWhenExpression);
+
+    if (hasEnabledWhenExpressions) {
       // When enableWhenExpression is involved we need to add listeners to every
       // non-static item (or the overall response model), as we have no way to
       // find out which items are referenced by the FHIR Path expression.
-      addListener(() => updateEnabledItems());
+      if (!_enableWhenExpressionsActivated) {
+        addListener(() => updateEnabledItems());
+        _enableWhenExpressionsActivated = true;
+      }
     } else {
+      // Activate enable behavior on individual items
       for (final itemModel in orderedFillerItemModels()) {
-        itemModel.questionnaireItemModel.forEnableWhens((qew) {
-          itemModel
-              .fromLinkId(qew.question!)
-              .addListener(() => updateEnabledItems());
-        });
+        itemModel.activateEnableBehavior();
       }
     }
 

@@ -64,6 +64,11 @@ class QuestionnaireItemModel with Diagnosticable {
     }
   }
 
+  /// Returns whether this is a nested item - an item with a question as its parent.
+  bool get isNestedItem {
+    return parent != null && parent!.isQuestion;
+  }
+
   /// All children below the current level as FHIR [QuestionnaireItem].
   /// Returns an empty list when there are no children.
   List<QuestionnaireItem> get childQuestionnaireItems {

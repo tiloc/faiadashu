@@ -10,7 +10,7 @@ import '../../../../questionnaires.dart';
 ///
 /// This class uses [CodeableConcept] to model multiple choice and open choice.
 ///
-/// Future R5 releases of the FHIR standard will likely have a `coding` item type.
+/// R5 release of the FHIR standard will have a `coding` item type.
 class CodingAnswerFiller extends QuestionnaireAnswerFiller {
   CodingAnswerFiller(
     QuestionResponseItemFillerState responseFillerState,

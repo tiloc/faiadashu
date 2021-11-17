@@ -8,7 +8,8 @@
       * Nested items are created as needed during the initial population of the model - See Bluebook Vitamin K for example.
       * Nested items are created as needed during human interaction (question with nested items is being answered for 
       the first time) - See LOINC AHRQ for example.
-      * >no dynamic behaviors (enableWhen, initialValue, ...) activated for subsequently added nested questions yet
+      * Nested items are enabled/disabled based on their parent answer
+      * >Some dynamic behaviors (initialValue, calculatedExpression...) are not activated for subsequently added nested questions yet
   * Clarified the relationship between FHIR and Presentation Model. The QuestionnaireResponse is used during
 model creation to populate the presentation model, and it is created by the aggregator from the presentation model.
 But it is not used in between anymore. This is resolving a lot of inconsistencies and uncertainties.

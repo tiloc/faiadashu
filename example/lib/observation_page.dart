@@ -102,7 +102,7 @@ class ObservationPage extends ExhibitPage {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ObservationWidget(
+        ObservationView(
           bpObservation,
           valueStyle: Theme.of(context).textTheme.headline4,
           codeStyle: Theme.of(context).textTheme.subtitle2,
@@ -111,7 +111,7 @@ class ObservationPage extends ExhibitPage {
         const SizedBox(
           height: 16,
         ),
-        ObservationWidget(
+        ObservationView(
           bpObservationWHR,
           valueStyle: Theme.of(context).textTheme.headline4,
           codeStyle: Theme.of(context).textTheme.subtitle2,
@@ -120,7 +120,7 @@ class ObservationPage extends ExhibitPage {
         const SizedBox(
           height: 16,
         ),
-        ObservationWidget(
+        ObservationView(
           bpObservationWHR,
           valueStyle: Theme.of(context).textTheme.headline4,
           codeStyle: Theme.of(context).textTheme.subtitle2,
