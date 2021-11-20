@@ -44,7 +44,9 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
   @override
   Widget buildInputControl(BuildContext context) {
     try {
-      return answerModel.isAutocomplete
+      return answerModel.isAutocomplete ||
+              answerModel.answerOptions.length >
+                  questionnaireTheme.autoCompleteThreshold
           ? _buildAutocompleteAnswers(context)
           : _buildChoiceAnswers(context);
     } catch (exception) {
@@ -53,11 +55,58 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
   }
 
   Widget _buildChoiceAnswers(BuildContext context) {
+    final choices = _createChoices(context);
+
+    return answerModel.isHorizontal &&
+            MediaQuery.of(context).size.width >
+                questionnaireTheme.horizontalCodingBreakpoint
+        ? _HorizontalCodingChoices(
+            firstFocusNode: firstFocusNode,
+            choices: choices,
+            errorText: errorText,
+          )
+        : _VerticalCodingChoices(
+            firstFocusNode: firstFocusNode,
+            answerModel: answerModel,
+            errorText: errorText,
+            choices: choices,
+          );
+  }
+
+  Widget _buildAutocompleteAnswers(BuildContext context) {
+    return FDashAutocomplete<QuestionnaireAnswerOption>(
+      focusNode: firstFocusNode,
+      initialValue: value?.localizedDisplay(locale),
+      displayStringForOption: (answerOption) =>
+          answerOption.localizedDisplay(locale),
+      optionsBuilder: (TextEditingValue textEditingValue) {
+        if (textEditingValue.text.isEmpty) {
+          return const Iterable<QuestionnaireAnswerOption>.empty();
+        }
+
+        return answerModel.answerOptions.values
+            .where((QuestionnaireAnswerOption option) {
+          return option
+              .localizedDisplay(locale)
+              .toLowerCase()
+              .contains(textEditingValue.text.toLowerCase());
+        });
+      },
+      onSelected: (answerModel.isEnabled)
+          ? (QuestionnaireAnswerOption selectedOption) {
+              value = answerModel.fromChoiceString(selectedOption.optionCode);
+            }
+          : null,
+    );
+  }
+
+  List<Widget> _createChoices(BuildContext context) {
     final isCheckBox = qi.isItemControl('check-box');
     final isMultipleChoice = qi.repeats?.value ?? isCheckBox;
     final isShowingNull = questionnaireTheme.showNullAnswerOption;
 
     final choices = <Widget>[];
+
     if (!isMultipleChoice) {
       if (isShowingNull) {
         choices.add(
@@ -197,45 +246,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
       );
     }
 
-    return answerModel.isHorizontal && MediaQuery.of(context).size.width > 750
-        ? _HorizontalCodingChoices(
-            firstFocusNode: firstFocusNode,
-            choices: choices,
-            errorText: errorText,
-          )
-        : _VerticalCodingChoices(
-            firstFocusNode: firstFocusNode,
-            answerModel: answerModel,
-            errorText: errorText,
-            choices: choices,
-          );
-  }
-
-  Widget _buildAutocompleteAnswers(BuildContext context) {
-    return FDashAutocomplete<QuestionnaireAnswerOption>(
-      focusNode: firstFocusNode,
-      initialValue: value?.localizedDisplay(locale),
-      displayStringForOption: (answerOption) =>
-          answerOption.localizedDisplay(locale),
-      optionsBuilder: (TextEditingValue textEditingValue) {
-        if (textEditingValue.text.isEmpty) {
-          return const Iterable<QuestionnaireAnswerOption>.empty();
-        }
-
-        return answerModel.answerOptions.values
-            .where((QuestionnaireAnswerOption option) {
-          return option
-              .localizedDisplay(locale)
-              .toLowerCase()
-              .contains(textEditingValue.text.toLowerCase());
-        });
-      },
-      onSelected: (answerModel.isEnabled)
-          ? (QuestionnaireAnswerOption selectedOption) {
-              value = answerModel.fromChoiceString(selectedOption.optionCode);
-            }
-          : null,
-    );
+    return choices;
   }
 }
 

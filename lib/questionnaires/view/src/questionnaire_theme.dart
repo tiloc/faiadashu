@@ -20,11 +20,23 @@ class QuestionnaireTheme {
   /// Returns whether a progress bar/circle is displayed while filling
   final bool showProgress;
 
+  static const defaultAutoCompleteThreshold = 10;
+
+  /// Coding answers with more than this amount of choices will be shown as auto-complete control
+  final int autoCompleteThreshold;
+
+  static const defaultHorizontalCodingBreakpoint = 750;
+
+  /// The minimum display width to show coding answers horizontally
+  final int horizontalCodingBreakpoint;
+
   const QuestionnaireTheme({
     this.canSkipQuestions = false,
     this.showNullAnswerOption = true,
     this.showQuestionNumerals = false,
     this.showProgress = true,
+    this.autoCompleteThreshold = defaultAutoCompleteThreshold,
+    this.horizontalCodingBreakpoint = defaultHorizontalCodingBreakpoint,
   });
 
   /// Returns a [QuestionnaireItemFiller] for a given [QuestionnaireFiller].

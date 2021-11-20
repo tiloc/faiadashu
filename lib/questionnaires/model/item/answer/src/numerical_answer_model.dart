@@ -70,6 +70,8 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
     return keyForUnitChoice(coding);
   }
 
+  static const defaultSliderMaxValue = 100.0;
+
   NumericalAnswerModel(QuestionItemModel responseModel) : super(responseModel) {
     _isSliding =
         questionnaireItemModel.questionnaireItem.isItemControl('slider');
@@ -84,7 +86,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
         0.0;
     _maxValue = maxValueExtension?.valueDecimal?.value ??
         maxValueExtension?.valueInteger?.value?.toDouble() ??
-        (_isSliding ? 100.0 : double.maxFinite);
+        (_isSliding ? defaultSliderMaxValue : double.maxFinite);
 
     if (_isSliding) {
       final sliderStepValueExtension = qi.extension_?.extensionOrNull(

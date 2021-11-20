@@ -120,8 +120,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
 
   /// Returns whether the options should be presented as an auto-complete control
   bool get isAutocomplete {
-    return !(qi.repeats == Boolean(true)) &&
-        (answerOptions.length > 10 || qi.isItemControl('autocomplete'));
+    return !(qi.repeats?.value ?? false) && (qi.isItemControl('autocomplete'));
   }
 
   // Take the existing extensions that might contain information about

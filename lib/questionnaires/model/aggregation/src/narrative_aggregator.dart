@@ -51,7 +51,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
       }
     } else if (itemModel is DisplayItemModel) {
       if (itemText != null) {
-        div.write('<h3>$itemText</h3>');
+        div.write('<p>$itemText</p>');
 
         return true;
       } else {

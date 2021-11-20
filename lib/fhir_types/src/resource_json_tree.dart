@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 ///
 /// Based on the internal JSON representation of the resource.
 class ResourceJsonTree extends StatefulWidget {
+  static const defaultAutoExpandLevel = 10;
+
   const ResourceJsonTree(
     this.resourceRoot, {
-    this.autoExpandLevel = 10,
+    this.autoExpandLevel = defaultAutoExpandLevel,
     Key? key,
   }) : super(key: key);
 

@@ -108,18 +108,22 @@ abstract class QuestionnaireAnswerFillerState<
     // Listen to the parent FocusNode and become focussed when it does.
     if (!_isFocusHookedUp) {
       WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-        // FIXME: On very rare occasions, Focus.of can fail with: Looking up a deactivated widget's ancestor is unsafe.
-        Focus.of(context).addListener(() {
-          if ((firstFocusNode.parent?.hasPrimaryFocus ?? false) &&
-              !firstFocusNode.hasPrimaryFocus) {
-            firstFocusNode.requestFocus();
-          }
-        });
+        // Focus.of could otherwise fail with: Looking up a deactivated widget's ancestor is unsafe.
+        if (mounted) {
+          Focus.maybeOf(context)?.addListener(_focusHasChanged);
+        }
       });
       _isFocusHookedUp = true;
     }
 
     return buildInputControl(context);
+  }
+
+  void _focusHasChanged() {
+    if ((firstFocusNode.parent?.hasPrimaryFocus ?? false) &&
+        !firstFocusNode.hasPrimaryFocus) {
+      firstFocusNode.requestFocus();
+    }
   }
 
   Widget buildInputControl(BuildContext context);
