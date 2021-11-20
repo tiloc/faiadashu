@@ -5,12 +5,17 @@ class NullDashText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const variant600Opacity = 0.54;
+
     return Text(
       '   ',
       style: Theme.of(context).textTheme.bodyText2?.copyWith(
             decoration: TextDecoration.lineThrough,
-            color:
-                Theme.of(context).textTheme.bodyText1!.color!.withOpacity(0.54),
+            color: Theme.of(context)
+                .textTheme
+                .bodyText1!
+                .color!
+                .withOpacity(variant600Opacity),
           ),
     );
   }

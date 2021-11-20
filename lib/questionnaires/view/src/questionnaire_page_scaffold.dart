@@ -40,7 +40,7 @@ class DefaultQuestionnairePageScaffoldBuilder
   }) {
     final theLocale = locale ?? Localizations.localeOf(context);
 
-    final questionnaireFiller = QuestionnaireFiller.of(context);
+    final questionnaireFiller = QuestionnaireResponseFiller.of(context);
     final questionnaire = questionnaireFiller
         .questionnaireResponseModel.questionnaireModel.questionnaire;
 

@@ -176,7 +176,7 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                         // TODO: In a real-world scenario this should have more state handling.
                         widget.uploadResponseFunction?.call(
                           widget.questionnairePath,
-                          QuestionnaireFiller.of(context)
+                          QuestionnaireResponseFiller.of(context)
                               .aggregator<QuestionnaireResponseAggregator>()
                               .aggregate(
                                 responseStatus:
@@ -214,7 +214,7 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                       // In a real-world scenario one would persist or post the response instead.
                       widget.saveResponseFunction.call(
                         widget.questionnairePath,
-                        QuestionnaireFiller.of(context)
+                        QuestionnaireResponseFiller.of(context)
                             .aggregator<QuestionnaireResponseAggregator>()
                             .aggregate(),
                       );

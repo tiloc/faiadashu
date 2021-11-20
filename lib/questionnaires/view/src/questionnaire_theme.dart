@@ -39,9 +39,9 @@ class QuestionnaireTheme {
     this.horizontalCodingBreakpoint = defaultHorizontalCodingBreakpoint,
   });
 
-  /// Returns a [QuestionnaireItemFiller] for a given [QuestionnaireFiller].
+  /// Returns a [QuestionnaireItemFiller] for a given [QuestionnaireResponseFiller].
   ///
-  /// Used by [QuestionnaireFiller].
+  /// Used by [QuestionnaireResponseFiller].
   QuestionnaireItemFiller createQuestionnaireItemFiller(
     QuestionnaireFillerData questionnaireFiller,
     FillerItemModel fillerItemModel, {

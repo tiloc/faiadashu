@@ -26,6 +26,8 @@ class ResourceJsonTree extends StatefulWidget {
     final nodeExpandedDepth =
         (parent != null) ? parent.expandedDepth - 1 : autoExpandLevel;
 
+    const jsonLeftOffset = 8.0;
+
     if (nodeValue == null) {
       node = _JsonViewerGenericNode(nodeName, nodeValue);
     } else if (nodeValue is Map) {
@@ -34,7 +36,7 @@ class ResourceJsonTree extends StatefulWidget {
         parent,
         nodeName,
         nodeValue as Map<String, dynamic>,
-        8,
+        jsonLeftOffset,
         nodeExpandedDepth,
       );
     } else if (nodeValue is List) {
@@ -43,7 +45,7 @@ class ResourceJsonTree extends StatefulWidget {
         parent,
         nodeName,
         nodeValue,
-        8,
+        jsonLeftOffset,
         nodeExpandedDepth,
       );
     } else {

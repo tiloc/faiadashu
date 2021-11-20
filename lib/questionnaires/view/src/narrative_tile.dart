@@ -33,7 +33,7 @@ class _NarrativeTileState extends State<NarrativeTile> {
   @override
   Widget build(BuildContext context) {
     final questionnaireResponseModel = widget.questionnaireResponseModel ??
-        QuestionnaireFiller.of(context).questionnaireResponseModel;
+        QuestionnaireResponseFiller.of(context).questionnaireResponseModel;
 
     return SizedBox.expand(
       child: Scrollbar(

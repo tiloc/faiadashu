@@ -13,7 +13,7 @@ import '../../questionnaires.dart';
 
 /// Fills a [Questionnaire] through a vertically scrolling input form.
 ///
-/// Takes the [QuestionnaireItemFiller]s as provided by the [QuestionnaireFiller]
+/// Takes the [QuestionnaireItemFiller]s as provided by the [QuestionnaireResponseFiller]
 /// and presents them as a scrolling [ListView].
 ///
 /// The [scaffoldBuilder] is used to build a wrapper around the list.
@@ -161,14 +161,14 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
   Widget build(BuildContext context) {
     final locale = widget.locale ?? Localizations.localeOf(context);
 
-    return QuestionnaireFiller(
+    return QuestionnaireResponseFiller(
       fhirResourceProvider: widget.fhirResourceProvider,
       launchContext: widget.launchContext,
       locale: locale,
       questionnaireTheme: widget.questionnaireTheme,
       builder: (BuildContext context) {
         _belowFillerContext = context;
-        final questionnaireFiller = QuestionnaireFiller.of(context);
+        final questionnaireFiller = QuestionnaireResponseFiller.of(context);
 
         final mainMatterLength = questionnaireFiller.fillerItemModels.length;
         final frontMatterLength = widget.frontMatter?.length ?? 0;
@@ -206,7 +206,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
                         ? (i - (frontMatterLength + mainMatterLength))
                         : -1;
                 if (mainMatterIndex != -1) {
-                  return QuestionnaireFiller.of(context)
+                  return QuestionnaireResponseFiller.of(context)
                       .itemFillerAt(mainMatterIndex);
                 } else if (backMatterIndex != -1) {
                   return widget.backMatter![backMatterIndex];
@@ -333,7 +333,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
 
     if (!_isFocussed) {
       WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-        QuestionnaireFiller.of(_belowFillerContext!).requestFocus(_focusIndex);
+        QuestionnaireResponseFiller.of(_belowFillerContext!).requestFocus(_focusIndex);
       });
 
       _isFocussed = true;

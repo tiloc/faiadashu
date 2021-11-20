@@ -49,7 +49,7 @@ abstract class QuestionnaireItemFillerState<W extends QuestionnaireItemFiller>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _questionnaireFiller = QuestionnaireFiller.of(context);
+    _questionnaireFiller = QuestionnaireResponseFiller.of(context);
     _questionnaireFiller?.registerQuestionnaireItemFillerState(this);
   }
 
@@ -267,7 +267,7 @@ class _QuestionnaireItemFillerSupportLink extends StatelessWidget {
       icon: const Icon(Icons.info_outline),
       onPressed: () {
         _logger.debug("supportLink '${supportLink.toString()}'");
-        QuestionnaireFiller.of(context).onLinkTap?.call(context, supportLink);
+        QuestionnaireResponseFiller.of(context).onLinkTap?.call(context, supportLink);
       },
     );
   }

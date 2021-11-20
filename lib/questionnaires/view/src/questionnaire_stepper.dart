@@ -33,13 +33,13 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
   Widget build(BuildContext context) {
     final controller = PageController();
 
-    return QuestionnaireFiller(
+    return QuestionnaireResponseFiller(
       locale: widget.locale ?? Localizations.localeOf(context),
       fhirResourceProvider: widget.fhirResourceProvider,
       launchContext: widget.launchContext,
       questionnaireTheme: widget.questionnaireTheme,
       builder: (BuildContext context) {
-        final questionnaireFiller = QuestionnaireFiller.of(context);
+        final questionnaireFiller = QuestionnaireResponseFiller.of(context);
         final itemCount = questionnaireFiller.fillerItemModels.length;
 
         return widget.scaffoldBuilder.build(
@@ -56,7 +56,7 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
                     controller: controller,
                     itemCount: itemCount,
                     itemBuilder: (BuildContext context, int index) {
-                      return QuestionnaireFiller.of(context)
+                      return QuestionnaireResponseFiller.of(context)
                           .itemFillerAt(index);
                     },
                   ),
@@ -93,7 +93,7 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
                               ),
                             );
                           },
-                          valueListenable: QuestionnaireFiller.of(context)
+                          valueListenable: QuestionnaireResponseFiller.of(context)
                               .aggregator<TotalScoreAggregator>(),
                         ),
                         if (widget.questionnaireTheme.showProgress)

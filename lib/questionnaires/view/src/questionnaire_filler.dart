@@ -5,15 +5,15 @@ import '../../../logging/logging.dart';
 import '../../../resource_provider/resource_provider.dart';
 import '../../questionnaires.dart';
 
-/// Fill a [Questionnaire].
+/// Fill a [QuestionnaireResponse] from a [Questionnaire].
 ///
-/// Provides visual components to view and fill a [Questionnaire].
+/// Provides visual components to view a [Questionnaire] and fill a [QuestionnaireResponse].
 /// The components are provided as a [List] of [Widget]s of type [QuestionnaireItemFiller].
 /// It is up to a higher-level component to present these to the user.
 ///
 /// see: [QuestionnaireScrollerPage]
 /// see: [QuestionnaireStepperPage]
-class QuestionnaireFiller extends StatefulWidget {
+class QuestionnaireResponseFiller extends StatefulWidget {
   final Locale locale;
   final WidgetBuilder builder;
   final List<Aggregator<dynamic>>? aggregators;
@@ -33,7 +33,7 @@ class QuestionnaireFiller extends StatefulWidget {
             launchContext: launchContext,
           );
 
-  const QuestionnaireFiller({
+  const QuestionnaireResponseFiller({
     Key? key,
     required this.locale,
     required this.builder,
@@ -54,11 +54,13 @@ class QuestionnaireFiller extends StatefulWidget {
   }
 
   @override
-  _QuestionnaireFillerState createState() => _QuestionnaireFillerState();
+  _QuestionnaireResponseFillerState createState() =>
+      _QuestionnaireResponseFillerState();
 }
 
-class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
-  static final _logger = Logger(_QuestionnaireFillerState);
+class _QuestionnaireResponseFillerState
+    extends State<QuestionnaireResponseFiller> {
+  static final _logger = Logger(_QuestionnaireResponseFillerState);
 
   late final Future<QuestionnaireResponseModel> builderFuture;
   QuestionnaireResponseModel? _questionnaireResponseModel;

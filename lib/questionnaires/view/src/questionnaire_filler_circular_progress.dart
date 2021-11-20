@@ -76,7 +76,7 @@ class _QuestionnaireFillerCircularProgressState
   void didChangeDependencies() {
     super.didChangeDependencies();
     final questionnaireResponseModel =
-        QuestionnaireFiller.of(context).questionnaireResponseModel;
+        QuestionnaireResponseFiller.of(context).questionnaireResponseModel;
     _questionnaireResponseModel = questionnaireResponseModel;
     questionnaireResponseModel.addListener(_updateProgress);
   }
