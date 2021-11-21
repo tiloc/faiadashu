@@ -61,26 +61,28 @@ class StringAnswerModel extends AnswerModel<String, String> {
 
   @override
   String? validateInput(String? inValue) {
-    if (inValue == null || inValue.isEmpty) {
+    final checkValue = inValue?.trim();
+
+    if (checkValue == null || checkValue.isEmpty) {
       return null;
     }
 
-    if (inValue.length < minLength) {
+    if (checkValue.length < minLength) {
       return lookupFDashLocalizations(locale).validatorMinLength(minLength);
     }
 
-    if (maxLength != null && inValue.length > maxLength!) {
+    if (maxLength != null && checkValue.length > maxLength!) {
       return lookupFDashLocalizations(locale).validatorMaxLength(maxLength!);
     }
 
     if (qi.type == QuestionnaireItemType.url) {
-      if (!_urlRegExp.hasMatch(inValue)) {
+      if (!_urlRegExp.hasMatch(checkValue)) {
         return lookupFDashLocalizations(locale).validatorUrl;
       }
     }
 
     if (regExp != null) {
-      if (!regExp!.hasMatch(inValue)) {
+      if (!regExp!.hasMatch(checkValue)) {
         return (entryFormat != null)
             ? lookupFDashLocalizations(locale)
                 .validatorEntryFormat(entryFormat!)
@@ -91,12 +93,12 @@ class StringAnswerModel extends AnswerModel<String, String> {
     return null;
   }
 
-  // TODO: Should the string get trimmed somewhere?
-
   @override
   QuestionnaireResponseAnswer? createFhirAnswer(
     List<QuestionnaireResponseItem>? items,
   ) {
+    final value = this.value?.trim();
+
     final valid = validateInput(value) == null;
     final dataAbsentReasonExtension = !valid
         ? [
@@ -107,7 +109,7 @@ class StringAnswerModel extends AnswerModel<String, String> {
           ]
         : null;
 
-    return (value != null && value!.isNotEmpty)
+    return (value != null && value.isNotEmpty)
         ? (qi.type != QuestionnaireItemType.url)
             ? QuestionnaireResponseAnswer(
                 valueString: value,
@@ -132,7 +134,7 @@ class StringAnswerModel extends AnswerModel<String, String> {
   }
 
   @override
-  bool get isUnanswered => (value == null) || value!.trim().isEmpty;
+  bool get isUnanswered => value?.trim().isEmpty ?? true;
 
   @override
   void populateFromExpression(dynamic evaluationResult) {
