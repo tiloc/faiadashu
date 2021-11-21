@@ -101,7 +101,8 @@ class QuestionResponseItemFillerState
                         // Wide landscape screen: Use horizontal layout
                         return AnimatedSwitcher(
                           duration: const Duration(milliseconds: 500),
-                          child: (constraints.maxWidth > 1000)
+                          child: (constraints.maxWidth >
+                                  questionnaireTheme.landscapeBreakpoint)
                               ? Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [

@@ -175,6 +175,7 @@ class _QuestionnaireResponseFillerState
   }
 }
 
+// ignore: prefer-single-widget-per-file
 class QuestionnaireFillerData extends InheritedWidget {
   static final _logger = Logger(QuestionnaireFillerData);
 

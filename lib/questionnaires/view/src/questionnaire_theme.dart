@@ -25,10 +25,16 @@ class QuestionnaireTheme {
   /// Coding answers with more than this amount of choices will be shown as auto-complete control
   final int autoCompleteThreshold;
 
-  static const defaultHorizontalCodingBreakpoint = 750;
+  static const defaultHorizontalCodingBreakpoint = 750.0;
 
   /// The minimum display width to show coding answers horizontally
-  final int horizontalCodingBreakpoint;
+  final double horizontalCodingBreakpoint;
+
+  static const defaultMaxLinesForTextItem = 4;
+  final int maxLinesForTextItem;
+
+  static const defaultLandscapeBreakpoint = 1000.0;
+  final double landscapeBreakpoint;
 
   const QuestionnaireTheme({
     this.canSkipQuestions = false,
@@ -36,7 +42,9 @@ class QuestionnaireTheme {
     this.showQuestionNumerals = false,
     this.showProgress = true,
     this.autoCompleteThreshold = defaultAutoCompleteThreshold,
+    this.landscapeBreakpoint = defaultLandscapeBreakpoint,
     this.horizontalCodingBreakpoint = defaultHorizontalCodingBreakpoint,
+    this.maxLinesForTextItem = defaultMaxLinesForTextItem,
   });
 
   /// Returns a [QuestionnaireItemFiller] for a given [QuestionnaireResponseFiller].

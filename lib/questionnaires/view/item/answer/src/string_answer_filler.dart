@@ -57,7 +57,9 @@ class _StringAnswerState extends QuestionnaireAnswerFillerState<String,
         enabled: answerModel.isEnabled,
         keyboardType: _keyboardType,
         controller: _editingController,
-        maxLines: (qi.type == QuestionnaireItemType.text) ? 4 : 1,
+        maxLines: (qi.type == QuestionnaireItemType.text)
+            ? questionnaireTheme.maxLinesForTextItem
+            : 1,
         decoration: questionnaireTheme.createDecoration().copyWith(
               errorText: answerModel.errorText,
               hintText: answerModel.entryFormat,

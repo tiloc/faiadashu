@@ -6,6 +6,10 @@ import '../../../resource_provider/resource_provider.dart';
 import '../../questionnaires.dart';
 import '../view.dart';
 
+/// A page, incl. a [Scaffold], that presents a questionnaire in the style of a wizard.
+///
+/// see [QuestionnaireStepper]
+/// see [QuestionnaireScrollerPage]
 class QuestionnaireStepperPage extends QuestionnaireStepper {
   const QuestionnaireStepperPage({
     Locale? locale,
