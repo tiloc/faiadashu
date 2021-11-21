@@ -403,6 +403,7 @@
             <list>
               <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/scrollable_positioned_list-0.2.2/lib" />
               <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/scrollable_positioned_list-0.2.0-nullsafety.0/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/scrollable_positioned_list-0.2.3/lib" />
             </list>
           </value>
         </entry>
@@ -630,6 +631,7 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/quiver-3.0.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/scrollable_positioned_list-0.2.0-nullsafety.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/scrollable_positioned_list-0.2.2/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/scrollable_positioned_list-0.2.3/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/simple_html_css-3.0.1+1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/simple_html_css-3.0.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/source_span-1.8.1/lib" />

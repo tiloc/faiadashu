@@ -38,7 +38,7 @@ dependencies:
   intl: ^0.17.0
   logging: ^1.0.2
   meta: ^1.7.0
-  scrollable_positioned_list: ^0.2.2
+  scrollable_positioned_list: ^0.2.3
   simple_html_css: ^3.0.1
 
 dev_dependencies:
