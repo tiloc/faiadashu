@@ -23,10 +23,10 @@ class QuestionnaireStepper extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _QuestionnaireStepperState();
+  State<StatefulWidget> createState() => QuestionnaireStepperState();
 }
 
-class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
+class QuestionnaireStepperState extends State<QuestionnaireStepper> {
   int step = 0;
 
   @override
@@ -119,24 +119,4 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
       },
     );
   }
-}
-
-class QuestionnaireStepperPage extends QuestionnaireStepper {
-  const QuestionnaireStepperPage({
-    Locale? locale,
-    required FhirResourceProvider fhirResourceProvider,
-    required LaunchContext launchContext,
-    QuestionnaireTheme questionnaireTheme = const QuestionnaireTheme(),
-    Key? key,
-  }) : super(
-          locale: locale,
-          scaffoldBuilder: const DefaultQuestionnairePageScaffoldBuilder(),
-          fhirResourceProvider: fhirResourceProvider,
-          launchContext: launchContext,
-          questionnaireTheme: questionnaireTheme,
-          key: key,
-        );
-
-  @override
-  State<StatefulWidget> createState() => _QuestionnaireStepperState();
 }
