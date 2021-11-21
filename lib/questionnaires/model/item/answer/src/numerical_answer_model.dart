@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:fhir/r4.dart';
 import 'package:intl/intl.dart';
 
@@ -32,7 +30,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
   int get maxDecimal => _maxDecimal;
   NumberFormat get numberFormat => _numberFormat;
 
-  late final LinkedHashMap<String, Coding> _units;
+  late final Map<String, Coding> _units;
 
   bool get hasUnit => value?.hasUnit ?? false;
 
@@ -72,20 +70,23 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
     return keyForUnitChoice(coding);
   }
 
-  NumericalAnswerModel(ResponseModel responseModel, int answerIndex)
-      : super(responseModel, answerIndex) {
-    _isSliding = itemModel.questionnaireItem.isItemControl('slider');
+  static const defaultSliderMaxValue = 100.0;
+
+  NumericalAnswerModel(QuestionItemModel responseModel) : super(responseModel) {
+    _isSliding =
+        questionnaireItemModel.questionnaireItem.isItemControl('slider');
 
     final minValueExtension = qi.extension_
         ?.extensionOrNull('http://hl7.org/fhir/StructureDefinition/minValue');
-    final maxValueExtension = itemModel.questionnaireItem.extension_
+    final maxValueExtension = questionnaireItemModel
+        .questionnaireItem.extension_
         ?.extensionOrNull('http://hl7.org/fhir/StructureDefinition/maxValue');
     _minValue = minValueExtension?.valueDecimal?.value ??
         minValueExtension?.valueInteger?.value?.toDouble() ??
         0.0;
     _maxValue = maxValueExtension?.valueDecimal?.value ??
         maxValueExtension?.valueInteger?.value?.toDouble() ??
-        (_isSliding ? 100.0 : double.maxFinite);
+        (_isSliding ? defaultSliderMaxValue : double.maxFinite);
 
     if (_isSliding) {
       final sliderStepValueExtension = qi.extension_?.extensionOrNull(
@@ -128,7 +129,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
     _numberPattern = '$maxIntegerDigits$maxFractionDigits';
 
     _logger.debug(
-      'input format for ${itemModel.linkId}: "$_numberPattern"',
+      'input format for ${questionnaireItemModel.linkId}: "$_numberPattern"',
     );
 
     _numberFormat = NumberFormat(
@@ -137,8 +138,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
     ); // TODO: toString or toLanguageTag?
 
     final unit = qi.unit;
-    // ignore: prefer_collection_literals
-    _units = LinkedHashMap<String, Coding>();
+    _units = <String, Coding>{};
     final unitsUri = qi.extension_
         ?.extensionOrNull(
           'http://hl7.org/fhir/StructureDefinition/questionnaire-unitValueSet',
@@ -146,7 +146,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
         ?.valueCanonical
         .toString();
     if (unitsUri != null) {
-      itemModel.questionnaireModel.forEachInValueSet(
+      questionnaireItemModel.questionnaireModel.forEachInValueSet(
         unitsUri,
         (coding) {
           _units[keyForUnitChoice(coding)] = coding;
@@ -156,27 +156,6 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
     } else if (unit != null) {
       _units[keyForUnitChoice(unit)] = unit;
     }
-
-    Quantity? existingValue;
-    final firstAnswer = itemModel.responseItem?.answer?.firstOrNull;
-    if (firstAnswer != null) {
-      existingValue = firstAnswer.valueQuantity ??
-          ((firstAnswer.valueDecimal != null &&
-                  firstAnswer.valueDecimal!.isValid)
-              ? Quantity(value: firstAnswer.valueDecimal)
-              : (firstAnswer.valueInteger != null &&
-                      firstAnswer.valueInteger!.isValid)
-                  ? Quantity(
-                      value:
-                          Decimal(firstAnswer.valueInteger!.value!.toDouble()),
-                    )
-                  : null);
-    }
-    value = (existingValue == null && isSliding)
-        ? Quantity(
-            value: Decimal((maxValue - minValue) / 2.0),
-          ) // Slider needs a guaranteed value
-        : existingValue;
   }
 
   @override
@@ -247,34 +226,28 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
             FhirExtension(
               url: dataAbsentReasonExtensionUrl,
               valueCode: dataAbsentReasonAsTextCode,
-            )
+            ),
           ]
         : null;
 
-    Quantity? returnValue;
-
-    if (textInput.trim().isEmpty) {
-      returnValue = value?.copyWith(value: null);
-    } else {
-      if (value == null) {
-        returnValue = Quantity(
-          value: Decimal(numberFormat.parse(textInput)),
-          extension_: dataAbsentReasonExtension,
-        );
-      } else {
-        returnValue = value!.copyWith(
-          value: Decimal(numberFormat.parse(textInput)),
-          extension_: dataAbsentReasonExtension,
-        );
-      }
-    }
-
-    return returnValue;
+    return textInput.trim().isEmpty
+        ? value?.copyWith(value: null)
+        : value == null
+            ? Quantity(
+                value: Decimal(numberFormat.parse(textInput)),
+                extension_: dataAbsentReasonExtension,
+              )
+            : value!.copyWith(
+                value: Decimal(numberFormat.parse(textInput)),
+                extension_: dataAbsentReasonExtension,
+              );
   }
 
   @override
-  QuestionnaireResponseAnswer? get filledAnswer {
-    _logger.debug('filledAnswer: $value');
+  QuestionnaireResponseAnswer? createFhirAnswer(
+    List<QuestionnaireResponseItem>? items,
+  ) {
+    _logger.debug('createFhirAnswer: $value');
     if (value == null) {
       return null;
     }
@@ -285,18 +258,21 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
             ? QuestionnaireResponseAnswer(
                 valueDecimal: value!.value,
                 extension_: value!.extension_,
+                item: items,
               )
             : null;
       case QuestionnaireItemType.quantity:
         return QuestionnaireResponseAnswer(
           valueQuantity: value,
           extension_: value!.extension_,
+          item: items,
         );
       case QuestionnaireItemType.integer:
         return (value!.value != null)
             ? QuestionnaireResponseAnswer(
                 valueInteger: Integer(value!.value!.value!.round()),
                 extension_: value!.extension_,
+                item: items,
               )
             : null;
       default:
@@ -317,6 +293,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
   void populateFromExpression(dynamic evaluationResult) {
     if (evaluationResult == null) {
       value = null;
+
       return;
     }
 
@@ -341,11 +318,21 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
                   'http://hl7.org/fhir/StructureDefinition/questionnaire-unit',
                 ),
                 valueCoding: unitCoding,
-              )
+              ),
             ]
           : null,
     );
+  }
 
-    responseModel.answers = [filledAnswer];
+  @override
+  void populate(QuestionnaireResponseAnswer answer) {
+    value = answer.valueQuantity ??
+        ((answer.valueDecimal != null && answer.valueDecimal!.isValid)
+            ? Quantity(value: answer.valueDecimal)
+            : (answer.valueInteger != null && answer.valueInteger!.isValid)
+                ? Quantity(
+                    value: Decimal(answer.valueInteger!.value!.toDouble()),
+                  )
+                : null);
   }
 }

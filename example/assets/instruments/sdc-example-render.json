@@ -241,7 +241,7 @@
           "required": true,
           "extension" : [
             {
-              "url" : "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-itemImage",
+              "url" : "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemMedia",
               "valueAttachment" : {
                 "url" : "http://example.org/images/user-id.png"
               }
@@ -255,7 +255,7 @@
               "valueString": "MM/DD/YYYY"
             },
             {
-              "url" : "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-itemImage",
+              "url" : "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemMedia",
               "valueAttachment" : {
                 "url" : "http://example.org/images/calendar.png"
               }

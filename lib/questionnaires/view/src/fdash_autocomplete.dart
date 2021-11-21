@@ -299,6 +299,7 @@ class _AutocompleteOptions<T extends Object> extends StatelessWidget {
             itemCount: options.length,
             itemBuilder: (BuildContext context, int index) {
               final T option = options.elementAt(index);
+
               return InkWell(
                 onTap: () {
                   onSelected(option);

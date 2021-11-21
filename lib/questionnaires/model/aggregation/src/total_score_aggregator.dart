@@ -4,8 +4,6 @@ import 'package:fhir/r4.dart';
 import '../../../../logging/logging.dart';
 import '../../model.dart';
 
-// TODO: Reduce code with calculatedExpression code
-
 /// Aggregate answers into a total score.
 ///
 /// The score is the sum of the ordinalValue of all answers.
@@ -18,25 +16,25 @@ import '../../model.dart';
 class TotalScoreAggregator extends Aggregator<Decimal> {
   static final _logger = Logger(TotalScoreAggregator);
 
-  late final QuestionnaireItemModel? totalScoreItem;
+  late final QuestionItemModel? totalScoreItem;
   TotalScoreAggregator({bool autoAggregate = true})
       : super(Decimal(0), autoAggregate: autoAggregate);
 
   @override
-  void init(QuestionnaireModel questionnaireModel) {
-    super.init(questionnaireModel);
+  void init(QuestionnaireResponseModel questionnaireResponseModel) {
+    super.init(questionnaireResponseModel);
 
     totalScoreItem =
-        questionnaireModel.orderedQuestionnaireItemModels().firstWhereOrNull(
-              (itemModel) => itemModel.isTotalScore,
-            );
-    // if there is no total score itemModel then leave value at 0 indefinitely
+        questionnaireResponseModel.orderedResponseItemModels().firstWhereOrNull(
+              (rim) => rim.questionnaireItemModel.isTotalScore,
+            ) as QuestionItemModel?;
+    // if there is no total score item then leave value at 0 indefinitely
     if (autoAggregate) {
       if (totalScoreItem != null) {
-        for (final itemModel
-            in questionnaireModel.orderedQuestionnaireItemModels()) {
-          if (!itemModel.isStatic && itemModel != totalScoreItem) {
-            itemModel.addListener(() => aggregate(notifyListeners: true));
+        for (final rim
+            in questionnaireResponseModel.orderedResponseItemModels()) {
+          if (!rim.questionnaireItemModel.isStatic && rim != totalScoreItem) {
+            rim.addListener(() => aggregate(notifyListeners: true));
           }
         }
       }
@@ -52,7 +50,7 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
 
     _logger.trace('totalScore.aggregate');
     final sum =
-        questionnaireModel.orderedQuestionnaireItemModels().fold<double>(
+        questionnaireResponseModel.orderedQuestionItemModels().fold<double>(
               0.0,
               (previousValue, element) =>
                   previousValue + (element.ordinalValue?.value ?? 0.0),
@@ -64,8 +62,7 @@ class TotalScoreAggregator extends Aggregator<Decimal> {
       value = result;
     }
 
-    totalScoreItem.responseModel.answerModel(0).populateFromExpression(result);
-    totalScoreItem.responseModel.updateResponse();
+    totalScoreItem.firstAnswerModel.populateFromExpression(result);
 
     return result;
   }

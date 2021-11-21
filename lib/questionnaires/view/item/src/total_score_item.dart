@@ -13,10 +13,10 @@ import '../../../questionnaires.dart';
 /// sundhed.dk questionnaire-feedback extension.
 class TotalScoreItem extends QuestionnaireAnswerFiller {
   TotalScoreItem(
-    QuestionnaireResponseFillerState responseFillerState,
-    int answerIndex, {
+    QuestionResponseItemFillerState responseItemFillerState,
+    AnswerModel answerModel, {
     Key? key,
-  }) : super(responseFillerState, answerIndex, key: key);
+  }) : super(responseItemFillerState, answerModel, key: key);
   @override
   State<StatefulWidget> createState() => _TotalScoreItemState();
 }
@@ -28,43 +28,47 @@ class _TotalScoreItemState extends State<TotalScoreItem> {
 
   _TotalScoreItemState();
 
+  void _updateCalcResult() {
+    calcResult =
+        (widget.responseItemModel.firstAnswerModel as NumericalAnswerModel)
+            .value
+            ?.value;
+  }
+
   @override
   void initState() {
     super.initState();
 
-    // TODO: This should go into a model.
-    calcResult =
-        widget.itemModel.responseItem?.answer?.firstOrNull?.valueDecimal ??
-            widget.itemModel.responseItem?.answer?.first.valueQuantity?.value;
+    _updateCalcResult();
 
-    if (widget.itemModel.isCalculated) {
+    if (widget.questionnaireItemModel.isCalculated) {
       _logger.debug(
-        'Adding listener to ${widget.itemModel} for calculated expression',
+        'Adding listener to ${widget.questionnaireItemModel} for calculated expression',
       );
-      widget.itemModel.questionnaireModel.addListener(_questionnaireChanged);
+      widget.responseItemModel.questionnaireResponseModel
+          .addListener(_questionnaireChanged);
     }
   }
 
   @override
   void dispose() {
-    widget.itemModel.questionnaireModel.removeListener(_questionnaireChanged);
+    widget.responseItemModel.questionnaireResponseModel
+        .removeListener(_questionnaireChanged);
     super.dispose();
   }
 
   void _questionnaireChanged() {
-    _logger.debug('questionnaireChanged(): ${widget.itemModel.responseItem}');
+    _logger.debug(
+      'questionnaireChanged(): ${widget.responseItemModel.nodeUid}',
+    );
     if (!mounted) {
       return;
     }
-    if (widget.itemModel.responseItem != null) {
-      setState(() {
-        calcResult =
-            widget.itemModel.responseItem!.answer?.firstOrNull?.valueDecimal ??
-                widget.itemModel.responseItem!.answer?.firstOrNull
-                    ?.valueQuantity?.value;
-      });
-      _logger.debug('calculated result: $calcResult');
-    }
+
+    setState(() {
+      _updateCalcResult();
+    });
+    _logger.debug('calculated result: $calcResult');
   }
 
   final _nullExtension = FhirExtension();
@@ -75,7 +79,7 @@ class _TotalScoreItemState extends State<TotalScoreItem> {
       return null;
     }
     final matchExtension =
-        widget.itemModel.questionnaireItem.extension_?.firstWhere(
+        widget.questionnaireItemModel.questionnaireItem.extension_?.firstWhere(
       (ext) {
         return (ext.url?.value.toString() ==
                 'http://ehealth.sundhed.dk/fhir/StructureDefinition/ehealth-questionnaire-feedback') &&
@@ -87,19 +91,18 @@ class _TotalScoreItemState extends State<TotalScoreItem> {
       orElse: () => _nullExtension,
     );
 
-    if (matchExtension == _nullExtension) {
-      return null;
-    } else {
-      return matchExtension!.extension_!.extensionOrNull('value')!.valueString;
-    }
+    return (matchExtension == _nullExtension)
+        ? null
+        : matchExtension!.extension_!.extensionOrNull('value')!.valueString;
   }
 
   @override
   Widget build(BuildContext context) {
-    if (widget.itemModel.isTotalScore) {
+    if (widget.questionnaireItemModel.isTotalScore) {
       final score = calcResult?.value?.round();
       final scoreText = score?.toString() ?? AnswerModel.nullText;
       final feedback = findDanishFeedback(score);
+
       return Center(
         child: Column(
           children: [
@@ -116,7 +119,18 @@ class _TotalScoreItemState extends State<TotalScoreItem> {
                 style: Theme.of(context).textTheme.headline1,
               ),
             ),
-            if (feedback != null) HTML.toRichText(context, feedback),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 500),
+              child: (feedback != null)
+                  ? Container(
+                      key: ValueKey<String>(feedback),
+                      child: HTML.toRichText(context, feedback),
+                    )
+                  : const SizedBox(
+                      height: 16.0,
+                      key: ValueKey<String>('no-feedback'),
+                    ),
+            ),
           ],
         ),
       );

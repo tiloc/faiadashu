@@ -6,9 +6,10 @@ import 'questionnaire_filler.dart';
 
 /// Display a narrative
 class NarrativeTile extends StatefulWidget {
-  final QuestionnaireModel? questionnaireModel;
+  final QuestionnaireResponseModel? questionnaireResponseModel;
 
-  const NarrativeTile({this.questionnaireModel, Key? key}) : super(key: key);
+  const NarrativeTile({this.questionnaireResponseModel, Key? key})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _NarrativeTileState();
@@ -31,8 +32,9 @@ class _NarrativeTileState extends State<NarrativeTile> {
 
   @override
   Widget build(BuildContext context) {
-    final questionnaireModel = widget.questionnaireModel ??
-        QuestionnaireFiller.of(context).questionnaireModel;
+    final questionnaireResponseModel = widget.questionnaireResponseModel ??
+        QuestionnaireResponseFiller.of(context).questionnaireResponseModel;
+
     return SizedBox.expand(
       child: Scrollbar(
         isAlwaysShown: true,
@@ -41,7 +43,7 @@ class _NarrativeTileState extends State<NarrativeTile> {
           controller: _narrativeScrollController,
           child: HTML.toRichText(
             context,
-            questionnaireModel
+            questionnaireResponseModel
                     .aggregator<NarrativeAggregator>()
                     .aggregate()
                     ?.div ??

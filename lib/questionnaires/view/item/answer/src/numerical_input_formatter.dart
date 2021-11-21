@@ -38,6 +38,7 @@ class NumericalTextInputFormatter extends TextInputFormatter {
     try {
       final parsed = numberFormat.parse(newValue.text);
       _logger.trace('parsed: ${newValue.text} -> $parsed');
+
       return newValue;
     } catch (_) {
       return oldValue;

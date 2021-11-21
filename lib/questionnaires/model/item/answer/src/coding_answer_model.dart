@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
 
@@ -10,12 +8,10 @@ import '../../../model.dart';
 
 /// Model answers which are [Coding]s.
 class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
-  // ignore: prefer_collection_literals
-  final _answerOptions = LinkedHashMap<String, QuestionnaireAnswerOption>();
+  final _answerOptions = <String, QuestionnaireAnswerOption>{};
   static final _logger = Logger(CodingAnswerModel);
 
-  LinkedHashMap<String, QuestionnaireAnswerOption> get answerOptions =>
-      _answerOptions;
+  Map<String, QuestionnaireAnswerOption> get answerOptions => _answerOptions;
 
   static const openChoiceOther = 'open-choice-other';
 
@@ -40,19 +36,22 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
       if (isExclusive(enabledCoding)) {
         _logger.debug('$checkboxValue isExclusive');
         // The newly enabled checkbox is exclusive, kill all others.
+
         return enabledCodeableConcept;
       } else {
         _logger.debug('$checkboxValue is not exclusive');
         // Kill all exclusive ones.
+
         return value.copyWith(
           coding: [
             ...value.coding!.whereNot((coding) => isExclusive(coding)),
-            enabledCoding
+            enabledCoding,
           ],
         );
       }
     } else {
       _logger.debug('$checkboxValue currently selected.');
+
       return CodeableConcept(coding: value.coding!..removeAt(entryIndex));
     }
   }
@@ -81,6 +80,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
 
     // TODO: Can it ever be harmful that this is only looking at the first coding?
     final coding = codings.firstOrNull;
+
     return choiceStringFromCoding(coding);
   }
 
@@ -95,6 +95,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
     if (codeableConcept == null) {
       return null;
     }
+
     return _choiceStringFromCodings(
       ArgumentError.checkNotNull(codeableConcept.coding),
     );
@@ -119,8 +120,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
 
   /// Returns whether the options should be presented as an auto-complete control
   bool get isAutocomplete {
-    return !(qi.repeats == Boolean(true)) &&
-        (answerOptions.length > 10 || qi.isItemControl('autocomplete'));
+    return !(qi.repeats?.value ?? false) && (qi.isItemControl('autocomplete'));
   }
 
   // Take the existing extensions that might contain information about
@@ -165,7 +165,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
           codingExtensionBuilder: (inCoding) =>
               _createOrdinalExtension(inCoding.extension_),
         ),
-      )
+      ),
     ]);
   }
 
@@ -202,7 +202,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
         );
       }
 
-      itemModel.questionnaireModel
+      questionnaireItemModel.questionnaireModel
           .forEachInValueSet(key, _addAnswerOption, context: qi);
     } else {
       if (qi.answerOption != null) {
@@ -232,8 +232,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
   late final int minOccurs;
   late final int? maxOccurs;
 
-  CodingAnswerModel(ResponseModel responseModel, int answerIndex)
-      : super(responseModel, answerIndex) {
+  CodingAnswerModel(QuestionItemModel responseModel) : super(responseModel) {
     _createAnswerOptions();
 
     minOccurs = qi.extension_
@@ -250,20 +249,6 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
         )
         ?.valueInteger
         ?.value;
-
-    if (itemModel.responseItem != null) {
-      value = (itemModel.responseItem!.answer != null)
-          ? CodeableConcept(
-              coding: itemModel.responseItem!.answer
-                  ?.map(
-                    (answer) => answerOptions[
-                            choiceStringFromCoding(answer.valueCoding)]!
-                        .valueCoding!,
-                  )
-                  .toList(),
-            )
-          : null;
-    }
   }
 
   @override
@@ -298,14 +283,18 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
   }
 
   @override
-  QuestionnaireResponseAnswer? get filledAnswer {
+  QuestionnaireResponseAnswer? createFhirAnswer(
+    List<QuestionnaireResponseItem>? items,
+  ) {
     throw UnsupportedError(
       'CodingAnswerModel will always return coding answers.',
     );
   }
 
   @override
-  List<QuestionnaireResponseAnswer>? get filledCodingAnswers {
+  List<QuestionnaireResponseAnswer>? createFhirCodingAnswers(
+    List<QuestionnaireResponseItem>? items,
+  ) {
     if (value == null) {
       return null;
     }
@@ -317,7 +306,8 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
         ? [
             QuestionnaireResponseAnswer(
               valueCoding: Coding(display: value!.text),
-            )
+              item: items,
+            ),
           ]
         : value!.coding?.map<QuestionnaireResponseAnswer>((coding) {
             // Some answers may only be a display, not have a code
@@ -325,8 +315,12 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
                 ? QuestionnaireResponseAnswer(
                     valueCoding: answerOptions[choiceStringFromCoding(coding)]!
                         .valueCoding,
+                    item: items,
                   )
-                : QuestionnaireResponseAnswer(valueCoding: coding);
+                : QuestionnaireResponseAnswer(
+                    valueCoding: coding,
+                    item: items,
+                  );
           }).toList();
 
     return result;
@@ -339,23 +333,42 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
   QuestionnaireErrorFlag? get isComplete {
     if (value == null && minOccurs > 0) {
       return QuestionnaireErrorFlag(
-        itemModel.linkId,
-        answerIndex: answerIndex,
+        responseItemModel.nodeUid,
         errorText:
             lookupFDashLocalizations(locale).validatorMinOccurs(minOccurs),
       );
     }
 
     final validationText = validateInput(value);
+
     return (validationText == null)
         ? null
         : QuestionnaireErrorFlag(
-            itemModel.linkId,
-            answerIndex: answerIndex,
+            responseItemModel.nodeUid,
             errorText: validationText,
           );
   }
 
   @override
   bool get isUnanswered => value == null;
+
+  @override
+  void populate(QuestionnaireResponseAnswer answer) {
+    throw UnimplementedError('populate not implemented.');
+  }
+
+  @override
+  void populateCodingAnswers(List<QuestionnaireResponseAnswer>? answers) {
+    value = (answers != null)
+        ? CodeableConcept(
+            coding: answers
+                .map(
+                  (answer) =>
+                      answerOptions[choiceStringFromCoding(answer.valueCoding)]!
+                          .valueCoding!,
+                )
+                .toList(),
+          )
+        : null;
+  }
 }

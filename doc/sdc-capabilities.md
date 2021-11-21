@@ -22,7 +22,8 @@ Limited support for variables is available.
 The general concept is described here: https://www.hl7.org/fhir/extension-variable.html
 
 Variables can only be used on the Questionnaire level.
-They are currently not supported on individual items.
+
+> Variables are currently not supported on individual items.
 
 Variables' `calculatedExpression` cannot refer to other variables. 
 `calculatedExpression` on items can refer to any variable, though.
@@ -96,6 +97,13 @@ Supported.
 Reference:
 [sdc-questionnaire-enableWhenExpression](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-enableWhenExpression.html)
 
+##### itemMedia
+An image to display as a visual accompaniment to the question being asked.
+> Only inlined images are supported. Only small image formats are supported.
+
+Reference: 
+[sdc-questionnaire-itemMedia](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-itemMedia.html)
+
 ---
 #### boolean
 Comprehensive support, incl. tri-state for "not answered"
@@ -119,7 +127,6 @@ Quantity requires the declaration of units. It does not support free-text entry 
 - sliderStepValue
 - unitValueSet
 - unit
-
 
 ---
 #### decimal
@@ -322,13 +329,4 @@ Choice answers will be marked as "user selected".
 ### Argonaut
 [Argonaut](http://fhir.org/guides/argonaut/questionnaire/index.html) is a subset of SDC and based on FHIR R3. The Form Filler is based on FHIR R4, which inherently makes it non-conformant
 to Argonaut. It does fill all the corresponding mandatory fields in the R4 QuestionnaireResponse.
-
-### FHIR Clinical Guidelines (CPG IG)
-[CPG](http://build.fhir.org/ig/HL7/cqf-recommendations/index.html) is generally not supported by this Form Filler.
-
-It does support select extensions for visual control:
-#### itemImage
-An image to display as a visual accompaniment to the question being asked.
-
-This extension can be applied to question items.
 

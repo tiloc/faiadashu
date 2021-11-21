@@ -9,10 +9,10 @@ import 'numerical_input_formatter.dart';
 /// Filler for answers of type [Integer], [Decimal], and [Quantity].
 class NumericalAnswerFiller extends QuestionnaireAnswerFiller {
   NumericalAnswerFiller(
-    QuestionnaireResponseFillerState responseFillerState,
-    int answerIndex, {
+    QuestionResponseItemFillerState responseFillerState,
+    AnswerModel answerModel, {
     Key? key,
-  }) : super(responseFillerState, answerIndex, key: key);
+  }) : super(responseFillerState, answerModel, key: key);
 
   @override
   State<NumericalAnswerFiller> createState() => _NumericalAnswerState();
@@ -40,45 +40,43 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
   }
 
   Widget _buildDropDownFromUnits(BuildContext context) {
-    if (answerModel.hasSingleUnitChoice) {
-      return Container(
-        alignment: Alignment.topLeft,
-        padding: const EdgeInsets.only(left: 8, top: 10),
-        width: 96,
-        child: Text(
-          answerModel.unitChoices.first.localizedDisplay(locale),
-          style: Theme.of(context).textTheme.subtitle1,
-        ),
-      );
-    } else {
-      return Container(
-        padding: const EdgeInsets.only(left: 8),
-        width: 96,
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<String>(
-            value: answerModel.keyOfUnit,
-            hint: const NullDashText(),
-            onChanged: (answerModel.isEnabled)
-                ? (String? newValue) {
-                    value = answerModel.copyWithUnit(newValue);
-                  }
-                : null,
-            items: [
-              const DropdownMenuItem<String>(
-                child: NullDashText(),
+    const unitWidth = 96.0;
+
+    return answerModel.hasSingleUnitChoice
+        ? Container(
+            alignment: Alignment.topLeft,
+            padding: const EdgeInsets.only(left: 8, top: 10),
+            width: unitWidth,
+            child: Text(
+              answerModel.unitChoices.first.localizedDisplay(locale),
+              style: Theme.of(context).textTheme.subtitle1,
+            ),
+          )
+        : Container(
+            padding: const EdgeInsets.only(left: 8),
+            width: unitWidth,
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: answerModel.keyOfUnit,
+                hint: const NullDashText(),
+                onChanged: (answerModel.isEnabled)
+                    ? (String? newValue) {
+                        value = answerModel.copyWithUnit(newValue);
+                      }
+                    : null,
+                items: [
+                  const DropdownMenuItem<String>(child: NullDashText()),
+                  ...answerModel.unitChoices
+                      .map<DropdownMenuItem<String>>((Coding value) {
+                    return DropdownMenuItem<String>(
+                      value: answerModel.keyForUnitChoice(value),
+                      child: Text(value.localizedDisplay(locale)),
+                    );
+                  }).toList(),
+                ],
               ),
-              ...answerModel.unitChoices
-                  .map<DropdownMenuItem<String>>((Coding value) {
-                return DropdownMenuItem<String>(
-                  value: answerModel.keyForUnitChoice(value),
-                  child: Text(value.localizedDisplay(locale)),
-                );
-              }).toList()
-            ],
-          ),
-        ),
-      );
-    }
+            ),
+          );
   }
 
   @override
@@ -96,13 +94,18 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
       );
     }
 
+    const averageDivisor = 2.0;
+
     return answerModel.isSliding
         ? Slider(
             focusNode: firstFocusNode,
             min: answerModel.minValue,
             max: answerModel.maxValue,
             divisions: answerModel.sliderDivisions,
-            value: value!.value!.value!, // Yay, triple value!
+            value: (value != null)
+                ? value!.value!.value!
+                : (answerModel.maxValue - answerModel.minValue) /
+                    averageDivisor,
             label: answerModel.display,
             onChanged: answerModel.isEnabled
                 ? (sliderValue) {
@@ -128,9 +131,10 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
                     decoration: questionnaireTheme.createDecoration().copyWith(
                           errorText: answerModel.errorText,
                           hintText: answerModel.entryFormat,
-                          prefixIcon: answerModel.itemModel.isCalculated
-                              ? const Icon(Icons.calculate)
-                              : null,
+                          prefixIcon:
+                              answerModel.questionnaireItemModel.isCalculated
+                                  ? const Icon(Icons.calculate)
+                                  : null,
                           suffixIcon: (answerModel.hasUnitChoices)
                               ? SizedBox(
                                   height: 16,

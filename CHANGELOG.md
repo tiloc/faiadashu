@@ -1,3 +1,37 @@
+## 0.6.0-dev.1
+* **[Breaking]** Fix hierarchy of models according to https://chat.fhir.org/#narrow/stream/179255-questionnaire/topic/Questionnaire.20Response.20example
+  * This introduces a strict separation of a questionnaire's structure and a response to this questionnaire
+    * QuestionnaireModel contains all static, structural descriptions of the questionnaire
+    * QuestionnaireResponseModel contains the result of filling a questionnaire and all dynamic behavior
+  * This replaces the previous, simplistic 1:1 relationships between items and responses with proper nested 1:n model
+    * Answers can have **nested responses** now. This is a major improvement that could only be enabled through the cleaned up data model.
+      * Nested items are created as needed during the initial population of the model - See Bluebook Vitamin K for example.
+      * Nested items are created as needed during human interaction (question with nested items is being answered for 
+      the first time) - See LOINC AHRQ for example.
+      * Nested items are enabled/disabled based on their parent answer
+      * >Some dynamic behaviors (initialValue, calculatedExpression...) are not activated for subsequently added nested questions yet
+  * Clarified the relationship between FHIR and Presentation Model. The FHIR `QuestionnaireResponse` is used during
+model creation to populate the presentation model, and it is created by the aggregator from the presentation model.
+But it is not used in between anymore. This is resolving a lot of inconsistencies and complexities.
+
+* QuestionnaireModel is no longer inheriting from QuestionnaireItemModel. This weird relationship had to end.
+    
+> You should not experience any breakage if you are merely using the questionnaire filler components.
+> You will see numerous API changes which will require fixes if you have forked/modified.
+
+> The documentation has been updated to reflect the changes.
+
+* **Repeating question items:** Answers to repeating question items can be added and removed now.
+This is a major improvement that could only be enabled through the cleaned up data model.
+
+
+* More possibilities for theming
+* Better narrative generator
+* JSON tree copies individual items to clipboard by tapping on them
+
+* Updated dependencies
+* Introduced stricter code analysis and fixed some findings
+
 ## 0.5.4-dev.6
 * Fix bug with unit extension
 * WIP: repeating question items

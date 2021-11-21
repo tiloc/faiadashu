@@ -62,7 +62,7 @@ class BrokenQuestionnaireItem extends StatelessWidget {
                     : (element is QuestionnaireItem)
                         ? jsonEncode((element! as QuestionnaireItem).toJson())
                         : element.toString(),
-              )
+              ),
           ],
         ),
       ),

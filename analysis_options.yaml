@@ -1,10 +1,35 @@
 include: package:lint/analysis_options_package.yaml
 
 analyzer:
+  plugins:
+    - dart_code_metrics
+
   exclude:
     - lib/**/*.g.dart
     - example/lib/generated_plugin_registrant.dart
 
 linter:
   rules:
-#    require_trailing_commas: false
+
+
+dart_code_metrics:
+  metrics:
+    cyclomatic-complexity: 20
+    number-of-arguments: 4
+    maximum-nesting-level: 5
+    source-lines-of-code: 50
+  metrics-exclude:
+    - test/**
+  rules:
+    - newline-before-return
+    - no-boolean-literal-compare
+#    - no-empty-block
+    - prefer-trailing-comma
+    - prefer-conditional-expressions
+    - no-equal-then-else
+    - no-magic-number
+    - prefer-single-widget-per-file:
+        ignore-private-widgets: true
+  anti-patterns:
+    - long-method
+    - long-parameter-list

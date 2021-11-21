@@ -5,34 +5,35 @@ import '../../../logging/logging.dart';
 import '../../../resource_provider/resource_provider.dart';
 import '../../questionnaires.dart';
 
-/// Fill a [Questionnaire].
+/// Fill a [QuestionnaireResponse] from a [Questionnaire].
 ///
-/// Provides visual components to view and fill a [Questionnaire].
+/// Provides visual components to view a [Questionnaire] and fill a [QuestionnaireResponse].
 /// The components are provided as a [List] of [Widget]s of type [QuestionnaireItemFiller].
 /// It is up to a higher-level component to present these to the user.
 ///
 /// see: [QuestionnaireScrollerPage]
 /// see: [QuestionnaireStepperPage]
-class QuestionnaireFiller extends StatefulWidget {
+class QuestionnaireResponseFiller extends StatefulWidget {
   final Locale locale;
   final WidgetBuilder builder;
   final List<Aggregator<dynamic>>? aggregators;
   final void Function(BuildContext context, Uri url)? onLinkTap;
-  final void Function(QuestionnaireModel)? onDataAvailable;
+  final void Function(QuestionnaireResponseModel)? onDataAvailable;
   final QuestionnaireTheme questionnaireTheme;
 
   final FhirResourceProvider fhirResourceProvider;
   final LaunchContext launchContext;
 
-  Future<QuestionnaireModel> _createQuestionnaireModel() async =>
-      QuestionnaireModel.fromFhirResourceBundle(
-        locale: locale,
-        aggregators: aggregators,
-        fhirResourceProvider: fhirResourceProvider,
-        launchContext: launchContext,
-      );
+  Future<QuestionnaireResponseModel>
+      _createQuestionnaireResponseModel() async =>
+          QuestionnaireResponseModel.fromFhirResourceBundle(
+            locale: locale,
+            aggregators: aggregators,
+            fhirResourceProvider: fhirResourceProvider,
+            launchContext: launchContext,
+          );
 
-  const QuestionnaireFiller({
+  const QuestionnaireResponseFiller({
     Key? key,
     required this.locale,
     required this.builder,
@@ -48,52 +49,78 @@ class QuestionnaireFiller extends StatefulWidget {
     final result =
         context.dependOnInheritedWidgetOfExactType<QuestionnaireFillerData>();
     assert(result != null, 'No QuestionnaireFillerData found in context');
+
     return result!;
   }
 
   @override
-  _QuestionnaireFillerState createState() => _QuestionnaireFillerState();
+  _QuestionnaireResponseFillerState createState() =>
+      _QuestionnaireResponseFillerState();
 }
 
-class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
-  static final _logger = Logger(_QuestionnaireFillerState);
+class _QuestionnaireResponseFillerState
+    extends State<QuestionnaireResponseFiller> {
+  static final _logger = Logger(_QuestionnaireResponseFillerState);
 
-  late final Future<QuestionnaireModel> builderFuture;
-  QuestionnaireModel? _questionnaireModel;
-  VoidCallback? _onQuestionnaireModelChangeListenerFunction;
-  late final QuestionnaireFillerData _questionnaireFillerData;
+  late final Future<QuestionnaireResponseModel> builderFuture;
+  QuestionnaireResponseModel? _questionnaireResponseModel;
+  VoidCallback? _onQuestionnaireResponseModelChangeListenerFunction;
+  // ignore: use_late_for_private_fields_and_variables
+  QuestionnaireFillerData? _questionnaireFillerData;
+
+  int _fillerItemCount = -1;
 
   @override
   void initState() {
     super.initState();
-    builderFuture = widget._createQuestionnaireModel();
+    builderFuture = widget._createQuestionnaireResponseModel();
   }
 
   @override
   void dispose() {
     _logger.trace('dispose');
 
-    if (_onQuestionnaireModelChangeListenerFunction != null &&
-        _questionnaireModel != null) {
-      _questionnaireModel!
-          .removeListener(_onQuestionnaireModelChangeListenerFunction!);
-      _questionnaireModel = null;
-      _onQuestionnaireModelChangeListenerFunction = null;
+    if (_onQuestionnaireResponseModelChangeListenerFunction != null &&
+        _questionnaireResponseModel != null) {
+      _questionnaireResponseModel!
+          .removeListener(_onQuestionnaireResponseModelChangeListenerFunction!);
+      _questionnaireResponseModel = null;
+      _onQuestionnaireResponseModelChangeListenerFunction = null;
     }
     super.dispose();
   }
 
-  void _onQuestionnaireModelChange() {
-    _logger.trace('_onQuestionnaireModelChange');
+  void _onQuestionnaireResponseModelChange() {
+    _logger.trace('_onQuestionnaireResponseModelChange');
+
+    final newFillerItems =
+        _questionnaireResponseModel!.orderedFillerItemModels();
+    final newFillerItemCount = newFillerItems.length;
+
     if (mounted) {
-      setState(() {});
+      setState(() {
+        if (_fillerItemCount != newFillerItemCount) {
+          _logger
+              .debug('Filler item count has changed. Updating filler views.');
+          _fillerItemCount = newFillerItemCount;
+          _questionnaireFillerData = QuestionnaireFillerData._(
+            _questionnaireResponseModel!,
+            locale: widget.locale,
+            builder: widget.builder,
+            onLinkTap: widget.onLinkTap,
+            onDataAvailable: widget.onDataAvailable,
+            questionnaireTheme: widget.questionnaireTheme,
+          );
+        }
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     _logger.trace('Enter build()');
-    return FutureBuilder<QuestionnaireModel>(
+
+    return FutureBuilder<QuestionnaireResponseModel>(
       future: builderFuture,
       builder: (context, snapshot) {
         switch (snapshot.connectionState) {
@@ -109,21 +136,26 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
           case ConnectionState.done:
             if (snapshot.hasError) {
               _logger.warn('FutureBuilder hasError', error: snapshot.error);
+
               return QuestionnaireLoadingIndicator(snapshot);
             }
             if (snapshot.hasData) {
               _logger.debug('FutureBuilder hasData');
-              _questionnaireModel = snapshot.data;
+              _questionnaireResponseModel = snapshot.data;
+
+              _fillerItemCount =
+                  _questionnaireResponseModel!.orderedFillerItemModels().length;
+
               // OPTIMIZE: There has got to be a more elegant way? Goal is to register the listener exactly once, after the future has completed.
-              if (_onQuestionnaireModelChangeListenerFunction == null) {
-                _onQuestionnaireModelChangeListenerFunction =
-                    () => _onQuestionnaireModelChange();
-                _questionnaireModel!.addListener(
-                  _onQuestionnaireModelChangeListenerFunction!,
+              if (_onQuestionnaireResponseModelChangeListenerFunction == null) {
+                _onQuestionnaireResponseModelChangeListenerFunction =
+                    () => _onQuestionnaireResponseModelChange();
+                _questionnaireResponseModel!.addListener(
+                  _onQuestionnaireResponseModelChangeListenerFunction!,
                 );
 
                 _questionnaireFillerData = QuestionnaireFillerData._(
-                  _questionnaireModel!,
+                  _questionnaireResponseModel!,
                   locale: widget.locale,
                   builder: widget.builder,
                   onLinkTap: widget.onLinkTap,
@@ -131,7 +163,8 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
                   questionnaireTheme: widget.questionnaireTheme,
                 );
               }
-              return _questionnaireFillerData;
+
+              return _questionnaireFillerData!;
             }
             throw StateError(
               'FutureBuilder snapshot has unexpected state: $snapshot',
@@ -142,59 +175,55 @@ class _QuestionnaireFillerState extends State<QuestionnaireFiller> {
   }
 }
 
-// OPTIMIZE: Would there be any benefit in making this an InheritedNotifier, listening to the QuestionnaireModel?
-
+// ignore: prefer-single-widget-per-file
 class QuestionnaireFillerData extends InheritedWidget {
   static final _logger = Logger(QuestionnaireFillerData);
 
   final Locale locale;
-  final QuestionnaireModel questionnaireModel;
-  final Iterable<QuestionnaireItemModel> questionnaireItemModels;
+  final QuestionnaireResponseModel questionnaireResponseModel;
+  // TODO: Should this copy exist, or just refer to the qrm as the source of truth?
+  final Iterable<FillerItemModel> fillerItemModels;
+
   final void Function(BuildContext context, Uri url)? onLinkTap;
-  final void Function(QuestionnaireModel)? onDataAvailable;
+  final void Function(QuestionnaireResponseModel)? onDataAvailable;
   final QuestionnaireTheme questionnaireTheme;
   late final List<QuestionnaireItemFiller?> _itemFillers;
-  final Map<int, QuestionnaireItemFillerState> _itemFillerStates = {};
+  final Map<String, QuestionnaireItemFillerState> _itemFillerStates = {};
   late final int _generation;
 
   QuestionnaireFillerData._(
-    this.questionnaireModel, {
+    this.questionnaireResponseModel, {
     Key? key,
     required this.locale,
     this.onDataAvailable,
     this.onLinkTap,
     required this.questionnaireTheme,
     required WidgetBuilder builder,
-  })  : _generation = questionnaireModel.generation,
-        questionnaireItemModels =
-            questionnaireModel.orderedQuestionnaireItemModels(),
+  })  : _generation = questionnaireResponseModel.generation,
+        fillerItemModels = questionnaireResponseModel.orderedFillerItemModels(),
         _itemFillers = List<QuestionnaireItemFiller?>.filled(
-          questionnaireModel.orderedQuestionnaireItemModels().length,
+          questionnaireResponseModel.orderedFillerItemModels().length,
           null,
         ),
         super(key: key, child: Builder(builder: builder)) {
     _logger.trace('constructor _');
-    onDataAvailable?.call(questionnaireModel);
+    onDataAvailable?.call(questionnaireResponseModel);
   }
 
   /// INTERNAL USE ONLY: Register a [QuestionnaireItemFillerState].
   void registerQuestionnaireItemFillerState(QuestionnaireItemFillerState qifs) {
-    _itemFillerStates[_indexOfLinkId(qifs.linkId)] = qifs;
+    _itemFillerStates[qifs.responseUid] = qifs;
   }
 
   /// INTERNAL USE ONLY: Unregister a [QuestionnaireItemFillerState].
   void unregisterQuestionnaireItemFillerState(
     QuestionnaireItemFillerState qifs,
   ) {
-    _itemFillerStates.remove(_indexOfLinkId(qifs.linkId));
-  }
-
-  int _indexOfLinkId(String linkId) {
-    return _itemFillers.indexWhere((qif) => qif?.itemModel.linkId == linkId);
+    _itemFillerStates.remove(qifs.responseUid);
   }
 
   T aggregator<T extends Aggregator>() {
-    return questionnaireModel.aggregator<T>();
+    return questionnaireResponseModel.aggregator<T>();
   }
 
   /// Requests focus on a [QuestionnaireItemFiller].
@@ -202,7 +231,8 @@ class QuestionnaireFillerData extends InheritedWidget {
   /// The item filler will be determined as by [itemFillerAt].
   void requestFocus(int index) {
     _logger.trace('requestFocus $index');
-    final itemFillerState = _itemFillerStates[index];
+    final fillerUid = fillerItemModels.elementAt(index).nodeUid;
+    final itemFillerState = _itemFillerStates[fillerUid];
     if (itemFillerState == null) {
       _logger.warn('requestFocus $index: itemFillerState == null');
     } else {
@@ -222,9 +252,9 @@ class QuestionnaireFillerData extends InheritedWidget {
       _logger.debug('itemFillerAt $index will be created.');
       _itemFillers[index] = questionnaireTheme.createQuestionnaireItemFiller(
         this,
-        index,
+        fillerItemModels.elementAt(index),
         key: ValueKey<String>(
-          'item-filler-${questionnaireItemModels.elementAt(index).linkId}',
+          'item-filler-${fillerItemModels.elementAt(index).nodeUid}',
         ),
       );
     } else {
@@ -238,6 +268,7 @@ class QuestionnaireFillerData extends InheritedWidget {
   bool updateShouldNotify(QuestionnaireFillerData oldWidget) {
     final shouldNotify = oldWidget._generation != _generation;
     _logger.debug('updateShouldNotify: $shouldNotify');
+
     return shouldNotify;
   }
 }

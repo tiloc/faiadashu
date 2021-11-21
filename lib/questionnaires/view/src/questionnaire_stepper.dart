@@ -23,23 +23,25 @@ class QuestionnaireStepper extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _QuestionnaireStepperState();
+  State<StatefulWidget> createState() => QuestionnaireStepperState();
 }
 
-class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
+class QuestionnaireStepperState extends State<QuestionnaireStepper> {
   int step = 0;
 
   @override
   Widget build(BuildContext context) {
     final controller = PageController();
-    return QuestionnaireFiller(
+
+    return QuestionnaireResponseFiller(
       locale: widget.locale ?? Localizations.localeOf(context),
       fhirResourceProvider: widget.fhirResourceProvider,
       launchContext: widget.launchContext,
       questionnaireTheme: widget.questionnaireTheme,
       builder: (BuildContext context) {
-        final questionnaireFiller = QuestionnaireFiller.of(context);
-        final itemCount = questionnaireFiller.questionnaireItemModels.length;
+        final questionnaireFiller = QuestionnaireResponseFiller.of(context);
+        final itemCount = questionnaireFiller.fillerItemModels.length;
+
         return widget.scaffoldBuilder.build(
           context,
           setStateCallback: (fn) => setState(fn),
@@ -54,7 +56,7 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
                     controller: controller,
                     itemCount: itemCount,
                     itemBuilder: (BuildContext context, int index) {
-                      return QuestionnaireFiller.of(context)
+                      return QuestionnaireResponseFiller.of(context)
                           .itemFillerAt(index);
                     },
                   ),
@@ -80,6 +82,7 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
                             Widget? child,
                           ) {
                             final scoreString = value.value!.round().toString();
+
                             return AnimatedSwitcher(
                               duration: const Duration(milliseconds: 200),
                               child: Text(
@@ -90,12 +93,13 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
                               ),
                             );
                           },
-                          valueListenable: QuestionnaireFiller.of(context)
-                              .aggregator<TotalScoreAggregator>(),
+                          valueListenable:
+                              QuestionnaireResponseFiller.of(context)
+                                  .aggregator<TotalScoreAggregator>(),
                         ),
                         if (widget.questionnaireTheme.showProgress)
                           QuestionnaireFillerProgressBar(
-                            questionnaireFiller.questionnaireModel,
+                            questionnaireFiller.questionnaireResponseModel,
                           ),
                       ],
                     ),
@@ -115,24 +119,4 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
       },
     );
   }
-}
-
-class QuestionnaireStepperPage extends QuestionnaireStepper {
-  const QuestionnaireStepperPage({
-    Locale? locale,
-    required FhirResourceProvider fhirResourceProvider,
-    required LaunchContext launchContext,
-    QuestionnaireTheme questionnaireTheme = const QuestionnaireTheme(),
-    Key? key,
-  }) : super(
-          locale: locale,
-          scaffoldBuilder: const DefaultQuestionnairePageScaffoldBuilder(),
-          fhirResourceProvider: fhirResourceProvider,
-          launchContext: launchContext,
-          questionnaireTheme: questionnaireTheme,
-          key: key,
-        );
-
-  @override
-  State<StatefulWidget> createState() => _QuestionnaireStepperState();
 }

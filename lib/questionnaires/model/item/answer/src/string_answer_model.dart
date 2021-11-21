@@ -18,8 +18,7 @@ class StringAnswerModel extends AnswerModel<String, String> {
   late final int? maxLength;
   late final StringAnswerKeyboard keyboard;
 
-  StringAnswerModel(ResponseModel responseModel, int answerIndex)
-      : super(responseModel, answerIndex) {
+  StringAnswerModel(QuestionItemModel responseModel) : super(responseModel) {
     final regexPattern = qi.extension_
         ?.extensionOrNull('http://hl7.org/fhir/StructureDefinition/regex')
         ?.valueString;
@@ -55,8 +54,6 @@ class StringAnswerModel extends AnswerModel<String, String> {
                     : (keyboardExtension == 'number')
                         ? StringAnswerKeyboard.number
                         : StringAnswerKeyboard.plain;
-
-    value = answer?.valueString;
   }
 
   @override
@@ -97,14 +94,16 @@ class StringAnswerModel extends AnswerModel<String, String> {
   // TODO: Should the string get trimmed somewhere?
 
   @override
-  QuestionnaireResponseAnswer? get filledAnswer {
+  QuestionnaireResponseAnswer? createFhirAnswer(
+    List<QuestionnaireResponseItem>? items,
+  ) {
     final valid = validateInput(value) == null;
     final dataAbsentReasonExtension = !valid
         ? [
             FhirExtension(
               url: dataAbsentReasonExtensionUrl,
               valueCode: dataAbsentReasonAsTextCode,
-            )
+            ),
           ]
         : null;
 
@@ -113,10 +112,12 @@ class StringAnswerModel extends AnswerModel<String, String> {
             ? QuestionnaireResponseAnswer(
                 valueString: value,
                 extension_: dataAbsentReasonExtension,
+                item: items,
               )
             : QuestionnaireResponseAnswer(
                 valueUri: FhirUri(value),
                 extension_: dataAbsentReasonExtension,
+                item: items,
               )
         : null;
   }
@@ -124,15 +125,10 @@ class StringAnswerModel extends AnswerModel<String, String> {
   @override
   QuestionnaireErrorFlag? get isComplete {
     final valid = validateInput(value);
-    if (valid == null) {
-      return null;
-    } else {
-      return QuestionnaireErrorFlag(
-        responseModel.itemModel.linkId,
-        answerIndex: answerIndex,
-        errorText: valid,
-      );
-    }
+
+    return valid == null
+        ? null
+        : QuestionnaireErrorFlag(responseItemModel.nodeUid, errorText: valid);
   }
 
   @override
@@ -142,11 +138,15 @@ class StringAnswerModel extends AnswerModel<String, String> {
   void populateFromExpression(dynamic evaluationResult) {
     if (evaluationResult == null) {
       value = null;
+
       return;
     }
 
     value = evaluationResult as String?;
+  }
 
-    responseModel.answers[answerIndex] = filledAnswer;
+  @override
+  void populate(QuestionnaireResponseAnswer answer) {
+    value = answer.valueString;
   }
 }

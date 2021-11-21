@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:fhir/r4.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +13,7 @@ import '../../questionnaires.dart';
 
 /// Fills a [Questionnaire] through a vertically scrolling input form.
 ///
-/// Takes the [QuestionnaireItemFiller]s as provided by the [QuestionnaireFiller]
+/// Takes the [QuestionnaireItemFiller]s as provided by the [QuestionnaireResponseFiller]
 /// and presents them as a scrolling [ListView].
 ///
 /// The [scaffoldBuilder] is used to build a wrapper around the list.
@@ -19,9 +21,11 @@ import '../../questionnaires.dart';
 /// A set of mandatory and optional FHIR resources need to be provided through
 /// the [fhirResourceProvider]:
 /// * (mandatory) [questionnaireResourceUri] - the [Questionnaire]
-/// * (mandatory) [subjectResourceUri] - the [Patient]
 /// * (optional) [questionnaireResponseResourceUri] - the [QuestionnaireResponse].
 /// Will be used to prefill the filler, if present.
+///
+/// The [launchContext] is used to provide:
+/// * (mandatory) - the [Patient]
 ///
 /// See: [QuestionnaireScrollerPage] for a [QuestionnaireScroller] which already
 /// wraps the list in a ready-made [Scaffold], incl. some commonly used buttons.
@@ -54,7 +58,7 @@ class QuestionnaireScroller extends StatefulWidget {
 }
 
 class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
-  QuestionnaireModel? _questionnaireModel;
+  QuestionnaireResponseModel? _questionnaireResponseModel;
   final ItemScrollController _listScrollController = ItemScrollController();
   final ItemPositionsListener _itemPositionsListener =
       ItemPositionsListener.create();
@@ -90,18 +94,22 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
   ///
   /// The item will also be focussed.
   void scrollToErrorFlag(QuestionnaireErrorFlag errorFlag) {
-    if (_questionnaireModel == null) {
+    if (_questionnaireResponseModel == null) {
       _logger.info(
         'Trying to scroll before QuestionnaireModel is loaded. Ignoring.',
       );
+
       return;
     }
 
-    final index =
-        _questionnaireModel!.indexOf((qim) => qim.linkId == errorFlag.linkId);
+    final index = _questionnaireResponseModel!
+        .indexOfFillerItem((fim) => fim.nodeUid == errorFlag.nodeUid);
 
     if (index == -1) {
-      _logger.warn('Error Flag with invalid linkId: ${errorFlag.linkId}');
+      _logger.warn(
+        'Error Flag with invalid responseUId: ${errorFlag.nodeUid}',
+      );
+
       return;
     }
 
@@ -116,6 +124,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
       _logger.info(
         'Trying to scroll before ListScrollController is attached. Ignoring.',
       );
+
       return;
     }
 
@@ -135,31 +144,33 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
         ? index - currentPosition
         : currentPosition - index;
 
-    final milliseconds = (distance < 10) ? 1000 : 1000 + (distance - 10) * 100;
+    final scrollDuration = max(1000, 1000 + (distance - 10) * 100);
+
+    // Scroll the item's top-edge into the top 30% of the screen.
+    const topThirtyPercent = 0.3;
 
     _listScrollController.scrollTo(
       index: index,
-      duration: Duration(milliseconds: milliseconds),
+      duration: Duration(milliseconds: scrollDuration),
       curve: Curves.easeInOutCubic,
-      alignment: 0.3,
-    ); // Scroll the item's top-edge into the top 30% of the screen.
+      alignment: topThirtyPercent,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final locale = widget.locale ?? Localizations.localeOf(context);
 
-    return QuestionnaireFiller(
+    return QuestionnaireResponseFiller(
       fhirResourceProvider: widget.fhirResourceProvider,
       launchContext: widget.launchContext,
       locale: locale,
       questionnaireTheme: widget.questionnaireTheme,
       builder: (BuildContext context) {
         _belowFillerContext = context;
-        final questionnaireFiller = QuestionnaireFiller.of(context);
+        final questionnaireFiller = QuestionnaireResponseFiller.of(context);
 
-        final mainMatterLength =
-            questionnaireFiller.questionnaireItemModels.length;
+        final mainMatterLength = questionnaireFiller.fillerItemModels.length;
         final frontMatterLength = widget.frontMatter?.length ?? 0;
         final backMatterLength = widget.backMatter?.length ?? 0;
         final totalLength =
@@ -195,7 +206,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
                         ? (i - (frontMatterLength + mainMatterLength))
                         : -1;
                 if (mainMatterIndex != -1) {
-                  return QuestionnaireFiller.of(context)
+                  return QuestionnaireResponseFiller.of(context)
                       .itemFillerAt(mainMatterIndex);
                 } else if (backMatterIndex != -1) {
                   return widget.backMatter![backMatterIndex];
@@ -210,7 +221,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
         );
       },
       aggregators: widget.aggregators,
-      onDataAvailable: (questionnaireModel) {
+      onDataAvailable: (questionnaireResponseModel) {
         if (_isPositioned) {
           return;
         }
@@ -219,22 +230,26 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
         if (!_isLoaded) {
           _isLoaded = true;
 
-          _questionnaireModel = questionnaireModel;
+          _questionnaireResponseModel = questionnaireResponseModel;
 
           // Listen for new error flags and then scroll to the first one.
-          questionnaireModel.errorFlags.addListener(() {
-            final markers = questionnaireModel.errorFlags.value;
+          questionnaireResponseModel.errorFlags.addListener(() {
+            final markers = questionnaireResponseModel.errorFlags.value;
             if (markers != null) {
               scrollToErrorFlag(markers.first);
             }
           });
 
-          _focusIndex = questionnaireModel
-              .indexOf((qim) => qim.isUnanswered || qim.isInvalid)!;
+          _focusIndex = questionnaireResponseModel.indexOfFillerItem(
+            (fim) =>
+                fim is QuestionItemModel && (fim.isUnanswered || fim.isInvalid),
+          )!;
 
           if (_focusIndex == -1) {
             // When all questions are answered then focus on the first field that can be filled by a human.
-            _focusIndex = questionnaireModel.indexOf((qim) => !qim.isReadOnly)!;
+            _focusIndex = questionnaireResponseModel.indexOfFillerItem(
+              (fim) => !fim.questionnaireItemModel.isReadOnly,
+            )!;
           }
         }
 
@@ -243,7 +258,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
         }
 
         _logger.debug(
-          'Focussing item# $_focusIndex - ${questionnaireModel.itemModelAt(_focusIndex)}',
+          'Focussing item# $_focusIndex - ${questionnaireResponseModel.itemFillerModelAt(_focusIndex)}',
         );
 
         _itemPositionsListener.itemPositions
@@ -275,6 +290,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
 
     if (isItemVisible) {
       _requestFocus();
+
       return;
     }
 
@@ -317,54 +333,11 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
 
     if (!_isFocussed) {
       WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-        QuestionnaireFiller.of(_belowFillerContext!).requestFocus(_focusIndex);
+        QuestionnaireResponseFiller.of(_belowFillerContext!)
+            .requestFocus(_focusIndex);
       });
 
       _isFocussed = true;
     }
   }
-}
-
-/// A [QuestionnaireScroller] with a scaffold.
-///
-/// Fills up the entire page, provides default navigation, help button.
-class QuestionnaireScrollerPage extends QuestionnaireScroller {
-  QuestionnaireScrollerPage({
-    Locale? locale,
-    required FhirResourceProvider fhirResourceProvider,
-    required LaunchContext launchContext,
-    Widget? floatingActionButton,
-    List<Widget>? persistentFooterButtons,
-    List<Widget>? frontMatter,
-    List<Widget>? backMatter = const [
-      SizedBox(
-        height: 80,
-      )
-    ],
-    List<Aggregator<dynamic>>? aggregators,
-    void Function(BuildContext context, Uri url)? onLinkTap,
-    QuestionnaireTheme questionnaireTheme = const QuestionnaireTheme(),
-    Key? key,
-  }) : super(
-          locale: locale,
-          scaffoldBuilder: DefaultQuestionnairePageScaffoldBuilder(
-            // Progress can only be shown instead of a FAB
-            floatingActionButton: floatingActionButton ??
-                (questionnaireTheme.showProgress
-                    ? Builder(
-                        builder: (context) =>
-                            const QuestionnaireFillerCircularProgress(),
-                      )
-                    : null),
-            persistentFooterButtons: persistentFooterButtons,
-          ),
-          fhirResourceProvider: fhirResourceProvider,
-          launchContext: launchContext,
-          frontMatter: frontMatter,
-          backMatter: backMatter,
-          aggregators: aggregators,
-          onLinkTap: onLinkTap,
-          questionnaireTheme: questionnaireTheme,
-          key: key,
-        );
 }

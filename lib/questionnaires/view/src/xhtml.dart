@@ -36,6 +36,7 @@ class Xhtml {
         xhtml.length - imgSuffix.length,
       );
       _logger.debug('Length of base64: ${base64String.length}');
+
       return Base64Image(
         base64String,
         width: width,
@@ -49,6 +50,7 @@ class Xhtml {
         xhtml.length - imgSuffix.length,
       );
       _logger.debug('Length of base64: ${base64String.length}');
+
       return Base64Image(
         base64String,
         width: width,
@@ -70,6 +72,7 @@ class Xhtml {
           elementId,
         );
       }
+
       return Base64Image(
         base64String,
         width: width,

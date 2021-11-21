@@ -37,6 +37,7 @@ class _NarrativeDrawerState extends State<NarrativeDrawer> {
   @override
   Widget build(BuildContext context) {
     final preferredHeight = MediaQuery.of(context).size.height * 0.7;
+
     return Card(
       margin: const EdgeInsets.all(8.0),
       child: ConstrainedBox(
@@ -68,13 +69,13 @@ class _NarrativeDrawerState extends State<NarrativeDrawer> {
                           ClipboardData(
                             text: _drawerMode
                                 ? const JsonEncoder.withIndent('    ').convert(
-                                    QuestionnaireFiller.of(context)
+                                    QuestionnaireResponseFiller.of(context)
                                         .aggregator<
                                             QuestionnaireResponseAggregator>()
                                         .aggregate(containPatient: true)
                                         ?.toJson(),
                                   )
-                                : QuestionnaireFiller.of(context)
+                                : QuestionnaireResponseFiller.of(context)
                                     .aggregator<NarrativeAggregator>()
                                     .aggregate()
                                     ?.div,
@@ -110,7 +111,7 @@ class _NarrativeDrawerState extends State<NarrativeDrawer> {
                             child: SingleChildScrollView(
                               controller: _responseScrollController,
                               child: ResourceJsonTree(
-                                QuestionnaireFiller.of(context)
+                                QuestionnaireResponseFiller.of(context)
                                     .aggregator<
                                         QuestionnaireResponseAggregator>()
                                     .aggregate(containPatient: true)

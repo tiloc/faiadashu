@@ -35,6 +35,7 @@ extension FDashDateExtension on Date {
       default:
         return defaultText;
     }
+
     return dateFormat.format(value!);
   }
 }
@@ -68,6 +69,7 @@ extension FDashDateTimeExtension on FhirDateTime {
             : DateFormat('y年M月d日', localeCode);
         break;
     }
+
     return dateFormat.format(value!);
   }
 }
@@ -82,6 +84,7 @@ extension FDashDecimalExtension on Decimal {
 
     try {
       final decimalFormat = NumberFormat.decimalPattern(locale.toString());
+
       return decimalFormat.format(value);
     } catch (exception) {
       _logger.warn('Cannot format $this', error: exception);
@@ -96,19 +99,13 @@ extension FDashQuantityExtension on Quantity {
     String defaultText = '',
     String unknownValueText = '?',
   }) {
-    if (value == null) {
-      if (unit == null) {
-        return defaultText;
-      } else {
-        return '$unknownValueText $unit';
-      }
-    } else {
-      if (unit == null) {
-        return value!.format(locale);
-      } else {
-        return '${value!.format(locale)} $unit';
-      }
-    }
+    return value == null
+        ? unit == null
+            ? defaultText
+            : '$unknownValueText $unit'
+        : unit == null
+            ? value!.format(locale)
+            : '${value!.format(locale)} $unit';
   }
 
   // Returns whether this [Quantity] has a specified unit.
@@ -174,6 +171,7 @@ extension FDashListCodingExtension on List<Coding> {
   /// Localized access to display value or empty string
   String localizedDisplay(Locale locale, {String defaultText = ''}) {
     if (isEmpty) return defaultText;
+
     return first.localizedDisplay(locale);
   }
 }
@@ -228,16 +226,19 @@ extension FDashListFhirExtensionExtension on List<FhirExtension> {
       final index = indexWhere((ext) {
         return ext == key;
       });
+
       return (index != -1) ? removeAt(index) : null;
     } else if (key is String) {
       final index = indexWhere((ext) {
         return ext.url == FhirUri(key);
       });
+
       return (index != -1) ? removeAt(index) : null;
     } else if (key is FhirUri) {
       final index = indexWhere((ext) {
         return ext.url == key;
       });
+
       return (index != -1) ? removeAt(index) : null;
     } else {
       throw ArgumentError.value(

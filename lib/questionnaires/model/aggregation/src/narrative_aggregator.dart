@@ -1,7 +1,6 @@
 import 'package:fhir/r4.dart';
 
 import '../../../../coding/coding.dart';
-import '../../../../fhir_types/fhir_types.dart';
 import '../../../../l10n/l10n.dart';
 import '../../../../logging/logging.dart';
 import '../../../questionnaires.dart';
@@ -10,7 +9,7 @@ import '../../../questionnaires.dart';
 class NarrativeAggregator extends Aggregator<Narrative> {
   static final _logger = Logger(NarrativeAggregator);
 
-  // Generation of questionnaireModel when _narrative was calculated
+  // Generation of QuestionnaireResponseModel when _narrative was calculated
   int _generation = -1;
   // Cached narrative
   Narrative? _narrative;
@@ -24,40 +23,65 @@ class NarrativeAggregator extends Aggregator<Narrative> {
       : super(NarrativeAggregator.emptyNarrative, autoAggregate: false);
 
   @override
-  void init(QuestionnaireModel questionnaireModel) {
-    super.init(questionnaireModel);
+  void init(QuestionnaireResponseModel questionnaireResponseModel) {
+    super.init(questionnaireResponseModel);
 
     _generation = -1;
     _narrative = value;
   }
 
-  bool _addResponseItemToDiv(
+  bool _addFillerItemToDiv(
     StringBuffer div,
-    QuestionnaireItemModel itemModel,
+    FillerItemModel itemModel,
   ) {
-    final item = itemModel.responseItem;
-
-    if (item == null) {
+    if (itemModel.questionnaireItemModel.isHidden || !itemModel.isEnabled) {
       return false;
     }
 
-    if (!itemModel.isEnabled) {
-      return false;
-    }
+    final itemText = itemModel.questionnaireItemModel.titleText;
 
-    bool returnValue = false;
+    if (itemModel is GroupItemModel) {
+      // TODO: Group model should also check for whether any item in the group is answered.
+      if (itemText != null) {
+        div.write('<h2>$itemText</h2>');
 
-    if (item.text != null) {
-      if (itemModel.isGroup) {
-        div.write('<h2>${item.text}</h2>');
+        return true;
       } else {
-        div.write('<h3>${item.text}</h3>');
+        return false;
       }
-      returnValue = true;
+    } else if (itemModel is DisplayItemModel) {
+      if (itemText != null) {
+        div.write('<p>$itemText</p>');
+
+        return true;
+      } else {
+        return false;
+      }
     }
 
-    final invalid =
-        item.extension_?.dataAbsentReason == dataAbsentReasonAsTextCode;
+    if (itemModel is! QuestionItemModel) {
+      throw ArgumentError('Expecting QuestionItemModel', 'itemModel');
+    }
+
+    return _addQuestionItemToDiv(div, itemModel, itemText);
+  }
+
+  bool _addQuestionItemToDiv(
+    StringBuffer div,
+    QuestionItemModel itemModel,
+    String? itemText,
+  ) {
+    if (itemModel.isUnanswered) {
+      return false;
+    }
+
+    if (itemText != null) {
+      div.write('<h3>$itemText</h3>');
+    }
+
+    final dataAbsentReason = itemModel.dataAbsentReason;
+
+    final invalid = dataAbsentReason == dataAbsentReasonAsTextCode;
 
     if (invalid) {
       div.write(
@@ -65,61 +89,30 @@ class NarrativeAggregator extends Aggregator<Narrative> {
       );
     }
 
-    final dataAbsentReason = item.extension_?.dataAbsentReason;
     if (dataAbsentReason == dataAbsentReasonMaskedCode) {
       div.write('<p>***</p>');
-      returnValue = true;
     } else if (dataAbsentReason == dataAbsentReasonAskedButDeclinedCode) {
       div.write(
         '<p><i><span style="color:red">X </span>${lookupFDashLocalizations(locale).dataAbsentReasonAskedDeclinedOutput}</i></p>',
       );
-      returnValue = true;
     } else {
-      if (item.answer != null) {
-        final repeatPrefix = (item.answer!.isNotEmpty) ? '• ' : '';
-        for (final answer in item.answer!) {
-          if (answer.valueString != null) {
-            div.write('<p>$repeatPrefix${answer.valueString}</p>');
-          } else if (answer.valueDecimal != null) {
-            if (itemModel.isTotalScore) {
-              div.write('<h3>${answer.valueDecimal!.format(locale)}</h3>');
-            } else {
-              div.write(
-                '<p>$repeatPrefix${answer.valueDecimal!.format(locale)}</p>',
-              );
-            }
-          } else if (answer.valueQuantity != null) {
-            div.write(
-              '<p>$repeatPrefix${answer.valueQuantity!.format(locale)}</p>',
-            );
-          } else if (answer.valueInteger != null) {
-            div.write('<p>$repeatPrefix${answer.valueInteger!.value}</p>');
-          } else if (answer.valueCoding != null) {
-            div.write(
-              '<p>- ${answer.valueCoding!.localizedDisplay(locale)}</p>',
-            );
-          } else if (answer.valueDateTime != null) {
-            div.write(
-              '<p>$repeatPrefix${answer.valueDateTime!.format(locale)}</p>',
-            );
-          } else if (answer.valueDate != null) {
-            div.write(
-              '<p>$repeatPrefix${answer.valueDate!.format(locale)}</p>',
-            );
-          } else if (answer.valueTime != null) {
-            div.write(
-              '<p>$repeatPrefix${answer.valueTime!.format(locale)}</p>',
-            );
-          } else if (answer.valueBoolean != null) {
-            div.write(
-              '<p>$repeatPrefix${(answer.valueBoolean!.value!) ? '[X]' : '[ ]'}</p>',
-            );
-          } else if (answer.valueUri != null) {
-            div.write('<p>$repeatPrefix${answer.valueUri.toString()}</p>');
+      final filledAnswers = itemModel.answeredAnswerModels;
+
+      final repeatPrefix =
+          itemModel.questionnaireItemModel.isRepeating ? '• ' : '';
+      for (final answerModel in filledAnswers) {
+        if (answerModel is NumericalAnswerModel) {
+          if (itemModel.questionnaireItemModel.isTotalScore) {
+            div.write('<h3>${answerModel.display}</h3>');
           } else {
-            div.write('<p>$repeatPrefix${answer.toString()}</p>');
+            div.write(
+              '<p>$repeatPrefix${answerModel.display}</p>',
+            );
           }
-          returnValue = true;
+        } else {
+          div.write(
+            '<p>$repeatPrefix${answerModel.display}</p>',
+          );
         }
       }
     }
@@ -127,10 +120,12 @@ class NarrativeAggregator extends Aggregator<Narrative> {
       div.write('</span>');
     }
 
-    return returnValue;
+    return true;
   }
 
-  Narrative _generateNarrative(QuestionnaireItemModel questionnaireModel) {
+  Narrative _generateNarrative(
+    QuestionnaireResponseModel questionnaireResponseModel,
+  ) {
     final languageTag = locale.toLanguageTag();
     final div = StringBuffer(
       '<div xmlns="http://www.w3.org/1999/xhtml" lang="$languageTag" xml:lang="$languageTag">',
@@ -139,8 +134,8 @@ class NarrativeAggregator extends Aggregator<Narrative> {
     bool generated = false;
 
     for (final itemModel
-        in questionnaireModel.orderedQuestionnaireItemModels()) {
-      generated = generated | _addResponseItemToDiv(div, itemModel);
+        in questionnaireResponseModel.orderedFillerItemModels()) {
+      generated = generated | _addFillerItemToDiv(div, itemModel);
     }
     div.write('<p>&nbsp;</p>');
     div.write('</div>');
@@ -154,21 +149,23 @@ class NarrativeAggregator extends Aggregator<Narrative> {
   @override
   Narrative? aggregate({bool notifyListeners = false}) {
     _logger.debug(
-      '$this.aggregate (Model Generation: ${questionnaireModel.generation}, Narrative Generation: $_generation)',
+      '$this.aggregate (Model Generation: ${questionnaireResponseModel.generation}, Narrative Generation: $_generation)',
     );
-    if (questionnaireModel.generation == _generation) {
+    if (questionnaireResponseModel.generation == _generation) {
       _logger.debug('Regurgitating narrative generation $_generation');
+
       return _narrative;
     }
     // Manually invoke the update, because the order matters and enableWhen calcs need to come after answer value updates.
-    questionnaireModel.updateEnabledItems(
+    questionnaireResponseModel.updateEnabledItems(
       notifyListeners: false,
     ); // Setting this to true might result in endless refresh and stack overflow
-    _narrative = _generateNarrative(questionnaireModel);
-    _generation = questionnaireModel.generation;
+    _narrative = _generateNarrative(questionnaireResponseModel);
+    _generation = questionnaireResponseModel.generation;
     if (notifyListeners) {
       value = _narrative!;
     }
+
     return _narrative;
   }
 }

@@ -4,12 +4,16 @@ import '../../../model.dart';
 
 /// A pseudo-model for a questionnaire item of an unsupported type.
 class UnsupportedAnswerModel extends AnswerModel<Object, Object> {
-  UnsupportedAnswerModel(ResponseModel responseModel, int answerIndex)
-      : super(responseModel, answerIndex);
+  UnsupportedAnswerModel(QuestionItemModel responseModel)
+      : super(responseModel);
 
   @override
-  QuestionnaireResponseAnswer? get filledAnswer {
-    throw UnimplementedError('UnsupportedAnswerModel cannot fill an answer.');
+  QuestionnaireResponseAnswer? createFhirAnswer(
+    List<QuestionnaireResponseItem>? items,
+  ) {
+    throw UnimplementedError(
+      'UnsupportedAnswerModel cannot create a FHIR answer.',
+    );
   }
 
   @override
@@ -25,4 +29,9 @@ class UnsupportedAnswerModel extends AnswerModel<Object, Object> {
 
   @override
   bool get isUnanswered => false;
+
+  @override
+  void populate(QuestionnaireResponseAnswer answer) {
+    throw UnsupportedError('Cannot populate item of unknown type.');
+  }
 }

@@ -40,8 +40,9 @@ class DefaultQuestionnairePageScaffoldBuilder
   }) {
     final theLocale = locale ?? Localizations.localeOf(context);
 
-    final questionnaireFiller = QuestionnaireFiller.of(context);
-    final questionnaire = questionnaireFiller.questionnaireModel.questionnaire;
+    final questionnaireFiller = QuestionnaireResponseFiller.of(context);
+    final questionnaire = questionnaireFiller
+        .questionnaireResponseModel.questionnaireModel.questionnaire;
 
     return Scaffold(
       appBar: AppBar(
@@ -71,14 +72,18 @@ class DefaultQuestionnairePageScaffoldBuilder
             IconButton(
               icon: const Icon(Icons.help_outline),
               onPressed: () {
-                showQuestionnaireInfo(context, theLocale, questionnaire,
-                    (context) {
-                  setStateCallback.call(() {
-                    Navigator.pop(context);
-                  });
-                });
+                showQuestionnaireInfo(
+                  context,
+                  theLocale,
+                  questionnaire,
+                  (context) {
+                    setStateCallback.call(() {
+                      Navigator.pop(context);
+                    });
+                  },
+                );
               },
-            )
+            ),
           ],
         ),
       ),

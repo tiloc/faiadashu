@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// A hierarchical viewer for any kind of FHIR resource.
 ///
 /// Based on the internal JSON representation of the resource.
 class ResourceJsonTree extends StatefulWidget {
+  static const defaultAutoExpandLevel = 10;
+
   const ResourceJsonTree(
     this.resourceRoot, {
-    this.autoExpandLevel = 10,
+    this.autoExpandLevel = defaultAutoExpandLevel,
     Key? key,
   }) : super(key: key);
 
@@ -24,6 +27,8 @@ class ResourceJsonTree extends StatefulWidget {
     final nodeExpandedDepth =
         (parent != null) ? parent.expandedDepth - 1 : autoExpandLevel;
 
+    const jsonLeftOffset = 8.0;
+
     if (nodeValue == null) {
       node = _JsonViewerGenericNode(nodeName, nodeValue);
     } else if (nodeValue is Map) {
@@ -32,7 +37,7 @@ class ResourceJsonTree extends StatefulWidget {
         parent,
         nodeName,
         nodeValue as Map<String, dynamic>,
-        8,
+        jsonLeftOffset,
         nodeExpandedDepth,
       );
     } else if (nodeValue is List) {
@@ -41,12 +46,13 @@ class ResourceJsonTree extends StatefulWidget {
         parent,
         nodeName,
         nodeValue,
-        8,
+        jsonLeftOffset,
         nodeExpandedDepth,
       );
     } else {
       node = _JsonViewerGenericNode(nodeName, nodeValue);
     }
+
     return node;
   }
 
@@ -133,6 +139,7 @@ class _JsonViewerMapNode extends _JsonNode<Map<String, dynamic>> {
     nodeValue.forEach((k, v) {
       result.add(root.buildNode(this, k, v));
     });
+
     return result;
   }
 }
@@ -152,7 +159,7 @@ class _MapNodeState extends _JsonNodeState<_JsonViewerMapNode> {
           Text(
             widget.nodeName,
             style: Theme.of(context).textTheme.bodyText1,
-          )
+          ),
         ],
       ),
     );
@@ -165,7 +172,7 @@ class _MapNodeState extends _JsonNodeState<_JsonViewerMapNode> {
             child: Column(
               children: widget.buildChildren(),
             ),
-          )
+          ),
         ],
       );
     }
@@ -205,6 +212,7 @@ class _JsonViewerListNode extends _JsonNode<List<dynamic>> {
       result.add(root.buildNode(this, "[$i]", entry));
       i++;
     }
+
     return result;
   }
 }
@@ -233,7 +241,7 @@ class _JsonViewerListNodeState extends _JsonNodeState<_JsonViewerListNode> {
             style: (count > 0)
                 ? TextStyle(
                     color:
-                        themeData.textTheme.bodyText1!.color!.withOpacity(0.54),
+                        themeData.textTheme.bodyText1?.color?.withOpacity(0.54),
                   )
                 : TextStyle(color: themeData.errorColor),
           ),
@@ -249,7 +257,7 @@ class _JsonViewerListNodeState extends _JsonNodeState<_JsonViewerListNode> {
             child: Column(
               children: widget.buildChildren(),
             ),
-          )
+          ),
         ],
       );
     }
@@ -269,13 +277,13 @@ class _JsonViewerGenericNode extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
 
-    var color = themeData.textTheme.bodyText1!.color;
+    var color = themeData.textTheme.bodyText1?.color;
     if (nodeValue == null) {
       color = themeData.errorColor;
     } else {
       switch (nodeValue.runtimeType) {
         case bool:
-          color = (nodeValue as bool) == true
+          color = (nodeValue as bool)
               ? themeData.colorScheme.secondary
               : themeData.errorColor;
           break;
@@ -288,21 +296,41 @@ class _JsonViewerGenericNode extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(left: 24),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
             nodeName,
             style: TextStyle(
-              color: themeData.textTheme.bodyText1!.color!.withOpacity(0.54),
+              color: themeData.textTheme.bodyText1?.color?.withOpacity(0.54),
             ),
           ),
           const Text(' : '),
           if (nodeValue != null)
             Expanded(
-              child: Text(
-                nodeValue.toString(),
-                softWrap: true,
-                maxLines: 999,
-                style: TextStyle(color: color),
+              child: GestureDetector(
+                child: Text(
+                  nodeValue.toString(),
+                  softWrap: true,
+                  maxLines: 999,
+                  style: TextStyle(color: color),
+                ),
+                onTap: () {
+                  Clipboard.setData(
+                    ClipboardData(
+                      text: nodeValue.toString(),
+                    ),
+                  ).then((_) {
+                    final messenger = ScaffoldMessenger.maybeOf(context);
+                    messenger?.clearSnackBars();
+                    messenger?.showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          '$nodeName copied to clipboard',
+                        ),
+                      ),
+                    );
+                  });
+                },
               ),
             ),
           if (nodeValue == null)

@@ -1,10 +1,9 @@
+import 'package:faiadashu/coding/coding.dart';
 import 'package:fhir/r4.dart';
 
 import '../../../../fhir_types/fhir_types.dart';
 import '../../../../logging/logging.dart';
 import '../../../questionnaires.dart';
-
-// TODO: Properly support nested questionnaire items (questions being children of other questions).
 
 /// Aggregates the user's responses into a [QuestionnaireResponse].
 ///
@@ -20,12 +19,12 @@ class QuestionnaireResponseAggregator
 
   /// Initialize the aggregator.
   @override
-  void init(QuestionnaireModel questionnaireModel) {
-    super.init(questionnaireModel);
+  void init(QuestionnaireResponseModel questionnaireResponseModel) {
+    super.init(questionnaireResponseModel);
   }
 
-  QuestionnaireResponseItem? _fromGroupItem(
-    QuestionnaireItemModel itemModel,
+  QuestionnaireResponseItem? _fromQuestionItem(
+    QuestionItemModel itemModel,
     QuestionnaireResponseStatus responseStatus,
   ) {
     if (responseStatus == QuestionnaireResponseStatus.completed &&
@@ -33,30 +32,99 @@ class QuestionnaireResponseAggregator
       return null;
     }
 
-    final nestedItems = <QuestionnaireResponseItem>[];
+    final isCodingAnswers = itemModel.questionnaireItemModel.isCodingType;
 
-    for (final nestedItem in itemModel.children) {
-      if (nestedItem.isGroup) {
-        final groupItem = _fromGroupItem(nestedItem, responseStatus);
+    final answeredAnswerModels = itemModel.answeredAnswerModels;
+
+    final dataAbsentReason = itemModel.dataAbsentReason;
+
+    // Don't care, if it is read-only, calculated, etc. If it exists: emit it!
+    if (answeredAnswerModels.isEmpty && dataAbsentReason == null) {
+      return null;
+    }
+
+    List<QuestionnaireResponseAnswer>? answers;
+    if (answeredAnswerModels.isNotEmpty) {
+      if (isCodingAnswers) {
+        // Evaluate nested items from first answer only
+        final firstAnswer = answeredAnswerModels.first;
+        final nestedItems = _fromResponseItems(firstAnswer, responseStatus);
+
+        answers = firstAnswer.createFhirCodingAnswers(nestedItems);
+      } else {
+        // Evaluate nested items
+        final List<QuestionnaireResponseAnswer> createdAnswers = [];
+        for (final answerModel in answeredAnswerModels) {
+          final nestedItems = _fromResponseItems(answerModel, responseStatus);
+          final fhirAnswer = answerModel.createFhirAnswer(nestedItems);
+          if (fhirAnswer != null) {
+            createdAnswers.add(fhirAnswer);
+          }
+        }
+        answers = (createdAnswers.isNotEmpty) ? createdAnswers : null;
+      }
+    }
+
+    return QuestionnaireResponseItem(
+      linkId: itemModel.questionnaireItemModel.linkId,
+      text: itemModel.questionnaireItemModel.titleText,
+      extension_: (dataAbsentReason != null)
+          ? [
+              FhirExtension(
+                url: dataAbsentReasonExtensionUrl,
+                valueCode: dataAbsentReason,
+              ),
+            ]
+          : null,
+      answer: answers,
+    );
+  }
+
+  QuestionnaireResponseItem? _fromGroupItem(
+    GroupItemModel itemModel,
+    QuestionnaireResponseStatus responseStatus,
+  ) {
+    if (responseStatus == QuestionnaireResponseStatus.completed &&
+        !itemModel.isEnabled) {
+      return null;
+    }
+
+    final nestedItems = _fromResponseItems(itemModel, responseStatus);
+
+    return (nestedItems != null)
+        ? QuestionnaireResponseItem(
+            linkId: itemModel.questionnaireItemModel.linkId,
+            text: itemModel.questionnaireItemModel.titleText,
+            item: nestedItems,
+          )
+        : null;
+  }
+
+  List<QuestionnaireResponseItem>? _fromResponseItems(
+    ResponseNode? parentNode,
+    QuestionnaireResponseStatus responseStatus,
+  ) {
+    final responseItems = <QuestionnaireResponseItem>[];
+
+    for (final itemModel in questionnaireResponseModel
+        .orderedResponseItemModelsWithParent(parent: parentNode)) {
+      if (itemModel.questionnaireItemModel.isGroup) {
+        final groupItem =
+            _fromGroupItem(itemModel as GroupItemModel, responseStatus);
         if (groupItem != null) {
-          nestedItems.add(groupItem);
+          responseItems.add(groupItem);
         }
       } else {
-        if (nestedItem.responseItem != null) {
-          nestedItems.add(nestedItem.responseItem!);
+        // isQuestion
+        final questionItem =
+            _fromQuestionItem(itemModel as QuestionItemModel, responseStatus);
+        if (questionItem != null) {
+          responseItems.add(questionItem);
         }
       }
     }
 
-    if (nestedItems.isNotEmpty) {
-      return QuestionnaireResponseItem(
-        linkId: itemModel.linkId,
-        text: itemModel.titleText,
-        item: nestedItems,
-      );
-    } else {
-      return null;
-    }
+    return (responseItems.isNotEmpty) ? responseItems : null;
   }
 
   @override
@@ -70,41 +138,30 @@ class QuestionnaireResponseAggregator
     // Are all minimum fields for SDC profile present?
     bool isValidSdc = true;
 
-    responseStatus ??= questionnaireModel.responseStatus;
+    responseStatus ??= questionnaireResponseModel.responseStatus;
 
-    final responseItems = <QuestionnaireResponseItem>[];
-
-    for (final itemModel in questionnaireModel.siblings) {
-      if (itemModel.isGroup) {
-        final groupItem = _fromGroupItem(itemModel, responseStatus);
-        if (groupItem != null) {
-          responseItems.add(groupItem);
-        }
-      } else {
-        if (itemModel.responseItem != null &&
-            (responseStatus != QuestionnaireResponseStatus.completed ||
-                itemModel.isEnabled)) {
-          responseItems.add(itemModel.responseItem!);
-        }
-      }
-    }
+    final responseItems = _fromResponseItems(null, responseStatus);
 
     final narrativeAggregator =
-        questionnaireModel.aggregator<NarrativeAggregator>();
+        questionnaireResponseModel.aggregator<NarrativeAggregator>();
 
-    final questionnaireUrl = questionnaireModel.questionnaire.url?.toString();
-    final questionnaireVersion = questionnaireModel.questionnaire.version;
+    final questionnaireUrl = questionnaireResponseModel
+        .questionnaireModel.questionnaire.url
+        ?.toString();
+    final questionnaireVersion =
+        questionnaireResponseModel.questionnaireModel.questionnaire.version;
     final questionnaireCanonical = (questionnaireUrl != null)
         ? Canonical(
             "$questionnaireUrl${(questionnaireVersion != null) ? '|$questionnaireVersion' : ''}",
           )
         : null;
 
-    final questionnaireTitle = questionnaireModel.questionnaire.title;
+    final questionnaireTitle =
+        questionnaireResponseModel.questionnaireModel.questionnaire.title;
 
     final contained = <Resource>[];
 
-    final subject = questionnaireModel.launchContext.patient;
+    final subject = questionnaireResponseModel.launchContext.patient;
 
     Reference? subjectReference;
     if (subject != null) {
@@ -131,10 +188,6 @@ class QuestionnaireResponseAggregator
         Canonical(
           'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaireresponse',
         ),
-      if (isValidSdc)
-        Canonical(
-          'http://fhir.org/guides/argonaut/questionnaire/StructureDefinition/argo-questionnaireresponse',
-        ),
     ];
 
     final meta = (profiles.isNotEmpty)
@@ -148,7 +201,7 @@ class QuestionnaireResponseAggregator
       meta: meta,
       contained: (contained.isNotEmpty) ? contained : null,
       questionnaire: questionnaireCanonical,
-      item: (responseItems.isNotEmpty) ? responseItems : null,
+      item: responseItems,
       authored: FhirDateTime(DateTime.now()),
       text: (narrative?.status == NarrativeStatus.empty) ? null : narrative,
       language: Code(locale.toLanguageTag()),
@@ -160,8 +213,9 @@ class QuestionnaireResponseAggregator
                   url: FhirUri(
                     'http://hl7.org/fhir/StructureDefinition/display',
                   ),
-                  valueString: questionnaireModel.questionnaire.title,
-                )
+                  valueString: questionnaireResponseModel
+                      .questionnaireModel.questionnaire.title,
+                ),
               ],
             )
           : null,
@@ -170,6 +224,7 @@ class QuestionnaireResponseAggregator
     if (notifyListeners) {
       value = questionnaireResponse;
     }
+
     return questionnaireResponse;
   }
 }

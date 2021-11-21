@@ -56,21 +56,21 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.5.4-dev.5"
+    version: "0.6.0-dev.1"
   faiadashu_online:
     dependency: "direct main"
     description:
       path: "../faiadashu_online"
       relative: true
     source: path
-    version: "0.5.4-dev.5"
+    version: "0.6.0-dev.1"
   fhir:
     dependency: "direct main"
     description:
       name: fhir
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.5.0-4"
+    version: "0.5.0-6"
   fhir_at_rest:
     dependency: transitive
     description:
@@ -91,7 +91,7 @@ packages:
       name: fhir_path
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.5.0-9"
+    version: "0.5.0-11"
   fhir_yaml:
     dependency: transitive
     description:

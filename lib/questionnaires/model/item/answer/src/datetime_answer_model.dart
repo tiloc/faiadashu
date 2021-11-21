@@ -4,6 +4,7 @@ import 'package:fhir/r4.dart'
         FhirDateTime,
         QuestionnaireItemType,
         QuestionnaireResponseAnswer,
+        QuestionnaireResponseItem,
         Time;
 
 import '../../../../../fhir_types/fhir_types.dart';
@@ -11,17 +12,15 @@ import '../../../../../l10n/l10n.dart';
 import '../../../model.dart';
 
 class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
-  DateTimeAnswerModel(ResponseModel responseModel, int answerIndex)
-      : super(responseModel, answerIndex) {
-    value = answer?.valueDateTime ??
-        ((answer?.valueDate != null) ? FhirDateTime(answer?.valueDate) : null);
-  }
+  DateTimeAnswerModel(QuestionItemModel responseModel) : super(responseModel);
 
   @override
   String get display => value?.format(locale) ?? AnswerModel.nullText;
 
   @override
-  QuestionnaireResponseAnswer? get filledAnswer {
+  QuestionnaireResponseAnswer? createFhirAnswer(
+    List<QuestionnaireResponseItem>? items,
+  ) {
     final itemType = qi.type;
 
     if (value?.value == null) {
@@ -29,14 +28,21 @@ class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
     }
 
     if (itemType == QuestionnaireItemType.date) {
-      return QuestionnaireResponseAnswer(valueDate: Date(value!.value));
+      return QuestionnaireResponseAnswer(
+        valueDate: Date(value!.value),
+        item: items,
+      );
     } else if (itemType == QuestionnaireItemType.datetime) {
-      return QuestionnaireResponseAnswer(valueDateTime: value);
+      return QuestionnaireResponseAnswer(
+        valueDateTime: value,
+        item: items,
+      );
     } else if (itemType == QuestionnaireItemType.time) {
       return QuestionnaireResponseAnswer(
         valueTime: Time(
           value!.value!.toIso8601String().substring('yyyy-MM-ddT'.length),
         ),
+        item: items,
       );
     } else {
       throw StateError('Unexpected itemType: $itemType');
@@ -45,11 +51,9 @@ class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
 
   @override
   String? validateInput(FhirDateTime? inValue) {
-    if (inValue == null || inValue.isValid) {
-      return null;
-    } else {
-      return lookupFDashLocalizations(locale).validatorDateTime;
-    }
+    return inValue == null || inValue.isValid
+        ? null
+        : lookupFDashLocalizations(locale).validatorDateTime;
   }
 
   @override
@@ -65,9 +69,16 @@ class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
   void populateFromExpression(dynamic evaluationResult) {
     if (evaluationResult == null) {
       value = null;
+
       return;
     }
 
     value = FhirDateTime(evaluationResult);
+  }
+
+  @override
+  void populate(QuestionnaireResponseAnswer answer) {
+    value = answer.valueDateTime ??
+        ((answer.valueDate != null) ? FhirDateTime(answer.valueDate) : null);
   }
 }

@@ -6,18 +6,20 @@ import '../../../../questionnaires.dart';
 
 /// Filler for an individual [QuestionnaireResponseAnswer].
 abstract class QuestionnaireAnswerFiller extends StatefulWidget {
-  final QuestionnaireResponseFillerState responseFillerState;
-  final int answerIndex;
-  final QuestionnaireItemModel itemModel;
+  final QuestionResponseItemFillerState responseFillerState;
+  final AnswerModel answerModel;
+  final QuestionnaireItemModel questionnaireItemModel;
+  final QuestionItemModel responseItemModel;
   final QuestionnaireTheme questionnaireTheme;
 
   QuestionnaireAnswerFiller(
     this.responseFillerState,
-    this.answerIndex, {
+    this.answerModel, {
     Key? key,
-  })  : itemModel = responseFillerState.responseModel.itemModel,
-        questionnaireTheme = responseFillerState
-            .widget.itemFiller.questionnaireFiller.questionnaireTheme,
+  })  : responseItemModel = responseFillerState.questionResponseItemModel,
+        questionnaireItemModel =
+            responseFillerState.responseItemModel.questionnaireItemModel,
+        questionnaireTheme = responseFillerState.questionnaireTheme,
         super(key: key);
 }
 
@@ -26,19 +28,20 @@ abstract class QuestionnaireAnswerFillerState<
     W extends QuestionnaireAnswerFiller,
     M extends AnswerModel<Object, V>> extends State<W> {
   static final _abstractLogger = Logger(QuestionnaireAnswerFillerState);
-  late final M answerModel;
+  M get answerModel => widget.answerModel as M;
 
   late final Object? answerModelError;
 
   late final FocusNode firstFocusNode;
   bool _isFocusHookedUp = false;
 
-  QuestionnaireItem get qi => widget.itemModel.questionnaireItem;
-  Locale get locale => widget.itemModel.questionnaireModel.locale;
-  QuestionnaireItemModel get itemModel => widget.itemModel;
+  QuestionnaireItem get qi => widget.questionnaireItemModel.questionnaireItem;
+  Locale get locale =>
+      widget.responseItemModel.questionnaireResponseModel.locale;
+  QuestionnaireItemModel get itemModel => widget.questionnaireItemModel;
 
-  QuestionnaireTheme get questionnaireTheme => widget.responseFillerState.widget
-      .itemFiller.questionnaireFiller.questionnaireTheme;
+  QuestionnaireTheme get questionnaireTheme =>
+      widget.responseFillerState.questionnaireTheme;
 
   QuestionnaireAnswerFillerState();
 
@@ -47,16 +50,15 @@ abstract class QuestionnaireAnswerFillerState<
     super.initState();
 
     try {
-      answerModel = widget.responseFillerState.responseModel
-          .answerModel(widget.answerIndex) as M;
-
       answerModelError = null;
 
       firstFocusNode = FocusNode(
-        debugLabel: 'AnswerFiller firstFocusNode: ${widget.itemModel.linkId}',
+        debugLabel:
+            'AnswerFiller firstFocusNode: ${widget.responseItemModel.nodeUid}',
       );
 
-      widget.itemModel.questionnaireModel.addListener(_forceRebuild);
+      widget.responseItemModel.questionnaireResponseModel
+          .addListener(_forceRebuild);
 
       postInitState();
     } catch (exception) {
@@ -77,7 +79,8 @@ abstract class QuestionnaireAnswerFillerState<
 
   @override
   void dispose() {
-    widget.itemModel.questionnaireModel.removeListener(_forceRebuild);
+    widget.responseItemModel.questionnaireResponseModel
+        .removeListener(_forceRebuild);
 
     firstFocusNode.dispose();
     super.dispose();
@@ -105,12 +108,10 @@ abstract class QuestionnaireAnswerFillerState<
     // Listen to the parent FocusNode and become focussed when it does.
     if (!_isFocusHookedUp) {
       WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-        Focus.of(context).addListener(() {
-          if ((firstFocusNode.parent?.hasPrimaryFocus ?? false) &&
-              !firstFocusNode.hasPrimaryFocus) {
-            firstFocusNode.requestFocus();
-          }
-        });
+        // Focus.of could otherwise fail with: Looking up a deactivated widget's ancestor is unsafe.
+        if (mounted) {
+          Focus.maybeOf(context)?.addListener(_focusHasChanged);
+        }
       });
       _isFocusHookedUp = true;
     }
@@ -118,24 +119,22 @@ abstract class QuestionnaireAnswerFillerState<
     return buildInputControl(context);
   }
 
+  void _focusHasChanged() {
+    if ((firstFocusNode.parent?.hasPrimaryFocus ?? false) &&
+        !firstFocusNode.hasPrimaryFocus) {
+      firstFocusNode.requestFocus();
+    }
+  }
+
   Widget buildInputControl(BuildContext context);
 
   set value(V? newValue) {
     if (mounted) {
       setState(() {
-        itemModel.questionnaireModel.resetMarkers();
+        // Updating a single answer resets all error markers
+        widget.responseItemModel.questionnaireResponseModel.resetMarkers();
         answerModel.value = newValue;
       });
-
-      if (answerModel.hasCodingAnswers) {
-        widget.responseFillerState.onAnswered(
-          answerModel.filledCodingAnswers,
-          answerModel.answerIndex,
-        );
-      } else {
-        widget.responseFillerState
-            .onAnswered([answerModel.filledAnswer], answerModel.answerIndex);
-      }
     }
   }
 

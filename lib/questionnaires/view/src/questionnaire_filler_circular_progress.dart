@@ -32,10 +32,12 @@ class _ProgressPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    const doublePi = pi + pi;
+
     canvas.drawArc(
       Offset.zero & Size(radius - strokeWidth, radius - strokeWidth),
       0,
-      2 * pi,
+      doublePi,
       false,
       _inactive,
     );
@@ -45,7 +47,7 @@ class _ProgressPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth;
 
-    final sweepAngle = 2 * pi / colors.length;
+    final sweepAngle = doublePi / colors.length;
 
     for (int i = 0; i < colors.length; i++) {
       final sweepColor = colors.elementAt(i);
@@ -68,19 +70,20 @@ class _ProgressPainter extends CustomPainter {
 
 class _QuestionnaireFillerCircularProgressState
     extends State<QuestionnaireFillerCircularProgress> {
-  late final QuestionnaireItemModel _questionnaireItemModel;
+  QuestionnaireResponseModel? _questionnaireResponseModel;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _questionnaireItemModel =
-        QuestionnaireFiller.of(context).questionnaireModel;
-    _questionnaireItemModel.questionnaireModel.addListener(_updateProgress);
+    final questionnaireResponseModel =
+        QuestionnaireResponseFiller.of(context).questionnaireResponseModel;
+    _questionnaireResponseModel = questionnaireResponseModel;
+    questionnaireResponseModel.addListener(_updateProgress);
   }
 
   @override
   void dispose() {
-    _questionnaireItemModel.questionnaireModel.removeListener(_updateProgress);
+    _questionnaireResponseModel?.removeListener(_updateProgress);
     super.dispose();
   }
 
@@ -94,21 +97,25 @@ class _QuestionnaireFillerCircularProgressState
 
   @override
   Widget build(BuildContext context) {
+    final questionnaireResponseModel = _questionnaireResponseModel;
+
     final radius = widget.radius ?? 36.0;
 
     return SizedBox(
       width: radius,
       height: radius,
       child: CustomPaint(
-        painter: _ProgressPainter(
-          radius,
-          colors: _questionnaireItemModel
-              .orderedQuestionnaireItemModels()
-              .where((qim) => qim.isAnswerable)
-              .map<Color?>((qim) {
-            return qim.isAnswered ? Colors.green : null;
-          }).toList(growable: false),
-        ),
+        painter: (questionnaireResponseModel != null)
+            ? _ProgressPainter(
+                radius,
+                colors: questionnaireResponseModel
+                    .orderedResponseItemModels()
+                    .where((rim) => rim.isAnswerable)
+                    .map<Color?>((rim) {
+                  return rim.isAnswered ? Colors.green : null;
+                }).toList(growable: false),
+              )
+            : _ProgressPainter(radius, colors: [null]),
       ),
     );
   }

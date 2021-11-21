@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../model/item/answer/src/answer_model.dart';
 import '../../../view.dart';
 import 'questionnaire_answer_filler.dart';
 
@@ -8,11 +9,11 @@ class BrokenAnswerFiller extends QuestionnaireAnswerFiller {
   final Object exception;
 
   BrokenAnswerFiller(
-    QuestionnaireResponseFillerState responseFillerState,
-    int answerIndex,
+    QuestionResponseItemFillerState responseFillerState,
+    AnswerModel answerModel,
     this.exception, {
     Key? key,
-  }) : super(responseFillerState, answerIndex, key: key);
+  }) : super(responseFillerState, answerModel, key: key);
 
   @override
   State<StatefulWidget> createState() => _BrokenItemState();
@@ -28,7 +29,7 @@ class _BrokenItemState extends State<BrokenAnswerFiller> {
   Widget build(BuildContext context) {
     return BrokenQuestionnaireItem(
       'Could not initialize QuestionnaireAnswerFiller',
-      widget.itemModel.questionnaireItem,
+      widget.questionnaireItemModel.questionnaireItem,
       widget.exception,
     );
   }

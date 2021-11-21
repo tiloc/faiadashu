@@ -1,121 +1,58 @@
-// Going with 'part of' here. 'import' would be preferred, but would force me to
-// expose numerous internal methods to the public.
-part of 'questionnaire_item_model.dart';
+import 'package:fhir/r4.dart';
+
+import '../../../fhir_types/fhir_types.dart';
+import '../../../logging/logging.dart';
+import '../../../resource_provider/resource_provider.dart';
+import '../../questionnaires.dart';
 
 /// Models a questionnaire.
 ///
-/// Combined higher-level abstraction of [Questionnaire] and [QuestionnaireResponse].
+/// Higher-level abstraction of a FHIR domain [Questionnaire].
 ///
 /// Any properties and functions that affect the overall questionnaire are provided by [QuestionnaireModel].
 ///
 /// Properties and functions that affect an individual item are in [QuestionnaireItemModel].
 ///
 /// [QuestionnaireModel] provides direct access to any [QuestionnaireItemModel] through linkId.
-class QuestionnaireModel extends QuestionnaireItemModel {
-  final Map<String, QuestionnaireItemModel> _cachedItems = {};
-  List<QuestionnaireItemModel>? _itemsWithEnableWhen;
-  List<QuestionnaireItemModel>? _itemsWithEnableWhenExpression;
-  // In which generation were the enabled items last determined?
-  int _updateEnabledGeneration = -1;
-  final List<Aggregator>? _aggregators;
+///
+/// Responses and all dynamic behaviors are modeled through [QuestionnaireResponseModel].
+///
+class QuestionnaireModel {
+  /// The FHIR [Questionnaire]
+  final Questionnaire questionnaire;
+
+  // OPTIMIZE: Can I get rid of _cachedItems because of _orderedItems?
+  // Careful: _buildOrderedItems uses both to ensure the proper order of items!
+
+  /// Maps linkId to [QuestionnaireItemModel]
+  final _cachedItems = <String, QuestionnaireItemModel>{};
+  final _orderedItems = <String, QuestionnaireItemModel>{};
 
   /// Direct access to [FhirResourceProvider]s for special use-cases.
   ///
   /// see: [getResource] for the preferred access method.
   final FhirResourceProvider fhirResourceProvider;
-  final LaunchContext launchContext;
-
-  int _generation = 1;
-  final Locale locale;
   static final _logger = Logger(QuestionnaireModel);
 
   QuestionnaireModel._({
-    required this.locale,
-    required Questionnaire questionnaire,
+    required this.questionnaire,
     required this.fhirResourceProvider,
-    required this.launchContext,
-    required List<Aggregator>? aggregators,
-  })  : _aggregators = aggregators,
-        super._(
-          questionnaire,
-          null,
-          ArgumentError.checkNotNull(questionnaire.item?.first),
-          ArgumentError.checkNotNull(questionnaire.item?.first.linkId),
-          null,
-          0,
-          0,
-        ) {
-    _questionnaireModel = this;
-    // This will set up the traversal order and fill up the cache.
-    _ensureOrderedItems();
-
-    // Set up conventional enableWhen feature
-    for (final itemModel in orderedQuestionnaireItemModels()) {
-      if (itemModel.isEnabledWhen) {
-        if (_itemsWithEnableWhen == null) {
-          _itemsWithEnableWhen = [itemModel];
-        } else {
-          _itemsWithEnableWhen!.add(itemModel);
-        }
-      }
-    }
-
-    _logger.debug('_itemsWithEnableWhen: $_itemsWithEnableWhen');
-
-    // Set up FHIRPath based enableWhenExpression feature
-    for (final itemModel in orderedQuestionnaireItemModels()) {
-      if (itemModel.isEnabledWhenExpression) {
-        if (_itemsWithEnableWhenExpression == null) {
-          _itemsWithEnableWhenExpression = [itemModel];
-        } else {
-          _itemsWithEnableWhenExpression!.add(itemModel);
-        }
-      }
-    }
-
-    _logger.debug(
-      '_itemsWithEnableWhenExpression: $_itemsWithEnableWhenExpression',
-    );
-
-    if (aggregators != null) {
-      for (final aggregator in aggregators) {
-        aggregator.init(this);
-        // Assumption: aggregators that don't autoAggregate will have their aggregate method invoked manually when it matters.
-        if (aggregator.autoAggregate) {
-          aggregator.aggregate(notifyListeners: true);
-        }
-      }
-    }
-
-    // TODO: Should the constructor activate any kind of dynamic behavior?
-    activateEnableBehavior();
-
-    // This ensures screen updates in case of invalid responses.
-    errorFlags.addListener(() {
-      nextGeneration();
-    });
+  }) {
+    _buildOrderedItems();
   }
 
   /// Create the model for a [Questionnaire].
   ///
   /// Will introspect the provided [fhirResourceProvider] to locate a
   /// * mandatory [Questionnaire]
-  /// * mandatory [Subject]
-  /// * optional [QuestionnaireResponse]
   /// * optional [ValueSet]
   ///
   /// Will throw [Error]s in case the [Questionnaire] has no items.
   ///
   /// The [fhirResourceProvider] is used for access to any required resources,
-  /// such as ValueSets, Subject, or Encounter.
-  ///
-  /// If no [QuestionnaireResponse] has been provided here, it can still later
-  /// be provided through the [populate] function.
+  /// such as ValueSets.
   static Future<QuestionnaireModel> fromFhirResourceBundle({
-    required Locale locale,
-    List<Aggregator>? aggregators,
     required FhirResourceProvider fhirResourceProvider,
-    required LaunchContext launchContext,
   }) async {
     _logger.debug('QuestionnaireModel.fromFhirResourceBundle');
 
@@ -128,98 +65,75 @@ class QuestionnaireModel extends QuestionnaireItemModel {
 
     final questionnaireModel = QuestionnaireModel._(
       questionnaire: questionnaire,
-      locale: locale,
-      aggregators: aggregators ??
-          [
-            TotalScoreAggregator(),
-            NarrativeAggregator(),
-            QuestionnaireResponseAggregator()
-          ],
       fhirResourceProvider: fhirResourceProvider,
-      launchContext: launchContext,
     );
 
     await questionnaireModel.fhirResourceProvider.init();
 
-    final response =
-        fhirResourceProvider.getResource(questionnaireResponseResourceUri)
-            as QuestionnaireResponse?;
-
-    // ================================================================
-    // Behaviors require a defined sequence during setup:
-    // * initialValue
-    // * variables
-    // * calculated
-    // * enableWhen
-    // * error flagging
-    // ================================================================
-
-    // Populate initial values if response == null
-    // This cannot happen in the constructor, as only this method has the
-    // extra information to populate variables.
-    if (response == null) {
-      questionnaireModel
-          .orderedQuestionnaireItemModels()
-          .where((qim) => qim.hasInitialValue)
-          .forEach((qim) {
-        qim._populateInitialValue();
-      });
-    } else {
-      questionnaireModel.populate(response);
-    }
-
-    // Set up updates for values of questionnaire-level variables
-    if (questionnaireModel.hasVariables) {
-      questionnaireModel._updateVariables();
-      questionnaireModel.addListener(questionnaireModel._updateVariables);
-    }
-
-    // WIP: Set up calculatedExpressions on items
-    questionnaireModel._updateCalculations();
-    questionnaireModel.addListener(questionnaireModel._updateCalculations);
-
-    // WIP: Set up enableWhen behavior on items
-    // TODO: Move this here from the constructor
-
-    // TODO: Move error flagging here from constructor
-
     return questionnaireModel;
   }
 
-  /// Returns an [Aggregator] of the given type.
-  T aggregator<T extends Aggregator>() {
-    if (_aggregators == null) {
-      throw StateError('Aggregators have not been specified in constructor.');
-    }
-    return (_aggregators?.firstWhere((aggregator) => aggregator is T) as T?)!;
-  }
-
-  /// Changes the [generation] and notifies all listeners.
-  ///
-  /// Each generation is unique during a run of the application.
-  void nextGeneration({bool notifyListeners = true}) {
-    final newGeneration = _generation + 1;
-    _logger.debug(
-      'nextGeneration $notifyListeners: $_generation -> $newGeneration',
+  String? get title {
+    final title = Xhtml.toXhtml(
+      questionnaire.title,
+      questionnaire.titleElement?.extension_,
     );
-    _generation = newGeneration;
 
-    // Invalidate cached items
-    _cachedQuestionnaireResponse = null;
+    return title;
+  }
 
-    if (notifyListeners) {
-      this.notifyListeners();
+  /// Returns the questionnaire items of this questionnaire.
+  List<QuestionnaireItemModel> get items => _orderedItems.values
+      .where((qim) => qim.parent == null)
+      .toList(growable: false);
+
+  bool get hasNestedItems =>
+      _orderedItems.values.any((qim) => qim.isNestedItem);
+
+  Map<String, QuestionnaireItemModel> _addChildren(
+    QuestionnaireItemModel qim,
+  ) {
+    _logger.trace('_addChildren $qim');
+    final itemModelMap = <String, QuestionnaireItemModel>{};
+    if (itemModelMap.containsKey(qim.linkId)) {
+      throw QuestionnaireFormatException(
+        'Duplicate linkId: ${qim.linkId}',
+        qim,
+      );
+    }
+    itemModelMap[qim.linkId] = qim;
+    if (qim.hasChildren) {
+      for (final child in qim.children) {
+        itemModelMap.addAll(_addChildren(child));
+      }
+    }
+
+    return itemModelMap;
+  }
+
+  void _buildOrderedItems() {
+    final questionnaireItems = questionnaire.item;
+    if (questionnaireItems == null) {
+      _logger.warn('Questionnaire has no items');
+
+      return;
+    }
+
+    final topLevelItemModels =
+        buildModelsFromItems(questionnaireItems, null, 0);
+
+    for (final topLevelItem in topLevelItemModels) {
+      _orderedItems[topLevelItem.linkId] = topLevelItem;
+      _orderedItems.addAll(_addChildren(topLevelItem));
     }
   }
 
-  QuestionnaireResponse? _cachedQuestionnaireResponse;
-
-  /// Returns a [QuestionnaireResponse].
+  /// Returns an [Iterable] of [QuestionnaireItemModel]s in "pre-order".
   ///
-  /// The response matches the model as of the current generation.
-  QuestionnaireResponse? get questionnaireResponse =>
-      _cachedQuestionnaireResponse ??=
-          aggregator<QuestionnaireResponseAggregator>().aggregate();
+  /// see: https://en.wikipedia.org/wiki/Tree_traversal
+  Iterable<QuestionnaireItemModel> orderedQuestionnaireItemModels() {
+    return _orderedItems.values;
+  }
 
   /// Returns a [Resource] which is referenced in the [Questionnaire].
   ///
@@ -392,14 +306,11 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     );
   }
 
-  /// Returns a number that indicates whether the model has changed.
-  int get generation => _generation;
-
   /// Returns the [QuestionnaireItemModel] that corresponds to the linkId.
   ///
   /// Throws an [Exception] when no such [QuestionnaireItemModel] exists.
   QuestionnaireItemModel fromLinkId(String linkId) {
-    final result = _orderedItems![linkId];
+    final result = _orderedItems[linkId];
     if (result == null) {
       throw QuestionnaireFormatException("Location '$linkId' not found.");
     } else {
@@ -407,172 +318,43 @@ class QuestionnaireModel extends QuestionnaireItemModel {
     }
   }
 
-  QuestionnaireResponseStatus _responseStatus =
-      QuestionnaireResponseStatus.in_progress;
-
-  QuestionnaireResponseStatus get responseStatus => _responseStatus;
-
-  set responseStatus(QuestionnaireResponseStatus newStatus) {
-    _responseStatus = newStatus;
-    nextGeneration();
-  }
-
-  void _populateItems(
-    List<QuestionnaireResponseItem>? questionnaireResponseItems,
+  QuestionnaireItemModel _createIfAbsent(
+    QuestionnaireItem questionnaireItem,
+    String linkId,
+    QuestionnaireItemModel? parent,
+    int level,
   ) {
-    if (questionnaireResponseItems == null) {
-      return;
-    }
-    for (final item in questionnaireResponseItems) {
-      fromLinkId(item.linkId!).responseItem = item;
-      _populateItems(item.item);
-      if (item.answer != null) {
-        for (final answer in item.answer!) {
-          _populateItems(answer.item);
-        }
-      }
-    }
+    return _cachedItems.putIfAbsent(
+      linkId,
+      () => QuestionnaireItemModel(
+        this,
+        questionnaireItem,
+        linkId,
+        parent,
+        level,
+      ),
+    );
   }
 
-  /// Populate the answers in the questionnaire with the answers from a response.
-  ///
-  /// Does nothing if [questionnaireResponse] is null.
-  void populate(QuestionnaireResponse? questionnaireResponse) {
-    _logger.debug('Populating with $questionnaireResponse');
-    if (questionnaireResponse == null) {
-      return;
-    }
+  /// Build list of [QuestionnaireItemModel] from [QuestionnaireItem] and meta-data.
+  List<QuestionnaireItemModel> buildModelsFromItems(
+    List<QuestionnaireItem> items,
+    QuestionnaireItemModel? parent,
+    int level,
+  ) {
+    final itemModelList = <QuestionnaireItemModel>[];
 
-    if (questionnaireResponse.item == null ||
-        questionnaireResponse.item!.isEmpty) {
-      return;
-    }
-
-    // OPTIMIZE: What is the best notification strategy?
-    // Assumption: It would be better to first set all responses in bulk and then recalc.
-    _populateItems(questionnaireResponse.item);
-
-    responseStatus =
-        questionnaireResponse.status ?? QuestionnaireResponseStatus.in_progress;
-  }
-
-  void _updateCalculations() {
-    orderedQuestionnaireItemModels()
-        .where((qim) => qim.isCalculatedExpression)
-        .forEach((qim) {
-      qim._updateCalculatedExpression();
-    });
-  }
-
-  /// Returns a bitfield of the items with `isEnabled` == true.
-  List<bool> get _currentlyEnabledItems => List<bool>.generate(
-        orderedQuestionnaireItemModels().length,
-        (index) => orderedQuestionnaireItemModels().elementAt(index).isEnabled,
-        growable: false,
+    for (final item in items) {
+      itemModelList.add(
+        _createIfAbsent(
+          item,
+          item.linkId,
+          parent,
+          level,
+        ),
       );
-
-  /// Update the current enablement status of all items.
-  ///
-  /// This updates enablement through enableWhen and enableWhenExpression.
-  void updateEnabledItems({bool notifyListeners = true}) {
-    _logger.trace('updateEnabledItems()');
-
-    if (_updateEnabledGeneration == _generation) {
-      _logger.debug(
-        'updateEnabledItems: already updated during this generation',
-      );
-      return;
     }
 
-    _updateEnabledGeneration = _generation;
-
-    if (_itemsWithEnableWhen == null &&
-        _itemsWithEnableWhenExpression == null) {
-      _logger.debug(
-        'updateEnabledItems: no conditionally enabled items',
-      );
-      return;
-    }
-
-    final previouslyEnabled = _currentlyEnabledItems;
-    _logger.trace('prevEnabled: $previouslyEnabled');
-    for (final itemModel in orderedQuestionnaireItemModels()) {
-      itemModel._isEnabled = true;
-    }
-
-    if (_itemsWithEnableWhen != null) {
-      for (final itemModel in _itemsWithEnableWhen!) {
-        itemModel._updateEnabled();
-      }
-    }
-
-    if (_itemsWithEnableWhenExpression != null) {
-      for (final itemModel in _itemsWithEnableWhenExpression!) {
-        itemModel._updateEnabled();
-      }
-    }
-
-    final nowEnabled = _currentlyEnabledItems;
-    _logger.trace('nowEnabled: $nowEnabled');
-
-    if (!listEquals(previouslyEnabled, nowEnabled)) {
-      nextGeneration(notifyListeners: notifyListeners);
-    } else {
-      _logger.debug('Enabled items unchanged.');
-    }
-  }
-
-  /// Activate the enable behavior.
-  ///
-  /// Adds the required listeners to evaluate enableWhen and
-  /// enableWhenExpression as items are changed.
-  void activateEnableBehavior() {
-    if (_itemsWithEnableWhenExpression != null) {
-      // When enableWhenExpression is involved we need to add listeners to every
-      // non-static item, as we have no way to find out which items are referenced
-      // by the FHIR Path expression.
-      addListener(() => updateEnabledItems());
-    } else {
-      for (final itemModel in orderedQuestionnaireItemModels()) {
-        itemModel.forEnableWhens((qew) {
-          fromLinkId(qew.question!).addListener(() => updateEnabledItems());
-        });
-      }
-    }
-
-    updateEnabledItems();
-  }
-
-  /// Returns whether the questionnaire meets all completeness criteria.
-  ///
-  /// Completeness criteria include:
-  /// * All required fields are filled
-  /// * All filled fields are valid
-  /// * All expression-based constraints are satisfied
-  ///
-  /// Returns null, if everything is complete.
-  /// Returns [QuestionnaireErrorFlag]s, if items are incomplete.
-  Iterable<QuestionnaireErrorFlag>? get isQuestionnaireComplete {
-    final errorFlags = <QuestionnaireErrorFlag>[];
-    for (final itemModel in orderedQuestionnaireItemModels()) {
-      final itemErrorFlags = itemModel.isComplete;
-      if (itemErrorFlags != null) {
-        errorFlags.addAll(itemErrorFlags);
-      }
-    }
-
-    return (errorFlags.isNotEmpty) ? errorFlags : null;
-  }
-
-  void resetMarkers() {
-    errorFlags.value = null;
-  }
-
-  final errorFlags = ValueNotifier<Iterable<QuestionnaireErrorFlag>?>(null);
-
-  /// Returns the [QuestionnaireErrorFlag] for an item with [linkId].
-  QuestionnaireErrorFlag? errorFlagForLinkId(String linkId) {
-    return questionnaireModel.errorFlags.value
-        ?.firstWhereOrNull((qm) => qm.linkId == linkId);
+    return itemModelList;
   }
 }

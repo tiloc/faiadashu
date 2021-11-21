@@ -4,26 +4,36 @@ import 'package:flutter/material.dart';
 import '../../../../../fhir_types/fhir_types.dart';
 import '../../../model.dart';
 
-/// Models an answer within a [QuestionnaireResponseItem].
-abstract class AnswerModel<I, V> {
+/// Models a single answer within a [QuestionItemModel].
+abstract class AnswerModel<I, V> extends ResponseNode {
   /// Textual depiction of an unanswered question.
   static const nullText = '—';
 
-  final ResponseModel responseModel;
-  final int answerIndex;
-  V? value;
+  final QuestionItemModel responseItemModel;
+  V? _value;
 
-  QuestionnaireItemModel get itemModel => responseModel.itemModel;
+  V? get value => _value;
+  set value(V? newValue) {
+    if (newValue != _value) {
+      _value = newValue;
 
-  QuestionnaireModel get questionnaireModel => itemModel.questionnaireModel;
+      responseItemModel.onAnswerChanged(this);
+    }
+  }
 
-  Locale get locale => questionnaireModel.locale;
+  QuestionnaireItemModel get questionnaireItemModel =>
+      responseItemModel.questionnaireItemModel;
 
-  QuestionnaireItem get qi => itemModel.questionnaireItem;
+  QuestionnaireResponseModel get questionnaireResponseModel =>
+      responseItemModel.questionnaireResponseModel;
+
+  Locale get locale => questionnaireResponseModel.locale;
+
+  QuestionnaireItem get qi => questionnaireItemModel.questionnaireItem;
 
   bool get isEnabled =>
-      !itemModel.isReadOnly &&
-      !(questionnaireModel.responseStatus ==
+      !questionnaireItemModel.isReadOnly &&
+      !(questionnaireResponseModel.responseStatus ==
           QuestionnaireResponseStatus.completed);
 
   /// Returns the human-readable entry format.
@@ -35,14 +45,13 @@ abstract class AnswerModel<I, V> {
         ?.valueString;
   }
 
-  AnswerModel(this.responseModel, this.answerIndex);
+  /// Construct a new, unpopulated answer model.
+  AnswerModel(this.responseItemModel) : super(responseItemModel);
 
   /// Returns a human-readable, localized, textual description of the model.
   ///
   /// Returns [nullText] if the question is unanswered.
   String get display;
-
-  QuestionnaireResponseAnswer? get answer => responseModel.answers[answerIndex];
 
   /// Validates a new input value. Does not change the [value].
   ///
@@ -64,24 +73,43 @@ abstract class AnswerModel<I, V> {
   /// when it is not.
   QuestionnaireErrorFlag? get isComplete;
 
+  /// Returns whether any answer (valid or invalid) has been provided.
+  bool get isAnswered => !isUnanswered;
+
   /// Returns whether this question is unanswered.
   bool get isUnanswered;
 
   String? get errorText {
-    return questionnaireModel.errorFlagForLinkId(itemModel.linkId)?.errorText;
+    return questionnaireResponseModel
+        .errorFlagForNodeUid(responseItemModel.nodeUid)
+        ?.errorText;
   }
 
   /// Returns a [QuestionnaireResponseAnswer] based on the current value.
   ///
+  /// Can optionally add nested [items].
+  ///
   /// This is the link between the presentation model and the underlying
   /// FHIR domain model.
-  QuestionnaireResponseAnswer? get filledAnswer;
+  QuestionnaireResponseAnswer? createFhirAnswer(
+    List<QuestionnaireResponseItem>? items,
+  );
 
-  List<QuestionnaireResponseAnswer>? get filledCodingAnswers {
-    throw UnimplementedError('filledCodingAnswers not implemented.');
+  List<QuestionnaireResponseAnswer>? createFhirCodingAnswers(
+    List<QuestionnaireResponseItem>? items,
+  ) {
+    throw UnimplementedError('createFhirCodingAnswers not implemented.');
   }
 
   bool get hasCodingAnswers => false;
+
+  /// Populate an answer model with a value from the FHIR domain model.
+  void populate(QuestionnaireResponseAnswer answer);
+
+  /// Populate an answer model with a multiple-choice answer from the FHIR domain model.
+  void populateCodingAnswers(List<QuestionnaireResponseAnswer>? answers) {
+    throw UnimplementedError('populateCodingAnswers not implemented.');
+  }
 
   /// Populates the answer from the result of a FHIRPath expression.
   ///
@@ -89,5 +117,15 @@ abstract class AnswerModel<I, V> {
   /// not be invoked by application code.
   void populateFromExpression(dynamic evaluationResult) {
     throw UnimplementedError('populateFromExpression not implemented.');
+  }
+
+  static int _uidCounter = 0;
+
+  /// INTERNAL USE ONLY - do not invoke!
+  @override
+  String calculateNodeUid() {
+    _uidCounter++;
+
+    return '${parentNode?.nodeUid}/$_uidCounter';
   }
 }

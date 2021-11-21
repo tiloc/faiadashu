@@ -891,7 +891,7 @@
               },
               {
                 "url": "expression",
-                "valueString": "%resource.repeat(item).where(linkId='4.3.b').item.where(answer.hasValue()).count() >= 3"
+                "valueString": "%resource.repeat(item).where(linkId='4.3.b').item.where((linkId = '4.3.b.TS').not() and answer.hasValue()).count() >= 3"
               },
               {
                 "url": "human",
@@ -1013,7 +1013,7 @@
                 }
               }
             ],
-            "linkId": "4.3.b.5",
+            "linkId": "4.3.b.TS",
             "text": "Total Score:",
             "type": "integer"
           }
