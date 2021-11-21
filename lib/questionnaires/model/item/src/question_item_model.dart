@@ -33,9 +33,10 @@ class QuestionItemModel extends ResponseItemModel {
           parentNode,
           questionnaireResponseModel,
           itemModel,
-        ) {
-    // FIXME: Should this be populated here? Or better a separate populate method?
-/*    dataAbsentReason = responseItem?.extension_?.dataAbsentReason; */
+        );
+
+  void populate(QuestionnaireResponseItem? responseItem) {
+    dataAbsentReason = responseItem?.extension_?.dataAbsentReason;
   }
 
   /// Is the response 'asked but declined'

@@ -386,6 +386,8 @@ class QuestionnaireResponseModel extends ChangeNotifier {
             'Populating question response $linkId into existing item $qrim.',
           );
 
+          qrim.populate(item);
+
           final itemAnswers = item.answer;
           if (itemAnswers != null && itemAnswers.isNotEmpty) {
             _logger.debug(

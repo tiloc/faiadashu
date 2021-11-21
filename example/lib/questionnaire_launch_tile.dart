@@ -84,7 +84,7 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
         builder: (context, snapshot) {
           var countString = '';
           if (snapshot.hasData) {
-            // FIXME: Add error handling (SDC Demo Survey is not showing count)
+            // TODO: Add error handling
             final _questionnaireResponseModel = snapshot.data!;
             final _numberCompleted =
                 _questionnaireResponseModel.count((rim) => rim.isAnswered);

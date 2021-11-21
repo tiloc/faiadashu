@@ -267,7 +267,9 @@ class _QuestionnaireItemFillerSupportLink extends StatelessWidget {
       icon: const Icon(Icons.info_outline),
       onPressed: () {
         _logger.debug("supportLink '${supportLink.toString()}'");
-        QuestionnaireResponseFiller.of(context).onLinkTap?.call(context, supportLink);
+        QuestionnaireResponseFiller.of(context)
+            .onLinkTap
+            ?.call(context, supportLink);
       },
     );
   }

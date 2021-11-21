@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// A hierarchical viewer for any kind of FHIR resource.
 ///
@@ -240,7 +241,7 @@ class _JsonViewerListNodeState extends _JsonNodeState<_JsonViewerListNode> {
             style: (count > 0)
                 ? TextStyle(
                     color:
-                        themeData.textTheme.bodyText1!.color!.withOpacity(0.54),
+                        themeData.textTheme.bodyText1?.color?.withOpacity(0.54),
                   )
                 : TextStyle(color: themeData.errorColor),
           ),
@@ -276,7 +277,7 @@ class _JsonViewerGenericNode extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
 
-    var color = themeData.textTheme.bodyText1!.color;
+    var color = themeData.textTheme.bodyText1?.color;
     if (nodeValue == null) {
       color = themeData.errorColor;
     } else {
@@ -295,21 +296,41 @@ class _JsonViewerGenericNode extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(left: 24),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
             nodeName,
             style: TextStyle(
-              color: themeData.textTheme.bodyText1!.color!.withOpacity(0.54),
+              color: themeData.textTheme.bodyText1?.color?.withOpacity(0.54),
             ),
           ),
           const Text(' : '),
           if (nodeValue != null)
             Expanded(
-              child: Text(
-                nodeValue.toString(),
-                softWrap: true,
-                maxLines: 999,
-                style: TextStyle(color: color),
+              child: GestureDetector(
+                child: Text(
+                  nodeValue.toString(),
+                  softWrap: true,
+                  maxLines: 999,
+                  style: TextStyle(color: color),
+                ),
+                onTap: () {
+                  Clipboard.setData(
+                    ClipboardData(
+                      text: nodeValue.toString(),
+                    ),
+                  ).then((_) {
+                    final messenger = ScaffoldMessenger.maybeOf(context);
+                    messenger?.clearSnackBars();
+                    messenger?.showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          '$nodeName copied to clipboard',
+                        ),
+                      ),
+                    );
+                  });
+                },
               ),
             ),
           if (nodeValue == null)

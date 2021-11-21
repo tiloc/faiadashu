@@ -93,8 +93,9 @@ class _QuestionnaireStepperState extends State<QuestionnaireStepperPage> {
                               ),
                             );
                           },
-                          valueListenable: QuestionnaireResponseFiller.of(context)
-                              .aggregator<TotalScoreAggregator>(),
+                          valueListenable:
+                              QuestionnaireResponseFiller.of(context)
+                                  .aggregator<TotalScoreAggregator>(),
                         ),
                         if (widget.questionnaireTheme.showProgress)
                           QuestionnaireFillerProgressBar(

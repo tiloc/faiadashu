@@ -211,7 +211,10 @@ class QuestionResponseItemFillerState
             (answerFiller) => questionnaireTheme.decorateRepeatingAnswer(
               context,
               answerFiller,
-              hasMoreThanOneAnswer
+              hasMoreThanOneAnswer &&
+                      widget.responseItemModel.questionnaireResponseModel
+                              .responseStatus ==
+                          QuestionnaireResponseStatus.in_progress
                   ? () {
                       _removeAnswerFiller(answerFiller);
                     }

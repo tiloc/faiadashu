@@ -333,7 +333,8 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
 
     if (!_isFocussed) {
       WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-        QuestionnaireResponseFiller.of(_belowFillerContext!).requestFocus(_focusIndex);
+        QuestionnaireResponseFiller.of(_belowFillerContext!)
+            .requestFocus(_focusIndex);
       });
 
       _isFocussed = true;
