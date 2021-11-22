@@ -39,6 +39,7 @@ class QuestionnaireScroller extends StatefulWidget {
   final void Function(BuildContext context, Uri url)? onLinkTap;
   final QuestionnairePageScaffoldBuilder scaffoldBuilder;
   final QuestionnaireTheme questionnaireTheme;
+  final QuestionnaireModelDefaults questionnaireModelDefaults;
 
   const QuestionnaireScroller({
     this.locale,
@@ -50,6 +51,7 @@ class QuestionnaireScroller extends StatefulWidget {
     this.aggregators,
     this.onLinkTap,
     this.questionnaireTheme = const QuestionnaireTheme(),
+    this.questionnaireModelDefaults = const QuestionnaireModelDefaults(),
     Key? key,
   }) : super(key: key);
 
@@ -166,6 +168,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
       launchContext: widget.launchContext,
       locale: locale,
       questionnaireTheme: widget.questionnaireTheme,
+      questionnaireModelDefaults: widget.questionnaireModelDefaults,
       builder: (BuildContext context) {
         _belowFillerContext = context;
         final questionnaireFiller = QuestionnaireResponseFiller.of(context);

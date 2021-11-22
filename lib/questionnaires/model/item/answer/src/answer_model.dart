@@ -27,6 +27,9 @@ abstract class AnswerModel<I, V> extends ResponseNode {
   QuestionnaireResponseModel get questionnaireResponseModel =>
       responseItemModel.questionnaireResponseModel;
 
+  QuestionnaireModelDefaults get modelDefaults =>
+      questionnaireResponseModel.questionnaireModel.questionnaireModelDefaults;
+
   Locale get locale => questionnaireResponseModel.locale;
 
   QuestionnaireItem get qi => questionnaireItemModel.questionnaireItem;

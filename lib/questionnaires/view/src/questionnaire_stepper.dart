@@ -12,6 +12,7 @@ class QuestionnaireStepper extends StatefulWidget {
   final LaunchContext launchContext;
   final QuestionnairePageScaffoldBuilder scaffoldBuilder;
   final QuestionnaireTheme questionnaireTheme;
+  final QuestionnaireModelDefaults questionnaireModelDefaults;
 
   const QuestionnaireStepper({
     this.locale,
@@ -19,6 +20,7 @@ class QuestionnaireStepper extends StatefulWidget {
     required this.fhirResourceProvider,
     required this.launchContext,
     this.questionnaireTheme = const QuestionnaireTheme(),
+    this.questionnaireModelDefaults = const QuestionnaireModelDefaults(),
     Key? key,
   }) : super(key: key);
 
@@ -38,6 +40,7 @@ class QuestionnaireStepperState extends State<QuestionnaireStepper> {
       fhirResourceProvider: widget.fhirResourceProvider,
       launchContext: widget.launchContext,
       questionnaireTheme: widget.questionnaireTheme,
+      questionnaireModelDefaults: widget.questionnaireModelDefaults,
       builder: (BuildContext context) {
         final questionnaireFiller = QuestionnaireResponseFiller.of(context);
         final itemCount = questionnaireFiller.fillerItemModels.length;

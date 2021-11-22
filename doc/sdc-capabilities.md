@@ -61,6 +61,9 @@ Supported
 #### shortText
 Supported
 
+#### usageMode
+Supported for generation of a narrative
+
 ### Item category: Group
 #### group
 Supported, but no support for item-control.

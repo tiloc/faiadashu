@@ -12,11 +12,23 @@ class GroupItemModel extends ResponseItemModel {
         );
 
   @override
-  bool get isInvalid => false;
+  bool get isInvalid {
+    return questionnaireResponseModel
+        .orderedResponseItemModelsWithParent(parent: this)
+        .any((rim) => rim.isInvalid);
+  }
 
   @override
-  bool get isAnswered => false;
+  bool get isAnswered {
+    return questionnaireResponseModel
+        .orderedResponseItemModelsWithParent(parent: this)
+        .any((rim) => rim.isAnswered);
+  }
 
   @override
-  bool get isUnanswered => false;
+  bool get isUnanswered {
+    return questionnaireResponseModel
+        .orderedResponseItemModelsWithParent(parent: this)
+        .every((rim) => rim.isUnanswered);
+  }
 }

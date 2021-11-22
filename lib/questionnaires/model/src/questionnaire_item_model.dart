@@ -259,13 +259,19 @@ class QuestionnaireItemModel with Diagnosticable {
         ?.valueString;
   }
 
+  /// Returns the `usageMode` for the item, or the default.
+  Code get usageMode {
+    return questionnaireItem.extension_?.usageMode ??
+        questionnaireModel.questionnaireModelDefaults.usageMode;
+  }
+
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
 
     properties.add(StringProperty('linkId', linkId));
     properties
-        .add(FlagProperty('children', value: hasChildren, ifTrue: 'children'));
+        .add(FlagProperty('children', value: hasChildren, ifTrue: 'hasChildren'));
     properties.add(IntProperty('level', level));
   }
 

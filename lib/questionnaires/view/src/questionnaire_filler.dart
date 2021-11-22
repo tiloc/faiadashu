@@ -20,6 +20,7 @@ class QuestionnaireResponseFiller extends StatefulWidget {
   final void Function(BuildContext context, Uri url)? onLinkTap;
   final void Function(QuestionnaireResponseModel)? onDataAvailable;
   final QuestionnaireTheme questionnaireTheme;
+  final QuestionnaireModelDefaults questionnaireModelDefaults;
 
   final FhirResourceProvider fhirResourceProvider;
   final LaunchContext launchContext;
@@ -31,6 +32,7 @@ class QuestionnaireResponseFiller extends StatefulWidget {
             aggregators: aggregators,
             fhirResourceProvider: fhirResourceProvider,
             launchContext: launchContext,
+            questionnaireModelDefaults: questionnaireModelDefaults,
           );
 
   const QuestionnaireResponseFiller({
@@ -43,6 +45,7 @@ class QuestionnaireResponseFiller extends StatefulWidget {
     this.onDataAvailable,
     this.onLinkTap,
     this.questionnaireTheme = const QuestionnaireTheme(),
+    this.questionnaireModelDefaults = const QuestionnaireModelDefaults(),
   }) : super(key: key);
 
   static QuestionnaireFillerData of(BuildContext context) {

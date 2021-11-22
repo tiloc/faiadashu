@@ -106,6 +106,10 @@
             ],
             "text": "The text provides guidance on how the information will be handled from a security perspective."
           }
+        },
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-usageMode",
+          "valueCode": "capture"
         }
       ],
       "linkId": "1.0-security",
@@ -181,7 +185,13 @@
           }
         ]
       },
-      "type": "display"
+      "type": "display",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-usageMode",
+          "valueCode": "capture"
+        }
+      ]
     },
     {
       "extension": [

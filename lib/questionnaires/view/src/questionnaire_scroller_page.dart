@@ -23,6 +23,8 @@ class QuestionnaireScrollerPage extends QuestionnaireScroller {
     List<Aggregator<dynamic>>? aggregators,
     void Function(BuildContext context, Uri url)? onLinkTap,
     QuestionnaireTheme questionnaireTheme = const QuestionnaireTheme(),
+    QuestionnaireModelDefaults questionnaireModelDefaults =
+        const QuestionnaireModelDefaults(),
     Key? key,
   }) : super(
           locale: locale,
@@ -44,6 +46,7 @@ class QuestionnaireScrollerPage extends QuestionnaireScroller {
           aggregators: aggregators,
           onLinkTap: onLinkTap,
           questionnaireTheme: questionnaireTheme,
+          questionnaireModelDefaults: questionnaireModelDefaults,
           key: key,
         );
 }

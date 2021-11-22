@@ -32,11 +32,15 @@ class QuestionnaireModel {
   ///
   /// see: [getResource] for the preferred access method.
   final FhirResourceProvider fhirResourceProvider;
+
+  final QuestionnaireModelDefaults questionnaireModelDefaults;
+
   static final _logger = Logger(QuestionnaireModel);
 
   QuestionnaireModel._({
     required this.questionnaire,
     required this.fhirResourceProvider,
+    required this.questionnaireModelDefaults,
   }) {
     _buildOrderedItems();
   }
@@ -53,6 +57,7 @@ class QuestionnaireModel {
   /// such as ValueSets.
   static Future<QuestionnaireModel> fromFhirResourceBundle({
     required FhirResourceProvider fhirResourceProvider,
+    required QuestionnaireModelDefaults questionnaireModelDefaults,
   }) async {
     _logger.debug('QuestionnaireModel.fromFhirResourceBundle');
 
@@ -66,6 +71,7 @@ class QuestionnaireModel {
     final questionnaireModel = QuestionnaireModel._(
       questionnaire: questionnaire,
       fhirResourceProvider: fhirResourceProvider,
+      questionnaireModelDefaults: questionnaireModelDefaults,
     );
 
     await questionnaireModel.fhirResourceProvider.init();

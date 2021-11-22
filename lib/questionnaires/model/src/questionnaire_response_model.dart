@@ -73,6 +73,8 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     List<Aggregator>? aggregators,
     required FhirResourceProvider fhirResourceProvider,
     required LaunchContext launchContext,
+    QuestionnaireModelDefaults questionnaireModelDefaults =
+        const QuestionnaireModelDefaults(),
   }) async {
     _logger.debug('QuestionnaireModel.fromFhirResourceBundle');
 
@@ -80,6 +82,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
     final questionnaireModel = await QuestionnaireModel.fromFhirResourceBundle(
       fhirResourceProvider: fhirResourceProvider,
+      questionnaireModelDefaults: questionnaireModelDefaults,
     );
 
     final questionnaireResponseModel = QuestionnaireResponseModel._(

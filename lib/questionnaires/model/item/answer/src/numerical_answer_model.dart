@@ -70,8 +70,6 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
     return keyForUnitChoice(coding);
   }
 
-  static const defaultSliderMaxValue = 100.0;
-
   NumericalAnswerModel(QuestionItemModel responseModel) : super(responseModel) {
     _isSliding =
         questionnaireItemModel.questionnaireItem.isItemControl('slider');
@@ -86,7 +84,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
         0.0;
     _maxValue = maxValueExtension?.valueDecimal?.value ??
         maxValueExtension?.valueInteger?.value?.toDouble() ??
-        (_isSliding ? defaultSliderMaxValue : double.maxFinite);
+        (_isSliding ? modelDefaults.sliderMaxValue : double.maxFinite);
 
     if (_isSliding) {
       final sliderStepValueExtension = qi.extension_?.extensionOrNull(
@@ -113,7 +111,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
                 )
                 ?.valueInteger
                 ?.value ??
-            3; // this is just an assumption what makes sense to your average human...
+            modelDefaults.maxDecimal;
         break;
       default:
         throw StateError('item.type cannot be ${qi.type}');

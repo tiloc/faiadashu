@@ -38,10 +38,21 @@ class NarrativeAggregator extends Aggregator<Narrative> {
       return false;
     }
 
+    final usageMode = itemModel.questionnaireItemModel.usageMode;
+
+    if (usageMode == usageModeCaptureCode) {
+      return false;
+    }
+
     final itemText = itemModel.questionnaireItemModel.titleText;
 
     if (itemModel is GroupItemModel) {
-      // TODO: Group model should also check for whether any item in the group is answered.
+      if ((usageMode == usageModeDisplayNonEmptyCode ||
+              usageMode == usageModeCaptureDisplayNonEmptyCode) &&
+          itemModel.isUnanswered) {
+        return false;
+      }
+
       if (itemText != null) {
         div.write('<h2>$itemText</h2>');
 
@@ -71,12 +82,21 @@ class NarrativeAggregator extends Aggregator<Narrative> {
     QuestionItemModel itemModel,
     String? itemText,
   ) {
-    if (itemModel.isUnanswered) {
+    final usageMode = itemModel.questionnaireItemModel.usageMode;
+    if ((usageMode == usageModeDisplayNonEmptyCode ||
+            usageMode == usageModeCaptureDisplayNonEmptyCode) &&
+        itemModel.isUnanswered) {
       return false;
     }
 
     if (itemText != null) {
       div.write('<h3>$itemText</h3>');
+    }
+
+    if (itemModel.isUnanswered) {
+      div.write('<p>&mdash;</p>');
+
+      return true;
     }
 
     final dataAbsentReason = itemModel.dataAbsentReason;

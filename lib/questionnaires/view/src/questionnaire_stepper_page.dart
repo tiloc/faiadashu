@@ -16,6 +16,7 @@ class QuestionnaireStepperPage extends QuestionnaireStepper {
     required FhirResourceProvider fhirResourceProvider,
     required LaunchContext launchContext,
     QuestionnaireTheme questionnaireTheme = const QuestionnaireTheme(),
+    QuestionnaireModelDefaults questionnaireModelDefaults = const QuestionnaireModelDefaults(),
     Key? key,
   }) : super(
           locale: locale,
@@ -23,6 +24,7 @@ class QuestionnaireStepperPage extends QuestionnaireStepper {
           fhirResourceProvider: fhirResourceProvider,
           launchContext: launchContext,
           questionnaireTheme: questionnaireTheme,
+          questionnaireModelDefaults: questionnaireModelDefaults,
           key: key,
         );
 
