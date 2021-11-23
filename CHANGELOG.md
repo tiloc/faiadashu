@@ -1,3 +1,7 @@
+## 0.6.0-dev.2
+* Support specifying defaults for some model properties (e.g. maxDecimal)
+* Support usageMode extension for narrative creation
+
 ## 0.6.0-dev.1
 * **[Breaking]** Fix hierarchy of models according to https://chat.fhir.org/#narrow/stream/179255-questionnaire/topic/Questionnaire.20Response.20example
   * This introduces a strict separation of a questionnaire's structure and a response to this questionnaire
