@@ -31,7 +31,11 @@ class _GroupItemState extends ResponseItemFillerState<GroupItem> {
 
     final titleWidget = this.titleWidget;
 
-    return (!widget.responseItemModel.questionnaireItemModel.isHidden)
+    final questionnaireItemModel =
+        widget.fillerItemModel.questionnaireItemModel;
+
+    return (!questionnaireItemModel.isHidden &&
+            questionnaireItemModel.isShownDuringCapture)
         ? Focus(
             focusNode: focusNode,
             child: AnimatedSwitcher(

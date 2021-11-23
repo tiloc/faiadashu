@@ -95,6 +95,28 @@
     {
       "extension": [
         {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-usageMode",
+          "valueCode": "capture"
+        }
+      ],
+      "linkId": "capture-welcome",
+      "text": "We hope this will only take you a minute!",
+      "type": "display"
+    },
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-usageMode",
+          "valueCode": "display"
+        }
+      ],
+      "linkId": "display-welcome",
+      "text": "We hope this only took you a minute!",
+      "type": "display"
+    },
+    {
+      "extension": [
+        {
           "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
           "valueCodeableConcept": {
             "coding": [

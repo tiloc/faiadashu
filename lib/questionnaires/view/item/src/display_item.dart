@@ -27,7 +27,11 @@ class _DisplayItemState extends QuestionnaireItemFillerState<DisplayItem> {
 
     final titleWidget = this.titleWidget;
 
-    return (!widget.fillerItemModel.questionnaireItemModel.isHidden)
+    final questionnaireItemModel =
+        widget.fillerItemModel.questionnaireItemModel;
+
+    return (!questionnaireItemModel.isHidden &&
+            questionnaireItemModel.isShownDuringCapture)
         ? Focus(
             focusNode: focusNode,
             child: AnimatedSwitcher(

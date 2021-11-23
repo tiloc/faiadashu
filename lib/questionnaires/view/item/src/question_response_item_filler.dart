@@ -85,7 +85,11 @@ class QuestionResponseItemFillerState
       'build ${widget.responseItemModel.nodeUid} hidden: ${widget.responseItemModel.questionnaireItemModel.isHidden}, enabled: ${widget.responseItemModel.isEnabled}',
     );
 
-    return (!widget.responseItemModel.questionnaireItemModel.isHidden)
+    final questionnaireItemModel =
+        widget.fillerItemModel.questionnaireItemModel;
+
+    return (!questionnaireItemModel.isHidden &&
+            questionnaireItemModel.isShownDuringCapture)
         ? Focus(
             focusNode: focusNode,
 // Only enable for low-level focus coding

@@ -216,6 +216,15 @@ class QuestionnaireItemModel with Diagnosticable {
         isHelp;
   }
 
+  /// Should the item be shown during "capture"?
+  ///
+  /// Capture is the interactive filling of the form.
+  bool get isShownDuringCapture {
+    return usageMode == usageModeCaptureDisplayCode ||
+        usageMode == usageModeCaptureCode ||
+        usageMode == usageModeCaptureDisplayNonEmptyCode;
+  }
+
   /// The [QuestionnaireItemModel] which contains help text about the current item.
   ///
   /// null, if this doesn't exist.
@@ -270,8 +279,8 @@ class QuestionnaireItemModel with Diagnosticable {
     super.debugFillProperties(properties);
 
     properties.add(StringProperty('linkId', linkId));
-    properties
-        .add(FlagProperty('children', value: hasChildren, ifTrue: 'hasChildren'));
+    properties.add(
+        FlagProperty('children', value: hasChildren, ifTrue: 'hasChildren'));
     properties.add(IntProperty('level', level));
   }
 

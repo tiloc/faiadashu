@@ -62,7 +62,7 @@ Supported
 Supported
 
 #### usageMode
-Supported for generation of a narrative
+Supported during filling of questionnaire ("capture"), and for generation of a narrative ("display").
 
 ### Item category: Group
 #### group
