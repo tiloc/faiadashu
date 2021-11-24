@@ -4,6 +4,15 @@ import '../../../l10n/l10n.dart';
 import '../../../logging/logging.dart';
 import '../../questionnaires.dart';
 
+/// Should coding selections be presented in a compact or an expanded format?
+///
+/// compact = dropdown or auto-complete
+/// expanded = radio buttons / check boxes
+enum CodingControlPreference {
+  compact,
+  expanded,
+}
+
 /// Create the views for all levels of a questionnaire. Provide styling theme.
 class QuestionnaireTheme {
   static final _logger = Logger(QuestionnaireTheme);
@@ -36,6 +45,9 @@ class QuestionnaireTheme {
   static const defaultLandscapeBreakpoint = 1000.0;
   final double landscapeBreakpoint;
 
+  static const defaultCodingControlPreference = CodingControlPreference.compact;
+  final CodingControlPreference codingControlPreference;
+
   const QuestionnaireTheme({
     this.canSkipQuestions = false,
     this.showNullAnswerOption = true,
@@ -45,6 +57,7 @@ class QuestionnaireTheme {
     this.landscapeBreakpoint = defaultLandscapeBreakpoint,
     this.horizontalCodingBreakpoint = defaultHorizontalCodingBreakpoint,
     this.maxLinesForTextItem = defaultMaxLinesForTextItem,
+    this.codingControlPreference = defaultCodingControlPreference,
   });
 
   /// Returns a [QuestionnaireItemFiller] for a given [QuestionnaireResponseFiller].

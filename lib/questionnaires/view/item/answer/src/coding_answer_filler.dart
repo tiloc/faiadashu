@@ -44,14 +44,50 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
   @override
   Widget buildInputControl(BuildContext context) {
     try {
-      return answerModel.isAutocomplete ||
-              answerModel.answerOptions.length >
-                  questionnaireTheme.autoCompleteThreshold
-          ? _buildAutocompleteAnswers(context)
-          : _buildChoiceAnswers(context);
+      // Only checkbox choices currently support repeating answers.
+      if (qi.repeats?.value ?? false) {
+        return _buildChoiceAnswers(context);
+      }
+
+      final isSmartAutoComplete = answerModel.answerOptions.length >
+          questionnaireTheme.autoCompleteThreshold;
+
+      // Large numbers of responses require auto-complete control
+      if (answerModel.isAutocomplete || isSmartAutoComplete) {
+        return _buildAutocompleteAnswers(context);
+      }
+
+      if (answerModel.isCheckbox || answerModel.isRadioButton) {
+        return _buildChoiceAnswers(context);
+      }
+
+      // Explicitly specified drop-down
+      if (answerModel.isDropdown) {
+        return _buildDropdownAnswers(context);
+      }
+
+      // No explicitly specified control, let the theme decide.
+      switch (questionnaireTheme.codingControlPreference) {
+        case CodingControlPreference.compact:
+          return _buildDropdownAnswers(context);
+        case CodingControlPreference.expanded:
+          return _buildChoiceAnswers(context);
+      }
     } catch (exception) {
       return BrokenQuestionnaireItem.fromException(exception);
     }
+  }
+
+  Widget _buildDropdownAnswers(BuildContext context) {
+    return _CodingDropdown(
+      firstFocusNode: firstFocusNode,
+      locale: locale,
+      answerModel: answerModel,
+      errorText: errorText,
+      onChanged: (code) {
+        value = answerModel.fromChoiceString(code);
+      },
+    );
   }
 
   Widget _buildChoiceAnswers(BuildContext context) {
@@ -124,23 +160,8 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
       }
     }
     for (final choice in answerModel.answerOptions.values) {
-      final optionPrefix = choice.extension_
-          ?.extensionOrNull(
-            'http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix',
-          )
-          ?.valueString;
-      final optionPrefixDisplay =
-          (optionPrefix != null) ? '$optionPrefix ' : '';
-      final optionTitle =
-          '$optionPrefixDisplay${choice.localizedDisplay(locale)}';
-      final styledOptionTitle = Xhtml.toWidget(
-        context,
-        answerModel.responseItemModel.questionnaireItemModel.questionnaireModel,
-        optionTitle,
-        choice.valueStringElement?.extension_,
-        width: 100,
-        height: 100,
-      );
+      Widget? styledOptionTitle =
+          _createStyledOptionTitle(context, answerModel, locale, choice);
 
       choices.add(
         isMultipleChoice
@@ -250,6 +271,67 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
   }
 }
 
+Widget _createStyledOptionTitle(
+  BuildContext context,
+  CodingAnswerModel answerModel,
+  Locale locale,
+  QuestionnaireAnswerOption choice,
+) {
+  final optionPrefix = choice.extension_
+      ?.extensionOrNull(
+        'http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix',
+      )
+      ?.valueString;
+  final optionPrefixDisplay = (optionPrefix != null) ? '$optionPrefix ' : '';
+  final optionTitle = '$optionPrefixDisplay${choice.localizedDisplay(locale)}';
+  final styledOptionTitle = Xhtml.toWidget(
+    context,
+    answerModel.responseItemModel.questionnaireItemModel.questionnaireModel,
+    optionTitle,
+    choice.valueStringElement?.extension_,
+    width: 100,
+    height: 100,
+  );
+
+  return styledOptionTitle ?? Text(choice.localizedDisplay(locale));
+}
+
+class _CodingDropdown extends StatelessWidget {
+  const _CodingDropdown({
+    Key? key,
+    required this.firstFocusNode,
+    required this.locale,
+    required this.answerModel,
+    required this.errorText,
+    required this.onChanged,
+  }) : super(key: key);
+
+  final FocusNode firstFocusNode;
+  final Locale locale;
+  final CodingAnswerModel answerModel;
+  final String? errorText;
+  final void Function(String?) onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final dropdownItems =
+        answerModel.answerOptions.values.map<DropdownMenuItem<String>>((qao) {
+      // FIXME: The max width needs to be limited to prevent overflow on long answers (e.g. PRAPARE housing)
+      return DropdownMenuItem<String>(
+        value: qao.optionCode,
+        child: _createStyledOptionTitle(context, answerModel, locale, qao),
+      );
+    }).toList(growable: false);
+
+    return DropdownButtonFormField<String>(
+      value: answerModel.value?.coding?.firstOrNull?.code?.value,
+      onChanged: onChanged,
+      focusNode: firstFocusNode,
+      items: dropdownItems,
+    );
+  }
+}
+
 class _VerticalCodingChoices extends StatelessWidget {
   const _VerticalCodingChoices({
     Key? key,
@@ -266,6 +348,8 @@ class _VerticalCodingChoices extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final errorText = this.errorText;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -293,11 +377,11 @@ class _VerticalCodingChoices extends StatelessWidget {
         ),
         if (errorText != null)
           Text(
-            errorText!,
+            errorText,
             style: Theme.of(context)
                 .textTheme
-                .caption!
-                .copyWith(color: Theme.of(context).errorColor),
+                .caption
+                ?.copyWith(color: Theme.of(context).errorColor),
           ),
       ],
     );

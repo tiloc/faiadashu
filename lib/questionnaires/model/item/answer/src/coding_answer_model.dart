@@ -108,6 +108,7 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
   }
 
   bool isExclusive(Coding coding) {
+    // FIXME: This ! can crash. coding was "open-choice-other", answerOptions only contains U1..U5.
     return answerOptions[choiceStringFromCoding(coding)]!
             .extension_
             ?.extensionOrNull(
@@ -119,9 +120,13 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
   }
 
   /// Returns whether the options should be presented as an auto-complete control
-  bool get isAutocomplete {
-    return !(qi.repeats?.value ?? false) && (qi.isItemControl('autocomplete'));
-  }
+  bool get isAutocomplete => qi.isItemControl('autocomplete');
+
+  bool get isDropdown => qi.isItemControl('drop-down');
+
+  bool get isRadioButton => qi.isItemControl('radio-button');
+
+  bool get isCheckbox => qi.isItemControl('check-box');
 
   // Take the existing extensions that might contain information about
   // ordinal values and provide them as both ordinalValue and iso21090-CO-value.

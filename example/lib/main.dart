@@ -432,6 +432,10 @@ class _HomePageState extends State<HomePage> {
                           questionnaireResourceUri,
                           'assets/instruments/phq9_instrument.json',
                         ),
+                        questionnaireTheme: const QuestionnaireTheme(
+                          // It is better for a wizard to overtly present all choices on each screen.
+                            codingControlPreference:
+                                CodingControlPreference.expanded),
                         launchContext: launchContext,
                       ),
                     ),
