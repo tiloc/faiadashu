@@ -280,7 +280,12 @@ class QuestionnaireItemModel with Diagnosticable {
 
     properties.add(StringProperty('linkId', linkId));
     properties.add(
-        FlagProperty('children', value: hasChildren, ifTrue: 'hasChildren'));
+      FlagProperty(
+        'children',
+        value: hasChildren,
+        ifTrue: 'hasChildren',
+      ),
+    );
     properties.add(IntProperty('level', level));
   }
 

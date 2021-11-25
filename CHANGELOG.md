@@ -1,4 +1,5 @@
 ## 0.6.0-dev.2
+* Support drop-down control for coding answers
 * Support specifying defaults for some model properties (e.g. maxDecimal)
 * Support usageMode extension for narrative creation
 

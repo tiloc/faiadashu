@@ -1,10 +1,8 @@
 import 'package:collection/collection.dart';
-import 'package:faiadashu/faiadashu.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../../fhir_types/fhir_types.dart';
-import '../../../../questionnaires.dart';
+import '../../../../../faiadashu.dart';
 
 /// Answer questions which require code(s) as a response.
 ///
@@ -80,6 +78,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
 
   Widget _buildDropdownAnswers(BuildContext context) {
     return _CodingDropdown(
+      questionnaireTheme: questionnaireTheme,
       firstFocusNode: firstFocusNode,
       locale: locale,
       answerModel: answerModel,
@@ -289,8 +288,8 @@ Widget _createStyledOptionTitle(
     answerModel.responseItemModel.questionnaireItemModel.questionnaireModel,
     optionTitle,
     choice.valueStringElement?.extension_,
-    width: 100,
-    height: 100,
+    imageWidth: 100,
+    imageHeight: 100,
   );
 
   return styledOptionTitle ?? Text(choice.localizedDisplay(locale));
@@ -300,6 +299,7 @@ class _CodingDropdown extends StatelessWidget {
   const _CodingDropdown({
     Key? key,
     required this.firstFocusNode,
+    required this.questionnaireTheme,
     required this.locale,
     required this.answerModel,
     required this.errorText,
@@ -307,6 +307,7 @@ class _CodingDropdown extends StatelessWidget {
   }) : super(key: key);
 
   final FocusNode firstFocusNode;
+  final QuestionnaireTheme questionnaireTheme;
   final Locale locale;
   final CodingAnswerModel answerModel;
   final String? errorText;
@@ -314,18 +315,23 @@ class _CodingDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dropdownItems =
-        answerModel.answerOptions.values.map<DropdownMenuItem<String>>((qao) {
-      // FIXME: The max width needs to be limited to prevent overflow on long answers (e.g. PRAPARE housing)
-      return DropdownMenuItem<String>(
-        value: qao.optionCode,
-        child: _createStyledOptionTitle(context, answerModel, locale, qao),
-      );
-    }).toList(growable: false);
+    final dropdownItems = [
+      if (questionnaireTheme.showNullAnswerOption)
+        const DropdownMenuItem<String>(
+          child: NullDashText(),
+        ),
+      ...answerModel.answerOptions.values.map<DropdownMenuItem<String>>((qao) {
+        return DropdownMenuItem<String>(
+          value: qao.optionCode,
+          child: _createStyledOptionTitle(context, answerModel, locale, qao),
+        );
+      }),
+    ];
 
     return DropdownButtonFormField<String>(
+      isExpanded: true,
       value: answerModel.value?.coding?.firstOrNull?.code?.value,
-      onChanged: onChanged,
+      onChanged: answerModel.isEnabled ? onChanged : null,
       focusNode: firstFocusNode,
       items: dropdownItems,
     );

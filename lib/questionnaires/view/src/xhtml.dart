@@ -16,8 +16,8 @@ class Xhtml {
     QuestionnaireModel questionnaireModel,
     String? plainText,
     List<FhirExtension>? extension, {
-    double? width,
-    double? height,
+    double? imageWidth,
+    double? imageHeight,
     Key? key,
   }) {
     _logger.trace('enter toWidget $plainText');
@@ -39,8 +39,8 @@ class Xhtml {
 
       return Base64Image(
         base64String,
-        width: width,
-        height: height,
+        width: imageWidth,
+        height: imageHeight,
         semanticLabel: plainText,
       );
     }
@@ -53,8 +53,8 @@ class Xhtml {
 
       return Base64Image(
         base64String,
-        width: width,
-        height: height,
+        width: imageWidth,
+        height: imageHeight,
         semanticLabel: plainText,
       );
     }
@@ -75,15 +75,19 @@ class Xhtml {
 
       return Base64Image(
         base64String,
-        width: width,
-        height: height,
+        width: imageWidth,
+        height: imageHeight,
         semanticLabel: plainText,
       );
     } else {
-      return HTML.toRichText(
-        context,
-        xhtml,
-        defaultTextStyle: Theme.of(context).textTheme.bodyText1,
+      return RichText(
+        maxLines: 5,
+        overflow: TextOverflow.ellipsis,
+        text: HTML.toTextSpan(
+          context,
+          xhtml,
+          defaultTextStyle: Theme.of(context).textTheme.bodyText1,
+        ),
       );
     }
   }

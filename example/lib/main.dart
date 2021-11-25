@@ -434,8 +434,9 @@ class _HomePageState extends State<HomePage> {
                         ),
                         questionnaireTheme: const QuestionnaireTheme(
                           // It is better for a wizard to overtly present all choices on each screen.
-                            codingControlPreference:
-                                CodingControlPreference.expanded),
+                          codingControlPreference:
+                              CodingControlPreference.expanded,
+                        ),
                         launchContext: launchContext,
                       ),
                     ),
