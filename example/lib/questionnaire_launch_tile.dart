@@ -106,31 +106,19 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
         child: Center(
           child: IconButton(
             icon: const Icon(Icons.preview),
-            onPressed: () async {
-              final questionnaireResponseModel =
-                  await QuestionnaireResponseModel.fromFhirResourceBundle(
-                fhirResourceProvider: _questionnaireProvider,
-                launchContext: widget.launchContext,
-                locale: _locale,
-                aggregators: [
-                  NarrativeAggregator(),
-                  // FIXME: This is required because responseModel tries to update calculated expressions
-                  // FIXME: ValueSets for this are missing in ResourceProvider.
-                  // Should there be a flag to disable dynamic behaviors in response model?
-                  QuestionnaireResponseAggregator()
-                ],
-              );
-              questionnaireResponseModel.populate(
-                widget.restoreResponseFunction.call(widget.questionnairePath),
-              );
-              if (!mounted) {
+            onPressed: () {
+              final questionnaireResponse =
+                  widget.restoreResponseFunction.call(widget.questionnairePath);
+              if (questionnaireResponse == null) {
+                // This is just a quick fix to prevent NPEs, in production code the button should be dimmed.
                 return;
               }
+              final narrative = questionnaireResponse.text!;
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => NarrativePage(
-                    questionnaireResponseModel: questionnaireResponseModel,
+                    narrative: narrative,
                   ),
                 ),
               );

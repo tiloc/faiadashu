@@ -598,13 +598,15 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     return orderedFillerItemModels().toList().elementAt(index);
   }
 
-  /// Returns the count of [ResponseItemModel]s which match the predicate function.
+  /// Returns the count of [QuestionItemModel]s which match the predicate function.
   ///
-  /// Considers the item models returned by [orderedResponseItemModels].
-  int count(bool Function(ResponseItemModel) predicate) {
+  /// Considers the item models returned by [orderedQuestionItemModels].
+  ///
+  /// The limitation to questions is in place to prevent groups from being counted.
+  int count(bool Function(QuestionItemModel) predicate) {
     int count = 0;
-    for (final rim in orderedResponseItemModels()) {
-      if (predicate.call(rim)) {
+    for (final qim in orderedQuestionItemModels()) {
+      if (predicate.call(qim)) {
         count++;
       }
     }
