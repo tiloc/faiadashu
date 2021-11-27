@@ -14,7 +14,7 @@ dependencies:
   faiadashu_online:
     path: ../faiadashu_online
 
-  fhir: ^0.5.0-6
+  fhir: ^0.5.0-9
 #  fhir:
 #    path: /Users/tilo/Projects/fhir/fhir
   fhir_auth: ^0.4.1
@@ -35,8 +35,8 @@ dev_dependencies:
 
 # Remove this when fhir_auth no longer depends on old fhir
 dependency_overrides:
-  fhir: ^0.5.0-6
-  freezed_annotation: ^0.15.0
+  fhir: ^0.5.0-9
+  freezed_annotation: ^1.0.0
 
 flutter:
   uses-material-design: true

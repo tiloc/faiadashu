@@ -132,6 +132,7 @@
         <entry key="fhir">
           <value>
             <list>
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir-0.5.0-9/lib" />
               <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir-0.5.0-6/lib" />
               <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir-0.5.0-8/lib" />
             </list>
@@ -154,6 +155,7 @@
         <entry key="fhir_path">
           <value>
             <list>
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_path-0.5.0-14/lib" />
               <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_path-0.5.0-11/lib" />
               <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_path-0.5.0-13/lib" />
             </list>
@@ -225,6 +227,7 @@
         <entry key="freezed_annotation">
           <value>
             <list>
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/freezed_annotation-1.0.0/lib" />
               <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/freezed_annotation-0.15.0/lib" />
             </list>
           </value>
@@ -569,16 +572,19 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fake_async-1.2.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir-0.5.0-6/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir-0.5.0-8/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir-0.5.0-9/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_at_rest-0.4.5/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_auth-0.4.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_path-0.5.0-11/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_path-0.5.0-13/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_path-0.5.0-14/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_yaml-0.5.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/file-6.1.2/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/flutter_appauth-1.1.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/flutter_appauth_platform_interface-3.1.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/flutter_secure_storage-4.2.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/freezed_annotation-0.15.0/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/freezed_annotation-1.0.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/glob-2.0.2/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/google_sign_in-5.2.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/google_sign_in_platform_interface-2.1.0/lib" />

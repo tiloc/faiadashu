@@ -35,8 +35,8 @@ dev_dependencies:
   lint: ^1.7.2
 
 dependency_overrides:
-  fhir: ^0.5.0-6
-  freezed_annotation: ^0.15.0
+  fhir: ^0.5.0-9
+  freezed_annotation: ^1.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
