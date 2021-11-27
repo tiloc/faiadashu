@@ -11,9 +11,7 @@ class UnsupportedAnswerModel extends AnswerModel<Object, Object> {
   QuestionnaireResponseAnswer? createFhirAnswer(
     List<QuestionnaireResponseItem>? items,
   ) {
-    throw UnimplementedError(
-      'UnsupportedAnswerModel cannot create a FHIR answer.',
-    );
+    return null;
   }
 
   @override

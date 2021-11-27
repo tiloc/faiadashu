@@ -84,7 +84,7 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
         builder: (context, snapshot) {
           var countString = '';
           if (snapshot.hasData) {
-            // TODO: Add error handling
+            // FIXME: Sometimes these stats are not being shown.
             final _questionnaireResponseModel = snapshot.data!;
             final _numberCompleted =
                 _questionnaireResponseModel.count((rim) => rim.isAnswered);
@@ -115,6 +115,7 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                 aggregators: [
                   NarrativeAggregator(),
                   // FIXME: This is required because responseModel tries to update calculated expressions
+                  // FIXME: ValueSets for this are missing in ResourceProvider.
                   // Should there be a flag to disable dynamic behaviors in response model?
                   QuestionnaireResponseAggregator()
                 ],

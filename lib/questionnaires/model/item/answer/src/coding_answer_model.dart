@@ -4,119 +4,121 @@ import 'package:fhir/r4.dart';
 import '../../../../../fhir_types/fhir_types.dart';
 import '../../../../../l10n/l10n.dart';
 import '../../../../../logging/logging.dart';
+import '../../../../questionnaires.dart';
 import '../../../model.dart';
 
 /// Model answers which are [Coding]s.
-class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
-  final _answerOptions = <String, QuestionnaireAnswerOption>{};
+class CodingAnswerModel extends AnswerModel<Set<String>, Set<String>> {
+  final _answerOptions = <String, CodingAnswerOptionModel>{};
   static final _logger = Logger(CodingAnswerModel);
 
-  Map<String, QuestionnaireAnswerOption> get answerOptions => _answerOptions;
+  Iterable<CodingAnswerOptionModel> get answerOptions => _answerOptions.values;
 
-  static const openChoiceOther = 'open-choice-other';
+  int get numberOfOptions => _answerOptions.length;
+
+  String? openText;
+
+  /// Returns an answer option by its [uid].
+  ///
+  /// Throws if it doesn't exist.
+  CodingAnswerOptionModel answerOptionByUid(String uid) {
+    final answerOption = _answerOptions[uid];
+    if (answerOption == null) {
+      throw StateError('CodingAnswerModel does not contain option $uid');
+    }
+
+    return answerOption;
+  }
+
+  /// Returns an answer option by its [uid].
+  ///
+  /// Returns null if it doesn't exist.
+  CodingAnswerOptionModel? answerOptionByUidOrNull(String? uid) =>
+      (uid != null) ? _answerOptions[uid] : null;
+
+  CodingAnswerOptionModel? get singleSelection {
+    return answerOptionByUidOrNull(singleSelectionUid);
+  }
+
+  String? get singleSelectionUid {
+    final value = this.value;
+    if (value == null) {
+      return null;
+    }
+
+    if (value.length != 1) {
+      throw StateError('Selection has ${value.length} elements. Expected 1.');
+    }
+
+    return value.first;
+  }
+
+  bool isSelected(String uid) => value?.contains(uid) ?? false;
+
+  String? get exclusiveSelectionUid {
+    final value = this.value;
+
+    if (value == null) {
+      return null;
+    }
+
+    final exclusiveSelection =
+        value.where((uid) => answerOptionByUid(uid).isExclusive);
+    if (exclusiveSelection.isEmpty) {
+      return null;
+    }
+
+    if (exclusiveSelection.length != 1) {
+      throw StateError(
+        '${exclusiveSelection.length} exclusive options selected.',
+      );
+    }
+
+    return exclusiveSelection.first;
+  }
+
+  Set<String>? selectOption(String? uid) {
+    return uid == null ? null : {uid};
+  }
 
   /// Toggles the checkbox with the provided [checkboxValue].
   ///
   /// Used in repeating items.
-  CodeableConcept? toggleValue(CodeableConcept? value, String? checkboxValue) {
-    _logger.trace('Enter toggledValue $checkboxValue');
-    if (checkboxValue == null) {
-      return null;
+  Set<String>? toggleOption(String uid) {
+    _logger.trace('Enter toggledValue $uid');
+
+    final value = this.value;
+
+    if (value == null) {
+      return {uid};
     }
-    if ((value == null) || (value.coding == null)) {
-      return fromChoiceString(checkboxValue);
+
+    final toggledOption = answerOptionByUid(uid);
+
+    if (toggledOption.isExclusive) {
+      return {uid};
     }
 
-    final entryIndex = value.coding!
-        .indexWhere((coding) => coding.code?.value == checkboxValue);
-    if (entryIndex == -1) {
-      _logger.debug('$checkboxValue currently not selected.');
-      final enabledCodeableConcept = fromChoiceString(checkboxValue)!;
-      final enabledCoding = enabledCodeableConcept.coding!.first;
-      if (isExclusive(enabledCoding)) {
-        _logger.debug('$checkboxValue isExclusive');
-        // The newly enabled checkbox is exclusive, kill all others.
+    final newSet = Set.of(value);
 
-        return enabledCodeableConcept;
-      } else {
-        _logger.debug('$checkboxValue is not exclusive');
-        // Kill all exclusive ones.
-
-        return value.copyWith(
-          coding: [
-            ...value.coding!.whereNot((coding) => isExclusive(coding)),
-            enabledCoding,
-          ],
-        );
-      }
+    if (newSet.contains(uid)) {
+      newSet.remove(uid);
     } else {
-      _logger.debug('$checkboxValue currently selected.');
-
-      return CodeableConcept(coding: value.coding!..removeAt(entryIndex));
+      newSet.removeWhere((uid) => answerOptionByUid(uid).isExclusive);
+      newSet.add(uid);
     }
+
+    return newSet;
   }
 
-  String? choiceStringFromCoding(Coding? coding) {
-    if (coding == null) {
-      return null;
-    }
-    final choiceString =
-        (coding.code != null) ? coding.code?.value : coding.display;
-
-    if (choiceString == null) {
-      throw QuestionnaireFormatException(
-        'Insufficient info for choice string in $coding',
-        coding,
-      );
-    } else {
-      return choiceString;
-    }
-  }
-
-  String? _choiceStringFromCodings(List<Coding>? codings) {
-    if (codings == null) {
-      return null;
-    }
-
-    // TODO: Can it ever be harmful that this is only looking at the first coding?
-    final coding = codings.firstOrNull;
-
-    return choiceStringFromCoding(coding);
-  }
-
-  /// Extract a string from a [CodeableConcept].
+  /// Is this answer equal to a given coding?
   ///
-  /// Can be used as groupValue in checkboxes/radiobuttons, or as a key in maps.
-  ///
-  /// Throws when [Questionnaire] is malformed.
-  ///
-  /// Returns null if [codeableConcept] is null
-  String? toChoiceString(CodeableConcept? codeableConcept) {
-    if (codeableConcept == null) {
-      return null;
-    }
-
-    return _choiceStringFromCodings(
-      ArgumentError.checkNotNull(codeableConcept.coding),
-    );
-  }
-
-  CodeableConcept? fromChoiceString(String? choiceString) {
-    return (choiceString != null)
-        ? CodeableConcept(coding: [answerOptions[choiceString]!.valueCoding!])
-        : null;
-  }
-
-  bool isExclusive(Coding coding) {
-    // FIXME: This ! can crash. coding was "open-choice-other", answerOptions only contains U1..U5.
-    return answerOptions[choiceStringFromCoding(coding)]!
-            .extension_
-            ?.extensionOrNull(
-              'http://hl7.org/fhir/StructureDefinition/questionnaire-optionExclusive',
-            )
-            ?.valueBoolean
-            ?.value ==
-        true;
+  /// Implements the semantics as specified for enabledWhen
+  bool equalsCoding(Coding? coding) {
+    return value?.any(
+          (uid) => _answerOptions[uid]?.coding?.match(coding) ?? false,
+        ) ??
+        false;
   }
 
   /// Returns whether the options should be presented as an auto-complete control
@@ -128,72 +130,21 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
 
   bool get isCheckbox => qi.isItemControl('check-box');
 
-  // Take the existing extensions that might contain information about
-  // ordinal values and provide them as both ordinalValue and iso21090-CO-value.
-  List<FhirExtension>? _createOrdinalExtension(
-    List<FhirExtension>? inExtension,
-  ) {
-    List<FhirExtension>? responseOrdinalExtension;
+  String get openLabel =>
+      qi.extension_
+          ?.extensionOrNull(
+            'http://hl7.org/fhir/uv/sdc/StructureDefinition/questionnaire-sdc-openLabel',
+          )
+          ?.valueString ??
+      lookupFDashLocalizations(locale).fillerOpenCodingOtherLabel;
 
-    final FhirExtension? ordinalExtension = inExtension?.extensionOrNull(
-          'http://hl7.org/fhir/StructureDefinition/ordinalValue',
-        ) ??
-        inExtension?.extensionOrNull(
-          'http://hl7.org/fhir/StructureDefinition/iso21090-CO-value',
-        );
-    if (ordinalExtension != null) {
-      responseOrdinalExtension = <FhirExtension>[
-        FhirExtension(
-          url: FhirUri('http://hl7.org/fhir/StructureDefinition/ordinalValue'),
-          valueDecimal: ordinalExtension.valueDecimal,
-        ),
-        FhirExtension(
-          url: FhirUri(
-            'http://hl7.org/fhir/StructureDefinition/iso21090-CO-value',
-          ),
-          valueDecimal: ordinalExtension.valueDecimal,
-        ),
-      ];
-    }
+  String _nextOptionUid() => _answerOptions.length.toString();
 
-    return responseOrdinalExtension;
-  }
-
-  void _addAnswerOption(Coding coding) {
-    _answerOptions.addEntries([
-      MapEntry<String, QuestionnaireAnswerOption>(
-        coding.code!.toString(),
-        FDashQuestionnaireAnswerOptionExtensions.fromCoding(
-          coding,
-          extensionBuilder: (inCoding) =>
-              _createOptionPrefixExtension(inCoding.extension_),
-          codingExtensionBuilder: (inCoding) =>
-              _createOrdinalExtension(inCoding.extension_),
-        ),
-      ),
-    ]);
-  }
-
-  List<FhirExtension>? _createOptionPrefixExtension(
-    List<FhirExtension>? inExtension,
-  ) {
-    List<FhirExtension>? responseOptionPrefixExtension;
-
-    final FhirExtension? labelExtension = inExtension?.extensionOrNull(
-      'http://hl7.org/fhir/StructureDefinition/valueset-label',
-    );
-    if (labelExtension != null) {
-      responseOptionPrefixExtension = <FhirExtension>[
-        FhirExtension(
-          url: FhirUri(
-            'http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix',
-          ),
-          valueString: labelExtension.valueString,
-        ),
-      ];
-    }
-
-    return responseOptionPrefixExtension;
+  void _addAnswerOptionFromValueSetCoding(Coding coding) {
+    final uid = _nextOptionUid();
+    final optionModel =
+        CodingAnswerOptionModel.fromValueSetCoding(uid, locale, coding);
+    _answerOptions[uid] = optionModel;
   }
 
   /// Convert [ValueSet]s or [QuestionnaireAnswerOption]s to normalized [QuestionnaireAnswerOption]s
@@ -207,30 +158,31 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
         );
       }
 
-      questionnaireItemModel.questionnaireModel
-          .forEachInValueSet(key, _addAnswerOption, context: qi);
+      questionnaireItemModel.questionnaireModel.forEachInValueSet(
+        key,
+        _addAnswerOptionFromValueSetCoding,
+        context: qi,
+      );
     } else {
-      if (qi.answerOption != null) {
-        _answerOptions.addEntries(
-          qi.answerOption!.map<MapEntry<String, QuestionnaireAnswerOption>>(
-            (qao) => MapEntry<String, QuestionnaireAnswerOption>(
-              qao.optionCode,
-              qao.copyWith(
-                valueCoding: (qao.valueCoding != null)
-                    ? qao.valueCoding!.copyWith(
-                        userSelected: Boolean(true),
-                        extension_: _createOrdinalExtension(qao.extension_),
-                      )
-                    : Coding(
-                        // The spec only allows valueCoding, but real-world incl. valueString
-                        display: qao.valueString,
-                        userSelected: Boolean(true),
-                      ),
-              ),
-            ),
-          ),
-        );
+      final qiAnswerOptions = qi.answerOption;
+
+      if (qiAnswerOptions != null) {
+        for (final answerOption in qiAnswerOptions) {
+          final uid = _nextOptionUid();
+          final optionModel =
+              CodingAnswerOptionModel.fromQuestionnaireAnswerOption(
+            uid,
+            locale,
+            answerOption,
+          );
+          _answerOptions[uid] = optionModel;
+        }
       }
+    }
+
+    if (qi.type == QuestionnaireItemType.open_choice) {
+      final optionModel = CodingAnswerOptionModel.fromOpenChoice(openLabel);
+      _answerOptions[optionModel.uid] = optionModel;
     }
   }
 
@@ -257,7 +209,19 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
   }
 
   @override
-  String get display => value?.localizedDisplay(locale) ?? AnswerModel.nullText;
+  String get display {
+    final value = this.value;
+    if (value == null || value.isEmpty) {
+      return AnswerModel.nullText;
+    }
+    // TODO: Localized or themed separator character?
+
+    return value.map<String>((uid) {
+      return uid != CodingAnswerOptionModel.openChoiceCode
+          ? answerOptionByUid(uid).plainText
+          : openText ?? AnswerModel.nullText;
+    }).join('; ');
+  }
 
   /// Returns whether the choices should be presented horizontally.
   bool get isHorizontal {
@@ -271,12 +235,12 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
   }
 
   @override
-  String? validateInput(CodeableConcept? inValue) {
+  String? validateInput(Set<String>? inValue) {
     if (inValue == null) {
       return null;
     }
 
-    final int length = inValue.coding?.length ?? 0;
+    final int length = inValue.length;
 
     if (length < minOccurs) {
       return lookupFDashLocalizations(locale).validatorMinOccurs(minOccurs);
@@ -300,35 +264,25 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
   List<QuestionnaireResponseAnswer>? createFhirCodingAnswers(
     List<QuestionnaireResponseItem>? items,
   ) {
+    final value = this.value;
+
     if (value == null) {
       return null;
     }
 
-    // TODO(tiloc): Return the order of the codings in the order of the choices?
-
-    // TODO: This is only supporting a single other text.
-    final result = (value!.coding?.firstOrNull?.code?.value == openChoiceOther)
-        ? [
-            QuestionnaireResponseAnswer(
-              valueCoding: Coding(display: value!.text),
+    final responses = value.map<QuestionnaireResponseAnswer>((uid) {
+      return uid != CodingAnswerOptionModel.openChoiceCode
+          ? QuestionnaireResponseAnswer(
+              valueCoding: answerOptionByUid(uid).createFhirCoding(),
               item: items,
-            ),
-          ]
-        : value!.coding?.map<QuestionnaireResponseAnswer>((coding) {
-            // Some answers may only be a display, not have a code
-            return coding.code != null
-                ? QuestionnaireResponseAnswer(
-                    valueCoding: answerOptions[choiceStringFromCoding(coding)]!
-                        .valueCoding,
-                    item: items,
-                  )
-                : QuestionnaireResponseAnswer(
-                    valueCoding: coding,
-                    item: items,
-                  );
-          }).toList();
+            )
+          : QuestionnaireResponseAnswer(
+              valueCoding: Coding(display: openText),
+              item: items,
+            );
+    }).toList(growable: false);
 
-    return result;
+    return responses;
   }
 
   @override
@@ -364,16 +318,33 @@ class CodingAnswerModel extends AnswerModel<CodeableConcept, CodeableConcept> {
 
   @override
   void populateCodingAnswers(List<QuestionnaireResponseAnswer>? answers) {
-    value = (answers != null)
-        ? CodeableConcept(
-            coding: answers
-                .map(
-                  (answer) =>
-                      answerOptions[choiceStringFromCoding(answer.valueCoding)]!
-                          .valueCoding!,
-                )
-                .toList(),
-          )
-        : null;
+    if (answers == null) {
+      return;
+    }
+
+    final popSet = <String>{};
+    for (final answer in answers) {
+      final matchCode = answer.valueCoding?.code?.value ?? answer.valueString;
+
+      // TODO: Currently not possible, due to open-choice
+/*      if (matchCode == null) {
+        throw QuestionnaireFormatException(
+          'QuestionnaireResponseAnswer $answer requires either a valueCoding or a valueString.',
+        );
+      }
+*/
+
+      final matchingOption = answerOptions
+          .firstWhereOrNull((answerOption) => answerOption.matches(matchCode));
+
+      if (matchingOption != null) {
+        popSet.add(matchingOption.uid);
+      } else {
+        popSet.add(CodingAnswerOptionModel.openChoiceCode);
+        openText = answer.valueCoding?.display ?? answer.valueString;
+      }
+    }
+
+    value = (popSet.isNotEmpty) ? popSet : null;
   }
 }

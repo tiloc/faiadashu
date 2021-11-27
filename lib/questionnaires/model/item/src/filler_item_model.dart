@@ -188,9 +188,14 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
   ) {
     final question = fromLinkId(questionLinkId);
     if (question is QuestionItemModel) {
-      final firstAnswer = (fromLinkId(questionLinkId) as QuestionItemModel)
-          .answeredAnswerModels
-          .firstOrNull;
+      final qim = fromLinkId(questionLinkId) as QuestionItemModel;
+
+      // If enableWhen logic depends on an item that is disabled, the logic should proceed as though the item is not valued - even if a default value or other value might be retained in memory in the event of the item being re-enabled.
+      final firstAnswer = (qim.isEnabled)
+          ? (fromLinkId(questionLinkId) as QuestionItemModel)
+              .answeredAnswerModels
+              .firstOrNull
+          : null;
 
       if (firstAnswer == null) {
         // null equals nothing
@@ -198,19 +203,16 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
           enableWhenTrigger.trigger();
         }
       } else if (firstAnswer is CodingAnswerModel) {
-        final responseCoding = firstAnswer.value?.coding?.firstOrNull;
-
-        // TODO: More sophistication- System, cardinality, etc.
-        if (responseCoding?.code == qew.answerCoding?.code) {
+        if (firstAnswer.equalsCoding(qew.answerCoding)) {
           _fimLogger.debug(
-            'enableWhen: $responseCoding == ${qew.answerCoding}',
+            'enableWhen: $firstAnswer == ${qew.answerCoding}',
           );
           if (qew.operator_ == QuestionnaireEnableWhenOperator.eq) {
             enableWhenTrigger.trigger();
           }
         } else {
           _fimLogger.debug(
-            'enableWhen: $responseCoding != ${qew.answerCoding}',
+            'enableWhen: $firstAnswer != ${qew.answerCoding}',
           );
           if (qew.operator_ == QuestionnaireEnableWhenOperator.ne) {
             enableWhenTrigger.trigger();
@@ -236,7 +238,14 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
     QuestionnaireEnableWhen qew,
     _EnableWhenTrigger enableWhenTrigger,
   ) {
-    if (fromLinkId(qew.question!).isAnswered == qew.answerBoolean!.value) {
+    final rim = fromLinkId(qew.question!);
+    final shouldExist = qew.answerBoolean?.value ?? true;
+
+    // If enableWhen logic depends on an item that is disabled, the logic should proceed as though the item is not valued - even if a default value or other value might be retained in memory in the event of the item being re-enabled.
+    if (rim.isEnabled && rim.isAnswered == shouldExist) {
+      enableWhenTrigger.trigger();
+    }
+    if (!rim.isEnabled && !shouldExist) {
       enableWhenTrigger.trigger();
     }
   }

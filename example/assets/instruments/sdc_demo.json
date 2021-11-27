@@ -362,6 +362,10 @@
       "maxLength": 25
     },
     {
+      "extension": [{
+        "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/questionnaire-sdc-openLabel",
+        "valueString": "Other event (specify)"
+      }],
       "linkId": "2.5.b-repeats",
       "text": "Heart History (check all that applies)",
       "type": "open-choice",

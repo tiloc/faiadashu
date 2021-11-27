@@ -1,12 +1,9 @@
-import 'package:collection/collection.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../faiadashu.dart';
 
 /// Answer questions which require code(s) as a response.
-///
-/// This class uses [CodeableConcept] to model multiple choice and open choice.
 ///
 /// R5 release of the FHIR standard will have a `coding` item type.
 class CodingAnswerFiller extends QuestionnaireAnswerFiller {
@@ -19,9 +16,9 @@ class CodingAnswerFiller extends QuestionnaireAnswerFiller {
   State<StatefulWidget> createState() => _CodingAnswerState();
 }
 
-class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
+class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
     CodingAnswerFiller, CodingAnswerModel> {
-  late final TextEditingController? _otherChoiceController;
+  late final TextEditingController? _openTextController;
 
   String? _errorText;
 
@@ -32,8 +29,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
   @override
   void postInitState() {
     if (qi.type == QuestionnaireItemType.open_choice) {
-      // TODO: Set initialValue
-      _otherChoiceController = TextEditingController();
+      _openTextController = TextEditingController(text: answerModel.openText);
     }
 
     _errorText = answerModel.validateInput(value);
@@ -47,7 +43,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
         return _buildChoiceAnswers(context);
       }
 
-      final isSmartAutoComplete = answerModel.answerOptions.length >
+      final isSmartAutoComplete = answerModel.numberOfOptions >
           questionnaireTheme.autoCompleteThreshold;
 
       // Large numbers of responses require auto-complete control
@@ -83,8 +79,8 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
       locale: locale,
       answerModel: answerModel,
       errorText: errorText,
-      onChanged: (code) {
-        value = answerModel.fromChoiceString(code);
+      onChanged: (uid) {
+        value = answerModel.selectOption(uid);
       },
     );
   }
@@ -109,27 +105,25 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
   }
 
   Widget _buildAutocompleteAnswers(BuildContext context) {
-    return FDashAutocomplete<QuestionnaireAnswerOption>(
+    return FDashAutocomplete<CodingAnswerOptionModel>(
       focusNode: firstFocusNode,
-      initialValue: value?.localizedDisplay(locale),
-      displayStringForOption: (answerOption) =>
-          answerOption.localizedDisplay(locale),
+      initialValue: answerModel.singleSelection?.plainText,
+      displayStringForOption: (answerOption) => answerOption.plainText,
       optionsBuilder: (TextEditingValue textEditingValue) {
         if (textEditingValue.text.isEmpty) {
-          return const Iterable<QuestionnaireAnswerOption>.empty();
+          return const Iterable<CodingAnswerOptionModel>.empty();
         }
 
-        return answerModel.answerOptions.values
-            .where((QuestionnaireAnswerOption option) {
-          return option
-              .localizedDisplay(locale)
+        return answerModel.answerOptions
+            .where((CodingAnswerOptionModel option) {
+          return option.plainText
               .toLowerCase()
               .contains(textEditingValue.text.toLowerCase());
         });
       },
       onSelected: (answerModel.isEnabled)
-          ? (QuestionnaireAnswerOption selectedOption) {
-              value = answerModel.fromChoiceString(selectedOption.optionCode);
+          ? (CodingAnswerOptionModel selectedOption) {
+              value = answerModel.selectOption(selectedOption.uid);
             }
           : null,
     );
@@ -148,41 +142,37 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
           RadioListTile<String?>(
             title: const NullDashText(),
             value: null,
-            groupValue: answerModel.toChoiceString(value),
+            groupValue: answerModel.singleSelectionUid,
             onChanged: (answerModel.isEnabled)
                 ? (String? newValue) {
-                    value = answerModel.fromChoiceString(newValue);
+                    value = answerModel.selectOption(newValue);
                   }
                 : null,
           ),
         );
       }
     }
-    for (final choice in answerModel.answerOptions.values) {
-      Widget? styledOptionTitle =
-          _createStyledOptionTitle(context, answerModel, locale, choice);
+    for (final answerOption in answerModel.answerOptions) {
+      final styledOptionTitle =
+          _createStyledOptionTitle(context, answerModel, answerOption);
+
+      if (answerOption.uid == CodingAnswerOptionModel.openChoiceCode) {
+        continue;
+      }
 
       choices.add(
         isMultipleChoice
-            ? answerModel.isExclusive(choice.valueCoding!)
+            ? answerOption.isExclusive
                 ? Focus(
                     child: RadioListTile<String>(
                       title: styledOptionTitle,
-                      groupValue: choice.optionCode,
-                      value: value?.coding
-                              ?.firstWhereOrNull(
-                                (coding) =>
-                                    coding.code?.value == choice.optionCode,
-                              )
-                              ?.code
-                              ?.value ??
-                          '',
+                      groupValue: answerModel.exclusiveSelectionUid,
+                      value: answerOption.uid,
                       onChanged: (answerModel.isEnabled)
                           ? (_) {
                               Focus.of(context).requestFocus();
-                              final newValue = answerModel.toggleValue(
-                                value,
-                                choice.optionCode,
+                              final newValue = answerModel.toggleOption(
+                                answerOption.uid,
                               );
                               _errorText = answerModel.validateInput(newValue);
                               value = newValue;
@@ -193,16 +183,12 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
                 : Focus(
                     child: CheckboxListTile(
                       title: styledOptionTitle,
-                      value: value?.coding?.firstWhereOrNull(
-                            (coding) => coding.code?.value == choice.optionCode,
-                          ) !=
-                          null,
+                      value: answerModel.isSelected(answerOption.uid),
                       onChanged: (answerModel.isEnabled)
                           ? (bool? newValue) {
                               Focus.of(context).requestFocus();
-                              final newValue = answerModel.toggleValue(
-                                value,
-                                choice.optionCode,
+                              final newValue = answerModel.toggleOption(
+                                answerOption.uid,
                               );
                               _errorText = answerModel.validateInput(newValue);
                               value = newValue;
@@ -213,14 +199,14 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
             : Focus(
                 child: RadioListTile<String>(
                   title: styledOptionTitle,
-                  value: choice.optionCode,
+                  value: answerOption.uid,
                   // allows value to be set to null on repeat tap
                   toggleable: true,
-                  groupValue: answerModel.toChoiceString(value),
+                  groupValue: answerModel.singleSelectionUid,
                   onChanged: (answerModel.isEnabled)
                       ? (String? newValue) {
                           Focus.of(context).requestFocus();
-                          value = answerModel.fromChoiceString(newValue);
+                          value = answerModel.selectOption(newValue);
                         }
                       : null,
                 ),
@@ -232,35 +218,31 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
       choices.add(
         Focus(
           child: RadioListTile<String>(
-            value: CodingAnswerModel.openChoiceOther,
-            groupValue: answerModel.toChoiceString(value),
+            value: CodingAnswerOptionModel.openChoiceCode,
+            groupValue: (answerModel.value
+                        ?.contains(CodingAnswerOptionModel.openChoiceCode) ??
+                    false)
+                ? CodingAnswerOptionModel.openChoiceCode
+                : null,
             onChanged: (answerModel.isEnabled)
                 ? (String? newValue) {
                     Focus.of(context).requestFocus();
-                    value = CodeableConcept(
-                      coding: [
-                        Coding(code: Code(CodingAnswerModel.openChoiceOther)),
-                      ],
-                      text: _otherChoiceController!.text,
-                    );
+                    value = answerModel
+                        .selectOption(CodingAnswerOptionModel.openChoiceCode);
                   }
                 : null,
             title: TextFormField(
-              controller: _otherChoiceController,
+              controller: _openTextController,
               enabled: answerModel.isEnabled,
               onChanged: (newText) {
-                value = (newText.isEmpty)
-                    ? null
-                    : CodeableConcept(
-                        coding: [
-                          Coding(code: Code(CodingAnswerModel.openChoiceOther)),
-                        ],
-                        text: _otherChoiceController!.text,
-                      );
+                answerModel.openText = newText;
+                value = answerModel
+                    .selectOption(CodingAnswerOptionModel.openChoiceCode);
               },
             ),
-            secondary:
-                Text(FDashLocalizations.of(context).fillerOpenCodingOtherLabel),
+            secondary: Text(
+              answerModel.openLabel,
+            ),
           ),
         ),
       );
@@ -273,26 +255,22 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<CodeableConcept,
 Widget _createStyledOptionTitle(
   BuildContext context,
   CodingAnswerModel answerModel,
-  Locale locale,
-  QuestionnaireAnswerOption choice,
+  CodingAnswerOptionModel optionModel,
 ) {
-  final optionPrefix = choice.extension_
-      ?.extensionOrNull(
-        'http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix',
-      )
-      ?.valueString;
+  final optionPrefix = optionModel.optionPrefix;
+  final plainText = optionModel.plainText;
   final optionPrefixDisplay = (optionPrefix != null) ? '$optionPrefix ' : '';
-  final optionTitle = '$optionPrefixDisplay${choice.localizedDisplay(locale)}';
+  final optionTitle = '$optionPrefixDisplay$plainText';
   final styledOptionTitle = Xhtml.toWidget(
     context,
     answerModel.responseItemModel.questionnaireItemModel.questionnaireModel,
     optionTitle,
-    choice.valueStringElement?.extension_,
+    optionModel.xhtmlExtensions,
     imageWidth: 100,
     imageHeight: 100,
   );
 
-  return styledOptionTitle ?? Text(choice.localizedDisplay(locale));
+  return styledOptionTitle ?? Text(plainText);
 }
 
 class _CodingDropdown extends StatelessWidget {
@@ -320,17 +298,18 @@ class _CodingDropdown extends StatelessWidget {
         const DropdownMenuItem<String>(
           child: NullDashText(),
         ),
-      ...answerModel.answerOptions.values.map<DropdownMenuItem<String>>((qao) {
+      ...answerModel.answerOptions
+          .map<DropdownMenuItem<String>>((answerOption) {
         return DropdownMenuItem<String>(
-          value: qao.optionCode,
-          child: _createStyledOptionTitle(context, answerModel, locale, qao),
+          value: answerOption.uid,
+          child: _createStyledOptionTitle(context, answerModel, answerOption),
         );
       }),
     ];
 
     return DropdownButtonFormField<String>(
       isExpanded: true,
-      value: answerModel.value?.coding?.firstOrNull?.code?.value,
+      value: answerModel.singleSelectionUid,
       onChanged: answerModel.isEnabled ? onChanged : null,
       focusNode: firstFocusNode,
       items: dropdownItems,
