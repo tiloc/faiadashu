@@ -2,6 +2,13 @@
 * Support drop-down control for coding answers
 * Support specifying defaults for some model properties (e.g. maxDecimal)
 * Support usageMode extension for narrative creation
+* Fixed count methods to get accurate count of unanswered questions
+* Improvements in the display of errors
+* NarrativeTile can use an existing narrative, rather than always generating a new one
+
+* Introduced a presentation model for individual answer options in coding questions.
+
+* Updated dependencies, including [Grey Faulkenberry's](https://github.com/Dokotela) latest and greatest `fhir_path` package.
 
 ## 0.6.0-dev.1
 * **[Breaking]** Fix hierarchy of models according to https://chat.fhir.org/#narrow/stream/179255-questionnaire/topic/Questionnaire.20Response.20example

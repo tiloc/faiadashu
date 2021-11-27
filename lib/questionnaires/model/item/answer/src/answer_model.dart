@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
@@ -8,6 +10,8 @@ import '../../../model.dart';
 abstract class AnswerModel<I, V> extends ResponseNode {
   /// Textual depiction of an unanswered question.
   static const nullText = '—';
+
+  static const _htmlEscaper = HtmlEscape();
 
   final QuestionItemModel responseItemModel;
   V? _value;
@@ -55,6 +59,11 @@ abstract class AnswerModel<I, V> extends ResponseNode {
   ///
   /// Returns [nullText] if the question is unanswered.
   String get display;
+
+  /// Same as [display], but safely escaped for HTML/XHTML.
+  String get xhtmlDisplay {
+    return AnswerModel._htmlEscaper.convert(display);
+  }
 
   /// Validates a new input value. Does not change the [value].
   ///

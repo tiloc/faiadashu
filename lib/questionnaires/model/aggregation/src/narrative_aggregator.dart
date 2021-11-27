@@ -123,15 +123,15 @@ class NarrativeAggregator extends Aggregator<Narrative> {
       for (final answerModel in filledAnswers) {
         if (answerModel is NumericalAnswerModel) {
           if (itemModel.questionnaireItemModel.isTotalScore) {
-            div.write('<h3>${answerModel.display}</h3>');
+            div.write('<h3>${answerModel.xhtmlDisplay}</h3>');
           } else {
             div.write(
-              '<p>$repeatPrefix${answerModel.display}</p>',
+              '<p>$repeatPrefix${answerModel.xhtmlDisplay}</p>',
             );
           }
         } else {
           div.write(
-            '<p>$repeatPrefix${answerModel.display}</p>',
+            '<p>$repeatPrefix${answerModel.xhtmlDisplay}</p>',
           );
         }
       }
