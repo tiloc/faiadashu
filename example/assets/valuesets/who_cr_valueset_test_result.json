@@ -1,0 +1,70 @@
+{
+  "resourceType": "ValueSet",
+  "id": "WhoCrValueSetTestResult",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-valueset"
+    ]
+  },
+  "text": {
+    "status": "extensions",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>This value set includes codes based on the following rules:</p><ul><li>Include these codes as defined in <a href=\"http://terminology.hl7.org/2.0.0/CodeSystem-v3-ObservationInterpretation.html\"><code>http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td><td><b>Definition</b></td></tr><tr><td><a href=\"http://terminology.hl7.org/2.0.0/CodeSystem-v3-ObservationInterpretation.html#v3-ObservationInterpretation-POS\">POS</a></td><td>Positive</td><td>A presence finding of the specified component / analyte, organism or clinical sign based on the established threshold of the performed test or procedure.</td></tr><tr><td><a href=\"http://terminology.hl7.org/2.0.0/CodeSystem-v3-ObservationInterpretation.html#v3-ObservationInterpretation-NEG\">NEG</a></td><td>Negative</td><td>An absence finding of the specified component / analyte, organism or clinical sign based on the established threshold of the performed test or procedure.<br/><br/>\\[Note: Negative does not necessarily imply the complete absence of the specified item.\\]</td></tr></table></li><li>Include these codes as defined in <a href=\"http://terminology.hl7.org/2.0.0/CodeSystem-v2-0532.html\"><code>http://terminology.hl7.org/CodeSystem/v2-0532</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td><td><b>Definition</b></td></tr><tr><td><a href=\"http://terminology.hl7.org/2.0.0/CodeSystem-v2-0532.html#v2-0532-UNK\">UNK</a></td><td>unknown</td><td>unknown</td></tr></table></li></ul></div>"
+  },
+  "url": "http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetTestResult",
+  "version": "0.1.0",
+  "name": "WhoCrValueSetTestResult",
+  "title": "Test Result",
+  "status": "draft",
+  "experimental": true,
+  "date": "2021-02-11T17:11:27+00:00",
+  "publisher": "OpenHIE",
+  "contact": [
+    {
+      "name": "OpenHIE",
+      "telecom": [
+        {
+          "system": "url",
+          "value": "http://www.ohie.org"
+        }
+      ]
+    }
+  ],
+  "description": "Test Result",
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "system": "http://unstats.un.org/unsd/methods/m49/m49.htm",
+          "code": "001"
+        }
+      ]
+    }
+  ],
+  "immutable": false,
+  "copyright": "2021",
+  "compose": {
+    "include": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+        "concept": [
+          {
+            "code": "POS",
+            "display": "Positive"
+          },
+          {
+            "code": "NEG",
+            "display": "Negative"
+          }
+        ]
+      },
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/v2-0532",
+        "concept": [
+          {
+            "code": "UNK"
+          }
+        ]
+      }
+    ]
+  }
+}

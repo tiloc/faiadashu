@@ -5,12 +5,12 @@
 // Copyright 2014 The Flutter Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
-
 // The referenced LICENSE file is located here: https://github.com/flutter/flutter/blob/master/LICENSE
 
 import 'package:flutter/material.dart';
 
 import '../../../l10n/l10n.dart';
+import '../../model/item/answer/answer.dart';
 
 /// {@macro flutter.widgets.RawAutocomplete.RawAutocomplete}
 ///
@@ -26,6 +26,8 @@ class FDashAutocomplete<T extends Object> extends StatefulWidget {
     required this.optionsBuilder,
     this.displayStringForOption = RawAutocomplete.defaultStringForOption,
     this.onSelected,
+    this.validator,
+    this.answerModel,
     this.optionsViewBuilder,
     this.initialValue,
   }) : super(key: key);
@@ -51,6 +53,10 @@ class FDashAutocomplete<T extends Object> extends StatefulWidget {
   final String? initialValue;
 
   final FocusNode? focusNode;
+
+  final String? Function(String?)? validator;
+
+  final AnswerModel? answerModel;
 
   @override
   State<StatefulWidget> createState() => FDashAutocompleteState<T>();
@@ -80,6 +86,7 @@ class FDashAutocompleteState<T extends Object>
   ) {
     return _AutocompleteField(
       initialValue: widget.initialValue,
+      answerModel: widget.answerModel,
       focusNode: focusNode,
       textEditingController: textEditingController,
       onFieldSubmitted: onFieldSubmitted,
@@ -128,6 +135,8 @@ class _AutocompleteField extends StatefulWidget {
     required this.focusNode,
     required this.textEditingController,
     required this.onFieldSubmitted,
+    this.answerModel,
+    this.validator,
   }) : super(key: key);
 
   final FocusNode focusNode;
@@ -137,6 +146,10 @@ class _AutocompleteField extends StatefulWidget {
   final TextEditingController textEditingController;
 
   final String? initialValue;
+
+  final String? Function(String?)? validator;
+
+  final AnswerModel? answerModel;
 
   @override
   State<StatefulWidget> createState() => _AutoCompleteFieldState();
@@ -156,11 +169,13 @@ class _AutoCompleteFieldState extends State<_AutocompleteField> {
       focusNode: widget.focusNode,
       decoration: InputDecoration(
         filled: true,
+        errorText: widget.answerModel?.errorText,
         hintText: FDashLocalizations.of(context).autoCompleteSearchTermInput,
       ),
       onFieldSubmitted: (String value) {
         widget.onFieldSubmitted();
       },
+      validator: widget.validator,
     );
   }
 }

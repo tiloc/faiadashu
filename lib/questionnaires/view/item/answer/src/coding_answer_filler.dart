@@ -107,6 +107,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
   Widget _buildAutocompleteAnswers(BuildContext context) {
     return FDashAutocomplete<CodingAnswerOptionModel>(
       focusNode: firstFocusNode,
+      answerModel: answerModel,
       initialValue: answerModel.singleSelection?.plainText,
       displayStringForOption: (answerOption) => answerOption.plainText,
       optionsBuilder: (TextEditingValue textEditingValue) {

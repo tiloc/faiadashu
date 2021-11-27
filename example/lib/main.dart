@@ -143,6 +143,8 @@ class _HomePageState extends State<HomePage> {
         'assets/valuesets/who_cr_valueset_admin_1.json',
     'http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetPatientOutcome':
         'assets/valuesets/who_cr_valueset_patient_outcome.json',
+    'http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetTestResult':
+        'assets/valuesets/who_cr_valueset_test_result.json',
     'http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemPatientOutcome':
         'assets/codesystems/who_cr_codesystem_patient_outcome.json',
     'http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemPregnancyTrimester':
