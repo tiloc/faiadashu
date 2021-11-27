@@ -311,9 +311,13 @@ class _CodingDropdown extends StatelessWidget {
     return DropdownButtonFormField<String>(
       isExpanded: true,
       value: answerModel.singleSelectionUid,
+      onTap: () {
+        firstFocusNode.requestFocus();
+      },
       onChanged: answerModel.isEnabled ? onChanged : null,
       focusNode: firstFocusNode,
       items: dropdownItems,
+      decoration: InputDecoration(errorText: answerModel.errorText),
     );
   }
 }

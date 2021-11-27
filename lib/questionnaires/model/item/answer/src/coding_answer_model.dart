@@ -324,7 +324,9 @@ class CodingAnswerModel extends AnswerModel<Set<String>, Set<String>> {
 
     final popSet = <String>{};
     for (final answer in answers) {
-      final matchCode = answer.valueCoding?.code?.value ?? answer.valueString;
+      final matchCode = answer.valueCoding?.code?.value ??
+          answer.valueCoding?.display ??
+          answer.valueString;
 
       // TODO: Currently not possible, due to open-choice
 /*      if (matchCode == null) {
