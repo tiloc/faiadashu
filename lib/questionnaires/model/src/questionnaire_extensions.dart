@@ -1,26 +1,24 @@
-import 'package:faiadashu/faiadashu.dart';
 import 'package:fhir/r4.dart';
 
+import '../../../faiadashu.dart';
 import '../../../fhir_types/fhir_types.dart';
 
 extension FDashQuestionnaireItemExtension on QuestionnaireItem {
-  bool get isNoItemControl {
+  FhirExtension? get itemControl {
     return extension_?.extensionOrNull(
-          'http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl',
-        ) ==
-        null;
+      'http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl',
+    );
   }
 
-  bool isItemControl(String itemControl) {
-    return extension_
-            ?.extensionOrNull(
-              'http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl',
-            )
-            ?.valueCodeableConcept
-            ?.containsCoding(
-              'http://hl7.org/fhir/questionnaire-item-control',
-              itemControl,
-            ) ??
+  bool get isNoItemControl {
+    return itemControl == null;
+  }
+
+  bool isItemControl(String itemControlCode) {
+    return itemControl?.valueCodeableConcept?.containsCoding(
+          'http://hl7.org/fhir/questionnaire-item-control',
+          itemControlCode,
+        ) ??
         false;
   }
 

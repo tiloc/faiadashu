@@ -1,7 +1,6 @@
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:simple_html_css/simple_html_css.dart';
 
 import '../../../../../fhir_types/fhir_types.dart';
 import '../../../../questionnaires.dart';
@@ -115,7 +114,7 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
                     ? value!.value!.value!
                     : (answerModel.maxValue - answerModel.minValue) /
                         averageDivisor,
-                label: answerModel.display,
+                label: answerModel.display.plainText,
                 onChanged: answerModel.isEnabled
                     ? (sliderValue) {
                         value = answerModel.copyWithValue(Decimal(sliderValue));
@@ -128,24 +127,24 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
               if (hasSliderLabels)
                 Row(
                   children: [
-                    SizedBox(width: 8.0),
+                    const SizedBox(width: 8.0),
                     if (lowerSliderLabel != null)
-                      HTML.toRichText(
+                      Xhtml.fromXhtmlString(
                         context,
                         lowerSliderLabel,
                         defaultTextStyle: Theme.of(context).textTheme.button,
                       ),
-                    Expanded(child: const SizedBox()),
+                    const Expanded(child: SizedBox()),
                     if (upperSliderLabel != null)
-                      HTML.toRichText(
+                      Xhtml.fromXhtmlString(
                         context,
                         upperSliderLabel,
                         defaultTextStyle: Theme.of(context).textTheme.button,
                       ),
-                    SizedBox(width: 8.0),
+                    const SizedBox(width: 8.0),
                   ],
                 ),
-              if (hasSliderLabels) SizedBox(height: 8.0),
+              if (hasSliderLabels) const SizedBox(height: 8.0),
             ],
           )
         : Container(

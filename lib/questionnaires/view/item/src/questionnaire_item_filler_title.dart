@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:simple_html_css/simple_html_css.dart';
 
@@ -31,9 +29,9 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
     Key? key,
   }) {
     final questionnaireItemModel = fillerItem.questionnaireItemModel;
-    final titleText = questionnaireItemModel.titleText;
+    final text = questionnaireItemModel.text;
 
-    if (titleText == null) {
+    if (text == null) {
       return null;
     } else {
       final leading =
@@ -47,8 +45,11 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
       final closeStyleTag =
           (questionnaireItemModel.isGroup) ? '</h2>' : '$requiredTag</b>';
 
-      final htmlTitleText =
-          '$openStyleTag${htmlEscape.convert(titleText)}$closeStyleTag';
+      final prefixText = questionnaireItemModel.prefix;
+
+      final htmlTitleText = (prefixText != null)
+          ? '$openStyleTag${prefixText.xhtmlText}&nbsp;${text.xhtmlText}$closeStyleTag'
+          : '$openStyleTag${text.xhtmlText}$closeStyleTag';
 
       // TODO: Do I need a refresh strategy? isAnswerable can change.
       final showQuestionNumerals = questionnaireTheme.showQuestionNumerals;
@@ -65,7 +66,7 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
         leading: leading,
         questionNumeral: htmlQuestionNumeral,
         help: help,
-        semanticsLabel: titleText,
+        semanticsLabel: text.plainText,
         key: key,
       );
     }
@@ -159,9 +160,9 @@ class _QuestionnaireItemFillerHelpState
       builder: (context) {
         return AlertDialog(
           title: const Text('Help'),
-          content: HTML.toRichText(
+          content: Xhtml.fromXhtmlString(
             context,
-            questionnaireItemModel.titleText ?? '',
+            questionnaireItemModel.text ?? XhtmlString.nullText,
             defaultTextStyle: Theme.of(context).textTheme.bodyText1,
           ),
           actions: <Widget>[

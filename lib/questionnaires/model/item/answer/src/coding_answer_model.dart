@@ -130,20 +130,25 @@ class CodingAnswerModel extends AnswerModel<Set<String>, Set<String>> {
 
   bool get isCheckbox => qi.isItemControl('check-box');
 
-  String get openLabel =>
-      qi.extension_
-          ?.extensionOrNull(
-            'http://hl7.org/fhir/uv/sdc/StructureDefinition/questionnaire-sdc-openLabel',
-          )
-          ?.valueString ??
-      lookupFDashLocalizations(locale).fillerOpenCodingOtherLabel;
+  XhtmlString get openLabel => XhtmlString.fromText(
+        qi.extension_
+                ?.extensionOrNull(
+                  'http://hl7.org/fhir/uv/sdc/StructureDefinition/questionnaire-sdc-openLabel',
+                )
+                ?.valueString ??
+            lookupFDashLocalizations(locale).fillerOpenCodingOtherLabel,
+      );
 
   String _nextOptionUid() => _answerOptions.length.toString();
 
   void _addAnswerOptionFromValueSetCoding(Coding coding) {
     final uid = _nextOptionUid();
-    final optionModel =
-        CodingAnswerOptionModel.fromValueSetCoding(uid, locale, coding);
+    final optionModel = CodingAnswerOptionModel.fromValueSetCoding(
+      uid,
+      locale,
+      questionnaireItemModel,
+      coding,
+    );
     _answerOptions[uid] = optionModel;
   }
 
@@ -173,6 +178,7 @@ class CodingAnswerModel extends AnswerModel<Set<String>, Set<String>> {
               CodingAnswerOptionModel.fromQuestionnaireAnswerOption(
             uid,
             locale,
+            questionnaireItemModel,
             answerOption,
           );
           _answerOptions[uid] = optionModel;
@@ -181,7 +187,10 @@ class CodingAnswerModel extends AnswerModel<Set<String>, Set<String>> {
     }
 
     if (qi.type == QuestionnaireItemType.open_choice) {
-      final optionModel = CodingAnswerOptionModel.fromOpenChoice(openLabel);
+      final optionModel = CodingAnswerOptionModel.fromOpenChoice(
+        questionnaireItemModel,
+        openLabel,
+      );
       _answerOptions[optionModel.uid] = optionModel;
     }
   }
@@ -209,18 +218,21 @@ class CodingAnswerModel extends AnswerModel<Set<String>, Set<String>> {
   }
 
   @override
-  String get display {
+  XhtmlString get display {
     final value = this.value;
     if (value == null || value.isEmpty) {
-      return AnswerModel.nullText;
+      return XhtmlString.nullText;
     }
+
+    final xhtmlStrings = value.map<XhtmlString>((uid) {
+      return uid != CodingAnswerOptionModel.openChoiceCode
+          ? answerOptionByUid(uid).optionText
+          : XhtmlString.fromText(openText ?? AnswerModel.nullText);
+    });
+
     // TODO: Localized or themed separator character?
 
-    return value.map<String>((uid) {
-      return uid != CodingAnswerOptionModel.openChoiceCode
-          ? answerOptionByUid(uid).plainText
-          : openText ?? AnswerModel.nullText;
-    }).join('; ');
+    return xhtmlStrings.concatenateXhtml('; ');
   }
 
   /// Returns whether the choices should be presented horizontally.

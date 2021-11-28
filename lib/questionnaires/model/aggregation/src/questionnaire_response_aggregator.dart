@@ -67,7 +67,8 @@ class QuestionnaireResponseAggregator
 
     return QuestionnaireResponseItem(
       linkId: itemModel.questionnaireItemModel.linkId,
-      text: itemModel.questionnaireItemModel.titleText,
+      text: itemModel.questionnaireItemModel.text?.plainText,
+      // TODO: Include textElement
       extension_: (dataAbsentReason != null)
           ? [
               FhirExtension(
@@ -94,7 +95,8 @@ class QuestionnaireResponseAggregator
     return (nestedItems != null)
         ? QuestionnaireResponseItem(
             linkId: itemModel.questionnaireItemModel.linkId,
-            text: itemModel.questionnaireItemModel.titleText,
+            text: itemModel.questionnaireItemModel.text?.plainText,
+            // TODO: include textElement
             item: nestedItems,
           )
         : null;

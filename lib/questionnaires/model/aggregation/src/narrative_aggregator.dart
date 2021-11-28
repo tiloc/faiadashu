@@ -44,7 +44,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
       return false;
     }
 
-    final itemText = itemModel.questionnaireItemModel.titleText;
+    final itemText = itemModel.questionnaireItemModel.text;
 
     if (itemModel is GroupItemModel) {
       if ((usageMode == usageModeDisplayNonEmptyCode ||
@@ -54,7 +54,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
       }
 
       if (itemText != null) {
-        div.write('<h2>$itemText</h2>');
+        div.write('<h2>${itemText.xhtmlText}</h2>');
 
         return true;
       } else {
@@ -62,7 +62,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
       }
     } else if (itemModel is DisplayItemModel) {
       if (itemText != null) {
-        div.write('<p>$itemText</p>');
+        div.write('<p>${itemText.xhtmlText}</p>');
 
         return true;
       } else {
@@ -80,7 +80,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
   bool _addQuestionItemToDiv(
     StringBuffer div,
     QuestionItemModel itemModel,
-    String? itemText,
+    XhtmlString? itemText,
   ) {
     final usageMode = itemModel.questionnaireItemModel.usageMode;
     if ((usageMode == usageModeDisplayNonEmptyCode ||
@@ -90,7 +90,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
     }
 
     if (itemText != null) {
-      div.write('<h3>$itemText</h3>');
+      div.write('<h3>${itemText.xhtmlText}</h3>');
     }
 
     if (itemModel.isUnanswered) {
@@ -123,15 +123,15 @@ class NarrativeAggregator extends Aggregator<Narrative> {
       for (final answerModel in filledAnswers) {
         if (answerModel is NumericalAnswerModel) {
           if (itemModel.questionnaireItemModel.isTotalScore) {
-            div.write('<h3>${answerModel.xhtmlDisplay}</h3>');
+            div.write('<h3>${answerModel.display.xhtmlText}</h3>');
           } else {
             div.write(
-              '<p>$repeatPrefix${answerModel.xhtmlDisplay}</p>',
+              '<p>$repeatPrefix${answerModel.display.xhtmlText}</p>',
             );
           }
         } else {
           div.write(
-            '<p>$repeatPrefix${answerModel.xhtmlDisplay}</p>',
+            '<p>$repeatPrefix${answerModel.display.xhtmlText}</p>',
           );
         }
       }

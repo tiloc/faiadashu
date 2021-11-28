@@ -15,7 +15,7 @@ class UnsupportedAnswerModel extends AnswerModel<Object, Object> {
   }
 
   @override
-  String get display => AnswerModel.nullText;
+  XhtmlString get display => XhtmlString.nullText;
 
   @override
   String? validateInput(Object? inValue) {

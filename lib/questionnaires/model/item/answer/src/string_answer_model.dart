@@ -57,7 +57,8 @@ class StringAnswerModel extends AnswerModel<String, String> {
   }
 
   @override
-  String get display => value ?? AnswerModel.nullText;
+  XhtmlString get display =>
+      (value != null) ? XhtmlString.fromText(value!) : XhtmlString.nullText;
 
   @override
   String? validateInput(String? inValue) {

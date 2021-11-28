@@ -15,7 +15,11 @@ class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
   DateTimeAnswerModel(QuestionItemModel responseModel) : super(responseModel);
 
   @override
-  String get display => value?.format(locale) ?? AnswerModel.nullText;
+  XhtmlString get display => (value != null)
+      ? XhtmlString.fromText(
+          value!.format(locale, defaultText: AnswerModel.nullText),
+        )
+      : XhtmlString.nullText;
 
   @override
   QuestionnaireResponseAnswer? createFhirAnswer(

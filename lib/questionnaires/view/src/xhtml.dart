@@ -6,26 +6,62 @@ import '../../../fhir_types/fhir_types.dart';
 import '../../../logging/logging.dart';
 import '../../model/model.dart';
 
-/// Extract Xhtml from SDC extensions and build Widgets from Xhtml.
-class Xhtml {
+/// Display XHTML formatted texts.
+class Xhtml extends StatelessWidget {
   static final Logger _logger = Logger(Xhtml);
-  const Xhtml._();
 
-  static Widget? toWidget(
+  final Widget _child;
+
+  const Xhtml._(this._child);
+
+  factory Xhtml.fromPlainTextAndExtensions(
     BuildContext context,
-    QuestionnaireModel questionnaireModel,
-    String? plainText,
-    List<FhirExtension>? extension, {
+    String plainText, {
+    List<FhirExtension>? extensions,
+    QuestionnaireModel? questionnaireModel,
     double? imageWidth,
     double? imageHeight,
+    TextStyle? defaultTextStyle,
     Key? key,
   }) {
-    _logger.trace('enter toWidget $plainText');
-    final xhtml = Xhtml.toXhtml(plainText, extension);
+    final xhtmlString = XhtmlString.fromText(plainText, extensions: extensions);
 
-    if (xhtml == null) {
-      return null;
+    return Xhtml.fromXhtmlString(
+      context,
+      xhtmlString,
+      questionnaireModel: questionnaireModel,
+      imageWidth: imageWidth,
+      imageHeight: imageHeight,
+      defaultTextStyle: defaultTextStyle,
+      key: key,
+    );
+  }
+
+  factory Xhtml.fromXhtmlString(
+    BuildContext context,
+    XhtmlString xhtmlString, {
+    QuestionnaireModel? questionnaireModel,
+    double? imageWidth,
+    double? imageHeight,
+    TextStyle? defaultTextStyle,
+    Key? key,
+  }) {
+    _logger.trace('enter fromXhtmlString $xhtmlString');
+
+    final xhtml = xhtmlString.xhtmlText;
+    final plainText = xhtmlString.plainText;
+
+    if (xhtmlString.isPlain) {
+      return Xhtml._(
+        Text(
+          plainText,
+          style: defaultTextStyle,
+          semanticsLabel: plainText,
+          key: key,
+        ),
+      );
     }
+
     const imgPngBase64Prefix = "<img src='data:image/png;base64,";
     const imgJpgBase64Prefix = "<img src='data:image/jpeg;base64,";
     const imgHashPrefix = "<img src='#";
@@ -37,11 +73,14 @@ class Xhtml {
       );
       _logger.debug('Length of base64: ${base64String.length}');
 
-      return Base64Image(
-        base64String,
-        width: imageWidth,
-        height: imageHeight,
-        semanticLabel: plainText,
+      return Xhtml._(
+        Base64Image(
+          base64String,
+          width: imageWidth,
+          height: imageHeight,
+          semanticLabel: plainText,
+          key: key,
+        ),
       );
     }
     if (xhtml.startsWith(imgJpgBase64Prefix)) {
@@ -51,11 +90,14 @@ class Xhtml {
       );
       _logger.debug('Length of base64: ${base64String.length}');
 
-      return Base64Image(
-        base64String,
-        width: imageWidth,
-        height: imageHeight,
-        semanticLabel: plainText,
+      return Xhtml._(
+        Base64Image(
+          base64String,
+          width: imageWidth,
+          height: imageHeight,
+          semanticLabel: plainText,
+          key: key,
+        ),
       );
     }
     if (xhtml.startsWith(imgHashPrefix)) {
@@ -63,6 +105,12 @@ class Xhtml {
         imgHashPrefix.length,
         xhtml.length - imgSuffix.length + 1,
       );
+      if (questionnaireModel == null) {
+        throw StateError(
+          'questionnaireModel missing. Cannot resolve #$elementId.',
+        );
+      }
+
       final base64Binary =
           questionnaireModel.findContainedByElementId(elementId) as Binary?;
       final base64String = base64Binary?.data?.value;
@@ -73,44 +121,34 @@ class Xhtml {
         );
       }
 
-      return Base64Image(
-        base64String,
-        width: imageWidth,
-        height: imageHeight,
-        semanticLabel: plainText,
+      return Xhtml._(
+        Base64Image(
+          base64String,
+          width: imageWidth,
+          height: imageHeight,
+          semanticLabel: plainText,
+          key: key,
+        ),
       );
     } else {
-      return RichText(
-        maxLines: 5,
-        overflow: TextOverflow.ellipsis,
-        text: HTML.toTextSpan(
-          context,
-          xhtml,
-          defaultTextStyle: Theme.of(context).textTheme.bodyText1,
+      return Xhtml._(
+        RichText(
+          key: key,
+          maxLines: 5,
+          overflow: TextOverflow.ellipsis,
+          text: HTML.toTextSpan(
+            context,
+            xhtml,
+            defaultTextStyle:
+                defaultTextStyle ?? Theme.of(context).textTheme.bodyText1,
+          ),
         ),
       );
     }
   }
 
-  static String? toXhtml(String? plainText, List<FhirExtension>? extension) {
-    final xhtml = extension
-        ?.extensionOrNull(
-          'http://hl7.org/fhir/StructureDefinition/rendering-xhtml',
-        )
-        ?.valueString;
-
-    final renderingStyle = extension
-        ?.extensionOrNull(
-          'http://hl7.org/fhir/StructureDefinition/rendering-style',
-        )
-        ?.valueString;
-
-    return (xhtml != null)
-        ? ((renderingStyle != null)
-            ? '<span style="$renderingStyle">$xhtml</span>'
-            : xhtml)
-        : (renderingStyle != null)
-            ? '<span style="$renderingStyle">$plainText</span>'
-            : plainText;
+  @override
+  Widget build(BuildContext context) {
+    return _child;
   }
 }

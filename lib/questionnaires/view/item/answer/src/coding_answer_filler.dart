@@ -108,8 +108,9 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
     return FDashAutocomplete<CodingAnswerOptionModel>(
       focusNode: firstFocusNode,
       answerModel: answerModel,
-      initialValue: answerModel.singleSelection?.plainText,
-      displayStringForOption: (answerOption) => answerOption.plainText,
+      initialValue: answerModel.singleSelection?.optionText.plainText,
+      displayStringForOption: (answerOption) =>
+          answerOption.optionText.plainText,
       optionsBuilder: (TextEditingValue textEditingValue) {
         if (textEditingValue.text.isEmpty) {
           return const Iterable<CodingAnswerOptionModel>.empty();
@@ -117,7 +118,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
 
         return answerModel.answerOptions
             .where((CodingAnswerOptionModel option) {
-          return option.plainText
+          return option.optionText.plainText
               .toLowerCase()
               .contains(textEditingValue.text.toLowerCase());
         });
@@ -241,7 +242,8 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
                     .selectOption(CodingAnswerOptionModel.openChoiceCode);
               },
             ),
-            secondary: Text(
+            secondary: Xhtml.fromXhtmlString(
+              context,
               answerModel.openLabel,
             ),
           ),
@@ -259,19 +261,22 @@ Widget _createStyledOptionTitle(
   CodingAnswerOptionModel optionModel,
 ) {
   final optionPrefix = optionModel.optionPrefix;
-  final plainText = optionModel.plainText;
-  final optionPrefixDisplay = (optionPrefix != null) ? '$optionPrefix ' : '';
-  final optionTitle = '$optionPrefixDisplay$plainText';
-  final styledOptionTitle = Xhtml.toWidget(
+  final optionText = optionModel.optionText;
+
+  final optionTitle = <XhtmlString>[
+    if (optionPrefix != null) optionPrefix,
+    optionText,
+  ].concatenateXhtml(': ');
+  final styledOptionTitle = Xhtml.fromXhtmlString(
     context,
-    answerModel.responseItemModel.questionnaireItemModel.questionnaireModel,
     optionTitle,
-    optionModel.xhtmlExtensions,
+    questionnaireModel:
+        answerModel.responseItemModel.questionnaireItemModel.questionnaireModel,
     imageWidth: 100,
     imageHeight: 100,
   );
 
-  return styledOptionTitle ?? Text(plainText);
+  return styledOptionTitle;
 }
 
 class _CodingDropdown extends StatelessWidget {

@@ -1,7 +1,11 @@
 ## 0.6.0-dev.2
+* [Breaking] Introduction of new XhtmlString type to handle items which can have plain and styled text
+  * Implemented throughout numerous models and views
+  * Side-effect: Narrative can now contain images
 * Support drop-down control for coding answers
 * Support specifying defaults for some model properties (e.g. maxDecimal)
 * Support usageMode extension for narrative creation
+* Basic support for choiceColumn extension
 * Fixed count methods to get accurate count of unanswered questions
 * Improvements in the display of errors
 * NarrativeTile can use an existing narrative, rather than always generating a new one

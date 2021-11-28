@@ -10,32 +10,47 @@ class CodingAnswerOptionModel {
 
   final String uid;
 
+  final QuestionnaireItemModel questionnaireItemModel;
+
   final Coding? coding;
-  final String plainText;
-  final List<FhirExtension>? xhtmlExtensions;
+
+  /// The styled text representation of the option during user-interaction.
+  final XhtmlString optionText;
+
+  /// The text representation that should fill the `display` field of the [Coding]
+  /// during FHIR response creation. Can differ from [plainText] when the
+  /// `choiceColumn` extension is used.
+  final String forDisplay;
+
   final Decimal? fhirOrdinalValue;
-  final String? optionPrefix;
+  final XhtmlString? optionPrefix;
   final bool isExclusive;
 
   bool matches(String? otherCode) {
     return (otherCode != null) &&
-        (otherCode == coding?.code?.value || plainText == otherCode);
+        (otherCode == coding?.code?.value || optionText.plainText == otherCode);
   }
 
   CodingAnswerOptionModel._({
     required this.uid,
-    required this.plainText,
-    this.xhtmlExtensions,
+    required this.questionnaireItemModel,
+    required this.optionText,
+    required this.forDisplay,
     this.coding,
     this.fhirOrdinalValue,
     this.optionPrefix,
     this.isExclusive = false,
   });
 
-  factory CodingAnswerOptionModel.fromOpenChoice(String openLabel) {
+  factory CodingAnswerOptionModel.fromOpenChoice(
+    QuestionnaireItemModel questionnaireItemModel,
+    XhtmlString openLabel,
+  ) {
     return CodingAnswerOptionModel._(
       uid: openChoiceCode,
-      plainText: openLabel,
+      questionnaireItemModel: questionnaireItemModel,
+      optionText: openLabel,
+      forDisplay: 'ERROR', // will never be used.
       isExclusive: true,
     );
   }
@@ -43,14 +58,19 @@ class CodingAnswerOptionModel {
   factory CodingAnswerOptionModel.fromValueSetCoding(
     String uid,
     Locale locale,
+    QuestionnaireItemModel questionnaireItemModel,
     Coding coding,
   ) {
     final extensions = coding.extension_;
-    final optionPrefix = extensions
+    final plainOptionPrefix = extensions
         ?.extensionOrNull(
           'http://hl7.org/fhir/StructureDefinition/valueset-label',
         )
         ?.valueString;
+
+    final optionPrefix = (plainOptionPrefix != null)
+        ? XhtmlString.fromText(plainOptionPrefix)
+        : null;
 
     final ordinalValue = extensions
         ?.extensionOrNull(
@@ -58,25 +78,44 @@ class CodingAnswerOptionModel {
         )
         ?.valueDecimal;
 
-    final plainText = coding.localizedDisplay(locale);
-    final xhtmlExtensions = coding.displayElement?.extension_;
+    XhtmlString optionText;
+    String forDisplay;
+
+    final choiceColumns = _findChoiceColumns(questionnaireItemModel);
+    if (choiceColumns == null) {
+      final plainText = coding.localizedDisplay(locale);
+      optionText = XhtmlString.fromText(
+        plainText,
+        extensions: coding.displayElement?.extension_,
+      );
+      forDisplay = plainText;
+    } else {
+      final plainText =
+          _createMultiColumn(coding, locale, questionnaireItemModel);
+      optionText = XhtmlString.fromText(plainText);
+      forDisplay = _createForDisplay(coding, locale, questionnaireItemModel);
+    }
 
     return CodingAnswerOptionModel._(
       uid: uid,
+      questionnaireItemModel: questionnaireItemModel,
       coding: coding,
       fhirOrdinalValue: ordinalValue,
       optionPrefix: optionPrefix,
-      plainText: plainText,
-      xhtmlExtensions: xhtmlExtensions,
+      optionText: optionText,
+      forDisplay: forDisplay,
     );
   }
 
   factory CodingAnswerOptionModel.fromQuestionnaireAnswerOption(
     String uid,
     Locale locale,
+    QuestionnaireItemModel questionnaireItemModel,
     QuestionnaireAnswerOption qao,
   ) {
     final extensions = qao.extension_;
+    final coding = qao.valueCoding;
+
     final ordinalValue = extensions
         ?.extensionOrNull(
           'http://hl7.org/fhir/StructureDefinition/ordinalValue',
@@ -91,18 +130,33 @@ class CodingAnswerOptionModel {
             ?.value ==
         true;
 
-    final optionPrefix = extensions
+    final plainOptionPrefix = extensions
         ?.extensionOrNull(
           'http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix',
         )
         ?.valueString;
 
-    String plainText;
-    List<FhirExtension>? xhtmlExtensions;
-    final valueCoding = qao.valueCoding;
-    if (valueCoding != null) {
-      plainText = valueCoding.localizedDisplay(locale);
-      xhtmlExtensions = valueCoding.displayElement?.extension_;
+    final optionPrefix = (plainOptionPrefix != null)
+        ? XhtmlString.fromText(plainOptionPrefix)
+        : null;
+
+    XhtmlString optionText;
+    String forDisplay;
+
+    if (coding != null) {
+      final choiceColumns = _findChoiceColumns(questionnaireItemModel);
+      if (choiceColumns == null) {
+        final plainText = coding.localizedDisplay(locale);
+        final xhtmlExtensions = coding.displayElement?.extension_;
+        forDisplay = plainText;
+        optionText =
+            XhtmlString.fromText(plainText, extensions: xhtmlExtensions);
+      } else {
+        final plainText =
+            _createMultiColumn(coding, locale, questionnaireItemModel);
+        forDisplay = _createForDisplay(coding, locale, questionnaireItemModel);
+        optionText = XhtmlString.fromText(plainText);
+      }
     } else {
       // The spec only allows valueCoding, but valueString occurs in the real world
       final valueString = qao.valueString;
@@ -111,15 +165,18 @@ class CodingAnswerOptionModel {
           '$qao specifies neither valueCode nor valueString.',
         );
       }
-      plainText = valueString;
-      xhtmlExtensions = qao.valueStringElement?.extension_;
+      final plainText = valueString;
+      final xhtmlExtensions = qao.valueStringElement?.extension_;
+      forDisplay = plainText;
+      optionText = XhtmlString.fromText(plainText, extensions: xhtmlExtensions);
     }
 
     return CodingAnswerOptionModel._(
       uid: uid,
-      coding: qao.valueCoding,
-      plainText: plainText,
-      xhtmlExtensions: xhtmlExtensions,
+      questionnaireItemModel: questionnaireItemModel,
+      coding: coding,
+      optionText: optionText,
+      forDisplay: forDisplay,
       fhirOrdinalValue: ordinalValue,
       isExclusive: isExclusive,
       optionPrefix: optionPrefix,
@@ -161,10 +218,135 @@ class CodingAnswerOptionModel {
           ? coding.copyWith(
               extension_:
                   (codingExtensions.isNotEmpty) ? codingExtensions : null,
+              userSelected: Boolean(true),
             )
-          : Coding(display: plainText);
+          : Coding(
+              display: forDisplay,
+              userSelected: Boolean(true),
+            );
     } else {
       throw StateError('open text option cannot create FHIR Coding.');
     }
+  }
+
+  static List<FhirExtension>? _findChoiceColumns(
+    QuestionnaireItemModel questionnaireItemModel,
+  ) {
+    final choiceColumns = questionnaireItemModel.questionnaireItem.extension_
+        ?.where(
+          (extension) =>
+              extension.url ==
+              FhirUri(
+                'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-choiceColumn',
+              ),
+        )
+        .toList(growable: false);
+
+    if (choiceColumns == null || choiceColumns.isEmpty) {
+      return null;
+    }
+
+    return choiceColumns;
+  }
+
+  static const displayForDisplayPath = 'display';
+  static const codeForDisplayPath = 'code';
+
+  static String _findForDisplayPath(
+    QuestionnaireItemModel questionnaireItemModel,
+  ) {
+    final itemControlExtension =
+        questionnaireItemModel.questionnaireItem.itemControl;
+    if (itemControlExtension == null) {
+      return displayForDisplayPath;
+    }
+
+    final choiceColumns = _findChoiceColumns(questionnaireItemModel);
+    if (choiceColumns == null) {
+      return displayForDisplayPath;
+    }
+
+    final forDisplayColumn = choiceColumns.firstWhere(
+      (choiceColumnExt) =>
+          choiceColumnExt.extension_
+              ?.extensionOrNull('forDisplay')
+              ?.valueBoolean ==
+          Boolean(true),
+    );
+
+    final forDisplayPath =
+        forDisplayColumn.extension_?.extensionOrNull('path')?.valueString;
+
+    return forDisplayPath ?? displayForDisplayPath;
+  }
+
+  static String _createForCodingPath(
+    String path,
+    Coding coding,
+    Locale locale,
+    QuestionnaireItemModel questionnaireItemModel,
+  ) {
+    if (path == displayForDisplayPath) {
+      return coding.localizedDisplay(locale);
+    } else if (path == codeForDisplayPath) {
+      final code = coding.code?.value;
+      if (code == null) {
+        throw QuestionnaireFormatException(
+          '$coding does not have a code for choiceColumn.',
+          questionnaireItemModel,
+        );
+      }
+
+      return code;
+    } else {
+      // TODO: Support further possibilities
+      return coding.localizedDisplay(locale);
+    }
+  }
+
+  static String _createMultiColumn(
+    Coding coding,
+    Locale locale,
+    QuestionnaireItemModel questionnaireItemModel,
+  ) {
+    final choiceColumns = _findChoiceColumns(questionnaireItemModel);
+
+    if (choiceColumns == null) {
+      throw StateError('Missing choice columns.');
+    }
+
+    final outputs = choiceColumns.map<String>((ext) {
+      final path = ext.extension_?.extensionOrNull('path')?.valueString;
+      if (path != null) {
+        return _createForCodingPath(
+          path,
+          coding,
+          locale,
+          questionnaireItemModel,
+        );
+      } else {
+        throw QuestionnaireFormatException(
+          'column choice is lacking path',
+          ext,
+        );
+      }
+    });
+
+    return outputs.join(' — ');
+  }
+
+  static String _createForDisplay(
+    Coding coding,
+    Locale locale,
+    QuestionnaireItemModel questionnaireItemModel,
+  ) {
+    final forDisplayPath = _findForDisplayPath(questionnaireItemModel);
+
+    return _createForCodingPath(
+      forDisplayPath,
+      coding,
+      locale,
+      questionnaireItemModel,
+    );
   }
 }

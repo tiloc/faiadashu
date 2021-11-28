@@ -200,7 +200,7 @@ class QuestionnaireTheme {
           label: Text(
             FDashLocalizations.of(context).fillerAddAnotherItemLabel(
               responseModel.questionnaireItemModel.shortText ??
-                  responseModel.questionnaireItemModel.titleText ??
+                  responseModel.questionnaireItemModel.text ??
                   '',
             ),
           ),

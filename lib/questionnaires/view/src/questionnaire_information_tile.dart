@@ -1,6 +1,5 @@
 import 'package:fhir/r4.dart' show Questionnaire;
 import 'package:flutter/material.dart';
-import 'package:simple_html_css/simple_html_css.dart';
 
 import '../../../l10n/l10n.dart';
 import 'xhtml.dart';
@@ -19,23 +18,19 @@ class QuestionnaireInformationTile extends StatelessWidget {
 
     return Column(
       children: [
-        HTML.toRichText(
+        Xhtml.fromPlainTextAndExtensions(
           context,
-          Xhtml.toXhtml(
-                questionnaire.title,
-                questionnaire.titleElement?.extension_,
-              ) ??
+          questionnaire.title ??
               FDashLocalizations.of(context).questionnaireUnknownTitle,
+          extensions: questionnaire.titleElement?.extension_,
           defaultTextStyle: defaultTextStyle,
         ),
         const Divider(),
-        HTML.toRichText(
+        Xhtml.fromPlainTextAndExtensions(
           context,
-          Xhtml.toXhtml(
-                questionnaire.publisher,
-                questionnaire.publisherElement?.extension_,
-              ) ??
+          questionnaire.publisher ??
               FDashLocalizations.of(context).questionnaireUnknownPublisher,
+          extensions: questionnaire.publisherElement?.extension_,
           defaultTextStyle: defaultTextStyle,
         ),
       ],

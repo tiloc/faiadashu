@@ -9,3 +9,4 @@ export 'src/questionnaire_model.dart';
 export 'src/questionnaire_model_defaults.dart';
 export 'src/questionnaire_response_model.dart';
 export 'src/variable_model.dart';
+export 'src/xhtml_string.dart';

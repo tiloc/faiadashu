@@ -263,18 +263,28 @@ class QuestionnaireItemModel with Diagnosticable {
             'help');
   }
 
-  String? get titleText {
-    final title = Xhtml.toXhtml(
-      questionnaireItem.text,
-      questionnaireItem.textElement?.extension_,
-    );
+  /// The name of a section, the text of a question or text content for a display item.
+  XhtmlString? get text {
+    final plainText = questionnaireItem.text;
 
-    final prefix = Xhtml.toXhtml(
-      questionnaireItem.prefix,
-      questionnaireItem.prefixElement?.extension_,
-    );
+    return (plainText != null)
+        ? XhtmlString.fromText(
+            plainText,
+            extensions: questionnaireItem.textElement?.extension_,
+          )
+        : null;
+  }
 
-    return (prefix != null) ? '$prefix $title' : title;
+  /// A short label for a particular group, question or set of display text within the questionnaire used for reference by the individual completing the questionnaire.
+  XhtmlString? get prefix {
+    final plainPrefix = questionnaireItem.prefix;
+
+    return (plainPrefix != null)
+        ? XhtmlString.fromText(
+            plainPrefix,
+            extensions: questionnaireItem.prefixElement?.extension_,
+          )
+        : null;
   }
 
   /// Returns the `shortText` provided for the item, or null.

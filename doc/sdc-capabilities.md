@@ -126,10 +126,18 @@ Quantity requires the declaration of units. It does not support free-text entry 
 - minValue
 - maxValue
 - maxDecimalPlaces
-- questionnaire-itemControl: slider
+- questionnaire-itemControl: slider (see below for details)
 - sliderStepValue
 - unitValueSet
 - unit
+
+##### Slider control
+When an item control of type "slider" is being used, then a maxValue should be provided. Otherwise a default value (typically: 100)
+will be used, since an unlimited maxValue is not possible.
+
+Nested display items with itemControl `upper` and `lower` are associated with the slider control and will display as upper and lower
+label. They can be either plain-text or use the `render-xhtml` extension for styled text.
+
 
 ---
 #### decimal
@@ -142,7 +150,7 @@ Special support for read-only display of total score - see [Scoring](#scoring)
 - minValue
 - maxValue
 - maxDecimalPlaces
-- questionnaire-itemControl: slider
+- questionnaire-itemControl: slider (see above for details)
 - sliderStepValue
 - unit
 - calculatedExpression
@@ -159,7 +167,7 @@ Special support for 🇩🇰 Danish specification on patient feedback.
 - entryFormat
 - minValue
 - maxValue
-- questionnaire-itemControl: slider
+- questionnaire-itemControl: slider (see above for details)
 - sliderStepValue
 - unit
 - http://ehealth.sundhed.dk/fhir/StructureDefinition/ehealth-questionnaire-feedback
@@ -216,12 +224,16 @@ See: http://build.fhir.org/questionnaire.html#valuesets
 - translation: option choices can be translated using the FHIR translation mechanism
 - minOccurs
 - maxOccurs
+- choiceColumn: Supports paths `code` and `display`. Support `forDisplay`. No support for column widths.
 
 ---
 #### open-choice 
 Same as `choice` with the following differences:
 - repeats is not supported
-- a single text input field labeled 'Other' is presented below the selections
+- a single text input field is presented below the selections
+
+##### Extensions
+- openLabel
 
 ---
 #### url

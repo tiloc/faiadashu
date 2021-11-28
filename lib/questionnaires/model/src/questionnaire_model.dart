@@ -79,13 +79,15 @@ class QuestionnaireModel {
     return questionnaireModel;
   }
 
-  String? get title {
-    final title = Xhtml.toXhtml(
-      questionnaire.title,
-      questionnaire.titleElement?.extension_,
-    );
+  XhtmlString? get title {
+    final plainTitle = questionnaire.title;
 
-    return title;
+    return (plainTitle != null)
+        ? XhtmlString.fromText(
+            plainTitle,
+            extensions: questionnaire.titleElement?.extension_,
+          )
+        : null;
   }
 
   /// Returns the questionnaire items of this questionnaire.

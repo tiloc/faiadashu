@@ -20,11 +20,11 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
   late final double? _sliderStepValue;
   late final int? _sliderDivisions;
 
-  String? _upperSliderLabel;
-  String? _lowerSliderLabel;
+  XhtmlString? _upperSliderLabel;
+  XhtmlString? _lowerSliderLabel;
 
-  String? get upperSliderLabel => _upperSliderLabel;
-  String? get lowerSliderLabel => _lowerSliderLabel;
+  XhtmlString? get upperSliderLabel => _upperSliderLabel;
+  XhtmlString? get lowerSliderLabel => _lowerSliderLabel;
 
   int? get sliderDivisions => _sliderDivisions;
   double? get sliderStepValue => _sliderStepValue;
@@ -102,8 +102,8 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
           ? ((_maxValue - _minValue) / _sliderStepValue!).round()
           : null;
 
-      _upperSliderLabel = questionnaireItemModel.upperTextItem?.titleText;
-      _lowerSliderLabel = questionnaireItemModel.lowerTextItem?.titleText;
+      _upperSliderLabel = questionnaireItemModel.upperTextItem?.text;
+      _lowerSliderLabel = questionnaireItemModel.lowerTextItem?.text;
     }
 
     // TODO: Evaluate max length
@@ -166,7 +166,11 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
   }
 
   @override
-  String get display => value?.format(locale) ?? AnswerModel.nullText;
+  XhtmlString get display => (value != null)
+      ? XhtmlString.fromText(
+          value!.format(locale, defaultText: AnswerModel.nullText),
+        )
+      : XhtmlString.nullText;
 
   @override
   String? validateInput(String? inputValue) {

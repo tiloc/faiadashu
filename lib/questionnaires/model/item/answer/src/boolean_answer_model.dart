@@ -14,11 +14,14 @@ class BooleanAnswerModel extends AnswerModel<Boolean, Boolean> {
           : null;
 
   @override
-  String get display => (value == null)
-      ? AnswerModel.nullText
-      : (value == Boolean(true))
-          ? '[X]'
-          : '[ ]';
+  XhtmlString get display => (value == null)
+      ? XhtmlString.nullText
+      : XhtmlString.fromText(
+          (value == Boolean(true)) ? '[X]' : '[ ]',
+          xhtmlText: (value == Boolean(true))
+              ? '<b>[X]</b>'
+              : '<span style="color:grey">[ ]</span>',
+        );
 
   @override
   String? validateInput(Boolean? inValue) {
