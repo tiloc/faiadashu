@@ -206,8 +206,6 @@ class _QuestionnaireItemFillerSupportLink extends StatelessWidget {
 
 class _QuestionnaireItemFillerTitleLeading extends StatelessWidget {
   final Widget _leadingWidget;
-//  static final _logger = Logger(QuestionnaireItemFillerTitleLeading);
-
   const _QuestionnaireItemFillerTitleLeading._(Widget leadingWidget, {Key? key})
       : _leadingWidget = leadingWidget,
         super(key: key);

@@ -3,6 +3,7 @@
   * Implemented throughout numerous models and views
   * Side-effect: Narrative can now contain images
 * Support drop-down control for coding answers
+* Support itemAnswerMedia extension for a clean way to add images to coding answers
 * Support specifying defaults for some model properties (e.g. maxDecimal)
 * Support usageMode extension for narrative creation
 * Basic support for choiceColumn extension

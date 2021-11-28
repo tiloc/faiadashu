@@ -22,6 +22,10 @@ class CodingAnswerOptionModel {
   /// `choiceColumn` extension is used.
   final String forDisplay;
 
+  final Attachment? mediaAttachment;
+
+  bool get hasMedia => mediaAttachment != null;
+
   final Decimal? fhirOrdinalValue;
   final XhtmlString? optionPrefix;
   final bool isExclusive;
@@ -36,6 +40,7 @@ class CodingAnswerOptionModel {
     required this.questionnaireItemModel,
     required this.optionText,
     required this.forDisplay,
+    this.mediaAttachment,
     this.coding,
     this.fhirOrdinalValue,
     this.optionPrefix,
@@ -171,6 +176,12 @@ class CodingAnswerOptionModel {
       optionText = XhtmlString.fromText(plainText, extensions: xhtmlExtensions);
     }
 
+    final mediaAttachment = qao.extension_
+        ?.extensionOrNull(
+          'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemAnswerMedia',
+        )
+        ?.valueAttachment;
+
     return CodingAnswerOptionModel._(
       uid: uid,
       questionnaireItemModel: questionnaireItemModel,
@@ -180,6 +191,7 @@ class CodingAnswerOptionModel {
       fhirOrdinalValue: ordinalValue,
       isExclusive: isExclusive,
       optionPrefix: optionPrefix,
+      mediaAttachment: mediaAttachment,
     );
   }
 

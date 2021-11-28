@@ -219,12 +219,15 @@ See: http://build.fhir.org/questionnaire.html#valuesets
 - choiceOrientation: supported, but `horizontal` may be ignored due to display constraints (mobile phone).
 - questionnaire-optionPrefix: supported
 - valueset-label: supported
-- rendering-xhtml: in addition to regular capabilities may also contain a base64 encoded image of type PNG or JPEG. 
+- rendering-xhtml: in addition to regular capabilities may also contain a base64 encoded image of type PNG or JPEG.
+- itemAnswerMedia: supports images of type PNG or JPEG.
 - questionnaire-itemControl: drop-down, check-box, radio-button, autocomplete
 - translation: option choices can be translated using the FHIR translation mechanism
 - minOccurs
 - maxOccurs
 - choiceColumn: Supports paths `code` and `display`. Support `forDisplay`. No support for column widths.
+
+> `itemAnswerMedia` should be favoured over `rendering-xhtml` to add images to answer options. 
 
 ---
 #### open-choice 

@@ -156,7 +156,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
     }
     for (final answerOption in answerModel.answerOptions) {
       final styledOptionTitle =
-          _createStyledOptionTitle(context, answerModel, answerOption);
+          _createStyledOption(context, answerModel, answerOption);
 
       if (answerOption.uid == CodingAnswerOptionModel.openChoiceCode) {
         continue;
@@ -255,11 +255,19 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
   }
 }
 
-Widget _createStyledOptionTitle(
+Widget _createStyledOption(
   BuildContext context,
   CodingAnswerModel answerModel,
   CodingAnswerOptionModel optionModel,
 ) {
+  if (optionModel.hasMedia) {
+    final mediaWidget = ItemMediaImage.fromAnswerOption(optionModel);
+    if (mediaWidget != null) {
+      return mediaWidget;
+    }
+    // continue if widget generation failed for any reason...
+  }
+
   final optionPrefix = optionModel.optionPrefix;
   final optionText = optionModel.optionText;
 
@@ -308,7 +316,7 @@ class _CodingDropdown extends StatelessWidget {
           .map<DropdownMenuItem<String>>((answerOption) {
         return DropdownMenuItem<String>(
           value: answerOption.uid,
-          child: _createStyledOptionTitle(context, answerModel, answerOption),
+          child: _createStyledOption(context, answerModel, answerOption),
         );
       }),
     ];
