@@ -1,3 +1,4 @@
+import 'package:faiadashu/faiadashu.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
@@ -29,6 +30,8 @@ class QuestionResponseItemFillerState
 
   late final FocusNode _skipSwitchFocusNode;
 
+  late final XhtmlString? _promptText;
+
   QuestionResponseItemFillerState();
 
   @override
@@ -43,6 +46,9 @@ class QuestionResponseItemFillerState
     );
 
     _initAnswerFillers();
+
+    _promptText =
+        questionResponseItemModel.questionnaireItemModel.promptTextItem?.text;
   }
 
   @override
@@ -88,6 +94,8 @@ class QuestionResponseItemFillerState
     final questionnaireItemModel =
         widget.fillerItemModel.questionnaireItemModel;
 
+    final promptText = _promptText;
+
     return (questionnaireItemModel.isNotHidden &&
             questionnaireItemModel.isShownDuringCapture)
         ? Focus(
@@ -107,24 +115,32 @@ class QuestionResponseItemFillerState
                           duration: const Duration(milliseconds: 500),
                           child: (constraints.maxWidth >
                                   questionnaireTheme.landscapeBreakpoint)
-                              ? Row(
+                              ? Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    if (titleWidget != null)
-                                      Expanded(
-                                        child: Container(
-                                          padding: const EdgeInsets.only(
-                                            top: 8,
-                                          ),
-                                          child: titleWidget,
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        if (titleWidget != null)
+                                          Expanded(
+                                            child: titleWidget!,
+                                          )
+                                        else
+                                          Expanded(child: Container()),
+                                        Expanded(
+                                          flex: 2,
+                                          child: _buildAnswerFillers(context),
                                         ),
-                                      )
-                                    else
-                                      Expanded(child: Container()),
-                                    Expanded(
-                                      flex: 2,
-                                      child: _buildAnswerFillers(context),
+                                      ],
                                     ),
+                                    if (promptText != null) const SizedBox(height: 8.0),
+                                    if (promptText != null)
+                                      Xhtml.fromXhtmlString(
+                                        context,
+                                        promptText,
+                                      ),
+                                    const SizedBox(height: 16.0),
                                   ],
                                 )
                               // Narrow, portrait screen: Use vertical layout
@@ -137,8 +153,13 @@ class QuestionResponseItemFillerState
                                         padding: const EdgeInsets.only(top: 8),
                                         child: titleWidget,
                                       ),
-                                    const SizedBox(width: 8),
                                     _buildAnswerFillers(context),
+                                    if (promptText != null)
+                                      Xhtml.fromXhtmlString(
+                                        context,
+                                        promptText,
+                                      ),
+                                    const SizedBox(width: 8),
                                   ],
                                 ),
                         );

@@ -381,7 +381,7 @@
                 {
                   "valueCoding": {
                     "code": "LA30190-5",
-                    "display": "I do not have housing (staying with others, in a hotel, in a shelter, living outside on the street, on a beach, in a car, or in a park)"
+                    "display": "I do not have housing"
                   }
                 },
                 {
@@ -392,6 +392,24 @@
                 }
               ],
               "item": [
+                {
+                  "linkId": "housing-prompt",
+                  "type": "display",
+                  "text": "'I do not have housing' means: Staying with others, in a hotel, in a shelter, living outside on the street, on a beach, in a car, or in a park.",
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                      "valueCodeableConcept": {
+                        "coding": [
+                          {
+                            "system": "http://hl7.org/fhir/questionnaire-item-control",
+                            "code": "prompt"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
                 {
                   "text": "Describes patients living arrangement",
                   "type": "display",

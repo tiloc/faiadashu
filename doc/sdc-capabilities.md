@@ -100,6 +100,11 @@ Supported.
 Reference:
 [sdc-questionnaire-enableWhenExpression](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-enableWhenExpression.html)
 
+##### itemControl: prompt
+Reference:
+[questionnaire-item-control-prompt](http://hl7.org/fhir/R4/codesystem-questionnaire-item-control.html#questionnaire-item-control-prompt)
+Text is displayed immediately below the containing question item (typically as a guide for what to enter)
+
 ##### itemMedia
 An image to display as a visual accompaniment to the question being asked.
 > Only inlined images are supported. Only small image formats are supported.

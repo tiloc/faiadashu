@@ -236,12 +236,16 @@ class QuestionnaireItemModel with Diagnosticable {
 
   bool get isUpperText => questionnaireItem.isItemControl('upper');
   bool get isLowerText => questionnaireItem.isItemControl('lower');
+  bool get isPromptText => questionnaireItem.isItemControl('prompt');
 
   QuestionnaireItemModel? get upperTextItem =>
       children.firstWhereOrNull((itemModel) => itemModel.isUpperText);
 
   QuestionnaireItemModel? get lowerTextItem =>
       children.firstWhereOrNull((itemModel) => itemModel.isLowerText);
+
+  QuestionnaireItemModel? get promptTextItem =>
+      children.firstWhereOrNull((itemModel) => itemModel.isPromptText);
 
   /// The [QuestionnaireItemModel] which contains help text about the current item.
   ///
