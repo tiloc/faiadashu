@@ -106,7 +106,7 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
     QuestionnaireItemModel itemModel, {
     Key? key,
   }) {
-    final helpItem = itemModel.helpItem;
+    final helpItem = itemModel.helpTextItem;
 
     if (helpItem != null) {
       return _QuestionnaireItemFillerHelp(helpItem, key: key);

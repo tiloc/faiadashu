@@ -1,6 +1,7 @@
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:simple_html_css/simple_html_css.dart';
 
 import '../../../../../fhir_types/fhir_types.dart';
 import '../../../../questionnaires.dart';
@@ -96,25 +97,56 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
 
     const averageDivisor = 2.0;
 
+    final lowerSliderLabel = answerModel.lowerSliderLabel;
+    final upperSliderLabel = answerModel.upperSliderLabel;
+
+    final hasSliderLabels =
+        lowerSliderLabel != null || upperSliderLabel != null;
+
     return answerModel.isSliding
-        ? Slider(
-            focusNode: firstFocusNode,
-            min: answerModel.minValue,
-            max: answerModel.maxValue,
-            divisions: answerModel.sliderDivisions,
-            value: (value != null)
-                ? value!.value!.value!
-                : (answerModel.maxValue - answerModel.minValue) /
-                    averageDivisor,
-            label: answerModel.display,
-            onChanged: answerModel.isEnabled
-                ? (sliderValue) {
-                    value = answerModel.copyWithValue(Decimal(sliderValue));
-                  }
-                : null,
-            onChangeStart: (_) {
-              firstFocusNode.requestFocus();
-            },
+        ? Column(
+            children: [
+              Slider(
+                focusNode: firstFocusNode,
+                min: answerModel.minValue,
+                max: answerModel.maxValue,
+                divisions: answerModel.sliderDivisions,
+                value: (value != null)
+                    ? value!.value!.value!
+                    : (answerModel.maxValue - answerModel.minValue) /
+                        averageDivisor,
+                label: answerModel.display,
+                onChanged: answerModel.isEnabled
+                    ? (sliderValue) {
+                        value = answerModel.copyWithValue(Decimal(sliderValue));
+                      }
+                    : null,
+                onChangeStart: (_) {
+                  firstFocusNode.requestFocus();
+                },
+              ),
+              if (hasSliderLabels)
+                Row(
+                  children: [
+                    SizedBox(width: 8.0),
+                    if (lowerSliderLabel != null)
+                      HTML.toRichText(
+                        context,
+                        lowerSliderLabel,
+                        defaultTextStyle: Theme.of(context).textTheme.button,
+                      ),
+                    Expanded(child: const SizedBox()),
+                    if (upperSliderLabel != null)
+                      HTML.toRichText(
+                        context,
+                        upperSliderLabel,
+                        defaultTextStyle: Theme.of(context).textTheme.button,
+                      ),
+                    SizedBox(width: 8.0),
+                  ],
+                ),
+              if (hasSliderLabels) SizedBox(height: 8.0),
+            ],
           )
         : Container(
             padding: const EdgeInsets.only(top: 8, bottom: 8),

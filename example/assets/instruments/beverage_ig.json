@@ -193,7 +193,53 @@
       ],
       "required": false,
       "linkId": "/38214-3",
-      "text": "How would you rate your pain if coffee was gone?"
+      "text": "How would you rate your pain if coffee was gone?",
+      "item": [
+        {
+          "linkId": "lower-pain",
+          "type": "display",
+          "text": "Mild",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "lower"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "upper-pain",
+          "type": "display",
+          "text": "Ng ng ng!",
+          "_text": {
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/StructureDefinition/rendering-xhtml",
+                "valueString": "<div style=\"color:red\"><b>Ng ng ng!</b></div>"
+              }
+            ]
+          },
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "upper"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
     },
     {
       "extension": [

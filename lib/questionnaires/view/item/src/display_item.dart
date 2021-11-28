@@ -30,7 +30,7 @@ class _DisplayItemState extends QuestionnaireItemFillerState<DisplayItem> {
     final questionnaireItemModel =
         widget.fillerItemModel.questionnaireItemModel;
 
-    return (!questionnaireItemModel.isHidden &&
+    return (questionnaireItemModel.isNotHidden &&
             questionnaireItemModel.isShownDuringCapture)
         ? Focus(
             focusNode: focusNode,

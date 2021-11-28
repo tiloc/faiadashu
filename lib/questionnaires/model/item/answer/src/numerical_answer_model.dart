@@ -20,6 +20,12 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
   late final double? _sliderStepValue;
   late final int? _sliderDivisions;
 
+  String? _upperSliderLabel;
+  String? _lowerSliderLabel;
+
+  String? get upperSliderLabel => _upperSliderLabel;
+  String? get lowerSliderLabel => _lowerSliderLabel;
+
   int? get sliderDivisions => _sliderDivisions;
   double? get sliderStepValue => _sliderStepValue;
 
@@ -95,6 +101,9 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
       _sliderDivisions = (_sliderStepValue != null)
           ? ((_maxValue - _minValue) / _sliderStepValue!).round()
           : null;
+
+      _upperSliderLabel = questionnaireItemModel.upperTextItem?.titleText;
+      _lowerSliderLabel = questionnaireItemModel.lowerTextItem?.titleText;
     }
 
     // TODO: Evaluate max length

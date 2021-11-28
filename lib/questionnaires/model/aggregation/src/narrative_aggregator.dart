@@ -34,7 +34,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
     StringBuffer div,
     FillerItemModel itemModel,
   ) {
-    if (itemModel.questionnaireItemModel.isHidden || !itemModel.isEnabled) {
+    if (itemModel.questionnaireItemModel.isHidden || itemModel.isNotEnabled) {
       return false;
     }
 

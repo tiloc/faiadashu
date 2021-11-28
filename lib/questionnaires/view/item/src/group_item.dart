@@ -34,7 +34,7 @@ class _GroupItemState extends ResponseItemFillerState<GroupItem> {
     final questionnaireItemModel =
         widget.fillerItemModel.questionnaireItemModel;
 
-    return (!questionnaireItemModel.isHidden &&
+    return (questionnaireItemModel.isNotHidden &&
             questionnaireItemModel.isShownDuringCapture)
         ? Focus(
             focusNode: focusNode,

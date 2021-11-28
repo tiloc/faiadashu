@@ -264,6 +264,8 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
   bool _isEnabled = true;
   bool get isEnabled => _isEnabled;
 
+  bool get isNotEnabled => !_isEnabled;
+
   bool get hasVariables => (_variables != null) && _variables!.isNotEmpty;
 
   /// Returns the evaluation result of a FHIRPath expression

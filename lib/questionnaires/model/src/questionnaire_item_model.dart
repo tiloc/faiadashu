@@ -213,8 +213,11 @@ class QuestionnaireItemModel with Diagnosticable {
                 ?.valueBoolean
                 ?.value ==
             true) ||
-        isHelp;
+        isHelpText ||
+        (isDisplay && !isInline);
   }
+
+  bool get isNotHidden => !isHidden;
 
   /// Should the item be shown during "capture"?
   ///
@@ -225,13 +228,28 @@ class QuestionnaireItemModel with Diagnosticable {
         usageMode == usageModeCaptureDisplayNonEmptyCode;
   }
 
+  bool get isInline {
+    return isDisplay &&
+        (questionnaireItem.isNoItemControl ||
+            questionnaireItem.isItemControl('inline'));
+  }
+
+  bool get isUpperText => questionnaireItem.isItemControl('upper');
+  bool get isLowerText => questionnaireItem.isItemControl('lower');
+
+  QuestionnaireItemModel? get upperTextItem =>
+      children.firstWhereOrNull((itemModel) => itemModel.isUpperText);
+
+  QuestionnaireItemModel? get lowerTextItem =>
+      children.firstWhereOrNull((itemModel) => itemModel.isLowerText);
+
   /// The [QuestionnaireItemModel] which contains help text about the current item.
   ///
   /// null, if this doesn't exist.
-  QuestionnaireItemModel? get helpItem =>
-      children.firstWhereOrNull((itemModel) => itemModel.isHelp);
+  QuestionnaireItemModel? get helpTextItem =>
+      children.firstWhereOrNull((itemModel) => itemModel.isHelpText);
 
-  bool get isHelp {
+  bool get isHelpText {
     return questionnaireItem.isItemControl('help') ||
         (questionnaireItem.extension_
                 ?.extensionOrNull(
