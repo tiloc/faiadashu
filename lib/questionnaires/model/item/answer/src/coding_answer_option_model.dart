@@ -121,6 +121,12 @@ class CodingAnswerOptionModel {
     final extensions = qao.extension_;
     final coding = qao.valueCoding;
 
+    final mediaAttachment = qao.extension_
+        ?.extensionOrNull(
+          'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemAnswerMedia',
+        )
+        ?.valueAttachment;
+
     final ordinalValue = extensions
         ?.extensionOrNull(
           'http://hl7.org/fhir/StructureDefinition/ordinalValue',
@@ -154,13 +160,17 @@ class CodingAnswerOptionModel {
         final plainText = coding.localizedDisplay(locale);
         final xhtmlExtensions = coding.displayElement?.extension_;
         forDisplay = plainText;
-        optionText =
-            XhtmlString.fromText(plainText, extensions: xhtmlExtensions);
+        optionText = XhtmlString.fromText(
+          plainText,
+          extensions: xhtmlExtensions,
+          mediaAttachment: mediaAttachment,
+        );
       } else {
         final plainText =
             _createMultiColumn(coding, locale, questionnaireItemModel);
         forDisplay = _createForDisplay(coding, locale, questionnaireItemModel);
-        optionText = XhtmlString.fromText(plainText);
+        optionText =
+            XhtmlString.fromText(plainText, mediaAttachment: mediaAttachment);
       }
     } else {
       // The spec only allows valueCoding, but valueString occurs in the real world
@@ -173,14 +183,12 @@ class CodingAnswerOptionModel {
       final plainText = valueString;
       final xhtmlExtensions = qao.valueStringElement?.extension_;
       forDisplay = plainText;
-      optionText = XhtmlString.fromText(plainText, extensions: xhtmlExtensions);
+      optionText = XhtmlString.fromText(
+        plainText,
+        extensions: xhtmlExtensions,
+        mediaAttachment: mediaAttachment,
+      );
     }
-
-    final mediaAttachment = qao.extension_
-        ?.extensionOrNull(
-          'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemAnswerMedia',
-        )
-        ?.valueAttachment;
 
     return CodingAnswerOptionModel._(
       uid: uid,

@@ -131,7 +131,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
           }
         } else {
           div.write(
-            '<p>$repeatPrefix${answerModel.display.xhtmlText}</p>',
+            '<p>$repeatPrefix${answerModel.display.xhtmlTextWithMedia}</p>',
           );
         }
       }

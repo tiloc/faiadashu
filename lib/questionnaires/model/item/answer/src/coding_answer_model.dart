@@ -283,15 +283,29 @@ class CodingAnswerModel extends AnswerModel<Set<String>, Set<String>> {
     }
 
     final responses = value.map<QuestionnaireResponseAnswer>((uid) {
-      return uid != CodingAnswerOptionModel.openChoiceCode
-          ? QuestionnaireResponseAnswer(
-              valueCoding: answerOptionByUid(uid).createFhirCoding(),
-              item: items,
-            )
-          : QuestionnaireResponseAnswer(
-              valueCoding: Coding(display: openText),
-              item: items,
-            );
+      if (uid != CodingAnswerOptionModel.openChoiceCode) {
+        final answerOption = answerOptionByUid(uid);
+        final answerExtensions = <FhirExtension>[
+          if (answerOption.hasMedia)
+            FhirExtension(
+              url: FhirUri(
+                'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemAnswerMedia',
+              ),
+              valueAttachment: answerOption.mediaAttachment,
+            ),
+        ];
+
+        return QuestionnaireResponseAnswer(
+          extension_: (answerExtensions.isNotEmpty) ? answerExtensions : null,
+          valueCoding: answerOption.createFhirCoding(),
+          item: items,
+        );
+      } else {
+        return QuestionnaireResponseAnswer(
+          valueCoding: Coding(display: openText),
+          item: items,
+        );
+      }
     }).toList(growable: false);
 
     return responses;

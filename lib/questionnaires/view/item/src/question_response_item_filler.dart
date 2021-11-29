@@ -1,4 +1,3 @@
-import 'package:faiadashu/faiadashu.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
@@ -134,7 +133,8 @@ class QuestionResponseItemFillerState
                                         ),
                                       ],
                                     ),
-                                    if (promptText != null) const SizedBox(height: 8.0),
+                                    if (promptText != null)
+                                      const SizedBox(height: 8.0),
                                     if (promptText != null)
                                       Xhtml.fromXhtmlString(
                                         context,
