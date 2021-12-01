@@ -56,7 +56,9 @@ class QuestionnaireScroller extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _QuestionnaireScrollerState();
+  State<StatefulWidget> createState() {
+    return _QuestionnaireScrollerState();
+  }
 }
 
 class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {

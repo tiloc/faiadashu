@@ -1,0 +1,45 @@
+import 'package:faiadashu/fhir_types/fhir_types.dart';
+import 'package:fhir/r4/resource/resource.dart';
+import 'package:flutter/material.dart';
+
+class JsonTree extends StatefulWidget {
+  final Resource resource;
+
+  const JsonTree(this.resource, {Key? key}) : super(key: key);
+
+  @override
+  _JsonTreeState createState() => _JsonTreeState();
+}
+
+class _JsonTreeState extends State<JsonTree> {
+  late final ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _scrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox.expand(
+      child: Scrollbar(
+        isAlwaysShown: true,
+        controller: _scrollController,
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          child: ResourceJsonTree(
+            widget.resource.toJson(),
+          ),
+        ),
+      ),
+    );
+  }
+}

@@ -80,6 +80,11 @@ class _QuestionnaireResponseFillerState
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  @override
   void dispose() {
     _logger.trace('dispose');
 
