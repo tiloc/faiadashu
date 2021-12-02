@@ -2,14 +2,20 @@ import 'package:faiadashu/questionnaires/questionnaires.dart';
 import 'package:faiadashu/resource_provider/resource_provider.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class QuestionnaireScrollerPanel extends StatefulWidget {
+import 'fhir_resource.dart';
+import 'fhir_resource_notifier.dart';
+
+class QuestionnaireScrollerPanel extends ConsumerStatefulWidget {
   final Questionnaire questionnaire;
   final QuestionnaireResponse? questionnaireResponse;
   final LaunchContext launchContext;
+  final StateNotifierProvider<FhirResourceNotifier, AsyncValue<FhirResource>>
+      fillerOutputProvider;
 
-  const QuestionnaireScrollerPanel(
-      this.questionnaire, this.questionnaireResponse, this.launchContext,
+  const QuestionnaireScrollerPanel(this.questionnaire,
+      this.questionnaireResponse, this.launchContext, this.fillerOutputProvider,
       {Key? key})
       : super(key: key);
 
@@ -19,7 +25,7 @@ class QuestionnaireScrollerPanel extends StatefulWidget {
 }
 
 class _QuestionnaireScrollerPanelState
-    extends State<QuestionnaireScrollerPanel> {
+    extends ConsumerState<QuestionnaireScrollerPanel> {
   late final FhirResourceProvider _fhirResourceProvider;
 
   @override
@@ -40,12 +46,27 @@ class _QuestionnaireScrollerPanelState
     );
   }
 
+  void _onQuestionnaireResponseChanged(
+      QuestionnaireResponseModel? questionnaireResponseModel) {
+    print('output QR changed.');
+
+    final questionnaireResponse =
+        questionnaireResponseModel?.questionnaireResponse;
+
+    final FhirResource resource = (questionnaireResponse != null)
+        ? FhirResource.fromResource(questionnaireResponse)
+        : emptyFhirResource;
+
+    ref.read(widget.fillerOutputProvider.notifier).updateFhirResource(resource);
+  }
+
   @override
   Widget build(BuildContext context) {
     return QuestionnaireScroller(
       fhirResourceProvider: _fhirResourceProvider,
       scaffoldBuilder: _FaiabenchFillerScaffoldBuilder(),
       launchContext: widget.launchContext,
+      onQuestionnaireResponseChanged: _onQuestionnaireResponseChanged,
     );
   }
 }

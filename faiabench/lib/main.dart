@@ -1,24 +1,72 @@
-import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
 
-import 'package:faiabench/json_editor.dart';
-import 'package:faiabench/json_tree.dart';
+import 'package:faiabench/fhir_resource_editor.dart';
 import 'package:faiabench/questionnaire_scroller_panel.dart';
 import 'package:faiadashu/faiadashu.dart';
-import 'package:faiadashu/logging/logging.dart' as fdashlog;
-import 'package:fhir/primitive_types/date.dart';
-import 'package:fhir/primitive_types/id.dart';
-import 'package:fhir/r4/r4.dart';
+import 'package:fhir/r4.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart' as dartlog;
 import 'package:multi_split_view/multi_split_view.dart';
 
 import 'about_page.dart';
 import 'disclaimer_page.dart';
+import 'fhir_resource.dart';
+import 'fhir_resource_notifier.dart';
+import 'filler_inputs.dart';
+
+final questionnaireProvider =
+    StateNotifierProvider<FhirResourceNotifier, AsyncValue<FhirResource>>(
+        (ref) {
+  return FhirResourceNotifier('assets/initial/bluebook-questionnaire.json');
+});
+
+final populateQuestionnaireResponseProvider =
+    StateNotifierProvider<FhirResourceNotifier, AsyncValue<FhirResource>>(
+        (ref) {
+  return FhirResourceNotifier(
+      'assets/initial/bluebook-questionnaire-response.json');
+});
+
+final launchContextProvider =
+    StateNotifierProvider<FhirResourceNotifier, AsyncValue<FhirResource>>(
+        (ref) {
+  return FhirResourceNotifier('assets/initial/launch-context.json');
+});
+
+final fillerInputsProvider = Provider<FillerInputs?>((ref) {
+  final questionnaire = ref.watch(questionnaireProvider).value;
+  final questionnaireResponse =
+      ref.watch(populateQuestionnaireResponseProvider).value;
+  final launchContext = ref.watch(launchContextProvider).value;
+
+  // null = loading. non-null means valid data. error would throw.
+  if (questionnaire != null && launchContext != null) {
+    // Only output valid inputs. Recipient can rely on validity.
+    if (questionnaire.hasError ||
+        (questionnaireResponse?.hasError ?? false) ||
+        launchContext.hasError) {
+      return null;
+    }
+
+    return FillerInputs(
+      questionnaire,
+      questionnaireResponse,
+      launchContext,
+    );
+  } else {
+    return null;
+  }
+});
+
+final fillerOutputProvider =
+    StateNotifierProvider<FhirResourceNotifier, AsyncValue<FhirResource>>(
+        (ref) {
+  return FhirResourceNotifier(null);
+});
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,28 +92,20 @@ void main() async {
     });
   }
 
-  final initialQuestionnaireJson =
-      await rootBundle.loadString('assets/initial/bluebook-questionnaire.json');
-
-  final initialQuestionnaireResponseJson = await rootBundle
-      .loadString('assets/initial/bluebook-questionnaire-response.json');
-
-  final initialLaunchContextJson = 'TBD';
-//      await rootBundle.loadString('assets/initial/launchContext.json');
-
-  runApp(MyApp(initialQuestionnaireJson, initialQuestionnaireResponseJson,
-      initialLaunchContextJson));
+  runApp(
+    ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
-class MyApp extends StatelessWidget {
-  final String initialQuestionnaireJson;
-  final String initialQuestionnaireResponseJson;
-  final String initialLaunchContextJson;
+final splitViewThemeData = MultiSplitViewThemeData(
+  dividerPainter: DividerPainters.grooved1(
+      color: Colors.indigo[100]!, highlightedColor: Colors.indigo[900]!),
+);
 
-  const MyApp(this.initialQuestionnaireJson,
-      this.initialQuestionnaireResponseJson, this.initialLaunchContextJson,
-      {Key? key})
-      : super(key: key);
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -80,144 +120,72 @@ class MyApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
       ],
       supportedLocales: FDashLocalizations.supportedLocales,
-      home:
-          HomePage(initialQuestionnaireJson, initialQuestionnaireResponseJson),
+      home: HomePage(),
     );
   }
 }
 
-class HomePage extends StatefulWidget {
-  final String initialQuestionnaireJson;
-  final String initialQuestionnaireResponseJson;
-
-  const HomePage(
-      this.initialQuestionnaireJson, this.initialQuestionnaireResponseJson,
-      {Key? key})
-      : super(key: key);
+class HomePage extends ConsumerStatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  static final _logger = fdashlog.Logger(_HomePageState);
-
-  late Questionnaire currentQuestionnaire;
-  late String currentQuestionnaireJson;
-
-  late QuestionnaireResponse currentQuestionnaireResponse;
-  late String currentQuestionnaireResponseJson;
-
-  late final JsonEditor _inputQuestionnaireEditor;
-  late final JsonEditor _inputQuestionnaireResponseEditor;
-  late final JsonEditor _inputLaunchContextEditor;
-
-  late Widget _questionnaireScrollerPanel;
-
-  final launchContext = LaunchContext(
-    patient: Patient(
-      id: Id('14603'),
-      name: [
-        HumanName(given: ['Emma'], family: 'Lee', use: HumanNameUse.official)
-      ],
-      birthDate: Date('1940-08-12'),
-      gender: PatientGender.female,
-    ),
-  );
+class _HomePageState extends ConsumerState<HomePage> {
+  MultiSplitViewController _overallSplitController =
+      MultiSplitViewController(weights: [0.3, 0.35, 0.35]);
 
   MultiSplitViewController _inputPanelSplitController =
       MultiSplitViewController(weights: [0.2, 0.4, 0.4]);
 
   @override
-  void initState() {
-    super.initState();
-
-    currentQuestionnaireJson = widget.initialQuestionnaireJson;
-    currentQuestionnaireResponseJson = widget.initialQuestionnaireResponseJson;
-
-    _inputQuestionnaireEditor = JsonEditor(
-      'Questionnaire',
-      currentQuestionnaireJson,
-      _inputsUpdated,
-    );
-
-    _inputQuestionnaireResponseEditor = JsonEditor(
-      'populate with QuestionnaireResponse',
-      currentQuestionnaireResponseJson,
-      _inputsUpdated,
-    );
-
-    _inputLaunchContextEditor = JsonEditor(
-      'Launch Context',
-      'Launch JSON',
-      _inputsUpdated,
-    );
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _rebuildFiller();
-  }
-
-  void _rebuildFiller() {
-    currentQuestionnaire =
-        Questionnaire.fromJson(jsonDecode(currentQuestionnaireJson));
-
-    currentQuestionnaireResponse = QuestionnaireResponse.fromJson(
-        jsonDecode(currentQuestionnaireResponseJson));
-
-    final hash =
-        currentQuestionnaire.hashCode + currentQuestionnaireResponse.hashCode;
-
-    _questionnaireScrollerPanel = QuestionnaireScrollerPanel(
-      currentQuestionnaire,
-      currentQuestionnaireResponse,
-      launchContext,
-      key: ValueKey<int>(hash),
-    );
-  }
-
-  @override
-  dispose() {
-    super.dispose();
-  }
-
-  void _inputsUpdated() {
-    setState(() {
-      currentQuestionnaireJson = _inputQuestionnaireEditor.getValue(context);
-      _rebuildFiller();
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final fillerInputs = ref.watch(fillerInputsProvider);
+
+    final questionnairePanel = (fillerInputs != null)
+        ? QuestionnaireScrollerPanel(
+            fillerInputs.questionnaire.resource as Questionnaire,
+            fillerInputs.questionnaireResponse?.resource
+                as QuestionnaireResponse?,
+            LaunchContext(
+                patient: fillerInputs.launchContext.resource as Patient),
+            fillerOutputProvider,
+            key: ValueKey<String>(fillerInputs.hashCode.toString()),
+          )
+        : CircularProgressIndicator();
+
     final inputsPanel = MultiSplitView(
         axis: Axis.vertical,
         controller: _inputPanelSplitController,
         children: [
           Container(
             padding: EdgeInsets.all(8),
-            child: _inputLaunchContextEditor,
+            child: FhirResourceEditor(
+              'Launch Context',
+              launchContextProvider,
+            ),
           ),
           Container(
             padding: EdgeInsets.all(8),
-            child: _inputQuestionnaireEditor,
+            child: FhirResourceEditor(
+              'Questionnaire',
+              questionnaireProvider,
+            ),
           ),
-          SizedBox.expand(
-            child: Container(
-              padding: EdgeInsets.all(8),
-              child: _inputQuestionnaireResponseEditor,
+          Container(
+            padding: EdgeInsets.all(8),
+            child: FhirResourceEditor(
+              'populate with QuestionnaireResponse',
+              populateQuestionnaireResponseProvider,
             ),
           ),
         ]);
 
     MultiSplitViewTheme themedInputsPanel = MultiSplitViewTheme(
-        child: inputsPanel,
-        data: MultiSplitViewThemeData(
-            dividerPainter: DividerPainters.grooved1(
-                color: Colors.indigo[100]!,
-                highlightedColor: Colors.indigo[900]!)));
+      child: inputsPanel,
+      data: splitViewThemeData,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -273,21 +241,28 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body: SafeArea(
-        child: Row(
-          children: [
-            Expanded(
-              flex: 1,
-              child: themedInputsPanel,
-            ),
-            Expanded(
-              flex: 1,
-              child: _questionnaireScrollerPanel,
-            ),
-            Expanded(
-              flex: 1,
-              child: JsonTree(currentQuestionnaire),
-            ),
-          ],
+        child: MultiSplitViewTheme(
+          data: splitViewThemeData,
+          child: MultiSplitView(
+            axis: Axis.horizontal,
+            controller: _overallSplitController,
+            children: [
+              themedInputsPanel,
+              AnimatedSwitcher(
+                  duration: Duration(milliseconds: 500),
+                  child: questionnairePanel),
+              Container(
+                padding: EdgeInsets.all(8),
+                child: FhirResourceEditor(
+                  'Output QuestionnaireResponse',
+                  fillerOutputProvider,
+                  showSubmitButton: false,
+                  fhirPathOutputMinLines: 15,
+                  fhirPathOutputMaxLines: 15,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

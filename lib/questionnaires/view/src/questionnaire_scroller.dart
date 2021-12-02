@@ -41,6 +41,9 @@ class QuestionnaireScroller extends StatefulWidget {
   final QuestionnaireTheme questionnaireTheme;
   final QuestionnaireModelDefaults questionnaireModelDefaults;
 
+  final void Function(QuestionnaireResponseModel?)?
+      onQuestionnaireResponseChanged;
+
   const QuestionnaireScroller({
     this.locale,
     required this.scaffoldBuilder,
@@ -52,6 +55,7 @@ class QuestionnaireScroller extends StatefulWidget {
     this.onLinkTap,
     this.questionnaireTheme = const QuestionnaireTheme(),
     this.questionnaireModelDefaults = const QuestionnaireModelDefaults(),
+    this.onQuestionnaireResponseChanged,
     Key? key,
   }) : super(key: key);
 
@@ -92,6 +96,10 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  void _onQuestionnaireResponseChanged() {
+    widget.onQuestionnaireResponseChanged?.call(_questionnaireResponseModel);
   }
 
   /// Scrolls to a position as conveyed by a [QuestionnaireErrorFlag].
@@ -236,6 +244,14 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
           _isLoaded = true;
 
           _questionnaireResponseModel = questionnaireResponseModel;
+
+          if (widget.onQuestionnaireResponseChanged != null) {
+            // TODO: Ideally an initial state should be broadcast, but this is leading to exceptions for UI updates/setState.
+            //            _onQuestionnaireResponseChanged();
+
+            _questionnaireResponseModel
+                ?.addListener(_onQuestionnaireResponseChanged);
+          }
 
           // Listen for new error flags and then scroll to the first one.
           questionnaireResponseModel.errorFlags.addListener(() {
