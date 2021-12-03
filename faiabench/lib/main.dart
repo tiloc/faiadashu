@@ -28,7 +28,8 @@ final populateQuestionnaireResponseProvider =
     StateNotifierProvider<FhirResourceNotifier, AsyncValue<FhirResource>>(
         (ref) {
   return FhirResourceNotifier(
-      'assets/initial/bluebook-questionnaire-response.json');
+    'assets/initial/bluebook-questionnaire-response.json',
+  );
 });
 
 final launchContextProvider =
@@ -68,7 +69,7 @@ final fillerOutputProvider =
   return FhirResourceNotifier(null);
 });
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
   if (kDebugMode || kIsWeb) {
@@ -93,7 +94,7 @@ void main() async {
   }
 
   runApp(
-    ProviderScope(
+    const ProviderScope(
       child: MyApp(),
     ),
   );
@@ -101,7 +102,9 @@ void main() async {
 
 final splitViewThemeData = MultiSplitViewThemeData(
   dividerPainter: DividerPainters.grooved1(
-      color: Colors.indigo[100]!, highlightedColor: Colors.indigo[900]!),
+    color: Colors.indigo[100]!,
+    highlightedColor: Colors.indigo[900],
+  ),
 );
 
 class MyApp extends StatelessWidget {
@@ -120,7 +123,7 @@ class MyApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
       ],
       supportedLocales: FDashLocalizations.supportedLocales,
-      home: HomePage(),
+      home: const HomePage(),
     );
   }
 }
@@ -133,10 +136,10 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-  MultiSplitViewController _overallSplitController =
+  final _overallSplitController =
       MultiSplitViewController(weights: [0.3, 0.35, 0.35]);
 
-  MultiSplitViewController _inputPanelSplitController =
+  final _inputPanelSplitController =
       MultiSplitViewController(weights: [0.2, 0.4, 0.4]);
 
   @override
@@ -145,46 +148,48 @@ class _HomePageState extends ConsumerState<HomePage> {
 
     final questionnairePanel = (fillerInputs != null)
         ? QuestionnaireScrollerPanel(
-            fillerInputs.questionnaire.resource as Questionnaire,
+            fillerInputs.questionnaire.resource! as Questionnaire,
             fillerInputs.questionnaireResponse?.resource
                 as QuestionnaireResponse?,
             LaunchContext(
-                patient: fillerInputs.launchContext.resource as Patient),
+              patient: fillerInputs.launchContext.resource! as Patient,
+            ),
             fillerOutputProvider,
             key: ValueKey<String>(fillerInputs.hashCode.toString()),
           )
-        : CircularProgressIndicator();
+        : const CircularProgressIndicator();
 
     final inputsPanel = MultiSplitView(
-        axis: Axis.vertical,
-        controller: _inputPanelSplitController,
-        children: [
-          Container(
-            padding: EdgeInsets.all(8),
-            child: FhirResourceEditor(
-              'Launch Context',
-              launchContextProvider,
-            ),
+      axis: Axis.vertical,
+      controller: _inputPanelSplitController,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          child: FhirResourceEditor(
+            'Launch Context',
+            launchContextProvider,
           ),
-          Container(
-            padding: EdgeInsets.all(8),
-            child: FhirResourceEditor(
-              'Questionnaire',
-              questionnaireProvider,
-            ),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          child: FhirResourceEditor(
+            'Questionnaire',
+            questionnaireProvider,
           ),
-          Container(
-            padding: EdgeInsets.all(8),
-            child: FhirResourceEditor(
-              'populate with QuestionnaireResponse',
-              populateQuestionnaireResponseProvider,
-            ),
+        ),
+        Container(
+          padding: const EdgeInsets.all(8),
+          child: FhirResourceEditor(
+            'populate with QuestionnaireResponse',
+            populateQuestionnaireResponseProvider,
           ),
-        ]);
+        ),
+      ],
+    );
 
-    MultiSplitViewTheme themedInputsPanel = MultiSplitViewTheme(
-      child: inputsPanel,
+    final themedInputsPanel = MultiSplitViewTheme(
       data: splitViewThemeData,
+      child: inputsPanel,
     );
 
     return Scaffold(
@@ -244,15 +249,15 @@ class _HomePageState extends ConsumerState<HomePage> {
         child: MultiSplitViewTheme(
           data: splitViewThemeData,
           child: MultiSplitView(
-            axis: Axis.horizontal,
             controller: _overallSplitController,
             children: [
               themedInputsPanel,
               AnimatedSwitcher(
-                  duration: Duration(milliseconds: 500),
-                  child: questionnairePanel),
+                duration: const Duration(milliseconds: 500),
+                child: questionnairePanel,
+              ),
               Container(
-                padding: EdgeInsets.all(8),
+                padding: const EdgeInsets.all(8),
                 child: FhirResourceEditor(
                   'Output QuestionnaireResponse',
                   fillerOutputProvider,

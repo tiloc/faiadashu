@@ -23,7 +23,7 @@ class FhirResourceNotifier extends StateNotifier<AsyncValue<FhirResource>> {
 
       state = AsyncValue.data(fhirResource);
     } else {
-      state = AsyncValue.data(emptyFhirResource);
+      state = const AsyncValue.data(emptyFhirResource);
     }
   }
 }

@@ -38,15 +38,17 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
+  flutter_riverpod: ^1.0.1
+
   intl: ^0.17.0
 
   logging: ^1.0.1
 
-  simple_html_css: ^3.0.1
-
   multi_split_view: ^1.10.0+1
 
-  flutter_riverpod: ^1.0.1
+  simple_html_css: ^3.0.1
+
+
 
 dev_dependencies:
   lint: ^1.7.2

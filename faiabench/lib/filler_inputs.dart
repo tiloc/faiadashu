@@ -6,5 +6,8 @@ class FillerInputs {
   final FhirResource launchContext;
 
   const FillerInputs(
-      this.questionnaire, this.questionnaireResponse, this.launchContext);
+    this.questionnaire,
+    this.questionnaireResponse,
+    this.launchContext,
+  );
 }

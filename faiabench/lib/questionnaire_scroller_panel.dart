@@ -14,10 +14,13 @@ class QuestionnaireScrollerPanel extends ConsumerStatefulWidget {
   final StateNotifierProvider<FhirResourceNotifier, AsyncValue<FhirResource>>
       fillerOutputProvider;
 
-  const QuestionnaireScrollerPanel(this.questionnaire,
-      this.questionnaireResponse, this.launchContext, this.fillerOutputProvider,
-      {Key? key})
-      : super(key: key);
+  const QuestionnaireScrollerPanel(
+    this.questionnaire,
+    this.questionnaireResponse,
+    this.launchContext,
+    this.fillerOutputProvider, {
+    Key? key,
+  }) : super(key: key);
 
   @override
   _QuestionnaireScrollerPanelState createState() =>
@@ -47,7 +50,8 @@ class _QuestionnaireScrollerPanelState
   }
 
   void _onQuestionnaireResponseChanged(
-      QuestionnaireResponseModel? questionnaireResponseModel) {
+    QuestionnaireResponseModel? questionnaireResponseModel,
+  ) {
     print('output QR changed.');
 
     final questionnaireResponse =
@@ -64,7 +68,7 @@ class _QuestionnaireScrollerPanelState
   Widget build(BuildContext context) {
     return QuestionnaireScroller(
       fhirResourceProvider: _fhirResourceProvider,
-      scaffoldBuilder: _FaiabenchFillerScaffoldBuilder(),
+      scaffoldBuilder: const _FaiabenchFillerScaffoldBuilder(),
       launchContext: widget.launchContext,
       onQuestionnaireResponseChanged: _onQuestionnaireResponseChanged,
     );

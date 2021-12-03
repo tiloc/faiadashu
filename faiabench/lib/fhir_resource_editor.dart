@@ -24,13 +24,15 @@ class FhirResourceEditor extends ConsumerStatefulWidget {
   final int fhirPathOutputMinLines;
   final int fhirPathOutputMaxLines;
 
-  FhirResourceEditor(this.title, this.fhirResourceProvider,
-      {this.showSubmitButton = true,
-      this.showFhirPath = true,
-      this.fhirPathOutputMinLines = 3,
-      this.fhirPathOutputMaxLines = 3,
-      Key? key})
-      : super(key: key);
+  const FhirResourceEditor(
+    this.title,
+    this.fhirResourceProvider, {
+    this.showSubmitButton = true,
+    this.showFhirPath = true,
+    this.fhirPathOutputMinLines = 3,
+    this.fhirPathOutputMaxLines = 3,
+    Key? key,
+  }) : super(key: key);
 
   @override
   _FhirResourceEditorState createState() => _FhirResourceEditorState();
@@ -47,10 +49,11 @@ class _FhirResourceEditorState extends ConsumerState<FhirResourceEditor> {
   void _fhirPathChanged(String newPath) {
     setState(() {
       try {
-        final newResource =
-            Resource.fromJson(jsonDecode(_codeController!.rawText));
+        final newResource = Resource.fromJson(
+          jsonDecode(_codeController!.rawText) as Map<String, dynamic>,
+        );
         final pathResult = walkFhirPath(newResource.toJson(), newPath);
-        JsonEncoder encoder = new JsonEncoder.withIndent('  ');
+        const encoder = JsonEncoder.withIndent('  ');
         _fhirPathOutputController!.text =
             encoder.convert(jsonDecode(jsonEncode(pathResult)));
       } catch (e) {
@@ -95,8 +98,7 @@ class _FhirResourceEditorState extends ConsumerState<FhirResourceEditor> {
 
   @override
   Widget build(BuildContext context) {
-    AsyncValue<FhirResource> fhirResource =
-        ref.watch(widget.fhirResourceProvider);
+    final fhirResource = ref.watch(widget.fhirResourceProvider);
 
     return fhirResource.when(
       data: (value) {
@@ -115,7 +117,7 @@ class _FhirResourceEditorState extends ConsumerState<FhirResourceEditor> {
               controller: _scrollController,
               child: CodeField(
                 controller: codeController,
-                textStyle: TextStyle(fontFamily: 'SourceCode'),
+                textStyle: const TextStyle(fontFamily: 'SourceCode'),
               ),
             ),
             Row(
@@ -123,69 +125,97 @@ class _FhirResourceEditorState extends ConsumerState<FhirResourceEditor> {
                 SizedBox(
                   width: 40,
                   height: 120,
-                  child: Stack(children: [
-                    Container(
-                      color: Colors.black54,
-                      child: SizedBox.expand(),
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            setState(() {
-                              _fhirPathVisible = !_fhirPathVisible;
-                            });
-                          },
-                          icon: _fhirPathVisible
-                              ? const Icon(Icons.local_fire_department,
-                                  color: Colors.white)
-                              : const Icon(Icons.local_fire_department,
-                                  color: Colors.deepOrange),
-                        ),
-                        IconButton(
-                          onPressed: () async {
-                            await Clipboard.setData(
-                              ClipboardData(
-                                text: codeController.rawText.trim(),
-                              ),
-                            );
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content: Text(
-                                    '${widget.title} copied to clipboard.')));
-                          },
-                          icon: Icon(
-                            Icons.copy,
-                            color: Colors.tealAccent,
+                  child: Stack(
+                    children: [
+                      Container(
+                        color: Colors.black54,
+                        child: const SizedBox.expand(),
+                      ),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            tooltip: 'Open FHIRPath editor.',
+                            onPressed: () {
+                              setState(() {
+                                _fhirPathVisible = !_fhirPathVisible;
+                              });
+                            },
+                            icon: _fhirPathVisible
+                                ? const Icon(
+                                    Icons.local_fire_department,
+                                    color: Colors.white,
+                                    semanticLabel: 'Close FHIRPath editor.',
+                                  )
+                                : const Icon(
+                                    Icons.local_fire_department,
+                                    color: Colors.deepOrange,
+                                  ),
                           ),
-                        ),
-                        IconButton(
-                          onPressed: () async {
-                            final clipboardData =
-                                await Clipboard.getData('text/plain');
-                            if (clipboardData != null) {
-                              codeController.text = clipboardData.text ?? '';
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                  content: Text(
-                                      '${widget.title} pasted from clipboard.')));
-                            } else {
+                          IconButton(
+                            onPressed: () async {
+                              await Clipboard.setData(
+                                ClipboardData(
+                                  text: codeController.rawText.trim(),
+                                ),
+                              );
+
+                              if (!mounted) {
+                                return;
+                              }
+
                               ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content:
-                                          const Text('Clipboard is empty.')));
-                            }
-                          },
-                          icon: Icon(
-                            Icons.paste,
-                            color: Colors.tealAccent,
+                                SnackBar(
+                                  content: Text(
+                                    '${widget.title} copied to clipboard.',
+                                  ),
+                                ),
+                              );
+                            },
+                            icon: const Icon(
+                              Icons.copy,
+                              color: Colors.tealAccent,
+                            ),
+                            tooltip: 'Send to clipboard.',
                           ),
-                        ),
-                      ],
-                    ),
-                  ]),
+                          IconButton(
+                            onPressed: () async {
+                              final clipboardData =
+                                  await Clipboard.getData('text/plain');
+
+                              if (!mounted) {
+                                return;
+                              }
+
+                              if (clipboardData != null) {
+                                codeController.text = clipboardData.text ?? '';
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      '${widget.title} pasted from clipboard.',
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Clipboard is empty.'),
+                                  ),
+                                );
+                              }
+                            },
+                            icon: const Icon(
+                              Icons.paste,
+                              color: Colors.tealAccent,
+                            ),
+                            tooltip: 'Paste from clipboard.',
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-                Expanded(child: SizedBox.shrink()),
+                const Expanded(child: SizedBox.shrink()),
                 if (widget.showSubmitButton)
                   IconButton(
                     onPressed: () {
@@ -196,10 +226,12 @@ class _FhirResourceEditorState extends ConsumerState<FhirResourceEditor> {
                           : emptyFhirResource;
 
                       if (fhirResource.hasError) {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          backgroundColor: Theme.of(context).errorColor,
-                          content: Text(fhirResource.errorMessage!),
-                        ));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: Theme.of(context).errorColor,
+                            content: Text(fhirResource.errorMessage!),
+                          ),
+                        );
                       }
 
                       ref
@@ -210,39 +242,42 @@ class _FhirResourceEditorState extends ConsumerState<FhirResourceEditor> {
                       Icons.drive_file_move,
                       color: Colors.white,
                     ),
+                    tooltip: 'Send to next step.',
                   ),
               ],
             ),
             AnimatedSwitcher(
-              duration: Duration(milliseconds: 500),
+              duration: const Duration(milliseconds: 500),
               child: _fhirPathVisible
                   ? Column(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Container(
-                          padding: EdgeInsets.all(4.0),
+                          padding: const EdgeInsets.all(4.0),
                           child: CodeField(
-                              minLines: 1,
-                              maxLines: 1,
-                              controller: fhirPathController),
+                            minLines: 1,
+                            maxLines: 1,
+                            controller: fhirPathController,
+                          ),
                         ),
                         Container(
-                          padding: EdgeInsets.all(4.0),
+                          padding: const EdgeInsets.all(4.0),
                           child: CodeField(
-                              minLines: widget.fhirPathOutputMinLines,
-                              maxLines: widget.fhirPathOutputMaxLines,
-                              enabled: false,
-                              controller: fhirPathOutputController),
+                            minLines: widget.fhirPathOutputMinLines,
+                            maxLines: widget.fhirPathOutputMaxLines,
+                            enabled: false,
+                            controller: fhirPathOutputController,
+                          ),
                         ),
                       ],
                     )
-                  : SizedBox.shrink(),
+                  : const SizedBox.shrink(),
             ),
           ],
         );
       },
       error: (error, stack) => Text('Error: $error'),
-      loading: () => CircularProgressIndicator(),
+      loading: () => const CircularProgressIndicator(),
     );
   }
 }

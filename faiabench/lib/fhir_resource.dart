@@ -27,7 +27,8 @@ class FhirResource {
 
   factory FhirResource.fromJsonString(String jsonString) {
     try {
-      final resource = Resource.fromJson(jsonDecode(jsonString));
+      final resource =
+          Resource.fromJson(jsonDecode(jsonString) as Map<String, dynamic>);
 
       return FhirResource(
         resource,
