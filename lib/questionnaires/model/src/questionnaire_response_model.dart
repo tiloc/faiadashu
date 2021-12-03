@@ -662,7 +662,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
   void removeAnswerModel(AnswerModel answerModel) {
     _answerModels.remove(answerModel.nodeUid);
-    nextGeneration(notifyListeners: false);
+    nextGeneration();
   }
 
   /// Returns whether the questionnaire meets all completeness criteria.

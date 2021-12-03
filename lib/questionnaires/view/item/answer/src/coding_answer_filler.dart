@@ -88,20 +88,24 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
   Widget _buildChoiceAnswers(BuildContext context) {
     final choices = _createChoices(context);
 
-    return answerModel.isHorizontal &&
-            MediaQuery.of(context).size.width >
-                questionnaireTheme.horizontalCodingBreakpoint
-        ? _HorizontalCodingChoices(
-            firstFocusNode: firstFocusNode,
-            choices: choices,
-            errorText: errorText,
-          )
-        : _VerticalCodingChoices(
-            firstFocusNode: firstFocusNode,
-            answerModel: answerModel,
-            errorText: errorText,
-            choices: choices,
-          );
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        return answerModel.isHorizontal &&
+                constraints.maxWidth >
+                    questionnaireTheme.horizontalCodingBreakpoint
+            ? _HorizontalCodingChoices(
+                firstFocusNode: firstFocusNode,
+                choices: choices,
+                errorText: errorText,
+              )
+            : _VerticalCodingChoices(
+                firstFocusNode: firstFocusNode,
+                answerModel: answerModel,
+                errorText: errorText,
+                choices: choices,
+              );
+      },
+    );
   }
 
   Widget _buildAutocompleteAnswers(BuildContext context) {

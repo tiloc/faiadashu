@@ -5,6 +5,7 @@ import 'package:faiabench/fhir_resource.dart';
 import 'package:fhir/r4/resource/resource.dart';
 import 'package:fhir_path/fhir_path.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_highlight/themes/github.dart';
 import 'package:flutter_highlight/themes/monokai-sublime.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -119,16 +120,70 @@ class _FhirResourceEditorState extends ConsumerState<FhirResourceEditor> {
             ),
             Row(
               children: [
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      _fhirPathVisible = !_fhirPathVisible;
-                    });
-                  },
-                  icon: Icon(
-                    Icons.local_fire_department,
-                    color: _fhirPathVisible ? Colors.white : Colors.deepOrange,
-                  ),
+                SizedBox(
+                  width: 40,
+                  height: 120,
+                  child: Stack(children: [
+                    Container(
+                      color: Colors.black54,
+                      child: SizedBox.expand(),
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            setState(() {
+                              _fhirPathVisible = !_fhirPathVisible;
+                            });
+                          },
+                          icon: _fhirPathVisible
+                              ? const Icon(Icons.local_fire_department,
+                                  color: Colors.white)
+                              : const Icon(Icons.local_fire_department,
+                                  color: Colors.deepOrange),
+                        ),
+                        IconButton(
+                          onPressed: () async {
+                            await Clipboard.setData(
+                              ClipboardData(
+                                text: codeController.rawText.trim(),
+                              ),
+                            );
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: Text(
+                                    '${widget.title} copied to clipboard.')));
+                          },
+                          icon: Icon(
+                            Icons.copy,
+                            color: Colors.tealAccent,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () async {
+                            final clipboardData =
+                                await Clipboard.getData('text/plain');
+                            if (clipboardData != null) {
+                              codeController.text = clipboardData.text ?? '';
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                  content: Text(
+                                      '${widget.title} pasted from clipboard.')));
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content:
+                                          const Text('Clipboard is empty.')));
+                            }
+                          },
+                          icon: Icon(
+                            Icons.paste,
+                            color: Colors.tealAccent,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ]),
                 ),
                 Expanded(child: SizedBox.shrink()),
                 if (widget.showSubmitButton)
@@ -151,7 +206,7 @@ class _FhirResourceEditorState extends ConsumerState<FhirResourceEditor> {
                           .read(widget.fhirResourceProvider.notifier)
                           .updateFhirResource(fhirResource);
                     },
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.drive_file_move,
                       color: Colors.white,
                     ),

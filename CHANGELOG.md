@@ -3,11 +3,12 @@
   * Using the best of `fhir`, `fhir_path`, and `faiadashu` to offer an IDE-like workbench experience
     * live display of SDC Questionnaire Filler
     * color-coded, formatted input/output of FHIR Resources (Patient, Questionnaire, QuestionnaireResponse)
+    * data exchange through clipboard copy/paste
     * live evaluation of FHIR Path expressions
 > _Faiabench_ is pushing Dart and Flutter to the limit.
-> * only works on Mac and Web due to screen size requirements
+> * only works on desktops or landscape tablets, due to screen size requirements
 > * only works on Flutter `master` branch, due to bug in Dart
-> * keyboard input to FHIR Path field broken on Mac, due to bug in macOS Flutter
+> * keyboard input to FHIR Path field broken on Mac, due to bugs in macOS Flutter: https://github.com/flutter/flutter/issues/82124
 
 * [Breaking] Introduction of new XhtmlString type to handle items which can have plain and styled text
   * Implemented throughout numerous models and views
@@ -21,6 +22,8 @@
 * Fixed count methods to get accurate count of unanswered questions
 * Improvements in the display of errors
 * NarrativeTile can use an existing narrative, rather than always generating a new one
+* Removing a repeating answer will notify listeners
+* Use LayoutBuilder instead of MediaQuery to work better when embedded into surround UI
 
 * Introduced a presentation model for individual answer options in coding questions.
 
