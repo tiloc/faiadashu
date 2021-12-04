@@ -32,12 +32,10 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   late final Iterable<FhirExpressionEvaluator> _variables;
 
   /// Questionnaire-level variables
-  Iterable<FhirExpressionEvaluator> get questionnaireLevelVariables =>
-      _variables;
+  Iterable<ExpressionEvaluator> get questionnaireLevelExpressionEvaluators =>
+      [..._launchContextExpressions, ..._variables];
 
   late final Iterable<ExpressionEvaluator> _launchContextExpressions;
-  Iterable<ExpressionEvaluator> get launchContextExpressions =>
-      _launchContextExpressions;
 
   bool _enableWhenExpressionsActivated = false;
 
@@ -50,6 +48,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     required this.launchContext,
     required List<Aggregator>? aggregators,
   }) : _aggregators = aggregators {
+    // FIXME: According to spec I need to map launchcontext items to names from launchContext extension
     _launchContextExpressions = [
       ResourceExpressionEvaluator('patient', () => launchContext.patient, []),
     ];
@@ -72,7 +71,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
         final variable = FhirExpressionEvaluator.fromExpression(
           () => questionnaireResponse,
           variableExpression,
-          [...launchContextExpressions, ...qLevelVars],
+          [..._launchContextExpressions, ...qLevelVars],
         );
 
         qLevelVars.add(variable);
@@ -694,10 +693,10 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   ///
   /// Returns null, if everything is complete.
   /// Returns [QuestionnaireErrorFlag]s, if items are incomplete.
-  Iterable<QuestionnaireErrorFlag>? get isQuestionnaireComplete {
+  Future<Iterable<QuestionnaireErrorFlag>?> get isQuestionnaireComplete async {
     final errorFlags = <QuestionnaireErrorFlag>[];
     for (final itemModel in orderedResponseItemModels()) {
-      final itemErrorFlags = itemModel.isComplete;
+      final itemErrorFlags = await itemModel.isComplete;
       if (itemErrorFlags != null) {
         errorFlags.addAll(itemErrorFlags);
       }

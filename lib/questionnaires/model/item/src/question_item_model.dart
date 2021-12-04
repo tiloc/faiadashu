@@ -44,8 +44,8 @@ class QuestionItemModel extends ResponseItemModel {
             () => questionnaireResponseModel.questionnaireResponse,
             calculatedExpression,
             [
-              ...questionnaireResponseModel.launchContextExpressions,
-              ...questionnaireResponseModel.questionnaireLevelVariables,
+              ...questionnaireResponseModel
+                  .questionnaireLevelExpressionEvaluators,
             ],
           )
         : null;
@@ -108,7 +108,7 @@ class QuestionItemModel extends ResponseItemModel {
   ///
   /// Returns null if not applicable (either question unanswered, or wrong type)
   Decimal? get ordinalValue {
-    // TODO: This is expensive and hacky. The codinganswermodel should have a property for its own current ordinalvalue.
+    // FIXME: This is expensive and hacky. The codinganswermodel should have a property for its own current ordinalvalue.
     final answerModel = firstAnswerModel;
 
     if (answerModel.isAnswered && answerModel is CodingAnswerModel) {
@@ -145,12 +145,12 @@ class QuestionItemModel extends ResponseItemModel {
   }
 
   @override
-  Iterable<QuestionnaireErrorFlag>? get isComplete {
+  Future<Iterable<QuestionnaireErrorFlag>?> get isComplete async {
     // Non-existent answer models can be incomplete, e.g. if minOccurs is not met.
     _ensureAnswerModel();
 
     final markers = <QuestionnaireErrorFlag>[];
-    final rimMarkers = super.isComplete;
+    final rimMarkers = await super.isComplete;
     if (rimMarkers != null) {
       markers.addAll(rimMarkers);
     }
@@ -305,7 +305,7 @@ class QuestionItemModel extends ResponseItemModel {
     final initialExpressionEvaluator = FhirExpressionEvaluator.fromExpression(
       null,
       fhirPathExpression,
-      questionnaireResponseModel.launchContextExpressions,
+      questionnaireResponseModel.questionnaireLevelExpressionEvaluators,
     );
 
     final evaluationResult = await initialExpressionEvaluator.fetchValue();

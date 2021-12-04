@@ -1,3 +1,5 @@
+import 'package:fhir/r4.dart';
+
 import '../../../../l10n/l10n.dart';
 import '../../../../logging/logging.dart';
 import '../../model.dart';
@@ -8,6 +10,8 @@ import '../../model.dart';
 abstract class ResponseItemModel extends FillerItemModel {
   static final _rimLogger = Logger(ResponseItemModel);
 
+  late final FhirPathExpressionEvaluator? _constraintExpression;
+
   ResponseItemModel(
     ResponseNode? parentNode,
     QuestionnaireResponseModel questionnaireResponseModel,
@@ -16,7 +20,23 @@ abstract class ResponseItemModel extends FillerItemModel {
           parentNode,
           questionnaireResponseModel,
           questionnaireItemModel,
-        );
+        ) {
+    final constraintExpression = questionnaireItemModel.constraintExpression;
+
+    _constraintExpression = constraintExpression != null
+        ? FhirPathExpressionEvaluator(
+            () => questionnaireResponseModel.questionnaireResponse,
+            Expression(
+              expression: constraintExpression,
+              language: ExpressionLanguage.text_fhirpath,
+            ),
+            [
+              ...questionnaireResponseModel
+                  .questionnaireLevelExpressionEvaluators,
+            ],
+          )
+        : null;
+  }
 
   /// Can the item be answered?
   ///
@@ -45,7 +65,7 @@ abstract class ResponseItemModel extends FillerItemModel {
   /// Is the item invalid?
   bool get isInvalid;
 
-  Iterable<QuestionnaireErrorFlag>? get isComplete {
+  Future<Iterable<QuestionnaireErrorFlag>?> get isComplete async {
     if (questionnaireItemModel.isRequired && isUnanswered) {
       return [
         QuestionnaireErrorFlag(
@@ -56,7 +76,7 @@ abstract class ResponseItemModel extends FillerItemModel {
       ];
     }
 
-    if (!isSatisfyingConstraint) {
+    if (!await isSatisfyingConstraint) {
       return [
         QuestionnaireErrorFlag(
           nodeUid,
@@ -71,17 +91,17 @@ abstract class ResponseItemModel extends FillerItemModel {
   /// Returns whether the item is satisfying the `questionnaire-constraint`.
   ///
   /// Returns true if no constraint is specified.
-  bool get isSatisfyingConstraint {
-    final fhirPathExpression = questionnaireItemModel.constraintExpression;
-    if (fhirPathExpression == null) {
+  Future<bool> get isSatisfyingConstraint async {
+    final constraintExpression = _constraintExpression;
+    if (constraintExpression == null) {
       return true;
     }
 
-    final fhirPathResult = evaluateFhirPathExpression(fhirPathExpression);
+    final fhirPathResult = await constraintExpression.fetchValue();
 
     return isFhirPathResultTrue(
       fhirPathResult,
-      fhirPathExpression,
+      constraintExpression,
       unknownValue: true,
     );
   }

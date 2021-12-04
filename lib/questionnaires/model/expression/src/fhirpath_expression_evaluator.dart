@@ -29,17 +29,21 @@ class FhirPathExpressionEvaluator extends FhirExpressionEvaluator {
   Future<dynamic> fetchValue() async {
     final upstreamExpressions = this.upstreamExpressions;
 
-    Map<String, dynamic>? upstreamMap;
+    final upstreamMap = <String, dynamic>{};
 
-    if (upstreamExpressions != null) {
-      upstreamMap = {};
+    for (final upstreamExpression
+        in upstreamExpressions.toList(growable: false).reversed) {
+      final name = ArgumentError.checkNotNull(upstreamExpression.name);
+      final key = '%$name';
 
-      for (final upstreamExpression in upstreamExpressions) {
-        final name = ArgumentError.checkNotNull(upstreamExpression.name);
-        final value = await upstreamExpression.fetchValue();
-
-        upstreamMap['%$name'] = value;
+      if (upstreamMap[key] != null) {
+        // items later in the list beat items earlier in the list.
+        continue;
       }
+
+      final value = await upstreamExpression.fetchValue();
+
+      upstreamMap[key] = value;
     }
 
     final resource = resourceBuilder?.call();

@@ -24,13 +24,13 @@ class _QuestionnaireCompleteButtonState
   @override
   Widget build(BuildContext context) {
     return ElevatedButton.icon(
-      onPressed: () {
+      onPressed: () async {
         final qf = QuestionnaireResponseFiller.of(context);
         final qm = qf.questionnaireResponseModel;
         final currentResponseStatus = qm.responseStatus;
 
         if (currentResponseStatus != QuestionnaireResponseStatus.completed) {
-          final isComplete = qm.isQuestionnaireComplete;
+          final isComplete = await qm.isQuestionnaireComplete;
           qm.errorFlags.value = isComplete;
 
           if (isComplete != null) {

@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart';
+import 'package:faiadashu/questionnaires/model/expression/src/fhir_expression_evaluator.dart';
 import 'package:fhir/r4.dart';
-import 'package:fhir_path/run_fhir_path.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../../../fhir_types/fhir_types.dart';
@@ -19,6 +19,8 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
 
   bool _enableWhenActivated = false;
 
+  late final FhirExpressionEvaluator? _enableWhenExpression;
+
   @override
   String calculateNodeUid() {
     return "${(parentNode != null) ? parentNode!.nodeUid : ''}/${questionnaireItemModel.linkId}";
@@ -28,7 +30,29 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
     ResponseNode? parentNode,
     this.questionnaireResponseModel,
     this.questionnaireItemModel,
-  ) : super(parentNode);
+  ) : super(parentNode) {
+    final enableWhenExtensionExpression = questionnaireItem.extension_
+        ?.extensionOrNull(
+          'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression',
+        )
+        ?.valueExpression;
+
+    // FIXME: Add further upstreams (item level)
+    // SDC variables
+    // TODO: %qitem, etc.
+    // http://hl7.org/fhir/uv/sdc/2019May/expressions.html#fhirpath-and-questionnaire
+    // http://build.fhir.org/ig/HL7/sdc/expressions.html#fhirpath
+    _enableWhenExpression = (enableWhenExtensionExpression != null)
+        ? FhirExpressionEvaluator.fromExpression(
+            () => questionnaireResponseModel.questionnaireResponse,
+            enableWhenExtensionExpression,
+            [
+              ...questionnaireResponseModel
+                  .questionnaireLevelExpressionEvaluators,
+            ],
+          )
+        : null;
+  }
 
   QuestionnaireItem get questionnaireItem =>
       questionnaireItemModel.questionnaireItem;
@@ -75,29 +99,18 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
   /// Updates the current enablement status of this item, based on enabledWhenExpression.
   ///
   /// Sets the [isEnabled] property
-  void _updateEnabledByEnableWhenExpression() {
+  Future<void> _updateEnabledByEnableWhenExpression() async {
     _fimLogger.trace('Enter _updateEnabledByEnableWhenExpression()');
 
-    final fhirPathExpression = questionnaireItem.extension_
-        ?.extensionOrNull(
-          'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression',
-        )
-        ?.valueExpression
-        ?.expression;
+    final enableWhenExpression =
+        ArgumentError.checkNotNull(_enableWhenExpression);
 
-    if (fhirPathExpression == null) {
-      throw QuestionnaireFormatException(
-        'enableWhenExpression missing expression',
-        questionnaireItem,
-      );
-    }
-
-    final fhirPathResult = evaluateFhirPathExpression(fhirPathExpression);
+    final fhirPathResult = await enableWhenExpression.fetchValue();
 
     // Evaluate result
     if (!isFhirPathResultTrue(
       fhirPathResult,
-      fhirPathExpression,
+      enableWhenExpression,
       unknownValue: false,
     )) {
       _disableWithChildren();
@@ -141,7 +154,7 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
         );
       }
 
-      enableWhenTrigger.increaseAllConditionCount();
+      enableWhenTrigger.incrementAllConditionCount();
       switch (qew.operator_) {
         case QuestionnaireEnableWhenOperator.exists:
           _evaluateExistsOperator(qew, enableWhenTrigger);
@@ -264,67 +277,27 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
 
   bool get isNotEnabled => !_isEnabled;
 
-  /// Returns the evaluation result of a FHIRPath expression
-  List<dynamic> evaluateFhirPathExpression(
-    String fhirPathExpression, {
-    bool requiresQuestionnaireResponse = true,
-  }) {
-    final responseResource = requiresQuestionnaireResponse
-        ? questionnaireResponseModel.questionnaireResponse
-        : null;
-
-    // FIXME: Launch context should be questionnaire-level upstream expressions
-
-    // Variables for launch context
-    final launchContextVariables = <String, dynamic>{};
-    if (questionnaireResponseModel.launchContext.patient != null) {
-      launchContextVariables.addEntries(
-        [
-          MapEntry<String, dynamic>(
-            '%patient',
-            questionnaireResponseModel.launchContext.patient?.toJson(),
-          ),
-        ],
-      );
-    }
-
-    // Calculated variables
-
-    // FIXME: Add item-level variables
-
-    // SDC variables
-    // TODO: %qitem, etc.
-    // http://hl7.org/fhir/uv/sdc/2019May/expressions.html#fhirpath-and-questionnaire
-    // http://build.fhir.org/ig/HL7/sdc/expressions.html#fhirpath
-
-    // FIXME: This should all be upstreams.
-    final evaluationVariables = launchContextVariables;
-
-    final fhirPathResult = r4WalkFhirPath(
-      responseResource,
-      fhirPathExpression,
-      evaluationVariables,
-    );
-
-    _fimLogger.debug(
-      'evaluateFhirPathExpression on $nodeUid: $fhirPathExpression = $fhirPathResult',
-    );
-
-    return fhirPathResult;
-  }
-
+  // FIXME: Move to evaluators
   bool isFhirPathResultTrue(
-    List<dynamic> fhirPathResult,
-    String fhirPathExpression, {
+    dynamic fhirPathResult,
+    ExpressionEvaluator expressionEvaluator, {
     required bool unknownValue,
   }) {
     // Proper behavior is undefined: http://jira.hl7.org/browse/FHIR-33295
     // Using singleton collection evaluation: https://hl7.org/fhirpath/#singleton-evaluation-of-collections
+    if (fhirPathResult == null) {
+      return unknownValue;
+    }
+
+    if (fhirPathResult is! List) {
+      throw ArgumentError('Expected List', 'fhirPathResult');
+    }
+
     if (fhirPathResult.isEmpty) {
       return unknownValue;
     } else if (fhirPathResult.first is! bool) {
       _fimLogger.warn(
-        'Questionnaire design issue: "$fhirPathExpression" at $nodeUid results in $fhirPathResult. Expected a bool.',
+        'Questionnaire design issue: "$expressionEvaluator" at $nodeUid results in $fhirPathResult. Expected a bool.',
       );
 
       return fhirPathResult.first != null;
@@ -339,7 +312,7 @@ class _EnableWhenTrigger {
   bool _anyTriggered = false;
   int _allTriggered = 0;
 
-  void increaseAllConditionCount() {
+  void incrementAllConditionCount() {
     _allCount++;
   }
 
