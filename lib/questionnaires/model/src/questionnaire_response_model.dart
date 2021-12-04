@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:collection/collection.dart';
+import 'package:faiadashu/questionnaires/model/expression/src/fhir_expression_evaluator.dart';
 import 'package:fhir/r4/r4.dart';
 import 'package:flutter/foundation.dart';
 
@@ -27,16 +28,16 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
   final _answerModels = <String, AnswerModel>{};
 
-  // TODO: Clarify item level variables vs. questionnaire level.
-
   // Questionnaire-level variables
-  List<VariableModel>? _variables;
+  late final Iterable<FhirExpressionEvaluator> _variables;
 
-  bool get hasVariables => (_variables != null) && _variables!.isNotEmpty;
+  /// Questionnaire-level variables
+  Iterable<FhirExpressionEvaluator> get questionnaireLevelVariables =>
+      _variables;
 
-  List<VariableModel>? get variables => _variables;
-
-  List<VariableModel>? get questionnaireLevelVariables => _variables;
+  late final Iterable<ExpressionEvaluator> _launchContextExpressions;
+  Iterable<ExpressionEvaluator> get launchContextExpressions =>
+      _launchContextExpressions;
 
   bool _enableWhenExpressionsActivated = false;
 
@@ -49,8 +50,38 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     required this.launchContext,
     required List<Aggregator>? aggregators,
   }) : _aggregators = aggregators {
-    _variables =
-        VariableModel.variables(questionnaireModel.questionnaire, null);
+    _launchContextExpressions = [
+      ResourceExpressionEvaluator('patient', () => launchContext.patient, []),
+    ];
+
+    final variableExtensions = questionnaireModel.questionnaire.extension_
+        ?.where((ext) => ext.url == variableExtensionUrl);
+
+    if (variableExtensions != null) {
+      final resource = questionnaireModel.questionnaire;
+      final qLevelVars = <FhirExpressionEvaluator>[];
+      for (final variableExtension in variableExtensions) {
+        final variableExpression = variableExtension.valueExpression;
+        if (variableExpression == null) {
+          throw QuestionnaireFormatException(
+            'Variable without expression.',
+            resource,
+          );
+        }
+
+        final variable = FhirExpressionEvaluator.fromExpression(
+          () => questionnaireResponse,
+          variableExpression,
+          [...launchContextExpressions, ...qLevelVars],
+        );
+
+        qLevelVars.add(variable);
+      }
+
+      _variables = qLevelVars;
+    } else {
+      _variables = [];
+    }
   }
 
   /// Create the model for a [QuestionnaireResponse].
@@ -120,8 +151,10 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
     // Populate initial values if response == null
     if (response == null) {
-      questionnaireResponseModel.orderedQuestionItemModels().forEach((qim) {
-        qim.populateInitialValue();
+      questionnaireResponseModel
+          .orderedQuestionItemModels()
+          .forEach((qim) async {
+        await qim.populateInitialValue();
       });
     } else {
       questionnaireResponseModel.populate(response);
@@ -137,13 +170,6 @@ class QuestionnaireResponseModel extends ChangeNotifier {
           aggregator.aggregate(notifyListeners: true);
         }
       }
-    }
-
-    // Set up updates for values of questionnaire-level variables
-    if (questionnaireResponseModel.hasVariables) {
-      questionnaireResponseModel._updateVariables();
-      questionnaireResponseModel
-          .addListener(questionnaireResponseModel._updateVariables);
     }
 
     // Set up calculatedExpressions on items
@@ -337,12 +363,6 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     nextGeneration();
   }
 
-  void _updateVariables() {
-    _variables?.forEach((variableModel) {
-      variableModel.updateValue(questionnaireResponse);
-    });
-  }
-
   void _populateItems(
     ResponseNode? parentNode,
     Iterable<ResponseItemModel> responseItemModels,
@@ -473,12 +493,12 @@ class QuestionnaireResponseModel extends ChangeNotifier {
         questionnaireResponse.status ?? QuestionnaireResponseStatus.in_progress;
   }
 
-  void _updateCalculations() {
+  Future<void> _updateCalculations() async {
     orderedResponseItemModels()
         .where((rim) => rim.questionnaireItemModel.isCalculatedExpression)
-        .forEach((rim) {
+        .forEach((rim) async {
       if (rim is QuestionItemModel) {
-        rim.updateCalculatedExpression();
+        await rim.updateCalculatedExpression();
       }
     });
   }
@@ -556,7 +576,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     if (hasEnabledWhenExpressions) {
       // When enableWhenExpression is involved we need to add listeners to every
       // non-static item (or the overall response model), as we have no way to
-      // find out which items are referenced by the FHIR Path expression.
+      // find out which items are referenced by the FHIRPath expression.
       if (!_enableWhenExpressionsActivated) {
         addListener(() => updateEnabledItems());
         _enableWhenExpressionsActivated = true;

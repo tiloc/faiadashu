@@ -1,10 +1,7 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 import '../../../resource_provider/resource_provider.dart';
 import '../../questionnaires.dart';
-import '../view.dart';
 
 /// A page, incl. a [Scaffold], that presents a questionnaire in the style of a wizard.
 ///

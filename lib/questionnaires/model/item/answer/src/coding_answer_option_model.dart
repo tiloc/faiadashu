@@ -169,8 +169,10 @@ class CodingAnswerOptionModel {
         final plainText =
             _createMultiColumn(coding, locale, questionnaireItemModel);
         forDisplay = _createForDisplay(coding, locale, questionnaireItemModel);
-        optionText = RenderingString.fromText(plainText,
-            mediaAttachment: mediaAttachment);
+        optionText = RenderingString.fromText(
+          plainText,
+          mediaAttachment: mediaAttachment,
+        );
       }
     } else {
       // The spec only allows valueCoding, but valueString occurs in the real world

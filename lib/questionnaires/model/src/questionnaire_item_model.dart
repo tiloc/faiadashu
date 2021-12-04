@@ -154,14 +154,13 @@ class QuestionnaireItemModel with Diagnosticable {
   static const String calculatedExpressionExtensionUrl =
       'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression';
 
-  String? get calculatedExpression {
+  Expression? get calculatedExpression {
     return questionnaireItem.extension_
         ?.firstWhereOrNull(
           (ext) =>
               ext.url?.value.toString() == calculatedExpressionExtensionUrl,
         )
-        ?.valueExpression
-        ?.expression;
+        ?.valueExpression;
   }
 
   /// Is the value of this item calculated by an expression?

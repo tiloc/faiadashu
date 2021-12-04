@@ -17,8 +17,6 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
   final QuestionnaireResponseModel questionnaireResponseModel;
   final QuestionnaireItemModel questionnaireItemModel;
 
-  List<VariableModel>? _variables;
-
   bool _enableWhenActivated = false;
 
   @override
@@ -266,8 +264,6 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
 
   bool get isNotEnabled => !_isEnabled;
 
-  bool get hasVariables => (_variables != null) && _variables!.isNotEmpty;
-
   /// Returns the evaluation result of a FHIRPath expression
   List<dynamic> evaluateFhirPathExpression(
     String fhirPathExpression, {
@@ -276,6 +272,8 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
     final responseResource = requiresQuestionnaireResponse
         ? questionnaireResponseModel.questionnaireResponse
         : null;
+
+    // FIXME: Launch context should be questionnaire-level upstream expressions
 
     // Variables for launch context
     final launchContextVariables = <String, dynamic>{};
@@ -292,27 +290,15 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
 
     // Calculated variables
 
-    // Questionnaire-level variables
-    final calculatedVariables = questionnaireResponseModel.hasVariables
-        ? Map.fromEntries(
-            questionnaireResponseModel.variables!
-                .map<MapEntry<String, dynamic>>(
-              (variable) => MapEntry('%${variable.name}', variable.value),
-            ),
-          )
-        : null;
-
-    // TODO: Add item-level variables
+    // FIXME: Add item-level variables
 
     // SDC variables
     // TODO: %qitem, etc.
     // http://hl7.org/fhir/uv/sdc/2019May/expressions.html#fhirpath-and-questionnaire
     // http://build.fhir.org/ig/HL7/sdc/expressions.html#fhirpath
 
+    // FIXME: This should all be upstreams.
     final evaluationVariables = launchContextVariables;
-    if (calculatedVariables != null) {
-      evaluationVariables.addAll(calculatedVariables);
-    }
 
     final fhirPathResult = r4WalkFhirPath(
       responseResource,

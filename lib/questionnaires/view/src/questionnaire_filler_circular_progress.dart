@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:faiadashu/questionnaires/model/model.dart';
 import 'package:faiadashu/questionnaires/view/src/questionnaire_filler.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
 
 /// A circular progress indicator for the filling of a [QuestionnaireModel]
 class QuestionnaireFillerCircularProgress extends StatefulWidget {

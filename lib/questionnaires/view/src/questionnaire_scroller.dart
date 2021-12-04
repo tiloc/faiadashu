@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:fhir/r4.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 

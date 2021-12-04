@@ -1,3 +1,4 @@
+import 'package:faiadashu/questionnaires/model/expression/src/fhir_expression_evaluator.dart';
 import 'package:fhir/r4.dart';
 
 import '../../../../coding/coding.dart';
@@ -9,7 +10,7 @@ import '../../../questionnaires.dart';
 ///
 /// A single response might reference multiple answers.
 class QuestionItemModel extends ResponseItemModel {
-  static final _qrimLogger = Logger(QuestionItemModel);
+  static final _qimLogger = Logger(QuestionItemModel);
 
   Code? _dataAbsentReason;
 
@@ -25,6 +26,8 @@ class QuestionItemModel extends ResponseItemModel {
     }
   }
 
+  late final FhirExpressionEvaluator? _calculatedExpression;
+
   QuestionItemModel(
     ResponseNode? parentNode,
     QuestionnaireResponseModel questionnaireResponseModel,
@@ -33,7 +36,20 @@ class QuestionItemModel extends ResponseItemModel {
           parentNode,
           questionnaireResponseModel,
           itemModel,
-        );
+        ) {
+    final calculatedExpression = questionnaireItemModel.calculatedExpression;
+    // FIXME: Determine all upstream inputs.
+    _calculatedExpression = (calculatedExpression != null)
+        ? FhirExpressionEvaluator.fromExpression(
+            () => questionnaireResponseModel.questionnaireResponse,
+            calculatedExpression,
+            [
+              ...questionnaireResponseModel.launchContextExpressions,
+              ...questionnaireResponseModel.questionnaireLevelVariables,
+            ],
+          )
+        : null;
+  }
 
   void populate(QuestionnaireResponseItem? responseItem) {
     dataAbsentReason = responseItem?.extension_?.dataAbsentReason;
@@ -83,7 +99,7 @@ class QuestionItemModel extends ResponseItemModel {
   /// This is currently entirely based on the [dataAbsentReason].
   @override
   bool get isInvalid {
-    _qrimLogger.trace('isInvalid $nodeUid');
+    _qimLogger.trace('isInvalid $nodeUid');
 
     return dataAbsentReason == dataAbsentReasonAsTextCode;
   }
@@ -151,7 +167,7 @@ class QuestionItemModel extends ResponseItemModel {
 
   @override
   bool get isAnswered {
-    _qrimLogger.trace('isAnswered $nodeUid');
+    _qimLogger.trace('isAnswered $nodeUid');
     if (!isAnswerable) {
       return false;
     }
@@ -166,7 +182,7 @@ class QuestionItemModel extends ResponseItemModel {
     }
 
     final returnValue = answerModels.every((am) => am.isUnanswered);
-    _qrimLogger.debug('isUnanswered $nodeUid: $returnValue');
+    _qimLogger.debug('isUnanswered $nodeUid: $returnValue');
 
     return returnValue;
   }
@@ -259,10 +275,10 @@ class QuestionItemModel extends ResponseItemModel {
   /// Does nothing if initial value is not specified.
   ///
   /// Currently only supports 'initialExpression'.
-  void populateInitialValue() {
-    _qrimLogger.debug('populateInitialValue: $nodeUid');
+  Future<void> populateInitialValue() async {
+    _qimLogger.debug('populateInitialValue: $nodeUid');
     if (questionnaireItemModel.hasInitialExpression) {
-      final initialEvaluationResult = evaluateInitialExpression();
+      final initialEvaluationResult = await evaluateInitialExpression();
       firstAnswerModel.populateFromExpression(initialEvaluationResult);
     } else {
       // initial.value[x]
@@ -274,43 +290,47 @@ class QuestionItemModel extends ResponseItemModel {
   ///
   /// Returns null if the item does not have an initialExpression,
   /// or it evaluates to an empty list.
-  dynamic evaluateInitialExpression() {
+  Future<dynamic> evaluateInitialExpression() async {
     final fhirPathExpression =
         questionnaireItemModel.questionnaireItem.extension_
             ?.extensionOrNull(
               'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression',
             )
-            ?.valueExpression
-            ?.expression;
+            ?.valueExpression;
 
     if (fhirPathExpression == null) {
-      return null;
+      return Future.value(null);
     }
 
-    final evaluationResult = evaluateFhirPathExpression(
+    final initialExpressionEvaluator = FhirExpressionEvaluator.fromExpression(
+      null,
       fhirPathExpression,
-      requiresQuestionnaireResponse: false,
+      questionnaireResponseModel.launchContextExpressions,
     );
 
-    if (evaluationResult.isEmpty) {
-      return null;
+    final evaluationResult = await initialExpressionEvaluator.fetchValue();
+
+    if (evaluationResult is! List || evaluationResult.isEmpty) {
+      return Future.value(null);
     }
 
-    return evaluationResult.first;
+    return Future.value(evaluationResult.first);
   }
 
-  void updateCalculatedExpression() {
-    final fhirPathExpression = questionnaireItemModel.calculatedExpression;
-    if (fhirPathExpression == null) {
+  Future<void> updateCalculatedExpression() async {
+    final calculatedExpression = _calculatedExpression;
+    if (calculatedExpression == null) {
       return;
     }
 
-    final rawEvaluationResult = evaluateFhirPathExpression(
-      fhirPathExpression,
-    );
+    final rawEvaluationResult = await calculatedExpression.fetchValue();
+
+    _qimLogger.debug('calculatedExpression: $rawEvaluationResult');
 
     final evaluationResult =
-        (rawEvaluationResult.isNotEmpty) ? rawEvaluationResult.first : null;
+        (rawEvaluationResult is List && rawEvaluationResult.isNotEmpty)
+            ? rawEvaluationResult.first
+            : null;
 
     // TODO: should this be able to populate multiple answers?
     // Write the value back to the answer model

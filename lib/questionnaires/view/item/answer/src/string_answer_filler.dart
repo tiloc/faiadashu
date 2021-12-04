@@ -2,7 +2,6 @@ import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../questionnaires.dart';
-import 'questionnaire_answer_filler.dart';
 
 class StringAnswerFiller extends QuestionnaireAnswerFiller {
   StringAnswerFiller(
