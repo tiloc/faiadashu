@@ -21,12 +21,12 @@ issue_tracker: https://github.com/tiloc/faiadashu/issues
 
 environment:
   sdk: '>=2.14.0 <3.0.0'
-  flutter: '>=2.5.0'
+  flutter: '>=2.5.3'
 
 dependencies:
   collection: ^1.15.0
-  fhir: ^0.5.0-9
-  fhir_path: ^0.5.0-14
+  fhir: ^0.5.0-10
+  fhir_path: ^0.5.0-16
 #  fhir_path:
 #    path: /Users/tilo/Projects/fhir/fhir_path
 #  fhir:
@@ -37,6 +37,7 @@ dependencies:
     sdk: flutter
   intl: ^0.17.0
   logging: ^1.0.2
+  markdown: ^4.0.1
   meta: ^1.7.0
   scrollable_positioned_list: ^0.2.3
   simple_html_css: ^3.0.1

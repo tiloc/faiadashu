@@ -14,9 +14,9 @@ class BooleanAnswerModel extends AnswerModel<Boolean, Boolean> {
           : null;
 
   @override
-  XhtmlString get display => (value == null)
-      ? XhtmlString.nullText
-      : XhtmlString.fromText(
+  RenderingString get display => (value == null)
+      ? RenderingString.nullText
+      : RenderingString.fromText(
           (value == Boolean(true)) ? '[X]' : '[ ]',
           xhtmlText: (value == Boolean(true))
               ? '<b>[X]</b>'

@@ -1,14 +1,16 @@
 import 'dart:convert';
 
-import 'package:fhir/r4/basic_types/fhir_extension.dart';
-import 'package:fhir/r4/general_types/general_types.dart';
+import 'package:fhir/r4.dart';
 import 'package:flutter/foundation.dart';
+import 'package:markdown/markdown.dart';
 
 import '../../../fhir_types/fhir_types.dart';
 
 /// Representation of a Fhir string which is plain text with optional
 /// information regarding styled rendering.
-class XhtmlString with Diagnosticable {
+///
+/// See: http://hl7.org/fhir/R4/rendering-extensions.html
+class RenderingString with Diagnosticable {
   /// The plain, unstyled text. Suitable as a semantic label.
   final String plainText;
 
@@ -29,12 +31,15 @@ class XhtmlString with Diagnosticable {
   /// The unaltered rendering-xhtml extension
   final String? renderingXhtml;
 
+  /// The unaltered rendering-markdown extension
+  final Markdown? renderingMarkdown;
+
   /// A media attachment associated with this text
   final Attachment? mediaAttachment;
 
   bool get hasMedia => mediaAttachment != null;
 
-  /// For [XhtmlString]s without media attachment: same as [xhtmlText].
+  /// For [RenderingString]s without media attachment: same as [xhtmlText].
   ///
   /// With media attachment:
   /// Will place image media into an <img> tag as base64 encoded binary.
@@ -54,20 +59,21 @@ class XhtmlString with Diagnosticable {
             : xhtmlText;
   }
 
-  /// Construct an [XhtmlString] from the provided attributes.
+  /// Construct an [RenderingString] from the provided attributes.
   ///
   /// No alterations of the attributes will take place, in particular,
   /// [xhtmlText] will not be calculated or escaped.
-  const XhtmlString._(
+  const RenderingString._(
     this.plainText,
     this.xhtmlText,
     this.isPlain, {
     this.renderingStyle,
     this.renderingXhtml,
+    this.renderingMarkdown,
     this.mediaAttachment,
   });
 
-  /// Construct an [XhtmlString] from plainText and optional extensions.
+  /// Construct an [RenderingString] from plainText and optional extensions.
   ///
   /// The XHTML representation can be either explicitly provided, or will be
   /// generated from plainText and the provided extensions.
@@ -78,7 +84,7 @@ class XhtmlString with Diagnosticable {
   /// -----------
   /// * rendering-style
   /// * rendering-xhtml
-  factory XhtmlString.fromText(
+  factory RenderingString.fromText(
     String plainText, {
     List<FhirExtension>? extensions,
     String? xhtmlText,
@@ -96,6 +102,12 @@ class XhtmlString with Diagnosticable {
         )
         ?.valueString;
 
+    final renderingMarkdown = extensions
+        ?.extensionOrNull(
+          'http://hl7.org/fhir/StructureDefinition/rendering-markdown',
+        )
+        ?.valueMarkdown;
+
     final escapedPlainText = _htmlEscape.convert(plainText);
 
     final outputXhtmlText = (xhtmlText != null)
@@ -104,23 +116,32 @@ class XhtmlString with Diagnosticable {
             ? ((renderingStyle != null)
                 ? '<span style="$renderingStyle">$renderingXhtml</span>'
                 : renderingXhtml)
-            : (renderingStyle != null)
-                ? '<span style="$renderingStyle">$escapedPlainText</span>'
-                : plainText;
+            : (renderingMarkdown != null)
+                ? markdownToHtml(
+                    renderingMarkdown.value ?? '',
+                    extensionSet: ExtensionSet.gitHubFlavored,
+                  )
+                : (renderingStyle != null)
+                    ? '<span style="$renderingStyle">$escapedPlainText</span>'
+                    : plainText;
 
-    return XhtmlString._(
+    return RenderingString._(
       plainText,
       outputXhtmlText,
-      xhtmlText == null && renderingStyle == null && renderingXhtml == null,
+      xhtmlText == null &&
+          renderingStyle == null &&
+          renderingXhtml == null &&
+          renderingMarkdown == null,
       renderingStyle: renderingStyle,
       renderingXhtml: renderingXhtml,
+      renderingMarkdown: renderingMarkdown,
       mediaAttachment: mediaAttachment,
     );
   }
 
   static const _htmlEscape = HtmlEscape();
 
-  static const nullText = XhtmlString._('——', '&mdash;&mdash;', false);
+  static const nullText = RenderingString._('——', '&mdash;&mdash;', false);
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -137,16 +158,16 @@ class XhtmlString with Diagnosticable {
   }
 }
 
-extension FDashXhtmlIterableExtension on Iterable<XhtmlString> {
+extension FDashXhtmlIterableExtension on Iterable<RenderingString> {
   /// Concatenate Xhtml strings.
   ///
   /// * For an empty list: Returns the given empty string.
   /// * For a list with a single element: Returns the original.
   /// * For a list with multiple elements: Combines plain texts and XHTML texts with separator. Discards the extensions.
-  XhtmlString concatenateXhtml(
+  RenderingString concatenateXhtml(
     String plainSeparator, [
     String? xhtmlSeparator,
-    XhtmlString emptyString = XhtmlString.nullText,
+    RenderingString emptyString = RenderingString.nullText,
   ]) {
     if (isEmpty) {
       return emptyString;
@@ -164,7 +185,7 @@ extension FDashXhtmlIterableExtension on Iterable<XhtmlString> {
     final isPlainList =
         fold<bool>(true, (prev, element) => prev && element.isPlain);
 
-    return XhtmlString._(
+    return RenderingString._(
       plainTextList.join(plainSeparator),
       xhtmlTextList.join(xhtmlSeparator ?? plainSeparator),
       isPlainList,

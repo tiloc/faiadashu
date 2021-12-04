@@ -162,7 +162,7 @@ class _QuestionnaireItemFillerHelpState
           title: const Text('Help'),
           content: Xhtml.fromXhtmlString(
             context,
-            questionnaireItemModel.text ?? XhtmlString.nullText,
+            questionnaireItemModel.text ?? RenderingString.nullText,
             defaultTextStyle: Theme.of(context).textTheme.bodyText1,
           ),
           actions: <Widget>[

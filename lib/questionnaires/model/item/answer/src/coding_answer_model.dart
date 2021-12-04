@@ -130,7 +130,7 @@ class CodingAnswerModel extends AnswerModel<Set<String>, Set<String>> {
 
   bool get isCheckbox => qi.isItemControl('check-box');
 
-  XhtmlString get openLabel => XhtmlString.fromText(
+  RenderingString get openLabel => RenderingString.fromText(
         qi.extension_
                 ?.extensionOrNull(
                   'http://hl7.org/fhir/uv/sdc/StructureDefinition/questionnaire-sdc-openLabel',
@@ -218,16 +218,16 @@ class CodingAnswerModel extends AnswerModel<Set<String>, Set<String>> {
   }
 
   @override
-  XhtmlString get display {
+  RenderingString get display {
     final value = this.value;
     if (value == null || value.isEmpty) {
-      return XhtmlString.nullText;
+      return RenderingString.nullText;
     }
 
-    final xhtmlStrings = value.map<XhtmlString>((uid) {
+    final xhtmlStrings = value.map<RenderingString>((uid) {
       return uid != CodingAnswerOptionModel.openChoiceCode
           ? answerOptionByUid(uid).optionText
-          : XhtmlString.fromText(openText ?? AnswerModel.nullText);
+          : RenderingString.fromText(openText ?? AnswerModel.nullText);
     });
 
     // TODO: Localized or themed separator character?

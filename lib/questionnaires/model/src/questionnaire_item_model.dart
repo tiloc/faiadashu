@@ -268,11 +268,11 @@ class QuestionnaireItemModel with Diagnosticable {
   }
 
   /// The name of a section, the text of a question or text content for a display item.
-  XhtmlString? get text {
+  RenderingString? get text {
     final plainText = questionnaireItem.text;
 
     return (plainText != null)
-        ? XhtmlString.fromText(
+        ? RenderingString.fromText(
             plainText,
             extensions: questionnaireItem.textElement?.extension_,
           )
@@ -280,11 +280,11 @@ class QuestionnaireItemModel with Diagnosticable {
   }
 
   /// A short label for a particular group, question or set of display text within the questionnaire used for reference by the individual completing the questionnaire.
-  XhtmlString? get prefix {
+  RenderingString? get prefix {
     final plainPrefix = questionnaireItem.prefix;
 
     return (plainPrefix != null)
-        ? XhtmlString.fromText(
+        ? RenderingString.fromText(
             plainPrefix,
             extensions: questionnaireItem.prefixElement?.extension_,
           )

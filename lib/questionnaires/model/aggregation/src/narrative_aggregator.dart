@@ -80,7 +80,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
   bool _addQuestionItemToDiv(
     StringBuffer div,
     QuestionItemModel itemModel,
-    XhtmlString? itemText,
+    RenderingString? itemText,
   ) {
     final usageMode = itemModel.questionnaireItemModel.usageMode;
     if ((usageMode == usageModeDisplayNonEmptyCode ||

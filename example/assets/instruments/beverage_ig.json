@@ -200,6 +200,14 @@
           "linkId": "lower-pain",
           "type": "display",
           "text": "Mild",
+          "_text" : {
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/StructureDefinition/rendering-markdown",
+                "valueMarkdown": "Not _too_ bad..."
+              }
+            ]
+          },
           "extension": [
             {
               "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",

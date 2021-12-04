@@ -24,7 +24,8 @@ class Xhtml extends StatelessWidget {
     TextStyle? defaultTextStyle,
     Key? key,
   }) {
-    final xhtmlString = XhtmlString.fromText(plainText, extensions: extensions);
+    final xhtmlString =
+        RenderingString.fromText(plainText, extensions: extensions);
 
     return Xhtml.fromXhtmlString(
       context,
@@ -39,7 +40,7 @@ class Xhtml extends StatelessWidget {
 
   factory Xhtml.fromXhtmlString(
     BuildContext context,
-    XhtmlString xhtmlString, {
+    RenderingString xhtmlString, {
     QuestionnaireModel? questionnaireModel,
     double? imageWidth,
     double? imageHeight,

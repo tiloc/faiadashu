@@ -20,11 +20,11 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
   late final double? _sliderStepValue;
   late final int? _sliderDivisions;
 
-  XhtmlString? _upperSliderLabel;
-  XhtmlString? _lowerSliderLabel;
+  RenderingString? _upperSliderLabel;
+  RenderingString? _lowerSliderLabel;
 
-  XhtmlString? get upperSliderLabel => _upperSliderLabel;
-  XhtmlString? get lowerSliderLabel => _lowerSliderLabel;
+  RenderingString? get upperSliderLabel => _upperSliderLabel;
+  RenderingString? get lowerSliderLabel => _lowerSliderLabel;
 
   int? get sliderDivisions => _sliderDivisions;
   double? get sliderStepValue => _sliderStepValue;
@@ -166,11 +166,11 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
   }
 
   @override
-  XhtmlString get display => (value != null)
-      ? XhtmlString.fromText(
+  RenderingString get display => (value != null)
+      ? RenderingString.fromText(
           value!.format(locale, defaultText: AnswerModel.nullText),
         )
-      : XhtmlString.nullText;
+      : RenderingString.nullText;
 
   @override
   String? validateInput(String? inputValue) {

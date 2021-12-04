@@ -79,11 +79,11 @@ class QuestionnaireModel {
     return questionnaireModel;
   }
 
-  XhtmlString? get title {
+  RenderingString? get title {
     final plainTitle = questionnaire.title;
 
     return (plainTitle != null)
-        ? XhtmlString.fromText(
+        ? RenderingString.fromText(
             plainTitle,
             extensions: questionnaire.titleElement?.extension_,
           )

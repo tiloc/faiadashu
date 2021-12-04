@@ -29,7 +29,7 @@ class QuestionResponseItemFillerState
 
   late final FocusNode _skipSwitchFocusNode;
 
-  late final XhtmlString? _promptText;
+  late final RenderingString? _promptText;
 
   QuestionResponseItemFillerState();
 

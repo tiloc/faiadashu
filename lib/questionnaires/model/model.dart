@@ -8,5 +8,5 @@ export 'src/questionnaire_item_model.dart';
 export 'src/questionnaire_model.dart';
 export 'src/questionnaire_model_defaults.dart';
 export 'src/questionnaire_response_model.dart';
+export 'src/rendering_string.dart';
 export 'src/variable_model.dart';
-export 'src/xhtml_string.dart';

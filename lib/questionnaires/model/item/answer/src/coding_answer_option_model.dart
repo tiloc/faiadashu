@@ -15,7 +15,7 @@ class CodingAnswerOptionModel {
   final Coding? coding;
 
   /// The styled text representation of the option during user-interaction.
-  final XhtmlString optionText;
+  final RenderingString optionText;
 
   /// The text representation that should fill the `display` field of the [Coding]
   /// during FHIR response creation. Can differ from [plainText] when the
@@ -27,7 +27,7 @@ class CodingAnswerOptionModel {
   bool get hasMedia => mediaAttachment != null;
 
   final Decimal? fhirOrdinalValue;
-  final XhtmlString? optionPrefix;
+  final RenderingString? optionPrefix;
   final bool isExclusive;
 
   bool matches(String? otherCode) {
@@ -49,7 +49,7 @@ class CodingAnswerOptionModel {
 
   factory CodingAnswerOptionModel.fromOpenChoice(
     QuestionnaireItemModel questionnaireItemModel,
-    XhtmlString openLabel,
+    RenderingString openLabel,
   ) {
     return CodingAnswerOptionModel._(
       uid: openChoiceCode,
@@ -74,7 +74,7 @@ class CodingAnswerOptionModel {
         ?.valueString;
 
     final optionPrefix = (plainOptionPrefix != null)
-        ? XhtmlString.fromText(plainOptionPrefix)
+        ? RenderingString.fromText(plainOptionPrefix)
         : null;
 
     final ordinalValue = extensions
@@ -83,13 +83,13 @@ class CodingAnswerOptionModel {
         )
         ?.valueDecimal;
 
-    XhtmlString optionText;
+    RenderingString optionText;
     String forDisplay;
 
     final choiceColumns = _findChoiceColumns(questionnaireItemModel);
     if (choiceColumns == null) {
       final plainText = coding.localizedDisplay(locale);
-      optionText = XhtmlString.fromText(
+      optionText = RenderingString.fromText(
         plainText,
         extensions: coding.displayElement?.extension_,
       );
@@ -97,7 +97,7 @@ class CodingAnswerOptionModel {
     } else {
       final plainText =
           _createMultiColumn(coding, locale, questionnaireItemModel);
-      optionText = XhtmlString.fromText(plainText);
+      optionText = RenderingString.fromText(plainText);
       forDisplay = _createForDisplay(coding, locale, questionnaireItemModel);
     }
 
@@ -148,10 +148,10 @@ class CodingAnswerOptionModel {
         ?.valueString;
 
     final optionPrefix = (plainOptionPrefix != null)
-        ? XhtmlString.fromText(plainOptionPrefix)
+        ? RenderingString.fromText(plainOptionPrefix)
         : null;
 
-    XhtmlString optionText;
+    RenderingString optionText;
     String forDisplay;
 
     if (coding != null) {
@@ -160,7 +160,7 @@ class CodingAnswerOptionModel {
         final plainText = coding.localizedDisplay(locale);
         final xhtmlExtensions = coding.displayElement?.extension_;
         forDisplay = plainText;
-        optionText = XhtmlString.fromText(
+        optionText = RenderingString.fromText(
           plainText,
           extensions: xhtmlExtensions,
           mediaAttachment: mediaAttachment,
@@ -169,8 +169,8 @@ class CodingAnswerOptionModel {
         final plainText =
             _createMultiColumn(coding, locale, questionnaireItemModel);
         forDisplay = _createForDisplay(coding, locale, questionnaireItemModel);
-        optionText =
-            XhtmlString.fromText(plainText, mediaAttachment: mediaAttachment);
+        optionText = RenderingString.fromText(plainText,
+            mediaAttachment: mediaAttachment);
       }
     } else {
       // The spec only allows valueCoding, but valueString occurs in the real world
@@ -183,7 +183,7 @@ class CodingAnswerOptionModel {
       final plainText = valueString;
       final xhtmlExtensions = qao.valueStringElement?.extension_;
       forDisplay = plainText;
-      optionText = XhtmlString.fromText(
+      optionText = RenderingString.fromText(
         plainText,
         extensions: xhtmlExtensions,
         mediaAttachment: mediaAttachment,

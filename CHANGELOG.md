@@ -10,7 +10,8 @@
 > * only works on Flutter `master` branch, due to bug in Dart
 > * keyboard input to FHIR Path field broken on Mac, due to bugs in macOS Flutter: https://github.com/flutter/flutter/issues/82124
 
-* [Breaking] Introduction of new XhtmlString type to handle items which can have plain and styled text
+* [Breaking] Introduction of new RenderingString type to handle items which can have plain and styled text
+  * Supports plain, XHTML, and Markdown
   * Implemented throughout numerous models and views
   * Side-effect: Narrative can now contain images
 * Support drop-down control for coding answers

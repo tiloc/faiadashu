@@ -40,6 +40,10 @@ Usable in many places (title, text, option) as permitted by the specification.
 
 ![rendering_xhtml](images/rendering_xhtml.png)
 
+#### rendering-markdown
+Support for GitHub Flavored Markdown ("GFM" CommonMark).
+Usable in many places (title, text, option) as permitted by the specification.
+
 #### help
 Display items with itemControl `help` are associated with the proper question and display a help dialog.
 

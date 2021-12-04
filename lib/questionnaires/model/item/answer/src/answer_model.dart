@@ -53,8 +53,8 @@ abstract class AnswerModel<I, V> extends ResponseNode {
 
   /// Returns a human-readable, localized, textual description of the model.
   ///
-  /// Returns [XhtmlString.nullText] if the question is unanswered.
-  XhtmlString get display;
+  /// Returns [RenderingString.nullText] if the question is unanswered.
+  RenderingString get display;
 
   /// Validates a new input value. Does not change the [value].
   ///
