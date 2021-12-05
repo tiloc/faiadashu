@@ -1,30 +1,19 @@
 import 'package:faiadashu/resource_provider/resource_provider.dart'
     show FhirResourceProvider;
 import 'package:fhir/r4.dart';
-import 'package:fhir_at_rest/r4.dart';
 import 'package:fhir_auth/r4.dart';
 
 /// Provide resources from open or secured FHIR servers.
 class RestfulResourceProvider extends FhirResourceProvider {
   late final Resource? resource;
   final String uri;
-  final Uri fhirServer;
   final R4ResourceType resourceType;
   final Id id;
-  FhirClient? client;
+  FhirClient client;
 
-  RestfulResourceProvider.open(
+  RestfulResourceProvider(
     this.uri,
     this.resource,
-    this.fhirServer,
-    this.resourceType,
-    this.id,
-  );
-
-  RestfulResourceProvider.secure(
-    this.uri,
-    this.resource,
-    this.fhirServer,
     this.resourceType,
     this.id,
     this.client,
@@ -37,13 +26,16 @@ class RestfulResourceProvider extends FhirResourceProvider {
 
   @override
   Future<void> init() async {
-    final request =
-        FhirRequest.read(base: fhirServer, type: resourceType, id: id);
-    resource = await request.request(
-      headers: client == null
-          ? {'Content-Type': 'application/fhir+json'}
-          : await client!.authHeaders,
+    await client.initialize(); // Is .initialize() idempotent???
+
+    final request = FhirRequest.read(
+      base: client.fhirUri!.value!,
+      type: resourceType,
+      id: id,
+      fhirClient: client,
     );
+    resource = await request.request();
+
     return;
   }
 

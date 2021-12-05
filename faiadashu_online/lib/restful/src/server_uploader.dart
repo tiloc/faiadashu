@@ -1,20 +1,18 @@
 import 'package:faiadashu/logging/logging.dart';
 import 'package:fhir/r4.dart';
-import 'package:fhir_at_rest/r4.dart';
 import 'package:fhir_auth/r4.dart';
 
 /// Uploads a [QuestionnaireResponse] to a server.
 Future<Id?> uploadQuestionnaireResponse(
-  SmartClient smartClient,
+  FhirClient fhirClient,
   QuestionnaireResponse resource,
 ) async {
   final _logger = Logger.tag('server_uploader');
 
   try {
-    // TODO: Should login be part of the upload? Or should the client already be logged in?
-    if (!smartClient.isLoggedIn) await smartClient.login();
+    await fhirClient.initialize();
   } catch (e) {
-    _logger.warn('Could not authenticate.', error: e);
+    _logger.warn('Could not initialize.', error: e);
     rethrow;
   }
 
@@ -22,13 +20,12 @@ Future<Id?> uploadQuestionnaireResponse(
     '${resource.resourceTypeString()} to be uploaded:\n${resource.toJson()}',
   );
   final request1 = FhirRequest.create(
-    base: smartClient.fhirUrl.value!,
+    base: fhirClient.fhirUri!.value!,
     resource: resource,
   );
 
   try {
-    final response1 =
-        await request1.request(headers: await smartClient.authHeaders);
+    final response1 = await request1.request();
     _logger.debug('Response from upload:\n${response1?.toJson()}');
 
     return response1?.id;

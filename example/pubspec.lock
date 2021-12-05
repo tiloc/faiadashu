@@ -21,7 +21,7 @@ packages:
       name: characters
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.2.0"
+    version: "1.1.0"
   charcode:
     dependency: transitive
     description:
@@ -84,14 +84,14 @@ packages:
       name: fhir_at_rest
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.4.5"
+    version: "0.5.0-11"
   fhir_auth:
     dependency: "direct main"
     description:
       name: fhir_auth
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.4.1"
+    version: "0.5.0-5"
   fhir_path:
     dependency: transitive
     description:
@@ -111,20 +111,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_appauth:
-    dependency: transitive
-    description:
-      name: flutter_appauth
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.1.1"
-  flutter_appauth_platform_interface:
-    dependency: transitive
-    description:
-      name: flutter_appauth_platform_interface
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "3.1.0"
   flutter_localizations:
     dependency: "direct main"
     description: flutter
@@ -137,13 +123,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.2.1"
+  flutter_web_auth:
+    dependency: transitive
+    description:
+      name: flutter_web_auth
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.1"
   flutter_web_plugins:
     dependency: transitive
     description: flutter
     source: sdk
     version: "0.0.0"
   freezed_annotation:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
       name: freezed_annotation
       url: "https://pub.dartlang.org"
@@ -247,13 +240,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.12.11"
-  material_color_utilities:
-    dependency: transitive
-    description:
-      name: material_color_utilities
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.1.2"
   meta:
     dependency: transitive
     description:
@@ -268,6 +254,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.0"
+  oauth2_client:
+    dependency: transitive
+    description:
+      name: oauth2_client
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.3.0"
   path:
     dependency: transitive
     description:
@@ -296,6 +289,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.1+1"
+  random_string:
+    dependency: transitive
+    description:
+      name: random_string
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.3.1"
   scrollable_positioned_list:
     dependency: transitive
     description:
@@ -433,7 +433,7 @@ packages:
       name: vector_math
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.1.1"
+    version: "2.1.0"
   xml:
     dependency: transitive
     description:

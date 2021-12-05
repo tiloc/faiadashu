@@ -10,6 +10,13 @@
 > * only works on Flutter `master` branch, due to bug in Dart
 > * keyboard input to FHIR Path field broken on Mac, due to bugs in macOS Flutter: https://github.com/flutter/flutter/issues/82124
 
+* ### Faiadashu Example / Gallery
+* Added demos of all the new capabilities listed for Faiadashu.
+* Renamed package to `com.legentix.faiagallery`, in order for it to be globally unique (required for some Apple signing stuff)
+* Beginning to rename Example to Gallery. Planning to have a much simpler example at some point. And then Gallery shows off everything.
+* Currently not fully functional because of work on Faiadashu Online
+
+* ### Faiadashu
 * **[Breaking]** Reworked support for FHIRPath expressions
   * Cleanly carved out into new `expression` module
   * Made async in preparation for query expressions
@@ -38,6 +45,10 @@
 * Introduced a presentation model for individual answer options in coding questions.
 
 * Updated dependencies, including [Grey Faulkenberry's](https://github.com/Dokotela) latest and greatest `fhir_path` package.
+
+* ### Faiadashu Online
+* **[Breaking]** Upgrade to latest fhir_auth. Very breaking (or actually currently broken)
+
 
 ## 0.6.0-dev.1
 * **[Breaking]** Fix hierarchy of models according to https://chat.fhir.org/#narrow/stream/179255-questionnaire/topic/Questionnaire.20Response.20example

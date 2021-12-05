@@ -1,5 +1,5 @@
 name: faiadashu_example
-description: Example app for Faiadashu™
+description: Gallery app for Faiadashu™
 
 environment:
   sdk: '>=2.14.0 <3.0.0'
@@ -17,7 +17,7 @@ dependencies:
   fhir: ^0.5.0-10
 #  fhir:
 #    path: /Users/tilo/Projects/fhir/fhir
-  fhir_auth: ^0.4.1
+  fhir_auth: ^0.5.0-5
 
   flutter:
     sdk: flutter
@@ -32,11 +32,6 @@ dependencies:
 
 dev_dependencies:
   lint: ^1.7.2
-
-# Remove this when fhir_auth no longer depends on old fhir
-dependency_overrides:
-  fhir: ^0.5.0-10
-  freezed_annotation: ^1.0.0
 
 flutter:
   uses-material-design: true

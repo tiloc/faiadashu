@@ -1,14 +1,14 @@
 import 'package:faiadashu/l10n/l10n.dart';
 import 'package:faiadashu_online/restful/restful.dart';
-import 'package:fhir_auth/r4/smart_client/smart_client.dart';
+import 'package:fhir_auth/fhir_client/fhir_client.dart';
 import 'package:flutter/material.dart';
 
-/// A login/logout button that is tied to the state of a [SmartClient].
+/// A login/logout button that is tied to the state of a [FhirClient].
 class SmartLoginButton extends StatefulWidget {
-  final SmartClient smartClient;
+  final FhirClient fhirClient;
   final VoidCallback? onLoginChanged;
 
-  const SmartLoginButton(this.smartClient, {this.onLoginChanged, Key? key})
+  const SmartLoginButton(this.fhirClient, {this.onLoginChanged, Key? key})
       : super(key: key);
 
   @override
@@ -27,9 +27,11 @@ class _SmartLoginButtonState extends State<SmartLoginButton> {
   @override
   void initState() {
     super.initState();
-    _loginStatus.value = (widget.smartClient.isLoggedIn)
+    // FIXME: What is the equivalent in latest fhir_auth?
+    _loginStatus.value = LoginStatus.loggedIn;
+/*    _loginStatus.value = (widget.fhirClient.isLoggedIn)
         ? LoginStatus.loggedIn
-        : LoginStatus.loggedOut;
+        : LoginStatus.loggedOut; */
 
     if (widget.onLoginChanged != null) {
       _loginStatus.addListener(widget.onLoginChanged!);
@@ -89,7 +91,8 @@ class _SmartLoginButtonState extends State<SmartLoginButton> {
               _loginStatus.value = LoginStatus.loggingOut;
             });
             _showStatusSnackBar(context);
-            await widget.smartClient.logout();
+            // FIXME: What is the equivalent in latest fhir_auth?
+//            await widget.fhirClient.logout();
             if (!mounted) {
               return;
             }
@@ -111,7 +114,8 @@ class _SmartLoginButtonState extends State<SmartLoginButton> {
             });
             _showStatusSnackBar(context);
             try {
-              await widget.smartClient.login();
+              // FIXME: What is the equivalent in latest fhir_auth?
+//              await widget.fhirClient.login();
               if (!mounted) {
                 return;
               }

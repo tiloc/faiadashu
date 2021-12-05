@@ -1,7 +1,7 @@
-# *Faiadashu™ FHIRDash* — Widgets for Digital Health - Example App
+# *Faiadashu™ FHIRDash* — Widgets for Digital Health - Gallery App
 ## *[(ファイアダッシュ)]*
 
-An example app to show off *Faiadashu™ FHIRDash* — Widgets for Digital Health.
+A gallery app to show off *Faiadashu™ FHIRDash* — Widgets for Digital Health.
 
 **Use the in-app menu to explore the widgets**
 

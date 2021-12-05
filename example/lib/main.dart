@@ -161,14 +161,15 @@ class _HomePageState extends State<HomePage> {
 
   late final SmartClient smartClient;
 
-  // Patient ID matches a patient on Logica Sandbox server.
+  // Patient ID matches a patient on Meld Sandbox server.
   final launchContext = LaunchContext(
     patient: Patient(
-      id: Id('14603'),
+      id: Id('smart-880378'),
       name: [
-        HumanName(given: ['Emma'], family: 'Lee', use: HumanNameUse.official)
+        HumanName(
+            given: ['Amy', 'R'], family: 'Lee', use: HumanNameUse.official)
       ],
-      birthDate: Date('1940-08-12'),
+      birthDate: Date('1999-12-08'),
       gender: PatientGender.female,
     ),
   );
@@ -184,11 +185,11 @@ class _HomePageState extends State<HomePage> {
       valueSetProvider
     ]);
 
-    // Setup a client for access to a Logica sandbox.
-    smartClient = SmartClient(
-      fhirUrl: FhirUri('https://api.logicahealth.org/faiadashu/data'),
-      clientId: '9f03822a-e4ca-4ea6-aaa3-107661bd86a4',
-      redirectUri: FhirUri('com.example.example://callback'),
+    // Setup a client for access to a Meld sandbox.
+    smartClient = SmartClient.getSmartClient(
+      fhirUri: FhirUri('https://gw.interop.community/FaiadashuGallery/data'),
+      clientId: '4564f6f7-335f-43d3-8867-a0f4e6f901d6',
+      redirectUri: FhirUri('com.legentix.faiagallery://callback'),
       scopes: Scopes(
         clinicalScopes: [
           ClinicalScope(
@@ -204,14 +205,15 @@ class _HomePageState extends State<HomePage> {
         ],
         openid: true,
         offlineAccess: true,
-      ),
+      ).scopesList(),
     );
   }
 
   @override
   void dispose() {
     try {
-      unawaited(smartClient.logout());
+// FIXME
+      //      unawaited(smartClient.logout());
     } catch (e) {
       _logger.warn('Could not log out', error: e);
     }
@@ -220,7 +222,8 @@ class _HomePageState extends State<HomePage> {
 
   /// Schedules repaint after login / logout.
   void _onLoginChanged() {
-    _logger.debug('_onLoginChanged: ${smartClient.isLoggedIn}');
+// FIXME
+//    _logger.debug('_onLoginChanged: ${smartClient.isLoggedIn}');
     setState(() {
       // Rebuild
     });
@@ -229,7 +232,9 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final uploadResponseFunction =
-        smartClient.isLoggedIn ? _uploadResponse : null;
+// FIXME
+//        smartClient.isLoggedIn ? _uploadResponse : null;
+        _uploadResponse;
 
     return Scaffold(
       appBar: AppBar(

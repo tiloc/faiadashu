@@ -12,15 +12,15 @@ issue_tracker: https://github.com/tiloc/faiadashu/issues
 
 environment:
   sdk: '>=2.14.0 <3.0.0'
-  flutter: '>=2.5.0'
+  flutter: '>=2.5.3'
 
 dependencies:
   faiadashu:
     path: ..
 
-  fhir: ^0.4.7
-  fhir_at_rest: ^0.4.4
-  fhir_auth: ^0.4.0
+  fhir: ^0.5.0-10
+  fhir_at_rest: ^0.5.0-11
+  fhir_auth: ^0.5.0-5
 
   flutter:
     sdk: flutter
@@ -33,10 +33,6 @@ dev_dependencies:
     sdk: flutter
 
   lint: ^1.7.2
-
-dependency_overrides:
-  fhir: ^0.5.0-9
-  freezed_annotation: ^1.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
