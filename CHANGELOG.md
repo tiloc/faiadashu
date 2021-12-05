@@ -7,7 +7,7 @@
     * live evaluation of FHIR Path expressions
 > _Faiabench_ is pushing Dart and Flutter to the limit.
 > * only works on desktops or landscape tablets, due to screen size requirements
-> * only works on Flutter `master` branch, due to bug in Dart
+> * deployment for web target only works on Flutter `master` branch, due to bug in Dart
 > * keyboard input to FHIR Path field broken on Mac, due to bugs in macOS Flutter: https://github.com/flutter/flutter/issues/82124
 
 * ### Faiadashu Example / Gallery
