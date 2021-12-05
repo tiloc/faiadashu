@@ -336,18 +336,4 @@ class QuestionItemModel extends ResponseItemModel {
     // Write the value back to the answer model
     firstAnswerModel.populateFromExpression(evaluationResult);
   }
-
-  /// Returns an integer, starting with 1, that provides the number
-  /// of this [QuestionItemModel] within the ordered sequence of [QuestionItemModels].
-  ///
-  /// Returns null if this model is not answerable.
-  int? get questionNumeral {
-    final thisQuestionIndex = questionnaireResponseModel
-        .orderedQuestionItemModels()
-        .where((qim) => qim.isAnswerable)
-        .toList()
-        .indexOf(this);
-
-    return (thisQuestionIndex != -1) ? thisQuestionIndex + 1 : null;
-  }
 }

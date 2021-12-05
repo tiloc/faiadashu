@@ -21,6 +21,8 @@ class QuestionnaireLaunchTile extends StatefulWidget {
       uploadResponseFunction;
   final QuestionnaireResponse? Function(String id) restoreResponseFunction;
 
+  final QuestionnaireModelDefaults questionnaireModelDefaults;
+
   const QuestionnaireLaunchTile({
     required this.title,
     this.subtitle,
@@ -31,6 +33,7 @@ class QuestionnaireLaunchTile extends StatefulWidget {
     required this.saveResponseFunction,
     this.uploadResponseFunction,
     required this.restoreResponseFunction,
+    this.questionnaireModelDefaults = const QuestionnaireModelDefaults(),
     Key? key,
   }) : super(key: key);
 
@@ -219,6 +222,7 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                   ),
                 ),
               ],
+              questionnaireModelDefaults: widget.questionnaireModelDefaults,
             ),
           ),
         ).then((value) {

@@ -278,7 +278,12 @@ class QuestionnaireItemModel with Diagnosticable {
         : null;
   }
 
-  /// A short label for a particular group, question or set of display text within the questionnaire used for reference by the individual completing the questionnaire.
+  /// A short label for a particular group, question or set of display text
+  /// within the questionnaire used for reference by the individual completing
+  /// the questionnaire.
+  ///
+  /// This is the unaltered prefix from the FHIR Questionnaire.
+  /// [FillerItemModel.prefix] can provide programmatically generated prefixes.
   RenderingString? get prefix {
     final plainPrefix = questionnaireItem.prefix;
 

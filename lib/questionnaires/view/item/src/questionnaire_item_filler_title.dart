@@ -7,7 +7,6 @@ import '../../../questionnaires.dart';
 
 class QuestionnaireItemFillerTitle extends StatelessWidget {
   final Widget? leading;
-  final String? questionNumeral;
   final Widget? help;
   final String htmlTitleText;
   final String semanticsLabel;
@@ -16,7 +15,6 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
   const QuestionnaireItemFillerTitle._({
     required this.questionnaireTheme,
     required this.htmlTitleText,
-    this.questionNumeral,
     this.leading,
     this.help,
     required this.semanticsLabel,
@@ -45,26 +43,16 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
       final closeStyleTag =
           (questionnaireItemModel.isGroup) ? '</h2>' : '$requiredTag</b>';
 
-      final prefixText = questionnaireItemModel.prefix;
+      final prefixText = fillerItem.prefix;
 
       final htmlTitleText = (prefixText != null)
           ? '$openStyleTag${prefixText.xhtmlText}&nbsp;${text.xhtmlText}$closeStyleTag'
           : '$openStyleTag${text.xhtmlText}$closeStyleTag';
 
-      // TODO: Do I need a refresh strategy? isAnswerable can change.
-      final showQuestionNumerals = questionnaireTheme.showQuestionNumerals;
-      final questionNumeral =
-          (fillerItem is QuestionItemModel) ? fillerItem.questionNumeral : null;
-      final htmlQuestionNumeral =
-          (showQuestionNumerals && questionNumeral != null)
-              ? '<b>$questionNumeral: <b>'
-              : null;
-
       return QuestionnaireItemFillerTitle._(
         questionnaireTheme: questionnaireTheme,
         htmlTitleText: htmlTitleText,
         leading: leading,
-        questionNumeral: htmlQuestionNumeral,
         help: help,
         semanticsLabel: text.plainText,
         key: key,
@@ -80,15 +68,6 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
       child: Text.rich(
         TextSpan(
           children: <InlineSpan>[
-            /// Show question numbers (if flag set in the Questionnaire Theme)
-            /// All items with the isAnswerable boolean as true will be
-            /// counted, starting with 1, and regardless of grouping.
-            ///
-            if (questionNumeral != null)
-              HTML.toTextSpan(
-                context,
-                questionNumeral!,
-              ),
             if (leading != null) WidgetSpan(child: leading!),
             HTML.toTextSpan(
               context,
@@ -212,6 +191,7 @@ class _QuestionnaireItemFillerTitleLeading extends StatelessWidget {
 
   static Widget? fromFillerItem(
     FillerItemModel fillerItemModel, {
+    // ignore: unused_element
     Key? key,
   }) {
     final displayCategory = fillerItemModel.questionnaireItem.extension_

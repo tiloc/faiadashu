@@ -10,10 +10,19 @@
 > * only works on Flutter `master` branch, due to bug in Dart
 > * keyboard input to FHIR Path field broken on Mac, due to bugs in macOS Flutter: https://github.com/flutter/flutter/issues/82124
 
-* [Breaking] Introduction of new RenderingString type to handle items which can have plain and styled text
+* **[Breaking]** Reworked support for FHIRPath expressions
+  * Cleanly carved out into new `expression` module
+  * Made async in preparation for query expressions
+  * Made all model operations that depend on expressions async
+* **[Breaking]** Introduction of new RenderingString type to handle items which can have plain and styled text
   * Supports plain, XHTML, and Markdown
   * Implemented throughout numerous models and views
   * Side-effect: Narrative can now contain images
+* **[Breaking]** Moved [John Manning's](https://github.com/FireJuun) question counting contribution from view to model.
+  * More flexibility for different prefix/numeral algorithms
+  * Number can be output into narrative
+  * Flexible formatting in combination with RenderingString
+* Support for `rendering-markdown` extension
 * Support drop-down control for coding answers
 * Support for 'prompt' item control
 * Support itemAnswerMedia extension for a clean way to add images to coding answers
@@ -24,7 +33,7 @@
 * Improvements in the display of errors
 * NarrativeTile can use an existing narrative, rather than always generating a new one
 * Removing a repeating answer will notify listeners
-* Use LayoutBuilder instead of MediaQuery to work better when embedded into surround UI
+* Use LayoutBuilder instead of MediaQuery to work better when embedded into surrounding UI (e.g. in Faiabench)
 
 * Introduced a presentation model for individual answer options in coding questions.
 

@@ -23,9 +23,6 @@ class QuestionnaireTheme {
   /// Returns whether user will be offered option for a null radio button value.
   final bool showNullAnswerOption;
 
-  /// Returns whether each question will be preceded by its own ID.
-  final bool showQuestionNumerals;
-
   /// Returns whether a progress bar/circle is displayed while filling
   final bool showProgress;
 
@@ -51,7 +48,6 @@ class QuestionnaireTheme {
   const QuestionnaireTheme({
     this.canSkipQuestions = false,
     this.showNullAnswerOption = true,
-    this.showQuestionNumerals = false,
     this.showProgress = true,
     this.autoCompleteThreshold = defaultAutoCompleteThreshold,
     this.landscapeBreakpoint = defaultLandscapeBreakpoint,

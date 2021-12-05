@@ -278,7 +278,7 @@ Widget _createStyledOption(
   final optionTitle = <RenderingString>[
     if (optionPrefix != null) optionPrefix,
     optionText,
-  ].concatenateXhtml(': ');
+  ].concatenateXhtml(' ', '&nbsp;');
   final styledOptionTitle = Xhtml.fromXhtmlString(
     context,
     optionTitle,

@@ -26,6 +26,12 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
     return "${(parentNode != null) ? parentNode!.nodeUid : ''}/${questionnaireItemModel.linkId}";
   }
 
+  RenderingString? get prefix =>
+      questionnaireItemModel.prefix ??
+      questionnaireItemModel
+          .questionnaireModel.questionnaireModelDefaults.prefixBuilder
+          ?.call(this);
+
   FillerItemModel(
     ResponseNode? parentNode,
     this.questionnaireResponseModel,

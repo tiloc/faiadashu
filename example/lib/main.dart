@@ -325,13 +325,29 @@ class _HomePageState extends State<HomePage> {
               ),
               QuestionnaireLaunchTile(
                 title: 'FHIR Hot Beverage IG',
-                subtitle: 'WIP Beverage Questionnaire',
+                subtitle:
+                    'Beverage Questionnaire - illustrates itemMedia, upper/lower, generated prefix',
                 fhirResourceProvider: resourceBundleProvider,
                 launchContext: launchContext,
                 questionnairePath: 'assets/instruments/beverage_ig.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
                 uploadResponseFunction: uploadResponseFunction,
+                questionnaireModelDefaults: QuestionnaireModelDefaults(
+                  prefixBuilder: (fim) {
+                    return (fim is GroupItemModel)
+                        ? RenderingString.fromText(
+                            'You want the Donut but all that you get is the hole…',
+                            xhtmlText: '🍩',
+                          )
+                        : (fim is QuestionItemModel)
+                            ? RenderingString.fromText(
+                                'Venti',
+                                xhtmlText: '☕',
+                              )
+                            : null;
+                  },
+                ),
               ),
               QuestionnaireLaunchTile(
                 title: 'SDC LOINC AHRQ Example',
@@ -446,7 +462,7 @@ class _HomePageState extends State<HomePage> {
                 },
               ),
               ListTile(
-                title: const Text('Cherry blossom Filler'),
+                title: const Text('🌸 Cherry blossom Filler 🌸'),
                 subtitle: const Text(
                   'Illustrates embedding of questionnaire (no Scaffold)',
                 ),
@@ -467,7 +483,11 @@ class _HomePageState extends State<HomePage> {
                         questionnaireTheme: const QuestionnaireTheme(
                           canSkipQuestions: true,
                           showNullAnswerOption: false,
-                          showQuestionNumerals: true,
+                        ),
+                        questionnaireModelDefaults:
+                            const QuestionnaireModelDefaults(
+                          prefixBuilder: QuestionnaireModelDefaults
+                              .questionNumeralPrefixBuilder,
                         ),
                       ),
                     ),

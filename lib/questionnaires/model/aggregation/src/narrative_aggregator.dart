@@ -45,6 +45,15 @@ class NarrativeAggregator extends Aggregator<Narrative> {
     }
 
     final itemText = itemModel.questionnaireItemModel.text;
+    final prefix = itemModel.prefix;
+
+    final prefixedItemText = (prefix != null)
+        ? (itemText != null)
+            ? '${prefix.xhtmlText} ${itemText.xhtmlText}'
+            : null
+        : (itemText != null)
+            ? itemText.xhtmlText
+            : null;
 
     if (itemModel is GroupItemModel) {
       if ((usageMode == usageModeDisplayNonEmptyCode ||
@@ -53,16 +62,16 @@ class NarrativeAggregator extends Aggregator<Narrative> {
         return false;
       }
 
-      if (itemText != null) {
-        div.write('<h2>${itemText.xhtmlText}</h2>');
+      if (prefixedItemText != null) {
+        div.write('<h2>$prefixedItemText</h2>');
 
         return true;
       } else {
         return false;
       }
     } else if (itemModel is DisplayItemModel) {
-      if (itemText != null) {
-        div.write('<p>${itemText.xhtmlText}</p>');
+      if (prefixedItemText != null) {
+        div.write('<p>$prefixedItemText</p>');
 
         return true;
       } else {
@@ -74,13 +83,13 @@ class NarrativeAggregator extends Aggregator<Narrative> {
       throw ArgumentError('Expecting QuestionItemModel', 'itemModel');
     }
 
-    return _addQuestionItemToDiv(div, itemModel, itemText);
+    return _addQuestionItemToDiv(div, itemModel, prefixedItemText);
   }
 
   bool _addQuestionItemToDiv(
     StringBuffer div,
     QuestionItemModel itemModel,
-    RenderingString? itemText,
+    String? prefixedItemText,
   ) {
     final usageMode = itemModel.questionnaireItemModel.usageMode;
     if ((usageMode == usageModeDisplayNonEmptyCode ||
@@ -89,8 +98,8 @@ class NarrativeAggregator extends Aggregator<Narrative> {
       return false;
     }
 
-    if (itemText != null) {
-      div.write('<h3>${itemText.xhtmlText}</h3>');
+    if (prefixedItemText != null) {
+      div.write('<h3>$prefixedItemText</h3>');
     }
 
     if (itemModel.isUnanswered) {
