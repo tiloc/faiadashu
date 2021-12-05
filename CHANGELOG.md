@@ -14,7 +14,6 @@
 * Added demos of all the new capabilities listed for Faiadashu.
 * Renamed package to `com.legentix.faiagallery`, in order for it to be globally unique (required for some Apple signing stuff)
 * Beginning to rename Example to Gallery. Planning to have a much simpler example at some point. And then Gallery shows off everything.
-* Currently not fully functional because of work on Faiadashu Online
 
 * ### Faiadashu
 * **[Breaking]** Reworked support for FHIRPath expressions
@@ -47,7 +46,7 @@
 * Updated dependencies, including [Grey Faulkenberry's](https://github.com/Dokotela) latest and greatest `fhir_path` package.
 
 * ### Faiadashu Online
-* **[Breaking]** Upgrade to latest fhir_auth. Very breaking (or actually currently broken)
+* **[Breaking]** Upgrade to latest fhir_auth. Login/Logout functionality is currently lost.
 
 
 ## 0.6.0-dev.1

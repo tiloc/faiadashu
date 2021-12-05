@@ -22,6 +22,7 @@ Future<Id?> uploadQuestionnaireResponse(
   final request1 = FhirRequest.create(
     base: fhirClient.fhirUri!.value!,
     resource: resource,
+    fhirClient: fhirClient,
   );
 
   try {

@@ -6,6 +6,7 @@
         <activity
                 android:name=".MainActivity"
                 android:launchMode="singleTop"
+                android:exported="true"
                 android:theme="@style/LaunchTheme"
                 android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
                 android:hardwareAccelerated="true"
@@ -24,7 +25,7 @@
             </intent-filter>
         </activity>
         <!-- This is required by the fhir_auth package for OAuth2 callbacks -->
-        <activity android:name="com.linusu.flutter_web_auth.CallbackActivity" >
+        <activity android:name="com.linusu.flutter_web_auth.CallbackActivity" android:exported="true" >
             <intent-filter android:label="flutter_web_auth">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
