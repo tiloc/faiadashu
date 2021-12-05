@@ -52,8 +52,6 @@ class _QuestionnaireScrollerPanelState
   void _onQuestionnaireResponseChanged(
     QuestionnaireResponseModel? questionnaireResponseModel,
   ) {
-    print('output QR changed.');
-
     final questionnaireResponse =
         questionnaireResponseModel?.questionnaireResponse;
 
