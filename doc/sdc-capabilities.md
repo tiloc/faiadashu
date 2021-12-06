@@ -18,17 +18,11 @@ Only expressions of type `text/fhirpath` are supported.
 > limitations.
 
 #### Variables
-Limited support for variables is available. 
-The general concept is described here: https://www.hl7.org/fhir/extension-variable.html
-
-Variables can only be used on the Questionnaire level.
-
-> Variables are currently not supported on individual items.
-
-Variables' `calculatedExpression` cannot refer to other variables. 
-`calculatedExpression` on items can refer to any variable, though.
+Full support for variables, on questionnaire level and item level. Proper support for visibility rules. 
+Specification: https://www.hl7.org/fhir/extension-variable.html
 
 ### Advanced Rendering
+See: https://www.hl7.org/fhir/rendering-extensions.html
 #### rendering-style
 Support for colors. Usable in many places (title, text, option) as permitted by the specification.
 
@@ -43,6 +37,9 @@ Usable in many places (title, text, option) as permitted by the specification.
 #### rendering-markdown
 Support for GitHub Flavored Markdown ("GFM" CommonMark).
 Usable in many places (title, text, option) as permitted by the specification.
+
+#### rendering-styleSensitive
+Silently ignored, as rendering will always preserve full styling.
 
 #### help
 Display items with itemControl `help` are associated with the proper question and display a help dialog.
@@ -99,7 +96,7 @@ Limited support for operators:
 * All other operators: always return true, as to not prevent filling of the questionnaire.
 
 ##### enableWhenExpression
-Supported.
+Fully supported.
 
 Reference:
 [sdc-questionnaire-enableWhenExpression](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-enableWhenExpression.html)
@@ -145,7 +142,7 @@ When an item control of type "slider" is being used, then a maxValue should be p
 will be used, since an unlimited maxValue is not possible.
 
 Nested display items with itemControl `upper` and `lower` are associated with the slider control and will display as upper and lower
-label. They can be either plain-text or use the `render-xhtml` extension for styled text.
+label. They can be either plain-text or use the rendering-x extensions for styled text.
 
 
 ---
@@ -258,7 +255,7 @@ Not supported
 
 ---
 ### Scoring
-The ordinalValue or iso21090-CO-value of all choice questions can be summed up into a total score.
+The ordinalValue of all choice questions can be summed up into a total score.
 
 The total score will be entered into a field which meets one of the following characteristics:
 - is readOnly and has extension `http://hl7.org/fhir/StructureDefinition/questionnaire-unit` with *display* value = `{score}`

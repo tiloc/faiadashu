@@ -32,30 +32,100 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
           .questionnaireModel.questionnaireModelDefaults.prefixBuilder
           ?.call(this);
 
+  FillerItemModel? get parentFillerItem {
+    ResponseNode? currentParent = parentNode;
+
+    while (currentParent != null) {
+      if (currentParent is FillerItemModel) {
+        return currentParent;
+      }
+      currentParent = currentParent.parentNode;
+    }
+
+    return null;
+  }
+
+  late final Iterable<ExpressionEvaluator> _itemLevelExpressionEvaluators;
+
+  // Builds the [ExpressionEvaluator]s for this item
+  void _buildItemLevelExpressionEvaluators() {
+    final qitemExpression =
+        _QuestionnaireItemExpressionEvaluator('qitem', questionnaireItem);
+
+    // http://build.fhir.org/ig/HL7/sdc/expressions.html#fhirpath
+    // TODO: Implement '%context';
+
+    // Item-level variables
+    final variableExtensions = questionnaireItem.extension_
+        ?.where((ext) => ext.url == variableExtensionUrl);
+    final qiLevelVars = <FhirExpressionEvaluator>[];
+
+    if (variableExtensions != null) {
+      for (final variableExtension in variableExtensions) {
+        final variableExpression = variableExtension.valueExpression;
+        if (variableExpression == null) {
+          throw QuestionnaireFormatException(
+            'Variable without expression.',
+            questionnaireItem,
+          );
+        }
+
+        // The %resource variable when it appears in expressions on elements in
+        // Questionnaire will be evaluated as the root of the QuestionnaireResponse.
+        final variable = FhirExpressionEvaluator.fromExpression(
+          () => questionnaireResponseModel.questionnaireResponse,
+          variableExpression,
+          [qitemExpression, ...qiLevelVars],
+        );
+
+        qiLevelVars.add(variable);
+      }
+    }
+
+    _itemLevelExpressionEvaluators = [qitemExpression, ...qiLevelVars];
+  }
+
+  /// Returns the [ExpressionEvaluator]s for this item, such as item-level variables
+  Iterable<ExpressionEvaluator> get itemLevelExpressionEvaluators =>
+      _itemLevelExpressionEvaluators;
+
+  /// Returns the [ExpressionEvaluator]s for this item, all parent items,
+  /// the questionnaire, and the launchcontext.
+  ///
+  /// One-stop shopping :-)
+  Iterable<ExpressionEvaluator> get itemWithPredecessorsExpressionEvaluators {
+    final fillerItemParent = parentFillerItem;
+
+    return fillerItemParent == null
+        ? [
+            ...questionnaireResponseModel
+                .questionnaireLevelExpressionEvaluators,
+            ...itemLevelExpressionEvaluators,
+          ]
+        : [
+            ...fillerItemParent.itemWithPredecessorsExpressionEvaluators,
+            ...itemLevelExpressionEvaluators,
+          ];
+  }
+
   FillerItemModel(
     ResponseNode? parentNode,
     this.questionnaireResponseModel,
     this.questionnaireItemModel,
   ) : super(parentNode) {
+    _buildItemLevelExpressionEvaluators();
+
     final enableWhenExtensionExpression = questionnaireItem.extension_
         ?.extensionOrNull(
           'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression',
         )
         ?.valueExpression;
 
-    // FIXME: Add further upstreams (item level)
-    // SDC variables
-    // TODO: %qitem, etc.
-    // http://hl7.org/fhir/uv/sdc/2019May/expressions.html#fhirpath-and-questionnaire
-    // http://build.fhir.org/ig/HL7/sdc/expressions.html#fhirpath
     _enableWhenExpression = (enableWhenExtensionExpression != null)
         ? FhirExpressionEvaluator.fromExpression(
             () => questionnaireResponseModel.questionnaireResponse,
             enableWhenExtensionExpression,
-            [
-              ...questionnaireResponseModel
-                  .questionnaireLevelExpressionEvaluators,
-            ],
+            itemWithPredecessorsExpressionEvaluators,
           )
         : null;
   }
@@ -329,4 +399,22 @@ class _EnableWhenTrigger {
 
   bool get anyTriggered => _anyTriggered;
   bool get allTriggered => _allTriggered == _allCount;
+}
+
+class _QuestionnaireItemExpressionEvaluator extends ExpressionEvaluator {
+  late final Map<String, dynamic> questionnaireItemJson;
+
+  @override
+  Future<dynamic> fetchValue() {
+    final qi = questionnaireItemJson;
+
+    return Future.value([qi]);
+  }
+
+  _QuestionnaireItemExpressionEvaluator(
+    String name,
+    QuestionnaireItem questionnaireItem,
+  ) : super(name, []) {
+    questionnaireItemJson = questionnaireItem.toJson();
+  }
 }

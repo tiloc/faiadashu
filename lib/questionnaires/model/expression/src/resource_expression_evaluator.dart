@@ -15,6 +15,5 @@ class ResourceExpressionEvaluator extends ExpressionEvaluator {
   ResourceExpressionEvaluator(
     String name,
     this.resourceBuilder,
-    Iterable<ExpressionEvaluator> upstreamExpressions,
-  ) : super(name, upstreamExpressions);
+  ) : super(name, []);
 }

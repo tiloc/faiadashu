@@ -20,13 +20,15 @@
   * Cleanly carved out into new `expression` module
   * Made async in preparation for query expressions
   * Made all model operations that depend on expressions async
+  * Support for item-level variables
+  * Support for %questionnaire, %qitem, %context (on Questionnaire level)
 * **[Breaking]** Introduction of new RenderingString type to handle items which can have plain and styled text
   * Supports plain, XHTML, and Markdown
   * Implemented throughout numerous models and views
   * Side-effect: Narrative can now contain images
 * **[Breaking]** Moved [John Manning's](https://github.com/FireJuun) question counting contribution from view to model.
   * More flexibility for different prefix/numeral algorithms
-  * Number can be output into narrative
+  * Prefix can be output into narrative
   * Flexible formatting in combination with RenderingString
 * Support for `rendering-markdown` extension
 * Support drop-down control for coding answers

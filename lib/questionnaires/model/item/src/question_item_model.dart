@@ -108,27 +108,13 @@ class QuestionItemModel extends ResponseItemModel {
   ///
   /// Returns null if not applicable (either question unanswered, or wrong type)
   Decimal? get ordinalValue {
-    // FIXME: This is expensive and hacky. The codinganswermodel should have a property for its own current ordinalvalue.
     final answerModel = firstAnswerModel;
 
-    if (answerModel.isAnswered && answerModel is CodingAnswerModel) {
-      final answers = answerModel.createFhirCodingAnswers(null);
-      // Find ordinal value in extensions
-      final ordinalExtension =
-          answers?.firstOrNull?.valueCoding?.extension_?.extensionOrNull(
-                'http://hl7.org/fhir/StructureDefinition/iso21090-CO-value',
-              ) ??
-              answers?.firstOrNull?.valueCoding?.extension_?.extensionOrNull(
-                'http://hl7.org/fhir/StructureDefinition/ordinalValue',
-              );
-      if (ordinalExtension == null) {
-        return null;
-      }
-
-      return ordinalExtension.valueDecimal;
-    } else {
-      return null;
-    }
+    return answerModel.isAnswered &&
+            answerModel is CodingAnswerModel &&
+            !questionnaireItemModel.isRepeating
+        ? answerModel.singleSelection?.fhirOrdinalValue
+        : null;
   }
 
   /// Returns all answers belonging to this question.

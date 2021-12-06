@@ -31,9 +31,27 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   // Questionnaire-level variables
   late final Iterable<FhirExpressionEvaluator> _variables;
 
+  Iterable<ExpressionEvaluator>
+      get _questionnaireBelowVariablesExpressionEvaluators {
+    final questionnaireExpression = ResourceExpressionEvaluator(
+      'questionnaire',
+      () => questionnaireModel.questionnaire,
+    );
+
+    final questionnaireResponseExpression =
+        ResourceExpressionEvaluator('context', () => questionnaireResponse,);
+
+    return [
+      ..._launchContextExpressions,
+      questionnaireResponseExpression,
+      questionnaireExpression,
+    ];
+  }
+
   /// Questionnaire-level variables
-  Iterable<ExpressionEvaluator> get questionnaireLevelExpressionEvaluators =>
-      [..._launchContextExpressions, ..._variables];
+  Iterable<ExpressionEvaluator> get questionnaireLevelExpressionEvaluators {
+    return [..._questionnaireBelowVariablesExpressionEvaluators, ..._variables];
+  }
 
   late final Iterable<ExpressionEvaluator> _launchContextExpressions;
 
@@ -50,7 +68,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   }) : _aggregators = aggregators {
     // FIXME: According to spec I need to map launchcontext items to names from launchContext extension
     _launchContextExpressions = [
-      ResourceExpressionEvaluator('patient', () => launchContext.patient, []),
+      ResourceExpressionEvaluator('patient', () => launchContext.patient),
     ];
 
     final variableExtensions = questionnaireModel.questionnaire.extension_
@@ -71,7 +89,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
         final variable = FhirExpressionEvaluator.fromExpression(
           () => questionnaireResponse,
           variableExpression,
-          [..._launchContextExpressions, ...qLevelVars],
+          [..._questionnaireBelowVariablesExpressionEvaluators, ...qLevelVars],
         );
 
         qLevelVars.add(variable);
