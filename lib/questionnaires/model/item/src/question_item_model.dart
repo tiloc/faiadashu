@@ -38,14 +38,12 @@ class QuestionItemModel extends ResponseItemModel {
           itemModel,
         ) {
     final calculatedExpression = questionnaireItemModel.calculatedExpression;
-    // FIXME: Determine all upstream inputs.
     _calculatedExpression = (calculatedExpression != null)
         ? FhirExpressionEvaluator.fromExpression(
             () => questionnaireResponseModel.questionnaireResponse,
             calculatedExpression,
             [
-              ...questionnaireResponseModel
-                  .questionnaireLevelExpressionEvaluators,
+              ...itemWithPredecessorsExpressionEvaluators,
             ],
           )
         : null;

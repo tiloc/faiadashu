@@ -31,8 +31,7 @@ abstract class ResponseItemModel extends FillerItemModel {
               language: ExpressionLanguage.text_fhirpath,
             ),
             [
-              ...questionnaireResponseModel
-                  .questionnaireLevelExpressionEvaluators,
+              ...itemWithPredecessorsExpressionEvaluators,
             ],
           )
         : null;
