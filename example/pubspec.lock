@@ -78,20 +78,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.5.0-10"
-  fhir_at_rest:
-    dependency: transitive
-    description:
-      name: fhir_at_rest
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.5.0-11"
   fhir_auth:
     dependency: "direct main"
     description:
       name: fhir_auth
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.5.0-5"
+    version: "0.5.0-6"
   fhir_path:
     dependency: transitive
     description:

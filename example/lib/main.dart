@@ -167,7 +167,10 @@ class _HomePageState extends State<HomePage> {
       id: Id('smart-880378'),
       name: [
         HumanName(
-            given: ['Amy', 'R'], family: 'Lee', use: HumanNameUse.official)
+          given: ['Amy', 'R'],
+          family: 'Lee',
+          use: HumanNameUse.official,
+        )
       ],
       birthDate: Date('1999-12-08'),
       gender: PatientGender.female,
@@ -212,8 +215,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose() {
     try {
-// FIXME
-      //      unawaited(smartClient.logout());
+      unawaited(smartClient.logout());
     } catch (e) {
       _logger.warn('Could not log out', error: e);
     }
@@ -383,6 +385,18 @@ class _HomePageState extends State<HomePage> {
                 launchContext: launchContext,
                 questionnairePath:
                     'assets/instruments/weight-height-tracking.json',
+                saveResponseFunction: _saveResponse,
+                restoreResponseFunction: _restoreResponse,
+                uploadResponseFunction: uploadResponseFunction,
+              ),
+              QuestionnaireLaunchTile(
+                title: 'Variable Scope Test',
+                subtitle:
+                    'Tests the visibility of questionnaire-level and item-level variables.',
+                fhirResourceProvider: resourceBundleProvider,
+                launchContext: launchContext,
+                questionnairePath:
+                    'assets/instruments/variable_scope_test.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
                 uploadResponseFunction: uploadResponseFunction,

@@ -1,6 +1,7 @@
 import 'package:fhir/r4/metadata_types/metadata_types.dart';
 import 'package:fhir/r4/resource/resource.dart';
 import 'package:fhir_path/run_fhir_path.dart';
+import 'package:flutter/foundation.dart';
 
 import 'expression_evaluator.dart';
 import 'fhir_expression_evaluator.dart';
@@ -50,6 +51,15 @@ class FhirPathExpressionEvaluator extends FhirExpressionEvaluator {
 
     return Future.value(
       r4WalkFhirPath(resource, fhirpath, upstreamMap),
+    );
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+
+    properties.add(
+      StringProperty('FHIRPath', fhirpath),
     );
   }
 }

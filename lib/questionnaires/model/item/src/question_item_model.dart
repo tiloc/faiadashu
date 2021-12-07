@@ -307,17 +307,26 @@ class QuestionItemModel extends ResponseItemModel {
       return;
     }
 
-    final rawEvaluationResult = await calculatedExpression.fetchValue();
+    try {
+      final rawEvaluationResult = await calculatedExpression.fetchValue();
 
-    _qimLogger.debug('calculatedExpression: $rawEvaluationResult');
+      _qimLogger.debug('calculatedExpression: $rawEvaluationResult');
 
-    final evaluationResult =
-        (rawEvaluationResult is List && rawEvaluationResult.isNotEmpty)
-            ? rawEvaluationResult.first
-            : null;
+      final evaluationResult =
+          (rawEvaluationResult is List && rawEvaluationResult.isNotEmpty)
+              ? rawEvaluationResult.first
+              : null;
 
-    // TODO: should this be able to populate multiple answers?
-    // Write the value back to the answer model
-    firstAnswerModel.populateFromExpression(evaluationResult);
+      // TODO: should this be able to populate multiple answers?
+      // Write the value back to the answer model
+      firstAnswerModel.populateFromExpression(evaluationResult);
+    } catch (ex) {
+      // FIXME: how to add an individual flag to the error list?
+      // Flags trigger re-calc, trigger ...
+/*      questionnaireResponseModel.errorFlags.value = [
+        QuestionnaireErrorFlag(nodeUid, errorText: ex.toString()),
+      ]; */
+      _qimLogger.warn('Calculation problem: $_calculatedExpression', error: ex);
+    }
   }
 }
