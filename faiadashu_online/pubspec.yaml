@@ -19,8 +19,7 @@ dependencies:
     path: ..
 
   fhir: ^0.5.0-10
-  fhir_at_rest: ^0.5.0-11
-  fhir_auth: ^0.5.0-5
+  fhir_auth: ^0.5.0-6
 
   flutter:
     sdk: flutter

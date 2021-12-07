@@ -26,13 +26,11 @@ class RestfulResourceProvider extends FhirResourceProvider {
 
   @override
   Future<void> init() async {
-    await client.initialize(); // Is .initialize() idempotent???
-
     final request = FhirRequest.read(
       base: client.fhirUri!.value!,
       type: resourceType,
       id: id,
-      fhirClient: client,
+      client: client,
     );
     resource = await request.request();
 

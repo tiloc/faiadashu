@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 
 /// A login/logout button that is tied to the state of a [FhirClient].
 class SmartLoginButton extends StatefulWidget {
-  final FhirClient fhirClient;
+  final FhirClient client;
   final VoidCallback? onLoginChanged;
 
-  const SmartLoginButton(this.fhirClient, {this.onLoginChanged, Key? key})
+  const SmartLoginButton(this.client, {this.onLoginChanged, Key? key})
       : super(key: key);
 
   @override
@@ -27,9 +27,9 @@ class _SmartLoginButtonState extends State<SmartLoginButton> {
   @override
   void initState() {
     super.initState();
-    // FIXME: What is the equivalent in latest fhir_auth?
+// FIXME: property currently doesn't exist.
     _loginStatus.value = LoginStatus.loggedIn;
-/*    _loginStatus.value = (widget.fhirClient.isLoggedIn)
+/*    _loginStatus.value = (widget.client.isLoggedIn)
         ? LoginStatus.loggedIn
         : LoginStatus.loggedOut; */
 
@@ -91,8 +91,7 @@ class _SmartLoginButtonState extends State<SmartLoginButton> {
               _loginStatus.value = LoginStatus.loggingOut;
             });
             _showStatusSnackBar(context);
-            // FIXME: What is the equivalent in latest fhir_auth?
-//            await widget.fhirClient.logout();
+            await widget.client.logout();
             if (!mounted) {
               return;
             }
@@ -114,8 +113,7 @@ class _SmartLoginButtonState extends State<SmartLoginButton> {
             });
             _showStatusSnackBar(context);
             try {
-              // FIXME: What is the equivalent in latest fhir_auth?
-//              await widget.fhirClient.login();
+              await widget.client.login();
               if (!mounted) {
                 return;
               }
