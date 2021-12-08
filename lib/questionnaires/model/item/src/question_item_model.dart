@@ -323,9 +323,9 @@ class QuestionItemModel extends ResponseItemModel {
     } catch (ex) {
       // FIXME: how to add an individual flag to the error list?
       // Flags trigger re-calc, trigger ...
-/*      questionnaireResponseModel.errorFlags.value = [
+      questionnaireResponseModel.errorFlags.value = [
         QuestionnaireErrorFlag(nodeUid, errorText: ex.toString()),
-      ]; */
+      ];
       _qimLogger.warn('Calculation problem: $_calculatedExpression', error: ex);
     }
   }

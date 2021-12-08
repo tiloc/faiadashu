@@ -38,8 +38,10 @@ class QuestionnaireResponseModel extends ChangeNotifier {
       () => questionnaireModel.questionnaire,
     );
 
-    final questionnaireResponseExpression =
-        ResourceExpressionEvaluator('context', () => questionnaireResponse,);
+    final questionnaireResponseExpression = ResourceExpressionEvaluator(
+      'context',
+      () => questionnaireResponse,
+    );
 
     return [
       ..._launchContextExpressions,
@@ -196,11 +198,6 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
     // Set up enableWhen behavior on items
     questionnaireResponseModel._activateEnableBehavior();
-
-    // This ensures screen updates in case of invalid responses.
-    questionnaireResponseModel.errorFlags.addListener(() {
-      questionnaireResponseModel.nextGeneration();
-    });
 
     return questionnaireResponseModel;
   }
