@@ -23,7 +23,9 @@ extension FDashQuestionnaireItemExtension on QuestionnaireItem {
   }
 
   /// Unit from SDC 'questionnaire-unit' extension.
-  Coding? get unit {
+  ///
+  /// This is for computation purposes. The human-readable unit is conveyed as a display element.
+  Coding? get computableUnit {
     return extension_
         ?.extensionOrNull(
           'http://hl7.org/fhir/StructureDefinition/questionnaire-unit',

@@ -331,6 +331,19 @@
     {
       "extension": [
         {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "slider",
+                "display": "Slider"
+              }
+            ],
+            "text": "A control where an axis is displayed between the high and low values and the control can be visually manipulated to select a value anywhere on the axis."
+          }
+        },
+        {
           "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unitValueSet",
           "valueCanonical": "http://hl7.org/fhir/ValueSet/ucum-bodyweight"
         },

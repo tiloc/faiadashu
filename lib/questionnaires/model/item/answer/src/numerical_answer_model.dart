@@ -144,7 +144,6 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
       locale.toLanguageTag(),
     ); // TODO: toString or toLanguageTag?
 
-    final unit = qi.unit;
     _units = <String, Coding>{};
     final unitsUri = qi.extension_
         ?.extensionOrNull(
@@ -160,8 +159,6 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
         },
         context: qi.linkId,
       );
-    } else if (unit != null) {
-      _units[keyForUnitChoice(unit)] = unit;
     }
   }
 
@@ -308,7 +305,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
       return;
     }
 
-    final unitCoding = qi.unit;
+    final unitCoding = qi.computableUnit;
 
     // OPTIMIZE: Submit improvement to Grey: Decimal factory should accept Decimal inValue
     final quantityValue = (evaluationResult is Decimal)

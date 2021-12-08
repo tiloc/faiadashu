@@ -23,6 +23,8 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
   late final TextInputFormatter _numberInputFormatter;
   final TextEditingController _editingController = TextEditingController();
 
+  double _sliderValueDuringChange = 0.0;
+
   @override
   void postInitState() {
     _numberInputFormatter =
@@ -37,6 +39,11 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
         TextPosition(offset: initialValue.length),
       ),
     );
+
+    const averageDivisor = 2.0;
+    _sliderValueDuringChange = (value != null)
+        ? value!.value!.value!
+        : (answerModel.maxValue - answerModel.minValue) / averageDivisor;
   }
 
   Widget _buildDropDownFromUnits(BuildContext context) {
@@ -94,8 +101,6 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
       );
     }
 
-    const averageDivisor = 2.0;
-
     final lowerSliderLabel = answerModel.lowerSliderLabel;
     final upperSliderLabel = answerModel.upperSliderLabel;
 
@@ -105,24 +110,43 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
     return answerModel.isSliding
         ? Column(
             children: [
-              Slider(
-                focusNode: firstFocusNode,
-                min: answerModel.minValue,
-                max: answerModel.maxValue,
-                divisions: answerModel.sliderDivisions,
-                value: (value != null)
-                    ? value!.value!.value!
-                    : (answerModel.maxValue - answerModel.minValue) /
-                        averageDivisor,
-                label: answerModel.display.plainText,
-                onChanged: answerModel.isEnabled
-                    ? (sliderValue) {
-                        value = answerModel.copyWithValue(Decimal(sliderValue));
-                      }
-                    : null,
-                onChangeStart: (_) {
-                  firstFocusNode.requestFocus();
-                },
+              Row(
+                children: [
+                  Expanded(
+                    child: Slider(
+                      focusNode: firstFocusNode,
+                      min: answerModel.minValue,
+                      max: answerModel.maxValue,
+                      divisions: answerModel.sliderDivisions,
+                      value: _sliderValueDuringChange,
+                      label: Decimal(_sliderValueDuringChange).format(locale),
+                      // Changes are only propagated to the model at change-end time.
+                      // onChange would cause very high-frequency storm of model updates
+                      onChanged: answerModel.isEnabled
+                          ? (sliderValue) {
+                              setState(() {
+                                _sliderValueDuringChange = sliderValue;
+                              });
+                            }
+                          : null, // Method required, or it gets disabled. setState required for updates.
+                      onChangeEnd: answerModel.isEnabled
+                          ? (sliderValue) {
+                              _sliderValueDuringChange = sliderValue;
+                              value = answerModel
+                                  .copyWithValue(Decimal(sliderValue));
+                            }
+                          : null,
+                      onChangeStart: (_) {
+                        firstFocusNode.requestFocus();
+                      },
+                    ),
+                  ),
+                  if (answerModel.hasUnitChoices)
+                       SizedBox(
+                    height: 16,
+                    child: _buildDropDownFromUnits(context),
+                  ),
+                ],
               ),
               if (hasSliderLabels)
                 Row(

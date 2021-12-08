@@ -138,7 +138,7 @@ class QuestionnaireItemModel with Diagnosticable {
     return (questionnaireItem.type == QuestionnaireItemType.quantity ||
             questionnaireItem.type == QuestionnaireItemType.decimal) &&
         ((questionnaireItem.readOnly == Boolean(true) &&
-                questionnaireItem.unit?.display == '{score}') ||
+                questionnaireItem.computableUnit?.display == '{score}') ||
             questionnaireItem.extension_
                     ?.firstWhereOrNull(
                       (ext) =>
