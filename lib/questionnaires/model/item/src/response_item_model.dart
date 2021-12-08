@@ -64,27 +64,24 @@ abstract class ResponseItemModel extends FillerItemModel {
   /// Is the item invalid?
   bool get isInvalid;
 
-  Future<Iterable<QuestionnaireErrorFlag>?> get isComplete async {
+  /// Returns a description of an error situation with this response item.
+  String? errorText;
+
+  Future<bool> get isComplete async {
     if (questionnaireItemModel.isRequired && isUnanswered) {
-      return [
-        QuestionnaireErrorFlag(
-          nodeUid,
-          errorText: lookupFDashLocalizations(questionnaireResponseModel.locale)
-              .validatorRequiredItem,
-        ),
-      ];
+      errorText = lookupFDashLocalizations(questionnaireResponseModel.locale)
+          .validatorRequiredItem;
+
+      return false;
     }
 
     if (!await isSatisfyingConstraint) {
-      return [
-        QuestionnaireErrorFlag(
-          nodeUid,
-          errorText: questionnaireItemModel.constraintHuman,
-        ),
-      ];
+      errorText = questionnaireItemModel.constraintHuman;
+
+      return false;
     }
 
-    return null;
+    return true;
   }
 
   /// Returns whether the item is satisfying the `questionnaire-constraint`.

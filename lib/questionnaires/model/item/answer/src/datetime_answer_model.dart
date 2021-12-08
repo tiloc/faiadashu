@@ -61,7 +61,7 @@ class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
   }
 
   @override
-  QuestionnaireErrorFlag? get isComplete {
+  String? get isComplete {
     // TODO: Look at validity?
     return null;
   }

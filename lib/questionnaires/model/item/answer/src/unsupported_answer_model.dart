@@ -23,7 +23,7 @@ class UnsupportedAnswerModel extends AnswerModel<Object, Object> {
   }
 
   @override
-  QuestionnaireErrorFlag? get isComplete => null;
+  String? get isComplete => null;
 
   @override
   bool get isUnanswered => false;

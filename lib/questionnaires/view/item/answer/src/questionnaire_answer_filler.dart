@@ -131,8 +131,8 @@ abstract class QuestionnaireAnswerFillerState<
   set value(V? newValue) {
     if (mounted) {
       setState(() {
-        // Updating a single answer resets all error markers
-        widget.responseItemModel.questionnaireResponseModel.resetMarkers();
+        // Updating an answer resets its error marker
+        widget.responseItemModel.errorText = null;
         answerModel.value = newValue;
       });
     }

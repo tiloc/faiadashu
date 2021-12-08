@@ -25,9 +25,7 @@ class _GroupItemState extends ResponseItemFillerState<GroupItem> {
       'build group ${widget.responseItemModel.nodeUid} hidden: ${widget.responseItemModel.questionnaireItemModel.isHidden}, enabled: ${widget.responseItemModel.isEnabled}',
     );
 
-    final errorText = widget.responseItemModel.questionnaireResponseModel
-        .errorFlagForNodeUid(widget.responseItemModel.nodeUid)
-        ?.errorText;
+    final errorText = widget.responseItemModel.errorText;
 
     final titleWidget = this.titleWidget;
 

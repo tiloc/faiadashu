@@ -72,9 +72,9 @@ abstract class AnswerModel<I, V> extends ResponseNode {
   /// Since an individual answer does not know whether it is required, this
   /// is not taken into account.
   ///
-  /// Returns null when the answer is valid, or a [QuestionnaireErrorFlag],
+  /// Returns null when the answer is valid, or an error text,
   /// when it is not.
-  QuestionnaireErrorFlag? get isComplete;
+  String? get isComplete;
 
   /// Returns whether any answer (valid or invalid) has been provided.
   bool get isAnswered => !isUnanswered;
@@ -82,11 +82,7 @@ abstract class AnswerModel<I, V> extends ResponseNode {
   /// Returns whether this question is unanswered.
   bool get isUnanswered;
 
-  String? get errorText {
-    return questionnaireResponseModel
-        .errorFlagForNodeUid(responseItemModel.nodeUid)
-        ?.errorText;
-  }
+  String? get errorText => responseItemModel.errorText;
 
   /// Returns a [QuestionnaireResponseAnswer] based on the current value.
   ///

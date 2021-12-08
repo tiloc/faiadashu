@@ -55,6 +55,15 @@ const dataAbsentReasonTempUnknownCode = Code.asConst('temp-unknown');
 
 const dataAbsentReasonAsTextCode = Code.asConst('as-text');
 
+const dataAbsentReasonErrorCode = Code.asConst('error');
+
+// Some system or workflow process error means that the information is not available.
+final dataAbsentReasonError = Coding(
+  code: dataAbsentReasonErrorCode,
+  display: 'Error',
+  system: dataAbsentReasonSystem,
+);
+
 /// The content of the data is represented in the resource narrative.
 ///
 /// It may be linked by internal references (e.g. xml:id).

@@ -29,7 +29,7 @@ class BooleanAnswerModel extends AnswerModel<Boolean, Boolean> {
   }
 
   @override
-  QuestionnaireErrorFlag? get isComplete => null;
+  String? get isComplete => null;
 
   @override
   bool get isUnanswered => value == null;

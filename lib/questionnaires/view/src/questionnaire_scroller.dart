@@ -101,10 +101,10 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
     widget.onQuestionnaireResponseChanged?.call(_questionnaireResponseModel);
   }
 
-  /// Scrolls to a position as conveyed by a [QuestionnaireErrorFlag].
+  /// Scrolls to a position for a [FillerItemModel].
   ///
   /// The item will also be focussed.
-  void scrollToErrorFlag(QuestionnaireErrorFlag errorFlag) {
+  void scrollToItem(FillerItemModel fillerItemModel) {
     if (_questionnaireResponseModel == null) {
       _logger.info(
         'Trying to scroll before QuestionnaireModel is loaded. Ignoring.',
@@ -114,15 +114,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
     }
 
     final index = _questionnaireResponseModel!
-        .indexOfFillerItem((fim) => fim.nodeUid == errorFlag.nodeUid);
-
-    if (index == -1) {
-      _logger.warn(
-        'Error Flag with invalid responseUId: ${errorFlag.nodeUid}',
-      );
-
-      return;
-    }
+        .indexOfFillerItem((fim) => fim == fillerItemModel);
 
     scrollTo(index!);
   }
@@ -253,11 +245,16 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
           }
 
           // Listen for new error flags and then scroll to the first one.
-          questionnaireResponseModel.errorFlags.addListener(() {
-            final markers = questionnaireResponseModel.errorFlags.value;
-            if (markers != null) {
-              scrollToErrorFlag(markers.first);
+          questionnaireResponseModel.isValid.addListener(() {
+            if (questionnaireResponseModel.isValid.value ?? true) {
+              return;
             }
+
+            final firstInvalidItem = questionnaireResponseModel
+                .orderedResponseItemModels()
+                .where((rim) => rim.errorText != null)
+                .first;
+            scrollToItem(firstInvalidItem);
           });
 
           _focusIndex = questionnaireResponseModel.indexOfFillerItem(

@@ -315,23 +315,14 @@ class CodingAnswerModel extends AnswerModel<Set<String>, Set<String>> {
   bool get hasCodingAnswers => true;
 
   @override
-  QuestionnaireErrorFlag? get isComplete {
+  String? get isComplete {
     if (value == null && minOccurs > 0) {
-      return QuestionnaireErrorFlag(
-        responseItemModel.nodeUid,
-        errorText:
-            lookupFDashLocalizations(locale).validatorMinOccurs(minOccurs),
-      );
+      return lookupFDashLocalizations(locale).validatorMinOccurs(minOccurs);
     }
 
     final validationText = validateInput(value);
 
-    return (validationText == null)
-        ? null
-        : QuestionnaireErrorFlag(
-            responseItemModel.nodeUid,
-            errorText: validationText,
-          );
+    return (validationText == null) ? null : validationText;
   }
 
   @override

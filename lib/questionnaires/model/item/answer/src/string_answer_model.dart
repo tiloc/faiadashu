@@ -127,12 +127,8 @@ class StringAnswerModel extends AnswerModel<String, String> {
   }
 
   @override
-  QuestionnaireErrorFlag? get isComplete {
-    final valid = validateInput(value);
-
-    return valid == null
-        ? null
-        : QuestionnaireErrorFlag(responseItemModel.nodeUid, errorText: valid);
+  String? get isComplete {
+    return validateInput(value);
   }
 
   @override

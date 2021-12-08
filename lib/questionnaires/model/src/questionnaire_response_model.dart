@@ -706,29 +706,19 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   /// * All filled fields are valid
   /// * All expression-based constraints are satisfied
   ///
-  /// Returns null, if everything is complete.
-  /// Returns [QuestionnaireErrorFlag]s, if items are incomplete.
-  Future<Iterable<QuestionnaireErrorFlag>?> get isQuestionnaireComplete async {
-    final errorFlags = <QuestionnaireErrorFlag>[];
+  /// Returns true, if everything is complete.
+  /// Returns false, if items are incomplete.
+  Future<bool> get isQuestionnaireComplete async {
     for (final itemModel in orderedResponseItemModels()) {
-      final itemErrorFlags = await itemModel.isComplete;
-      if (itemErrorFlags != null) {
-        errorFlags.addAll(itemErrorFlags);
+      final isItemComplete = await itemModel.isComplete;
+      if (!isItemComplete) {
+        return false;
       }
     }
 
-    return (errorFlags.isNotEmpty) ? errorFlags : null;
+    return true;
   }
 
-  void resetMarkers() {
-    errorFlags.value = null;
-  }
-
-  final errorFlags = ValueNotifier<Iterable<QuestionnaireErrorFlag>?>(null);
-
-  /// Returns the [QuestionnaireErrorFlag] for an item with [nodeUid].
-  QuestionnaireErrorFlag? errorFlagForNodeUid(String responseUid) {
-    return errorFlags.value
-        ?.firstWhereOrNull((ef) => ef.nodeUid == responseUid);
-  }
+  // TODO: Is it enough for this to be a bool? Or should it be a Set of UIDs?
+  final isValid = ValueNotifier<bool?>(null);
 }

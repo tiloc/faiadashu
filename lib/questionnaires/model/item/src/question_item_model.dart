@@ -1,5 +1,6 @@
 import 'package:faiadashu/questionnaires/model/expression/src/fhir_expression_evaluator.dart';
 import 'package:fhir/r4.dart';
+import 'package:fhir_path/fhir_path.dart';
 
 import '../../../../coding/coding.dart';
 import '../../../../fhir_types/fhir_types.dart';
@@ -129,24 +130,23 @@ class QuestionItemModel extends ResponseItemModel {
   }
 
   @override
-  Future<Iterable<QuestionnaireErrorFlag>?> get isComplete async {
+  Future<bool> get isComplete async {
     // Non-existent answer models can be incomplete, e.g. if minOccurs is not met.
     _ensureAnswerModel();
 
-    final markers = <QuestionnaireErrorFlag>[];
-    final rimMarkers = await super.isComplete;
-    if (rimMarkers != null) {
-      markers.addAll(rimMarkers);
-    }
+    final isResponseComplete = await super.isComplete;
 
+    bool isAnswersComplete = true;
     for (final am in answerModels) {
-      final marker = am.isComplete;
-      if (marker != null) {
-        markers.add(marker);
+      final answerCompletionMessage = am.isComplete;
+
+      if (answerCompletionMessage != null) {
+        isAnswersComplete = false;
+        errorText = answerCompletionMessage;
       }
     }
 
-    return (markers.isNotEmpty) ? markers : null;
+    return isResponseComplete && isAnswersComplete;
   }
 
   @override
@@ -321,11 +321,9 @@ class QuestionItemModel extends ResponseItemModel {
       // Write the value back to the answer model
       firstAnswerModel.populateFromExpression(evaluationResult);
     } catch (ex) {
-      // FIXME: how to add an individual flag to the error list?
-      // Flags trigger re-calc, trigger ...
-      questionnaireResponseModel.errorFlags.value = [
-        QuestionnaireErrorFlag(nodeUid, errorText: ex.toString()),
-      ];
+      errorText =
+          (ex is FhirPathEvaluationException) ? ex.message : ex.toString();
+      questionnaireResponseModel.isValid.value = false;
       _qimLogger.warn('Calculation problem: $_calculatedExpression', error: ex);
     }
   }

@@ -31,9 +31,9 @@ class _QuestionnaireCompleteButtonState
 
         if (currentResponseStatus != QuestionnaireResponseStatus.completed) {
           final isComplete = await qm.isQuestionnaireComplete;
-          qm.errorFlags.value = isComplete;
+          qm.isValid.value = isComplete;
 
-          if (isComplete != null) {
+          if (!isComplete) {
             return;
           }
         }

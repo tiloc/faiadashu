@@ -142,10 +142,10 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
                     ),
                   ),
                   if (answerModel.hasUnitChoices)
-                       SizedBox(
-                    height: 16,
-                    child: _buildDropDownFromUnits(context),
-                  ),
+                    SizedBox(
+                      height: 16,
+                      child: _buildDropDownFromUnits(context),
+                    ),
                 ],
               ),
               if (hasSliderLabels)
@@ -185,10 +185,18 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
                     textAlign: TextAlign.end,
                     decoration: questionnaireTheme.createDecoration().copyWith(
                           errorText: answerModel.errorText,
+                          errorStyle: TextStyle(
+                            color: Theme.of(context).errorColor,
+                          ),
                           hintText: answerModel.entryFormat,
                           prefixIcon:
                               answerModel.questionnaireItemModel.isCalculated
-                                  ? const Icon(Icons.calculate)
+                                  ? Icon(
+                                      Icons.calculate,
+                                      color: (answerModel.errorText != null)
+                                          ? Theme.of(context).errorColor
+                                          : null,
+                                    )
                                   : null,
                           suffixIcon: (answerModel.hasUnitChoices)
                               ? SizedBox(
@@ -202,10 +210,14 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
                       signed: answerModel.minValue < 0,
                       decimal: answerModel.maxDecimal > 0,
                     ),
-                    validator: (inputValue) {
-                      return answerModel.validateInput(inputValue);
-                    },
-                    autovalidateMode: AutovalidateMode.always,
+                    validator: (itemModel.isCalculated)
+                        ? null
+                        : (inputValue) {
+                            return answerModel.validateInput(inputValue);
+                          },
+                    autovalidateMode: (itemModel.isCalculated)
+                        ? AutovalidateMode.disabled
+                        : AutovalidateMode.always,
                     onChanged: (content) {
                       value = answerModel.copyWithTextInput(content);
                     },
