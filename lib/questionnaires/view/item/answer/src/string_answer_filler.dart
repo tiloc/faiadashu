@@ -61,6 +61,12 @@ class _StringAnswerState extends QuestionnaireAnswerFillerState<String,
             : 1,
         decoration: questionnaireTheme.createDecoration().copyWith(
               errorText: answerModel.errorText,
+              errorStyle: (itemModel
+                      .isCalculated) // Force display of error text on calculated item
+                  ? TextStyle(
+                      color: Theme.of(context).errorColor,
+                    )
+                  : null,
               hintText: answerModel.entryFormat,
             ),
         validator: (inputValue) => answerModel.validateInput(inputValue),

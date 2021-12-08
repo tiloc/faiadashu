@@ -49,9 +49,15 @@ class _DateTimeAnswerState extends QuestionnaireAnswerFillerState<FhirDateTime,
         firstDate: DateTime(1860),
         lastDate: DateTime(2050),
         pickerType: pickerType,
-        decoration: questionnaireTheme
-            .createDecoration()
-            .copyWith(errorText: answerModel.errorText),
+        decoration: questionnaireTheme.createDecoration().copyWith(
+              errorText: answerModel.errorText,
+              errorStyle: (itemModel
+                      .isCalculated) // Force display of error text on calculated item
+                  ? TextStyle(
+                      color: Theme.of(context).errorColor,
+                    )
+                  : null,
+            ),
         onChanged: (fhirDatetime) => value = fhirDatetime,
       ),
     );
