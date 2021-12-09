@@ -44,8 +44,8 @@ class QuestionnaireLaunchTile extends StatefulWidget {
 
 class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
   late final FhirResourceProvider _questionnaireProvider;
-  late final Locale _locale;
-  late final NumberFormat _percentPattern;
+  late Locale _locale;
+  late NumberFormat _percentPattern;
   late Future<QuestionnaireResponseModel> _modelFuture;
 
   @override
@@ -87,7 +87,7 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
         builder: (context, snapshot) {
           var countString = '';
           if (snapshot.hasData) {
-            // FIXME: Sometimes these stats are not being shown.
+            // FIXME: Sometimes these stats are not being shown. Handle snapshot error.
             final _questionnaireResponseModel = snapshot.data!;
             final _numberCompleted =
                 _questionnaireResponseModel.count((rim) => rim.isAnswered);
