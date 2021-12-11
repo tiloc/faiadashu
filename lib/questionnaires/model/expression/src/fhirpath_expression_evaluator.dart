@@ -3,25 +3,32 @@ import 'package:fhir/r4/resource/resource.dart';
 import 'package:fhir_path/run_fhir_path.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../../../logging/logging.dart';
 import 'expression_evaluator.dart';
 import 'fhir_expression_evaluator.dart';
 
 class FhirPathExpressionEvaluator extends FhirExpressionEvaluator {
+  static final _logger = Logger(FhirPathExpressionEvaluator);
+
   final Resource? Function()? resourceBuilder;
-  final String fhirpath;
+  final String fhirPath;
+  final Map<String, dynamic>? Function()? jsonBuilder;
 
   FhirPathExpressionEvaluator(
     this.resourceBuilder,
-    Expression fhirpathExpression,
-    Iterable<ExpressionEvaluator> upstreamExpressions,
-  )   : fhirpath = ArgumentError.checkNotNull(fhirpathExpression.expression),
+    Expression fhirPathExpression,
+    Iterable<ExpressionEvaluator> upstreamExpressions, {
+    this.jsonBuilder,
+    String? debugLabel,
+  })  : fhirPath = ArgumentError.checkNotNull(fhirPathExpression.expression),
         super(
-          fhirpathExpression,
+          fhirPathExpression,
           upstreamExpressions,
+          debugLabel: debugLabel,
         ) {
-    if (fhirpathExpression.language != ExpressionLanguage.text_fhirpath) {
+    if (fhirPathExpression.language != ExpressionLanguage.text_fhirpath) {
       throw ArgumentError(
-        "$name has wrong language: ${fhirpathExpression.language.toString()}",
+        "$name has wrong language: ${fhirPathExpression.language.toString()}",
       );
     }
   }
@@ -32,25 +39,30 @@ class FhirPathExpressionEvaluator extends FhirExpressionEvaluator {
 
     final upstreamMap = <String, dynamic>{};
 
-    for (final upstreamExpression
-        in upstreamExpressions.toList(growable: false).reversed) {
+    for (final upstreamExpression in upstreamExpressions) {
       final name = ArgumentError.checkNotNull(upstreamExpression.name);
       final key = '%$name';
 
-      if (upstreamMap[key] != null) {
-        // items later in the list beat items earlier in the list.
-        continue;
+      try {
+        final value = await upstreamExpression.fetchValue();
+
+        upstreamMap[key] = value;
+      } catch (ex) {
+        // If resolving the value fails: silently put nothing into the map
+        // If it was required it will fail later during FHIRPath eval. If not: great!
+        _logger.warn('Cannot fetch upstream $upstreamExpression', error: ex);
       }
-
-      final value = await upstreamExpression.fetchValue();
-
-      upstreamMap[key] = value;
     }
 
-    final resource = resourceBuilder?.call();
+    final jsonContext =
+        resourceBuilder?.call()?.toJson() ?? jsonBuilder?.call();
+    final fhirPathResult =
+        walkFhirPath(jsonContext, fhirPath, environment: upstreamMap);
+
+    _logger.debug('${toStringShort()} $fhirPath: $fhirPathResult');
 
     return Future.value(
-      r4WalkFhirPath(resource, fhirpath, upstreamMap),
+      fhirPathResult,
     );
   }
 
@@ -59,7 +71,7 @@ class FhirPathExpressionEvaluator extends FhirExpressionEvaluator {
     super.debugFillProperties(properties);
 
     properties.add(
-      StringProperty('FHIRPath', fhirpath),
+      StringProperty('FHIRPath', fhirPath),
     );
   }
 }

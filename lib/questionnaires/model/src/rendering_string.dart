@@ -152,7 +152,7 @@ class RenderingString with Diagnosticable {
       FlagProperty(
         'media',
         value: hasMedia,
-        ifTrue: 'hasMedia',
+        ifTrue: 'HAS MEDIA',
       ),
     );
   }

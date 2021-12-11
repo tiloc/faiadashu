@@ -12,10 +12,20 @@ Information on Structured Data Capture can be found here:
 
 ### Advanced Behavior
 #### Expressions
-Only expressions of type `text/fhirpath` are supported.
+Support for expressions of types: 
+* `text/fhirpath`
 > FHIRPath support in Faiadashu is *highly experimental* and uses [fhir_path](https://pub.dev/packages/fhir_path) as its
 > underlying implementation. See the [fhir_path documentation](https://pub.dev/packages/fhir_path) for capabilities and
 > limitations.
+
+_No_ support for:
+* CQL
+* Server Queries
+
+##### Environment
+* %context
+* %resource
+* %qitem
 
 #### Variables
 Full support for variables, on questionnaire level and item level. Proper support for visibility rules. 
@@ -76,7 +86,7 @@ Supported for styled static output.
 ### Item category: Question
 #### All types
 ##### required
-Supported. Renders a '*' after the label
+Supported. Renders an asterisk '*' after the label
 
 ##### repeats
 Supported. Renders a multi-selection for items of type `choice`. Not supported for `open-choice`. 
@@ -108,7 +118,8 @@ Text is displayed immediately below the containing question item (typically as a
 
 ##### itemMedia
 An image to display as a visual accompaniment to the question being asked.
-> Only inlined images are supported. Only small image formats are supported.
+> Only inlined images are supported. 
+> Only small image formats are supported.
 
 Reference: 
 [sdc-questionnaire-itemMedia](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-itemMedia.html)
@@ -244,6 +255,8 @@ Same as `choice` with the following differences:
 ##### Extensions
 - openLabel
 
+The label for the "open" choice. Default is "Other"
+
 ---
 #### url
 Supported (accepts http, https, ftp, and sftp)
@@ -271,6 +284,8 @@ A total score field will be visualized with a "Total Score" heading and a large 
 
 It will also evaluate and visualize the Danish http://ehealth.sundhed.dk/fhir/StructureDefinition/ehealth-questionnaire-feedback extension
 for patient feedback.
+
+> Handling of calculatedExpression is mature enough for scoring, and is the recommended approach.
 
 ### Response creation
 

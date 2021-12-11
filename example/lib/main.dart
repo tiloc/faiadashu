@@ -22,7 +22,7 @@ import 'primitive_page.dart';
 
 void main() {
   if (kDebugMode || kIsWeb) {
-    dartlog.Logger.root.level = dartlog.Level.ALL;
+    dartlog.Logger.root.level = dartlog.Level.FINE;
     dartlog.Logger.root.onRecord.listen((dartlog.LogRecord rec) {
       developer.log(
         rec.message,

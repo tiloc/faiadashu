@@ -38,8 +38,10 @@ class QuestionnaireResponseModel extends ChangeNotifier {
       () => questionnaireModel.questionnaire,
     );
 
+    // The %resource variable when it appears in expressions on elements in
+    // Questionnaire will be evaluated as the root of the QuestionnaireResponse.
     final questionnaireResponseExpression = ResourceExpressionEvaluator(
-      'context',
+      'resource',
       () => questionnaireResponse,
     );
 
@@ -355,14 +357,26 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     }
   }
 
-  QuestionnaireResponse? _cachedQuestionnaireResponse;
+  Map<String, dynamic>? _cachedQuestionnaireResponse;
+
+  /// INTERNAL ONLY - Returns a FHIR JSON fragment for a node with a given [uid].
+  Map<String, dynamic>? responseItemByUid(String uid) {
+    _cachedQuestionnaireResponse ??=
+        aggregator<QuestionnaireResponseAggregator>().aggregateResponseItems();
+
+    return _cachedQuestionnaireResponse?[uid] as Map<String, dynamic>?;
+  }
 
   /// Returns a [QuestionnaireResponse].
   ///
   /// The response matches the model as of the current generation.
-  QuestionnaireResponse? get questionnaireResponse =>
-      _cachedQuestionnaireResponse ??=
-          aggregator<QuestionnaireResponseAggregator>().aggregate();
+  QuestionnaireResponse? get questionnaireResponse {
+    _cachedQuestionnaireResponse ??=
+        aggregator<QuestionnaireResponseAggregator>().aggregateResponseItems();
+
+    return _cachedQuestionnaireResponse?[QuestionnaireResponseAggregator
+        .questionnaireResponseKey] as QuestionnaireResponse?;
+  }
 
   /// Returns a number that indicates whether the model has changed.
   int get generation => _generation;

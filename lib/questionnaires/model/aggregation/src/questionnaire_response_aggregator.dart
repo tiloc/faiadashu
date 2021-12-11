@@ -26,6 +26,7 @@ class QuestionnaireResponseAggregator
   QuestionnaireResponseItem? _fromQuestionItem(
     QuestionItemModel itemModel,
     QuestionnaireResponseStatus responseStatus,
+    Map<String, dynamic> responseItemRegistry,
   ) {
     if (responseStatus == QuestionnaireResponseStatus.completed &&
         !itemModel.isEnabled) {
@@ -48,14 +49,22 @@ class QuestionnaireResponseAggregator
       if (isCodingAnswers) {
         // Evaluate nested items from first answer only
         final firstAnswer = answeredAnswerModels.first;
-        final nestedItems = _fromResponseItems(firstAnswer, responseStatus);
+        final nestedItems = _fromResponseItems(
+          firstAnswer,
+          responseStatus,
+          responseItemRegistry,
+        );
 
         answers = firstAnswer.createFhirCodingAnswers(nestedItems);
       } else {
         // Evaluate nested items
         final List<QuestionnaireResponseAnswer> createdAnswers = [];
         for (final answerModel in answeredAnswerModels) {
-          final nestedItems = _fromResponseItems(answerModel, responseStatus);
+          final nestedItems = _fromResponseItems(
+            answerModel,
+            responseStatus,
+            responseItemRegistry,
+          );
           final fhirAnswer = answerModel.createFhirAnswer(nestedItems);
           if (fhirAnswer != null) {
             createdAnswers.add(fhirAnswer);
@@ -65,7 +74,7 @@ class QuestionnaireResponseAggregator
       }
     }
 
-    return QuestionnaireResponseItem(
+    final responseItem = QuestionnaireResponseItem(
       linkId: itemModel.questionnaireItemModel.linkId,
       text: itemModel.questionnaireItemModel.text?.plainText,
       // TODO: Include textElement
@@ -79,47 +88,66 @@ class QuestionnaireResponseAggregator
           : null,
       answer: answers,
     );
+
+    responseItemRegistry[itemModel.nodeUid] = responseItem.toJson();
+
+    return responseItem;
   }
 
   QuestionnaireResponseItem? _fromGroupItem(
     GroupItemModel itemModel,
     QuestionnaireResponseStatus responseStatus,
+    Map<String, dynamic> responseItemRegistry,
   ) {
     if (responseStatus == QuestionnaireResponseStatus.completed &&
         !itemModel.isEnabled) {
       return null;
     }
 
-    final nestedItems = _fromResponseItems(itemModel, responseStatus);
+    final nestedItems =
+        _fromResponseItems(itemModel, responseStatus, responseItemRegistry);
 
-    return (nestedItems != null)
-        ? QuestionnaireResponseItem(
-            linkId: itemModel.questionnaireItemModel.linkId,
-            text: itemModel.questionnaireItemModel.text?.plainText,
-            // TODO: include textElement
-            item: nestedItems,
-          )
-        : null;
+    if (nestedItems != null) {
+      final responseItem = QuestionnaireResponseItem(
+        linkId: itemModel.questionnaireItemModel.linkId,
+        text: itemModel.questionnaireItemModel.text?.plainText,
+        // TODO: include textElement
+        item: nestedItems,
+      );
+
+      responseItemRegistry[itemModel.nodeUid] = responseItem.toJson();
+
+      return responseItem;
+    } else {
+      return null;
+    }
   }
 
   List<QuestionnaireResponseItem>? _fromResponseItems(
     ResponseNode? parentNode,
     QuestionnaireResponseStatus responseStatus,
+    Map<String, dynamic> responseItemRegistry,
   ) {
     final responseItems = <QuestionnaireResponseItem>[];
 
     for (final itemModel in questionnaireResponseModel
         .orderedResponseItemModelsWithParent(parent: parentNode)) {
       if (itemModel.questionnaireItemModel.isGroup) {
-        final groupItem =
-            _fromGroupItem(itemModel as GroupItemModel, responseStatus);
+        final groupItem = _fromGroupItem(
+          itemModel as GroupItemModel,
+          responseStatus,
+          responseItemRegistry,
+        );
         if (groupItem != null) {
           responseItems.add(groupItem);
         }
       } else {
         // isQuestion
-        final questionItem =
-            _fromQuestionItem(itemModel as QuestionItemModel, responseStatus);
+        final questionItem = _fromQuestionItem(
+          itemModel as QuestionItemModel,
+          responseStatus,
+          responseItemRegistry,
+        );
         if (questionItem != null) {
           responseItems.add(questionItem);
         }
@@ -129,20 +157,43 @@ class QuestionnaireResponseAggregator
     return (responseItems.isNotEmpty) ? responseItems : null;
   }
 
+  static const questionnaireResponseKey = '_questionnaireResponse';
+
   @override
   QuestionnaireResponse? aggregate({
     QuestionnaireResponseStatus? responseStatus,
     bool notifyListeners = false,
     bool containPatient = false,
   }) {
-    _logger.trace('QuestionnaireResponse.aggregate');
+    _logger.trace('QuestionnaireResponseAggregator.aggregate');
+
+    final responseItems = aggregateResponseItems(
+      responseStatus: responseStatus,
+      notifyListeners: notifyListeners,
+      containPatient: containPatient,
+    );
+
+    final questionnaireResponse =
+        responseItems[questionnaireResponseKey] as QuestionnaireResponse?;
+
+    return questionnaireResponse;
+  }
+
+  Map<String, dynamic> aggregateResponseItems({
+    QuestionnaireResponseStatus? responseStatus,
+    bool notifyListeners = false,
+    bool containPatient = false,
+  }) {
+    _logger.trace('QuestionnaireResponseAggregator.aggregateResponseItems');
 
     // Are all minimum fields for SDC profile present?
     bool isValidSdc = true;
 
     responseStatus ??= questionnaireResponseModel.responseStatus;
 
-    final responseItems = _fromResponseItems(null, responseStatus);
+    final responseItemRegistry = <String, dynamic>{};
+    final responseItems =
+        _fromResponseItems(null, responseStatus, responseItemRegistry);
 
     final narrativeAggregator =
         questionnaireResponseModel.aggregator<NarrativeAggregator>();
@@ -227,6 +278,8 @@ class QuestionnaireResponseAggregator
       value = questionnaireResponse;
     }
 
-    return questionnaireResponse;
+    responseItemRegistry[questionnaireResponseKey] = questionnaireResponse;
+
+    return responseItemRegistry;
   }
 }

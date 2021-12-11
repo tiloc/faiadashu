@@ -7,7 +7,7 @@
     * live evaluation of FHIR Path expressions
 > _Faiabench_ is pushing Dart and Flutter to the limit.
 > * only works on desktops or landscape tablets, due to screen size requirements
-> * deployment for web target only works on Flutter `master` branch, due to bug in Dart
+> * requires Flutter 2.8 due to bugs in earlier versions of Flutter
 > * keyboard input to FHIR Path field broken on Mac, due to bugs in macOS Flutter: https://github.com/flutter/flutter/issues/82124
 
 * ### Faiadashu Example / Gallery
@@ -20,8 +20,9 @@
   * Cleanly carved out into new `expression` module
   * Made async in preparation for query expressions
   * Made all model operations that depend on expressions async
-  * Support for item-level variables
-  * Support for %questionnaire, %qitem, %context (on Questionnaire level)
+  * Support for item-level expressions
+  * Support for %questionnaire, %qitem, %context, %resource
+    * see "Variable Scope Test" in the Gallery for an example
 * **[Breaking]** Introduction of new RenderingString type to handle items which can have plain and styled text
   * Supports plain, XHTML, and Markdown
   * Implemented throughout numerous models and views
@@ -35,7 +36,7 @@
 * Support for 'prompt' item control
 * Support itemAnswerMedia extension for a clean way to add images to coding answers
 * Support specifying defaults for some model properties (e.g. maxDecimal)
-* Support usageMode extension for narrative creation
+* Support usageMode extension (hide elements during filling, or during narrative creation)
 * Basic support for choiceColumn extension
 * Fixed count methods to get accurate count of unanswered questions
 * Improvements in the display of errors

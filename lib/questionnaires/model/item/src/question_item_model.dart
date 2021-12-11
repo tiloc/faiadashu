@@ -41,11 +41,13 @@ class QuestionItemModel extends ResponseItemModel {
     final calculatedExpression = questionnaireItemModel.calculatedExpression;
     _calculatedExpression = (calculatedExpression != null)
         ? FhirExpressionEvaluator.fromExpression(
-            () => questionnaireResponseModel.questionnaireResponse,
+            null,
             calculatedExpression,
             [
               ...itemWithPredecessorsExpressionEvaluators,
             ],
+            jsonBuilder: () =>
+                questionnaireResponseModel.responseItemByUid(nodeUid),
           )
         : null;
   }

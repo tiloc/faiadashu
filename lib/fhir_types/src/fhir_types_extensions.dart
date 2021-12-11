@@ -99,13 +99,16 @@ extension FDashQuantityExtension on Quantity {
     String defaultText = '',
     String unknownValueText = '?',
   }) {
+    final value = this.value;
+    final unit = this.unit;
+
     return value == null
         ? unit == null
             ? defaultText
             : '$unknownValueText $unit'
         : unit == null
-            ? value!.format(locale)
-            : '${value!.format(locale)} $unit';
+            ? value.format(locale)
+            : '${value.format(locale)} $unit';
   }
 
   // Returns whether this [Quantity] has a specified unit.
@@ -125,18 +128,20 @@ extension FDashCodingExtension on Coding {
     if (otherCoding == null) {
       return false;
     }
+    final codeValue = code?.value;
+    final otherCodeValue = otherCoding.code?.value;
 
     if (system != otherCoding.system) {
       return false;
     }
 
-    if (code?.value == otherCoding.code?.value) {
+    if (codeValue == otherCodeValue) {
       return true;
     }
 
-    return code?.value != null &&
-        otherCoding.code?.value != null &&
-        code!.value!.toUpperCase() == otherCoding.code!.value!.toUpperCase();
+    return codeValue != null &&
+        otherCodeValue != null &&
+        codeValue.toUpperCase() == otherCodeValue.toUpperCase();
   }
 
   /// Localized access to display value.

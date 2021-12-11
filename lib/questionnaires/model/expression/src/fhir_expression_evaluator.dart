@@ -7,23 +7,29 @@ import 'fhirpath_expression_evaluator.dart';
 abstract class FhirExpressionEvaluator extends ExpressionEvaluator {
   FhirExpressionEvaluator(
     Expression fhirExpression,
-    Iterable<ExpressionEvaluator> upstreamExpressions,
-  ) : super(
+    Iterable<ExpressionEvaluator> upstreamExpressions, {
+    String? debugLabel,
+  }) : super(
           fhirExpression.name?.value,
           upstreamExpressions,
+          debugLabel: debugLabel,
         );
 
   factory FhirExpressionEvaluator.fromExpression(
     Resource? Function()? resourceBuilder,
     Expression fhirExpression,
-    Iterable<ExpressionEvaluator> upstreamExpressions,
-  ) {
+    Iterable<ExpressionEvaluator> upstreamExpressions, {
+    Map<String, dynamic>? Function()? jsonBuilder,
+    String? debugLabel,
+  }) {
     switch (ArgumentError.checkNotNull(fhirExpression.language)) {
       case ExpressionLanguage.text_fhirpath:
         return FhirPathExpressionEvaluator(
           resourceBuilder,
           fhirExpression,
           upstreamExpressions,
+          jsonBuilder: jsonBuilder,
+          debugLabel: debugLabel,
         );
       case ExpressionLanguage.application_x_fhir_query:
       case ExpressionLanguage.text_cql:

@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:code_text_field/code_text_field.dart';
 import 'package:faiabench/fhir_resource.dart';
-import 'package:fhir/r4/resource/resource.dart';
 import 'package:fhir_path/fhir_path.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -49,10 +48,9 @@ class _FhirResourceEditorState extends ConsumerState<FhirResourceEditor> {
   void _fhirPathChanged(String newPath) {
     setState(() {
       try {
-        final newResource = Resource.fromJson(
-          jsonDecode(_codeController!.rawText) as Map<String, dynamic>,
-        );
-        final pathResult = walkFhirPath(newResource.toJson(), newPath);
+        final jsonContext =
+            jsonDecode(_codeController!.rawText) as Map<String, dynamic>;
+        final pathResult = walkFhirPath(jsonContext, newPath);
         const encoder = JsonEncoder.withIndent('  ');
         _fhirPathOutputController!.text =
             encoder.convert(jsonDecode(jsonEncode(pathResult)));

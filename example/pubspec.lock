@@ -21,7 +21,7 @@ packages:
       name: characters
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.0"
+    version: "1.2.0"
   charcode:
     dependency: transitive
     description:
@@ -84,13 +84,13 @@ packages:
       name: fhir_auth
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.5.0-6"
+    version: "0.5.0-7"
   fhir_path:
     dependency: transitive
     description:
-      name: fhir_path
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "/Users/tilo/Projects/fhir/fhir_path"
+      relative: false
+    source: path
     version: "0.5.0-16"
   fhir_yaml:
     dependency: transitive
@@ -426,7 +426,7 @@ packages:
       name: vector_math
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.1.0"
+    version: "2.1.1"
   xml:
     dependency: transitive
     description:
@@ -442,5 +442,5 @@ packages:
     source: hosted
     version: "3.1.0"
 sdks:
-  dart: ">=2.14.0 <3.0.0"
-  flutter: ">=2.5.3"
+  dart: ">=2.15.0 <3.0.0"
+  flutter: ">=2.8.0"

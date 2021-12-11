@@ -10,7 +10,7 @@ import '../../../questionnaires.dart';
 /// An item entry for a questionnaire filler.
 ///
 /// This is a common base-class for items that can generate responses (questions, groups),
-/// and those that don't (display).
+/// and those that cannot (display).
 abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
   static final _fimLogger = Logger(FillerItemModel);
 
@@ -47,13 +47,19 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
 
   late final Iterable<ExpressionEvaluator> _itemLevelExpressionEvaluators;
 
+  Iterable<ExpressionEvaluator> get _itemBelowVariablesExpressionEvaluators {
+    final qitemExpression =
+        _QuestionnaireItemExpressionEvaluator(questionnaireItem);
+
+    return [
+      ...questionnaireResponseModel.questionnaireLevelExpressionEvaluators,
+      qitemExpression,
+    ];
+  }
+
   // Builds the [ExpressionEvaluator]s for this item
   void _buildItemLevelExpressionEvaluators() {
-    final qitemExpression =
-        _QuestionnaireItemExpressionEvaluator('qitem', questionnaireItem);
-
-    // http://build.fhir.org/ig/HL7/sdc/expressions.html#fhirpath
-    // TODO: Implement '%context';
+    final itemUpstream = _itemBelowVariablesExpressionEvaluators;
 
     // Item-level variables
     final variableExtensions = questionnaireItem.extension_
@@ -70,19 +76,21 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
           );
         }
 
-        // The %resource variable when it appears in expressions on elements in
-        // Questionnaire will be evaluated as the root of the QuestionnaireResponse.
+        // %context is not a full resource, but just a fragment from the QuestionnaireResponse,
+        // corresponding to this item.
         final variable = FhirExpressionEvaluator.fromExpression(
-          () => questionnaireResponseModel.questionnaireResponse,
+          null,
           variableExpression,
-          [qitemExpression, ...qiLevelVars],
+          [...itemUpstream, ...qiLevelVars],
+          jsonBuilder: () =>
+              questionnaireResponseModel.responseItemByUid(nodeUid),
         );
 
         qiLevelVars.add(variable);
       }
     }
 
-    _itemLevelExpressionEvaluators = [qitemExpression, ...qiLevelVars];
+    _itemLevelExpressionEvaluators = [...itemUpstream, ...qiLevelVars];
   }
 
   /// Returns the [ExpressionEvaluator]s for this item, such as item-level variables
@@ -90,7 +98,7 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
       _itemLevelExpressionEvaluators;
 
   /// Returns the [ExpressionEvaluator]s for this item, all parent items,
-  /// the questionnaire, and the launchcontext.
+  /// the questionnaire, and the launch context.
   ///
   /// One-stop shopping :-)
   Iterable<ExpressionEvaluator> get itemWithPredecessorsExpressionEvaluators {
@@ -123,9 +131,11 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
 
     _enableWhenExpression = (enableWhenExtensionExpression != null)
         ? FhirExpressionEvaluator.fromExpression(
-            () => questionnaireResponseModel.questionnaireResponse,
+            null,
             enableWhenExtensionExpression,
             itemWithPredecessorsExpressionEvaluators,
+            jsonBuilder: () =>
+                questionnaireResponseModel.responseItemByUid(nodeUid),
           )
         : null;
   }
@@ -412,9 +422,8 @@ class _QuestionnaireItemExpressionEvaluator extends ExpressionEvaluator {
   }
 
   _QuestionnaireItemExpressionEvaluator(
-    String name,
     QuestionnaireItem questionnaireItem,
-  ) : super(name, []) {
+  ) : super('qitem', []) {
     questionnaireItemJson = questionnaireItem.toJson();
   }
 }

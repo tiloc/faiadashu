@@ -14,6 +14,11 @@ class ResourceExpressionEvaluator extends ExpressionEvaluator {
 
   ResourceExpressionEvaluator(
     String name,
-    this.resourceBuilder,
-  ) : super(name, []);
+    this.resourceBuilder, {
+    String? debugLabel,
+  }) : super(
+          name,
+          [],
+          debugLabel: debugLabel,
+        );
 }

@@ -44,7 +44,7 @@ abstract class ResponseItemModel extends FillerItemModel {
   bool get isAnswerable {
     final returnValue = !(questionnaireItemModel.isReadOnly || !isEnabled);
 
-    _rimLogger.debug('isAnswerable $nodeUid: $returnValue');
+    _rimLogger.trace('isAnswerable $nodeUid: $returnValue');
 
     return returnValue;
   }
