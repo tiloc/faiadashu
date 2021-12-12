@@ -115,7 +115,12 @@ Not supported.
 Not supported.
 
 ### Item category: Question
-#### All types
+#### Commonalities across question types
+Question items share many commonalities. Individual item types may offer additional features.
+
+###### entryFormat
+Supported. Displays the guidance text next to the input control.
+
 ###### required
 Supported. 
 * Renders an asterisk (*) after the label
@@ -150,85 +155,73 @@ Comprehensive support, incl. tri-state for "not answered"
 See: http://build.fhir.org/questionnaire.html#booleans for a discussion of tri-state.
 
 ---
-#### quantity
-Comprehensive support.
+### Commonalities: quantity, decimal, integer
+Numerical inputs share many commonalities. Individual item types may offer additional features.
 
-Special support for read-only display of total score.
-
-> Quantity requires the declaration of units. It does not support free-text entry for units.
-
-##### Extensions
-- entryFormat
+#### Extensions
 - minValue
 - maxValue
-- maxDecimalPlaces
 - questionnaire-itemControl: slider (see below for details)
 - sliderStepValue
-- unitValueSet
-- unit
+- calculatedExpression
+- unit: as per the spec, this is only a computational unit, and not used for display
 
-##### Slider control
-When an item control of type "slider" is being used, then a maxValue should be provided. Otherwise a default value (typically: 100)
+#### Slider control
+When an item control of type "slider" is being used, then a maxValue should be provided. Otherwise, a default value (typically: 100)
 will be used, since an unlimited maxValue is not possible.
 
 Nested display items with itemControl `upper` and `lower` are associated with the slider control and will display as upper and lower
 label. They support [styled rendering](#styled-rendering).
 
----
-#### decimal
+#### Total Score
+Special support for read-only display of total score - see [Scoring](#scoring)
+
+### quantity
 Comprehensive support.
 
-Special support for read-only display of total score - see [Scoring](#scoring)
+> Quantity requires the declaration of units. It does not support free-text entry for units.
 
-##### Extensions
-- entryFormat
-- minValue
-- maxValue
+#### Extensions
 - maxDecimalPlaces
-- questionnaire-itemControl: slider (see above for details)
-- sliderStepValue
-- unit
-- calculatedExpression
+- unitValueSet
 
 ---
-#### integer
-Comprehensive support
+### decimal
+Comprehensive support.
 
-Special support for read-only display of total score - see [Scoring](#scoring)
+#### Extensions
+- maxDecimalPlaces
+
+---
+### integer
+Comprehensive support
 
 Special support for 🇩🇰 Danish specification on patient feedback.
 
-##### Extensions
-- entryFormat
-- minValue
-- maxValue
-- questionnaire-itemControl: slider (see above for details)
-- sliderStepValue
-- unit
+#### Extensions
 - http://ehealth.sundhed.dk/fhir/StructureDefinition/ehealth-questionnaire-feedback
 
 ---
-#### date
+### date
 Comprehensive support. Date picker with localized format.
 
-##### Extensions
+#### Extensions
 - (none)
 
 ---
-#### dateTime
+### dateTime
 Comprehensive support. Date/Time picker with localized format.
 
-##### Extensions
+#### Extensions
 - sdc-questionnaire-initialExpression
 
-#### time
+### time
 Comprehensive support. Time picker with localized format.
 
-#### string, text 
+### string, text 
 Comprehensive support. Keyboard type can be hinted.
 
-##### Extensions
-- entryFormat (use regular expressions, *not the "ANA NAN" format as seen in some examples.*)
+#### Extensions
 - minLength  
 - maxLength
 - regex  
@@ -236,18 +229,18 @@ Comprehensive support. Keyboard type can be hinted.
 - sdc-questionnaire-keyboard: email, phone, number
 
 ---
-#### choice
+### choice
 Comprehensive support, incl. optionChoice and choices from ValueSets.
 Support for multiple choice (item.repeats = true) and autocomplete from ValueSets (triggered automatically by large # of choices).
 
 Support for leaving a question unanswered.
 
-##### Value Sets
+#### Value Sets
 The value set `http://hl7.org/fhir/ValueSet/yesnodontknow` is hard-coded into the library and always available.
 
 See: http://build.fhir.org/questionnaire.html#valuesets
 
-##### Extensions
+#### Extensions
 - optionExclusive
 - ordinalValue
 - iso21090-CO-value
@@ -265,22 +258,22 @@ See: http://build.fhir.org/questionnaire.html#valuesets
 > `itemAnswerMedia` should be favoured over `rendering-xhtml` to add images to answer options. 
 
 ---
-#### open-choice 
+### open-choice 
 Same as `choice` with the following differences:
 - repeats is not supported
 - a single text input field is presented below the selections
 
-##### Extensions
+#### Extensions
 - openLabel
 
 The label for the "open" choice. Default is "Other"
 
 ---
-#### url
+### url
 Supported (accepts http, https, ftp, and sftp)
 
 ---
-#### attachment, reference
+### attachment, reference
 Not supported
 
 ---
