@@ -88,6 +88,13 @@ Fully supported.
 Reference:
 [sdc-questionnaire-enableWhenExpression](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-enableWhenExpression.html)
 
+#### Constraints
+Complex constraints can be expressed through [Expressions](#expressions).
+
+See: http://hl7.org/fhir/StructureDefinition/questionnaire-constraint
+
+> More specific constraints can be expressed with `required`, `minOccurs`, `maxOccurs`.
+
 ### Item category: Display
 #### display
 Supported.
