@@ -1,4 +1,4 @@
-## Structured Data Capture (SDC) Capabilities
+# Structured Data Capture (SDC) Capabilities
 The Form Filler is based on a specification called [Structured Data Capture (SDC)](https://hl7.org/fhir/uv/sdc/2019May/index.html).
 
 Information on Structured Data Capture can be found here:
@@ -10,113 +10,125 @@ Information on Structured Data Capture can be found here:
 
 [![Walk-through of the capabilities](https://img.youtube.com/vi/k9vEy9Z_L18/hqdefault.jpg)](https://www.youtube.com/watch?v=k9vEy9Z_L18 "Walk-through of the Capabilities")
 
-### Advanced Behavior
-#### Expressions
-Support for expressions of types: 
-* `text/fhirpath`
-> FHIRPath support in Faiadashu is *highly experimental* and uses [fhir_path](https://pub.dev/packages/fhir_path) as its
-> underlying implementation. See the [fhir_path documentation](https://pub.dev/packages/fhir_path) for capabilities and
-> limitations.
 
-_No_ support for:
-* CQL
-* Server Queries
 
-##### Environment
-* %context
-* %resource
-* %qitem
+## Items by Category
+FHIR categorizes item types into three categories:
+1. Group
+2. Display
+3. Question
 
-#### Variables
-Full support for variables, on questionnaire level and item level. Proper support for visibility rules. 
-Specification: https://www.hl7.org/fhir/extension-variable.html
+### All categories
+Group, Display, and Questions share several commonalities.
 
-### Advanced Rendering
+#### Styled Rendering
 See: https://www.hl7.org/fhir/rendering-extensions.html
-#### rendering-style
+##### rendering-style
 Support for colors. Usable in many places (title, text, option) as permitted by the specification.
 
 ![rendering_style](images/rendering_style.png)
 
-#### rendering-xhtml
+###### rendering-xhtml
 Comprehensive support for fonts, style, and colors. No support for tables or lists.
 Usable in many places (title, text, option) as permitted by the specification.
 
 ![rendering_xhtml](images/rendering_xhtml.png)
 
-#### rendering-markdown
+###### rendering-markdown
 Support for GitHub Flavored Markdown ("GFM" CommonMark).
 Usable in many places (title, text, option) as permitted by the specification.
 
-#### rendering-styleSensitive
+###### rendering-styleSensitive
 Silently ignored, as rendering will always preserve full styling.
 
-#### help
+#### User Assistance 
+###### help
 Display items with itemControl `help` are associated with the proper question and display a help dialog.
 
-#### supportLink
+###### supportLink
 Support links are recognized and visualized. The particular action behind them is determined through an
 integration point of the SDK.
 
+#### Decorations
+###### shortText
+Supported
+
 ![item_help](images/item_help.png)
-#### displayCategory
+###### displayCategory
 Supports `security` and `instructions`.
 ![displayCategory](images/displaycategory.png)
 
-#### optionalDisplay
-The filler never chooses to omit a field from display.
+#### Visibility
 
-#### hidden
+###### hidden
 Supported
 
-#### shortText
-Supported
-
-#### usageMode
+###### usageMode
 Supported during filling of questionnaire ("capture"), and for generation of a narrative ("display").
 
-### Item category: Group
-#### group
-Supported, but no support for item-control.
+##### optionalDisplay
+The filler never chooses to omit a field from display.
 
-### Item category: Display
-### display
-Supported for styled static output.
+#### Enablement
+Items can be shown or hidden depending on dynamic conditions.
 
-### Item category: Question
-#### All types
-##### required
-Supported. Renders an asterisk '*' after the label
-
-##### repeats
-Supported. Renders a multi-selection for items of type `choice`. Not supported for `open-choice`. 
-Renders UI elements to add/remove repeating answers for all other item types.
-
-The label of the UI element uses the `shortText` as a description for a single item.
-
-##### readOnly
-Supported.
-
-##### enableWhen
+###### enableWhen
 Support for all behaviors: `any`, `all`
 
 Limited support for operators:
-* `=` only on coding 
+* `=` only on `Coding`
 * `exists` on all types
-* All other operators: always return true, as to not prevent filling of the questionnaire.
+* All other operators: **unsupported** (always return true, as to not prevent filling of the questionnaire.)
 
-##### enableWhenExpression
+> `enableWhenExpression` can be used for more complex evaluations.
+
+###### enableWhenExpression
 Fully supported.
 
 Reference:
 [sdc-questionnaire-enableWhenExpression](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-enableWhenExpression.html)
 
-##### itemControl: prompt
+### Item category: Display
+#### display
+Supported.
+
+### Item category: Group
+#### group
+Supported.
+
+###### required
+Supported.
+* Renders an asterisk (*) after the label
+* Evaluated as a constraint on check for completeness
+
+###### repeats
+Not supported.
+
+###### item-control
+Not supported.
+
+### Item category: Question
+#### All types
+###### required
+Supported. 
+* Renders an asterisk (*) after the label
+* Evaluated as a constraint on check for completeness
+
+###### repeats
+Supported. Renders a multi-selection for items of type `choice`. Not supported for `open-choice`. 
+Renders UI elements to add/remove repeating answers for all other item types.
+
+The label of the UI element uses the `shortText` as a description for a single item.
+
+###### readOnly
+Supported.
+
+###### itemControl: prompt
 Reference:
 [questionnaire-item-control-prompt](http://hl7.org/fhir/R4/codesystem-questionnaire-item-control.html#questionnaire-item-control-prompt)
 Text is displayed immediately below the containing question item (typically as a guide for what to enter)
 
-##### itemMedia
+###### itemMedia
 An image to display as a visual accompaniment to the question being asked.
 > Only inlined images are supported. 
 > Only small image formats are supported.
@@ -136,7 +148,7 @@ Comprehensive support.
 
 Special support for read-only display of total score.
 
-Quantity requires the declaration of units. It does not support free-text entry for units.
+> Quantity requires the declaration of units. It does not support free-text entry for units.
 
 ##### Extensions
 - entryFormat
@@ -153,8 +165,7 @@ When an item control of type "slider" is being used, then a maxValue should be p
 will be used, since an unlimited maxValue is not possible.
 
 Nested display items with itemControl `upper` and `lower` are associated with the slider control and will display as upper and lower
-label. They can be either plain-text or use the rendering-x extensions for styled text.
-
+label. They support [styled rendering](#styled-rendering).
 
 ---
 #### decimal
@@ -265,6 +276,41 @@ Supported (accepts http, https, ftp, and sftp)
 #### attachment, reference
 Not supported
 
+---
+## Expressions
+Support for expressions of types:
+* `text/fhirpath`
+
+_No_ support for:
+* CQL
+* Server Queries
+
+### FHIRPath
+> FHIRPath support in Faiadashu is getting better every day, and should be very useful for many real-world scenarios.
+>
+> It uses [fhir_path](https://pub.dev/packages/fhir_path) as its
+> underlying implementation. See the [fhir_path documentation](https://pub.dev/packages/fhir_path)
+> for current capabilities and limitations.
+
+#### Environment
+* %resource
+* %context
+* %qitem
+
+_No_ support for:
+* %rootResource
+* %ucum
+* %sct
+* %loinc
+
+#### SDC functions
+* answers()
+* ordinal()
+* sum()
+
+### Variables
+Full support for variables, on questionnaire level and item level. Proper support for visibility rules.
+Specification: https://www.hl7.org/fhir/extension-variable.html
 
 ---
 ### Scoring
@@ -285,34 +331,36 @@ A total score field will be visualized with a "Total Score" heading and a large 
 It will also evaluate and visualize the Danish http://ehealth.sundhed.dk/fhir/StructureDefinition/ehealth-questionnaire-feedback extension
 for patient feedback.
 
-> Handling of calculatedExpression is mature enough for scoring, and is the recommended approach.
+> Handling of `calculatedExpression` is mature enough for scoring, and is the recommended approach.
 
-### Response creation
+> The feedback extension can be replaced by `enableWhenExpression` on `display` items.
 
-#### Reference to Questionnaire
+## Response creation
+
+### Reference to Questionnaire
 A canonical reference to the questionnaire will be generated, including a version number.
 
 The optional `http://hl7.org/fhir/StructureDefinition/display` extension will be set when the questionnaire has a title.
 
-#### Status
+### Status
 Status can be set to any of the supported values. Setting the status to `complete` discards items which are not enabled.
 
-#### Authored
+### Authored
 Will be set to the current time.
 
-#### Narrative
+### Narrative
 A narrative will be auto-generated. Its status will be `generated`. Empty narratives will be omitted entirely.
 
-#### Subject
+### Subject
 A reference to the subject will be added if a subject with an `id` is present. The SDK can be requested to place the
 entire `Patient` into the `contained` section of the QuestionnaireResponse.
 
-#### Answers
+### Answers
 All detail from the questions in the questionnaire carries over into the Response.
 
 Choice answers will be marked as "user selected".
 
-#### Example QuestionnaireResponse
+### Example QuestionnaireResponse
 ```json
 {
   "resourceType": "QuestionnaireResponse",
