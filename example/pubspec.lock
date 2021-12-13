@@ -88,9 +88,9 @@ packages:
   fhir_path:
     dependency: transitive
     description:
-      path: "/Users/tilo/Projects/fhir/fhir_path"
-      relative: false
-    source: path
+      name: fhir_path
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "0.5.0-17"
   fhir_yaml:
     dependency: transitive
