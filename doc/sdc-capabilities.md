@@ -295,6 +295,7 @@ _No_ support for:
 #### Environment
 * %resource
 * %context
+* %questionnaire
 * %qitem
 
 _No_ support for:
