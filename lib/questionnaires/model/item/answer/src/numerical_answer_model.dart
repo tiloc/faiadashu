@@ -289,7 +289,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
   }
 
   @override
- String? get isComplete {
+  String? get isComplete {
     // TODO: Check the actual value
     return null;
   }
