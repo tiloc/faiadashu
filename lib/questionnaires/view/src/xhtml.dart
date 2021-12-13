@@ -6,6 +6,8 @@ import '../../../fhir_types/fhir_types.dart';
 import '../../../logging/logging.dart';
 import '../../model/model.dart';
 
+// OPTIMIZE: Can this wrapper around a child be avoided?
+
 /// Display XHTML formatted texts.
 class Xhtml extends StatelessWidget {
   static final Logger _logger = Logger(Xhtml);
@@ -63,44 +65,35 @@ class Xhtml extends StatelessWidget {
       );
     }
 
-    const imgPngBase64Prefix = "<img src='data:image/png;base64,";
-    const imgJpgBase64Prefix = "<img src='data:image/jpeg;base64,";
-    const imgHashPrefix = "<img src='#";
     const imgSuffix = "'/>";
-    if (xhtml.startsWith(imgPngBase64Prefix)) {
-      final base64String = xhtml.substring(
-        imgPngBase64Prefix.length,
-        xhtml.length - imgSuffix.length,
-      );
-      _logger.debug('Length of base64: ${base64String.length}');
 
-      return Xhtml._(
-        Base64Image(
-          base64String,
-          width: imageWidth,
-          height: imageHeight,
-          semanticLabel: plainText,
-          key: key,
-        ),
-      );
-    }
-    if (xhtml.startsWith(imgJpgBase64Prefix)) {
-      final base64String = xhtml.substring(
-        imgJpgBase64Prefix.length,
-        xhtml.length - imgSuffix.length,
-      );
-      _logger.debug('Length of base64: ${base64String.length}');
+    for (final contentType in [
+      'image/png',
+      'image/jpeg',
+    ]) {
+      final imgPrefix = "<img src='data:$contentType;base64,";
 
-      return Xhtml._(
-        Base64Image(
-          base64String,
-          width: imageWidth,
-          height: imageHeight,
-          semanticLabel: plainText,
-          key: key,
-        ),
-      );
+      if (xhtml.startsWith(imgPrefix)) {
+        final base64String = xhtml.substring(
+          imgPrefix.length,
+          xhtml.length - imgSuffix.length,
+        );
+
+        _logger.debug('Length of base64: ${base64String.length}');
+
+        return Xhtml._(
+          Base64Image(
+            base64String,
+            width: imageWidth,
+            height: imageHeight,
+            semanticLabel: plainText,
+            key: key,
+          ),
+        );
+      }
     }
+
+    const imgHashPrefix = "<img src='#";
     if (xhtml.startsWith(imgHashPrefix)) {
       final elementId = xhtml.substring(
         imgHashPrefix.length,

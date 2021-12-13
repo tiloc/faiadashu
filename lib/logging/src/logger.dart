@@ -24,18 +24,6 @@ class Logger {
   Logger._(this.name) : loggingLogger = logging.Logger(name);
 
   /// Log. See dart:developer log for meaning of params.
-  void warn(
-    String message, {
-    DateTime? time,
-    int? sequenceNumber,
-    Zone? zone,
-    Object? error,
-    StackTrace? stackTrace,
-  }) {
-    loggingLogger.log(LogLevel.warn, message, error, stackTrace, zone);
-  }
-
-  /// Log. See dart:developer log for meaning of params.
   void error(
     String message, {
     DateTime? time,
@@ -48,16 +36,15 @@ class Logger {
   }
 
   /// Log. See dart:developer log for meaning of params.
-  void trace(
+  void warn(
     String message, {
     DateTime? time,
     int? sequenceNumber,
     Zone? zone,
+    Object? error,
+    StackTrace? stackTrace,
   }) {
-    if (kDebugMode) {
-      // Can the compiler kill this code on prod builds?
-      loggingLogger.log(LogLevel.trace, message, null, null, zone);
-    }
+    loggingLogger.log(LogLevel.warn, message, error, stackTrace, zone);
   }
 
   /// Log. See dart:developer log for meaning of params.
@@ -67,7 +54,6 @@ class Logger {
     int? sequenceNumber,
     Zone? zone,
   }) {
-    // Can the compiler kill this code on prod builds?
     loggingLogger.log(LogLevel.info, message, null, null, zone);
   }
 
@@ -79,8 +65,21 @@ class Logger {
     Zone? zone,
   }) {
     if (kDebugMode) {
-      // Can the compiler kill this code on prod builds?
+      // The compiler kills this on production builds
       loggingLogger.log(LogLevel.debug, message, null, null, zone);
+    }
+  }
+
+  /// Log. See dart:developer log for meaning of params.
+  void trace(
+    String message, {
+    DateTime? time,
+    int? sequenceNumber,
+    Zone? zone,
+  }) {
+    if (kDebugMode) {
+      // The compiler kills this on production builds
+      loggingLogger.log(LogLevel.trace, message, null, null, zone);
     }
   }
 }

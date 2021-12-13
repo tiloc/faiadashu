@@ -1,9 +1,8 @@
+import 'package:faiadashu/l10n/l10n.dart';
+import 'package:faiadashu/questionnaires/questionnaires.dart';
+import 'package:faiadashu/resource_provider/resource_provider.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
-
-import '../../../l10n/l10n.dart';
-import '../../../resource_provider/resource_provider.dart';
-import '../../questionnaires.dart';
 
 /// Fill a questionnaire through a wizard-style series of individual questions.
 class QuestionnaireStepper extends StatefulWidget {

@@ -70,7 +70,7 @@ class _ResourceJsonTreeState extends State<ResourceJsonTree> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.buildNode(null, "[root]", widget.resourceRoot);
+    return widget.buildNode(null, '[root]', widget.resourceRoot);
   }
 }
 
@@ -209,7 +209,7 @@ class _JsonViewerListNode extends _JsonNode<List<dynamic>> {
     final result = <Widget>[];
     var i = 0;
     for (final entry in nodeValue) {
-      result.add(root.buildNode(this, "[$i]", entry));
+      result.add(root.buildNode(this, '[$i]', entry));
       i++;
     }
 
@@ -237,7 +237,7 @@ class _JsonViewerListNodeState extends _JsonNodeState<_JsonViewerListNode> {
             style: Theme.of(context).textTheme.bodyText1,
           ),
           Text(
-            " ($count)",
+            ' ($count)',
             style: (count > 0)
                 ? TextStyle(
                     color:

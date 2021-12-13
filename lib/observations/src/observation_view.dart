@@ -1,8 +1,7 @@
+import 'package:faiadashu/fhir_types/fhir_types.dart';
+import 'package:faiadashu/observations/observations.dart';
 import 'package:fhir/r4/r4.dart';
 import 'package:flutter/material.dart';
-
-import '../../fhir_types/fhir_types.dart';
-import 'observation_value_view.dart';
 
 /// Display a single [Observation] with value, code, and timestamp.
 ///

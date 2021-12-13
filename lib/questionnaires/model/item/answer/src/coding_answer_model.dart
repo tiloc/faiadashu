@@ -1,11 +1,10 @@
 import 'package:collection/collection.dart';
+import 'package:faiadashu/fhir_types/fhir_types.dart';
+import 'package:faiadashu/l10n/l10n.dart';
+import 'package:faiadashu/logging/logging.dart';
+import 'package:faiadashu/questionnaires/model/model.dart';
+import 'package:faiadashu/questionnaires/questionnaires.dart';
 import 'package:fhir/r4.dart';
-
-import '../../../../../fhir_types/fhir_types.dart';
-import '../../../../../l10n/l10n.dart';
-import '../../../../../logging/logging.dart';
-import '../../../../questionnaires.dart';
-import '../../../model.dart';
 
 /// Model answers which are [Coding]s.
 class CodingAnswerModel extends AnswerModel<Set<String>, Set<String>> {

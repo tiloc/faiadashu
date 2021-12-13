@@ -1,8 +1,7 @@
+import 'package:faiadashu/fhir_types/fhir_types.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
-import 'fhir_types_extensions.dart';
 
 // TODO: Is it really advantageous to use a TextFormField? Or would a FocusableActionDetector be the better basis?
 
