@@ -1,8 +1,7 @@
 import 'package:faiadashu/observations/observations.dart';
+import 'package:faiadashu_example/exhibit_page.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
-
-import 'exhibit_page.dart';
 
 class ObservationPage extends ExhibitPage {
   ObservationPage({Key? key}) : super(key: key);

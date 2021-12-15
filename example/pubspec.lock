@@ -84,7 +84,7 @@ packages:
       name: fhir_auth
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.5.0-7"
+    version: "0.5.0-8"
   fhir_path:
     dependency: transitive
     description:
@@ -122,7 +122,7 @@ packages:
       name: flutter_web_auth
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.3.1"
+    version: "0.3.2"
   flutter_web_plugins:
     dependency: transitive
     description: flutter
@@ -134,7 +134,7 @@ packages:
       name: freezed_annotation
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.0"
+    version: "1.1.0"
   google_sign_in:
     dependency: transitive
     description:
@@ -211,7 +211,7 @@ packages:
       name: lint
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.7.2"
+    version: "1.8.1"
   logging:
     dependency: "direct main"
     description:
@@ -253,7 +253,7 @@ packages:
       name: oauth2_client
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.3.0"
+    version: "2.3.1"
   path:
     dependency: transitive
     description:

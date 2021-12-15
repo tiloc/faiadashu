@@ -4,6 +4,10 @@ import 'dart:io';
 
 import 'package:faiadashu/faiadashu.dart';
 import 'package:faiadashu/logging/logging.dart' as fdashlog;
+import 'package:faiadashu_example/about_page.dart';
+import 'package:faiadashu_example/disclaimer_page.dart';
+import 'package:faiadashu_example/observation_page.dart';
+import 'package:faiadashu_example/primitive_page.dart';
 import 'package:faiadashu_example/questionnaire_launch_tile.dart';
 import 'package:faiadashu_online/restful/restful.dart';
 import 'package:fhir/r4.dart';
@@ -14,11 +18,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:logging/logging.dart' as dartlog;
-
-import 'about_page.dart';
-import 'disclaimer_page.dart';
-import 'observation_page.dart';
-import 'primitive_page.dart';
 
 void main() {
   if (kDebugMode || kIsWeb) {
