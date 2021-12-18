@@ -37,29 +37,34 @@ class _GroupItemState extends ResponseItemFillerState<GroupItem> {
             focusNode: focusNode,
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 500),
-              child: widget.responseItemModel.isEnabled
-                  ? Column(
-                      children: [
-                        if (titleWidget != null) titleWidget,
-                        if (errorText != null)
-                          Container(
-                            padding: const EdgeInsets.only(top: 4.0),
-                            child: Text(
-                              errorText,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .subtitle1!
-                                  .copyWith(
-                                    color: Theme.of(context).errorColor,
-                                  ),
+              child: AnimatedBuilder(
+                animation: widget.responseItemModel.questionnaireResponseModel,
+                builder: (context, _) {
+                  return widget.responseItemModel.isEnabled
+                      ? Column(
+                          children: [
+                            if (titleWidget != null) titleWidget,
+                            if (errorText != null)
+                              Container(
+                                padding: const EdgeInsets.only(top: 4.0),
+                                child: Text(
+                                  errorText,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .subtitle1!
+                                      .copyWith(
+                                        color: Theme.of(context).errorColor,
+                                      ),
+                                ),
+                              ),
+                            const SizedBox(
+                              height: 16.0,
                             ),
-                          ),
-                        const SizedBox(
-                          height: 16.0,
-                        ),
-                      ],
-                    )
-                  : const SizedBox(),
+                          ],
+                        )
+                      : const SizedBox();
+                },
+              ),
             ),
           )
         : const SizedBox();

@@ -56,9 +56,6 @@ abstract class QuestionnaireAnswerFillerState<
             'AnswerFiller firstFocusNode: ${widget.responseItemModel.nodeUid}',
       );
 
-      widget.responseItemModel.questionnaireResponseModel
-          .addListener(_forceRebuild);
-
       postInitState();
     } catch (exception) {
       _abstractLogger.warn(
@@ -78,24 +75,8 @@ abstract class QuestionnaireAnswerFillerState<
 
   @override
   void dispose() {
-    widget.responseItemModel.questionnaireResponseModel
-        .removeListener(_forceRebuild);
-
     firstFocusNode.dispose();
     super.dispose();
-  }
-
-  // OPTIMIZE: Should everything listen to the central model on the top?
-  // Or do something more hierarchical?
-
-  /// Triggers a repaint of the filler.
-  ///
-  /// Required for visual updates on enablement changes.
-  void _forceRebuild() {
-    _abstractLogger.trace('_forceRebuild()');
-    setState(() {
-      // Just repaint.
-    });
   }
 
   Widget _guardedBuildInputControl(BuildContext context) {
@@ -141,6 +122,11 @@ abstract class QuestionnaireAnswerFillerState<
 
   @override
   Widget build(BuildContext context) {
-    return _guardedBuildInputControl(context);
+    return AnimatedBuilder(
+      animation: widget.responseItemModel.questionnaireResponseModel,
+      builder: (context, _) {
+        return _guardedBuildInputControl(context);
+      },
+    );
   }
 }

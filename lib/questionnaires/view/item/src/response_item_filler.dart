@@ -30,16 +30,5 @@ abstract class ResponseItemFillerState<W extends ResponseItemFiller>
   void initState() {
     super.initState();
     responseItemModel = widget.responseItemModel;
-
-    widget.responseItemModel.questionnaireResponseModel
-        .addListener(forceRebuild);
-  }
-
-  @override
-  void dispose() {
-    widget.responseItemModel.questionnaireResponseModel
-        .removeListener(forceRebuild);
-
-    super.dispose();
   }
 }

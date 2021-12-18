@@ -100,9 +100,7 @@ class QuestionnaireStepperState extends State<QuestionnaireStepper> {
                                   .aggregator<TotalScoreAggregator>(),
                         ),
                         if (widget.questionnaireTheme.showProgress)
-                          QuestionnaireFillerProgressBar(
-                            questionnaireFiller.questionnaireResponseModel,
-                          ),
+                          const QuestionnaireFillerProgressBar(),
                       ],
                     ),
                   ),

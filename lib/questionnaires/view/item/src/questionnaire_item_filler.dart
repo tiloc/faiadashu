@@ -1,4 +1,3 @@
-import 'package:faiadashu/logging/logging.dart';
 import 'package:faiadashu/questionnaires/questionnaires.dart';
 import 'package:flutter/material.dart';
 
@@ -18,7 +17,6 @@ abstract class QuestionnaireItemFiller extends StatefulWidget {
 
 abstract class QuestionnaireItemFillerState<W extends QuestionnaireItemFiller>
     extends State<W> {
-  static final _logger = Logger(QuestionnaireItemFillerState);
   late final Widget? _titleWidget;
   Widget? get titleWidget => _titleWidget;
 
@@ -54,18 +52,6 @@ abstract class QuestionnaireItemFillerState<W extends QuestionnaireItemFiller>
 
     _focusNode.dispose();
     super.dispose();
-  }
-
-  // OPTIMIZE: Should rather QuestionnaireFiller become an InheritedNotifier?
-
-  /// Triggers a repaint of the filler.
-  ///
-  /// Required for visual updates on enableWhen changes.
-  void forceRebuild() {
-    _logger.trace('forceRebuild()');
-    setState(() {
-      // Just repaint.
-    });
   }
 
   /// Requests focus on this [QuestionnaireItemFiller].
