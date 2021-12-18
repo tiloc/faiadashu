@@ -1,8 +1,8 @@
+import 'package:faiadashu/l10n/l10n.dart';
+import 'package:faiadashu/questionnaires/questionnaires.dart'
+    show QuestionnaireResponseFiller;
 import 'package:fhir/r4/r4.dart' show QuestionnaireResponseStatus;
 import 'package:flutter/material.dart';
-
-import '../../../l10n/l10n.dart';
-import '../../questionnaires.dart' show QuestionnaireResponseFiller;
 
 /// A button to complete a questionnaire.
 ///
@@ -15,6 +15,7 @@ class QuestionnaireCompleteButton extends StatefulWidget {
       : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _QuestionnaireCompleteButtonState createState() =>
       _QuestionnaireCompleteButtonState();
 }

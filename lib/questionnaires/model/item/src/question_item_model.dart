@@ -1,11 +1,9 @@
-import 'package:faiadashu/questionnaires/model/expression/src/fhir_expression_evaluator.dart';
+import 'package:faiadashu/coding/coding.dart';
+import 'package:faiadashu/fhir_types/fhir_types.dart';
+import 'package:faiadashu/logging/logging.dart';
+import 'package:faiadashu/questionnaires/questionnaires.dart';
 import 'package:fhir/r4.dart';
 import 'package:fhir_path/fhir_path.dart';
-
-import '../../../../coding/coding.dart';
-import '../../../../fhir_types/fhir_types.dart';
-import '../../../../logging/logging.dart';
-import '../../../questionnaires.dart';
 
 /// Model a response item to a question.
 ///

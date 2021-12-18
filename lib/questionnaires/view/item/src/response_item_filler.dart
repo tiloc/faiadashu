@@ -1,7 +1,6 @@
+import 'package:faiadashu/questionnaires/questionnaires.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
-
-import '../../../questionnaires.dart';
 
 /// Filler for a [QuestionnaireResponseItem].
 abstract class ResponseItemFiller extends QuestionnaireItemFiller {

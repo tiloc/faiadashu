@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:code_text_field/code_text_field.dart';
 import 'package:faiabench/fhir_resource.dart';
+import 'package:faiabench/fhir_resource_notifier.dart';
 import 'package:fhir_path/fhir_path.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,8 +11,6 @@ import 'package:flutter_highlight/themes/monokai-sublime.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:highlight/languages/javascript.dart';
 import 'package:highlight/languages/json.dart';
-
-import 'fhir_resource_notifier.dart';
 
 class FhirResourceEditor extends ConsumerStatefulWidget {
   final String title;
@@ -34,6 +33,7 @@ class FhirResourceEditor extends ConsumerStatefulWidget {
   }) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _FhirResourceEditorState createState() => _FhirResourceEditorState();
 }
 

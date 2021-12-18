@@ -1,10 +1,9 @@
+import 'package:faiadashu/fhir_types/fhir_types.dart';
+import 'package:faiadashu/logging/logging.dart';
+import 'package:faiadashu/questionnaires/model/model.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_html_css/simple_html_css.dart';
-
-import '../../../fhir_types/fhir_types.dart';
-import '../../../logging/logging.dart';
-import '../../model/model.dart';
 
 // OPTIMIZE: Can this wrapper around a child be avoided?
 
@@ -15,6 +14,8 @@ class Xhtml extends StatelessWidget {
   final Widget _child;
 
   const Xhtml._(this._child);
+
+  static const int defaultMaxLines = 5;
 
   factory Xhtml.fromPlainTextAndExtensions(
     BuildContext context,
@@ -47,6 +48,7 @@ class Xhtml extends StatelessWidget {
     double? imageWidth,
     double? imageHeight,
     TextStyle? defaultTextStyle,
+    int maxLines = defaultMaxLines,
     Key? key,
   }) {
     _logger.trace('enter fromXhtmlString $xhtmlString');
@@ -128,7 +130,7 @@ class Xhtml extends StatelessWidget {
       return Xhtml._(
         RichText(
           key: key,
-          maxLines: 5,
+          maxLines: maxLines,
           overflow: TextOverflow.ellipsis,
           text: HTML.toTextSpan(
             context,

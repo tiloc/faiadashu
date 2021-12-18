@@ -1,8 +1,7 @@
+import 'package:faiadashu/l10n/l10n.dart';
+import 'package:faiadashu/questionnaires/view/view.dart';
 import 'package:fhir/r4.dart' show Questionnaire;
 import 'package:flutter/material.dart';
-
-import '../../../l10n/l10n.dart';
-import 'questionnaire_information_tile.dart';
 
 /// Show a dialog containing a [QuestionnaireInformationTile].
 Future<void> showQuestionnaireInfo(

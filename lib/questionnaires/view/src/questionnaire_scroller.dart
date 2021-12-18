@@ -1,12 +1,11 @@
 import 'dart:math';
 
+import 'package:faiadashu/logging/logging.dart';
+import 'package:faiadashu/questionnaires/questionnaires.dart';
+import 'package:faiadashu/resource_provider/resource_provider.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-
-import '../../../logging/logging.dart';
-import '../../../resource_provider/resource_provider.dart';
-import '../../questionnaires.dart';
 
 // TODO: Some calculations regarding focus + front matter maybe currently off.
 

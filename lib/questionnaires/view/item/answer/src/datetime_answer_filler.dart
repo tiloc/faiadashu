@@ -1,9 +1,8 @@
+import 'package:faiadashu/fhir_types/fhir_types.dart';
+import 'package:faiadashu/questionnaires/questionnaires.dart';
 import 'package:fhir/r4.dart'
     show Date, FhirDateTime, QuestionnaireItemType, Time;
 import 'package:flutter/material.dart';
-
-import '../../../../../fhir_types/fhir_types.dart';
-import '../../../../questionnaires.dart';
 
 class DateTimeAnswerFiller extends QuestionnaireAnswerFiller {
   DateTimeAnswerFiller(
@@ -20,6 +19,7 @@ class _DateTimeAnswerState extends QuestionnaireAnswerFillerState<FhirDateTime,
   _DateTimeAnswerState();
 
   @override
+  // ignore: no-empty-block
   void postInitState() {
     // Intentionally do nothing.
   }

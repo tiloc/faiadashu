@@ -1,7 +1,6 @@
+import 'package:faiadashu/questionnaires/questionnaires.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
-
-import '../../../../questionnaires.dart';
 
 class BooleanAnswerFiller extends QuestionnaireAnswerFiller {
   BooleanAnswerFiller(
@@ -18,6 +17,7 @@ class _BooleanItemState extends QuestionnaireAnswerFillerState<Boolean,
   _BooleanItemState();
 
   @override
+  // ignore: no-empty-block
   void postInitState() {
     // Intentionally do nothing.
   }

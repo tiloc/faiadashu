@@ -1,6 +1,5 @@
+import 'package:faiabench/exhibit_page.dart';
 import 'package:flutter/material.dart';
-
-import 'exhibit_page.dart';
 
 class DisclaimerPage extends ExhibitPage {
   const DisclaimerPage({Key? key}) : super(key: key);

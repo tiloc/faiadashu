@@ -1,10 +1,9 @@
+import 'package:faiadashu/fhir_types/fhir_types.dart';
+import 'package:faiadashu/logging/logging.dart';
+import 'package:faiadashu/questionnaires/model/model.dart';
+import 'package:faiadashu/resource_provider/resource_provider.dart';
 import 'package:fhir/r4/general_types/general_types.dart';
 import 'package:flutter/material.dart';
-
-import '../../../../fhir_types/fhir_types.dart';
-import '../../../../logging/logging.dart';
-import '../../../../resource_provider/resource_provider.dart';
-import '../../../model/model.dart';
 
 /// Image [Widget] for itemMedia extension
 class ItemMediaImage extends StatelessWidget {

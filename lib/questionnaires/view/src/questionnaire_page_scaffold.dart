@@ -1,7 +1,6 @@
 import 'package:faiadashu/l10n/l10n.dart';
+import 'package:faiadashu/questionnaires/questionnaires.dart';
 import 'package:flutter/material.dart';
-
-import '../../questionnaires.dart';
 
 /// Builder class to create a wrapper around a questionnaire filler.
 abstract class QuestionnairePageScaffoldBuilder {

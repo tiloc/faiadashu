@@ -1,13 +1,11 @@
 import 'dart:ui';
 
 import 'package:collection/collection.dart';
-import 'package:faiadashu/questionnaires/model/expression/src/fhir_expression_evaluator.dart';
+import 'package:faiadashu/logging/logging.dart';
+import 'package:faiadashu/questionnaires/questionnaires.dart';
+import 'package:faiadashu/resource_provider/resource_provider.dart';
 import 'package:fhir/r4/r4.dart';
 import 'package:flutter/foundation.dart';
-
-import '../../../logging/logging.dart';
-import '../../../resource_provider/resource_provider.dart';
-import '../../questionnaires.dart';
 
 /// High-level model of a response to a questionnaire.
 class QuestionnaireResponseModel extends ChangeNotifier {

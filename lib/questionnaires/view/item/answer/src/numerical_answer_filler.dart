@@ -1,10 +1,8 @@
+import 'package:faiadashu/fhir_types/fhir_types.dart';
+import 'package:faiadashu/questionnaires/questionnaires.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import '../../../../../fhir_types/fhir_types.dart';
-import '../../../../questionnaires.dart';
-import 'numerical_input_formatter.dart';
 
 /// Filler for answers of type [Integer], [Decimal], and [Quantity].
 class NumericalAnswerFiller extends QuestionnaireAnswerFiller {

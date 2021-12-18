@@ -2,8 +2,9 @@ import 'package:faiadashu/l10n/l10n.dart';
 import 'package:faiadashu_online/restful/restful.dart';
 import 'package:fhir_auth/fhir_client/fhir_client.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 
-/// A login/logout button that is tied to the state of a [FhirClient].
+/// A login/logout button for a [FhirClient].
 class SmartLoginButton extends StatefulWidget {
   final FhirClient client;
   final VoidCallback? onLoginChanged;
@@ -12,6 +13,7 @@ class SmartLoginButton extends StatefulWidget {
       : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _SmartLoginButtonState createState() => _SmartLoginButtonState();
 }
 
@@ -27,15 +29,23 @@ class _SmartLoginButtonState extends State<SmartLoginButton> {
   @override
   void initState() {
     super.initState();
-// FIXME: property currently doesn't exist.
-    _loginStatus.value = LoginStatus.loggedIn;
-/*    _loginStatus.value = (widget.client.isLoggedIn)
-        ? LoginStatus.loggedIn
-        : LoginStatus.loggedOut; */
+    _loginStatus.value = LoginStatus.unknown;
 
     if (widget.onLoginChanged != null) {
+      // TODO: Make listener receive the value.
       _loginStatus.addListener(widget.onLoginChanged!);
     }
+
+    // Discover the current login status after button is first drawn.
+    SchedulerBinding.instance?.addPostFrameCallback((_) async {
+      try {
+        _loginStatus.value = await widget.client.isLoggedIn()
+            ? LoginStatus.loggedIn
+            : LoginStatus.loggedOut;
+      } catch (ex) {
+        _loginStatus.value = LoginStatus.error;
+      }
+    });
   }
 
   @override
@@ -68,88 +78,79 @@ class _SmartLoginButtonState extends State<SmartLoginButton> {
         break;
     }
 
-    ScaffoldMessenger.of(context)
-      ..removeCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(message),
-          duration: const Duration(milliseconds: 1500),
-        ),
-      );
+    WidgetsBinding.instance?.addPostFrameCallback(
+      (_) {
+        ScaffoldMessenger.of(context)
+          ..removeCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              content: Text(message),
+              duration: const Duration(milliseconds: 1500),
+            ),
+          );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget? child;
+    return ValueListenableBuilder<LoginStatus>(
+      valueListenable: _loginStatus,
+      builder: (context, loginStatus, independentChild) {
+        _showStatusSnackBar(context);
 
-    switch (_loginStatus.value) {
-      case LoginStatus.loggedIn:
-        child = IconButton(
-          key: _loggedInKey,
-          onPressed: () async {
-            setState(() {
-              _loginStatus.value = LoginStatus.loggingOut;
-            });
-            _showStatusSnackBar(context);
-            await widget.client.logout();
-            if (!mounted) {
-              return;
-            }
-            setState(() {
-              _loginStatus.value = LoginStatus.loggedOut;
-            });
-            _showStatusSnackBar(context);
-          },
-          icon: const Icon(Icons.logout),
-        );
-        break;
-      case LoginStatus.loggedOut:
-      case LoginStatus.error:
-        child = IconButton(
-          key: _loggedOutKey,
-          onPressed: () async {
-            setState(() {
-              _loginStatus.value = LoginStatus.loggingIn;
-            });
-            _showStatusSnackBar(context);
-            try {
-              await widget.client.login();
-              if (!mounted) {
-                return;
-              }
-              setState(() {
-                _loginStatus.value = LoginStatus.loggedIn;
-              });
-              _showStatusSnackBar(context);
-            } catch (e) {
-              setState(() {
-                _loginStatus.value = LoginStatus.error;
-                _showStatusSnackBar(context);
-              });
-            }
-          },
-          icon: (_loginStatus.value == LoginStatus.loggedOut)
-              ? const Icon(Icons.login)
-              : const Icon(Icons.error),
-        );
-        break;
-      case LoginStatus.loggingIn:
-      case LoginStatus.loggingOut:
-        child = const SyncIndicator();
-        break;
-      case LoginStatus.unknown:
-        child = const Icon(Icons.device_unknown);
-    }
+        Widget? child;
 
-    return SizedBox(
-      width: 40,
-      height: 32,
-      child: Center(
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 1000),
-          child: child,
-        ),
-      ),
+        switch (loginStatus) {
+          case LoginStatus.loggedIn:
+            child = IconButton(
+              key: _loggedInKey,
+              onPressed: () async {
+                _loginStatus.value = LoginStatus.loggingOut;
+                await widget.client.logout();
+
+                _loginStatus.value = LoginStatus.loggedOut;
+              },
+              icon: const Icon(Icons.logout),
+            );
+            break;
+          case LoginStatus.loggedOut:
+          case LoginStatus.error:
+            child = IconButton(
+              key: _loggedOutKey,
+              onPressed: () async {
+                _loginStatus.value = LoginStatus.loggingIn;
+                try {
+                  await widget.client.login();
+                  _loginStatus.value = LoginStatus.loggedIn;
+                } catch (e) {
+                  _loginStatus.value = LoginStatus.error;
+                }
+              },
+              icon: (_loginStatus.value == LoginStatus.loggedOut)
+                  ? const Icon(Icons.login)
+                  : const Icon(Icons.error),
+            );
+            break;
+          case LoginStatus.loggingIn:
+          case LoginStatus.loggingOut:
+            child = const SyncIndicator();
+            break;
+          case LoginStatus.unknown:
+            child = const Icon(Icons.device_unknown);
+        }
+
+        return SizedBox(
+          width: 40,
+          height: 32,
+          child: Center(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 1000),
+              child: child,
+            ),
+          ),
+        );
+      },
     );
   }
 }

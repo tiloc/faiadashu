@@ -1,11 +1,10 @@
 import 'dart:core';
 
 import 'package:collection/collection.dart';
+import 'package:faiadashu/fhir_types/fhir_types.dart';
+import 'package:faiadashu/questionnaires/questionnaires.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/foundation.dart';
-
-import '../../../fhir_types/fhir_types.dart';
-import '../../questionnaires.dart';
 
 /// Models an individual item of a questionnaire.
 ///

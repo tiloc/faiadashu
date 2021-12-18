@@ -1,7 +1,6 @@
+import 'package:faiadashu/fhir_types/fhir_types.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
-
-import 'fhir_types_extensions.dart';
 
 /// A [Text] widget built from a [FhirDateTime].
 /// Takes the precision and locale into account.

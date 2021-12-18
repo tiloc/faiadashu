@@ -1,8 +1,7 @@
+import 'package:faiadashu/l10n/l10n.dart';
+import 'package:faiadashu/logging/logging.dart';
+import 'package:faiadashu/questionnaires/questionnaires.dart';
 import 'package:flutter/material.dart';
-
-import '../../../l10n/l10n.dart';
-import '../../../logging/logging.dart';
-import '../../questionnaires.dart';
 
 /// Should coding selections be presented in a compact or an expanded format?
 ///

@@ -1,7 +1,6 @@
+import 'package:faiadashu/questionnaires/questionnaires.dart';
+import 'package:faiadashu/resource_provider/resource_provider.dart';
 import 'package:flutter/material.dart';
-
-import '../../../resource_provider/resource_provider.dart';
-import '../../questionnaires.dart';
 
 /// A page, incl. a [Scaffold], that presents a questionnaire in the style of a wizard.
 ///

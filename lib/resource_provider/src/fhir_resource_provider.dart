@@ -1,9 +1,8 @@
 import 'dart:convert';
 
+import 'package:faiadashu/logging/logging.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/services.dart' show rootBundle;
-
-import '../../logging/logging.dart';
 
 /// Provide [Resource]s based on a Uri.
 ///

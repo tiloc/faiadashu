@@ -1,9 +1,8 @@
+import 'package:faiadashu/coding/coding.dart';
+import 'package:faiadashu/fhir_types/fhir_types.dart';
+import 'package:faiadashu/l10n/l10n.dart';
+import 'package:faiadashu/questionnaires/model/model.dart';
 import 'package:fhir/r4.dart';
-
-import '../../../../../coding/coding.dart';
-import '../../../../../fhir_types/fhir_types.dart';
-import '../../../../../l10n/l10n.dart';
-import '../../../../model/model.dart';
 
 enum StringAnswerKeyboard { plain, email, phone, number, multiline, url }
 

@@ -1,9 +1,8 @@
 import 'dart:ui';
 
+import 'package:faiadashu/fhir_types/fhir_types.dart';
 import 'package:faiadashu/questionnaires/model/model.dart';
 import 'package:fhir/r4.dart';
-
-import '../../../../../fhir_types/fhir_types.dart';
 
 class CodingAnswerOptionModel {
   static const openChoiceCode = 'x-faiadashu-open-choice';

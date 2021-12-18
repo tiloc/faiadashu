@@ -1,9 +1,8 @@
+import 'package:faiadashu/logging/logging.dart';
+import 'package:faiadashu/questionnaires/questionnaires.dart';
+import 'package:faiadashu/resource_provider/resource_provider.dart';
 import 'package:fhir/r4/r4.dart';
 import 'package:flutter/material.dart';
-
-import '../../../logging/logging.dart';
-import '../../../resource_provider/resource_provider.dart';
-import '../../questionnaires.dart';
 
 /// Fill a [QuestionnaireResponse] from a [Questionnaire].
 ///
@@ -57,6 +56,7 @@ class QuestionnaireResponseFiller extends StatefulWidget {
   }
 
   @override
+  // ignore: library_private_types_in_public_api
   _QuestionnaireResponseFillerState createState() =>
       _QuestionnaireResponseFillerState();
 }

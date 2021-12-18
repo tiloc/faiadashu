@@ -1,7 +1,6 @@
+import 'package:faiadashu/faiadashu.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
-
-import '../../../../../faiadashu.dart';
 
 /// Answer questions which require code(s) as a response.
 ///

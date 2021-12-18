@@ -1,10 +1,9 @@
 import 'dart:convert';
 
+import 'package:faiadashu/fhir_types/fhir_types.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/foundation.dart';
 import 'package:markdown/markdown.dart';
-
-import '../../../fhir_types/fhir_types.dart';
 
 /// Representation of a Fhir string which is plain text with optional
 /// information regarding styled rendering.

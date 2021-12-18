@@ -1,6 +1,5 @@
+import 'package:faiadashu/questionnaires/model/model.dart';
 import 'package:fhir/r4.dart';
-
-import '../../../model.dart';
 
 class BooleanAnswerModel extends AnswerModel<Boolean, Boolean> {
   BooleanAnswerModel(QuestionItemModel responseModel) : super(responseModel);

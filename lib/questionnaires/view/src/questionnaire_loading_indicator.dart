@@ -1,7 +1,6 @@
+import 'package:faiadashu/l10n/l10n.dart';
+import 'package:faiadashu/questionnaires/model/model.dart';
 import 'package:flutter/material.dart';
-
-import '../../../l10n/l10n.dart';
-import '../../model/model.dart';
 
 /// Loading indicator during retrieval / decoding of a questionnaire.
 class QuestionnaireLoadingIndicator extends StatelessWidget {

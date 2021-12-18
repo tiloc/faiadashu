@@ -1,3 +1,6 @@
+import 'package:faiadashu/fhir_types/fhir_types.dart';
+import 'package:faiadashu/l10n/l10n.dart';
+import 'package:faiadashu/questionnaires/model/model.dart';
 import 'package:fhir/r4.dart'
     show
         Date,
@@ -6,10 +9,6 @@ import 'package:fhir/r4.dart'
         QuestionnaireResponseAnswer,
         QuestionnaireResponseItem,
         Time;
-
-import '../../../../../fhir_types/fhir_types.dart';
-import '../../../../../l10n/l10n.dart';
-import '../../../model.dart';
 
 class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
   DateTimeAnswerModel(QuestionItemModel responseModel) : super(responseModel);

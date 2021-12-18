@@ -1,11 +1,9 @@
 import 'package:collection/collection.dart';
-import 'package:faiadashu/questionnaires/model/expression/src/fhir_expression_evaluator.dart';
+import 'package:faiadashu/fhir_types/fhir_types.dart';
+import 'package:faiadashu/logging/logging.dart';
+import 'package:faiadashu/questionnaires/questionnaires.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/foundation.dart';
-
-import '../../../../fhir_types/fhir_types.dart';
-import '../../../../logging/logging.dart';
-import '../../../questionnaires.dart';
 
 /// An item entry for a questionnaire filler.
 ///

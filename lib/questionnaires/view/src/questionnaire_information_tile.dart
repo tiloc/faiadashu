@@ -1,8 +1,7 @@
+import 'package:faiadashu/l10n/l10n.dart';
+import 'package:faiadashu/questionnaires/view/view.dart' show Xhtml;
 import 'package:fhir/r4.dart' show Questionnaire;
 import 'package:flutter/material.dart';
-
-import '../../../l10n/l10n.dart';
-import 'xhtml.dart';
 
 /// Informational tile about a [Questionnaire].
 ///

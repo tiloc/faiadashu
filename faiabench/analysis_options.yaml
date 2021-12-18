@@ -10,7 +10,8 @@ analyzer:
 
 linter:
   rules:
-
+    lines_longer_than_80_chars: false
+    always_use_package_imports: false
 
 dart_code_metrics:
   metrics:

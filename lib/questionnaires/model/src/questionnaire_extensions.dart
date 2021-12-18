@@ -1,7 +1,5 @@
+import 'package:faiadashu/fhir_types/fhir_types.dart';
 import 'package:fhir/r4.dart';
-
-import '../../../faiadashu.dart';
-import '../../../fhir_types/fhir_types.dart';
 
 extension FDashQuestionnaireItemExtension on QuestionnaireItem {
   FhirExtension? get itemControl {

@@ -1,16 +1,14 @@
 // This is a modified version of the "AutoComplete" class from the Flutter SDK.
 
 // The original class is licensed as follows:
-
 // Copyright 2014 The Flutter Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 // The referenced LICENSE file is located here: https://github.com/flutter/flutter/blob/master/LICENSE
 
+import 'package:faiadashu/l10n/l10n.dart';
+import 'package:faiadashu/questionnaires/model/item/answer/answer.dart';
 import 'package:flutter/material.dart';
-
-import '../../../l10n/l10n.dart';
-import '../../model/item/answer/answer.dart';
 
 /// {@macro flutter.widgets.RawAutocomplete.RawAutocomplete}
 ///

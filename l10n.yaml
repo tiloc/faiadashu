@@ -5,7 +5,7 @@ synthetic-package: false
 output-localization-file: fdash_localizations.g.dart
 output-class: FDashLocalizations
 nullable-getter: false
-header: "// ignore_for_file: avoid_escaping_inner_quotes, unnecessary_brace_in_string_interps, unnecessary_string_escapes"
+header: "// ignore_for_file: avoid_escaping_inner_quotes, unnecessary_brace_in_string_interps, unnecessary_string_escapes, always_use_package_imports"
 preferred-supported-locales:
   - en
 

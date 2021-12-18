@@ -1,11 +1,10 @@
 import 'dart:convert';
 
+import 'package:faiadashu/fhir_types/fhir_types.dart';
+import 'package:faiadashu/l10n/l10n.dart';
+import 'package:faiadashu/questionnaires/questionnaires.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import '../../../fhir_types/fhir_types.dart';
-import '../../../l10n/l10n.dart';
-import '../../questionnaires.dart';
 
 /// "Drawer" which contains the narrative for a questionnaire.
 /// To be used with the drawer or endDrawer parameter of a [Scaffold].

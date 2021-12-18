@@ -1,9 +1,8 @@
+import 'package:faiadashu/fhir_types/fhir_types.dart';
+import 'package:faiadashu/logging/logging.dart';
+import 'package:faiadashu/questionnaires/questionnaires.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_html_css/simple_html_css.dart';
-
-import '../../../../fhir_types/fhir_types.dart';
-import '../../../../logging/logging.dart';
-import '../../../questionnaires.dart';
 
 class QuestionnaireItemFillerTitle extends StatelessWidget {
   final Widget? leading;

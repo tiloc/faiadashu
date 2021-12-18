@@ -69,6 +69,7 @@ class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _HomePageState createState() => _HomePageState();
 }
 
@@ -223,8 +224,7 @@ class _HomePageState extends State<HomePage> {
 
   /// Schedules repaint after login / logout.
   void _onLoginChanged() {
-// FIXME
-//    _logger.debug('_onLoginChanged: ${smartClient.isLoggedIn}');
+    _logger.debug('_onLoginChanged: ${smartClient.isLoggedIn()}');
     setState(() {
       // Rebuild
     });
@@ -233,8 +233,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final uploadResponseFunction =
-// FIXME
-//        smartClient.isLoggedIn ? _uploadResponse : null;
+//    smartClient.isLoggedIn() ? _uploadResponse : null;
         _uploadResponse;
 
     return Scaffold(

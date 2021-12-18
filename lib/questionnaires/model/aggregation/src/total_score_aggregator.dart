@@ -1,8 +1,7 @@
 import 'package:collection/collection.dart';
+import 'package:faiadashu/logging/logging.dart';
+import 'package:faiadashu/questionnaires/model/model.dart';
 import 'package:fhir/r4.dart';
-
-import '../../../../logging/logging.dart';
-import '../../model.dart';
 
 /// Aggregate answers into a total score.
 ///

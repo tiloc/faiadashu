@@ -17,7 +17,7 @@ class ResourceJsonTree extends StatefulWidget {
   final int autoExpandLevel;
 
   /// Create a widget representation of a node in the hierarchical JSON.
-  Widget buildNode(
+  Widget _buildNode(
     _JsonNode? parent,
     String nodeName,
     dynamic nodeValue,
@@ -70,7 +70,7 @@ class _ResourceJsonTreeState extends State<ResourceJsonTree> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.buildNode(null, '[root]', widget.resourceRoot);
+    return widget._buildNode(null, '[root]', widget.resourceRoot);
   }
 }
 
@@ -137,7 +137,7 @@ class _JsonViewerMapNode extends _JsonNode<Map<String, dynamic>> {
   List<Widget> buildChildren() {
     final result = <Widget>[];
     nodeValue.forEach((k, v) {
-      result.add(root.buildNode(this, k, v));
+      result.add(root._buildNode(this, k, v));
     });
 
     return result;
@@ -209,7 +209,7 @@ class _JsonViewerListNode extends _JsonNode<List<dynamic>> {
     final result = <Widget>[];
     var i = 0;
     for (final entry in nodeValue) {
-      result.add(root.buildNode(this, '[$i]', entry));
+      result.add(root._buildNode(this, '[$i]', entry));
       i++;
     }
 

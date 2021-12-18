@@ -1,9 +1,11 @@
+import 'package:faiadashu/questionnaires/questionnaires.dart'
+    show
+        NarrativeAggregator,
+        QuestionnaireResponseFiller,
+        QuestionnaireResponseModel;
 import 'package:fhir/r4/special_types/special_types.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_html_css/simple_html_css.dart';
-
-import '../../model/model.dart';
-import 'questionnaire_filler.dart';
 
 /// Display a narrative
 class NarrativeTile extends StatefulWidget {

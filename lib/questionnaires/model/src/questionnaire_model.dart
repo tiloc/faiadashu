@@ -1,9 +1,8 @@
+import 'package:faiadashu/fhir_types/fhir_types.dart';
+import 'package:faiadashu/logging/logging.dart';
+import 'package:faiadashu/questionnaires/questionnaires.dart';
+import 'package:faiadashu/resource_provider/resource_provider.dart';
 import 'package:fhir/r4.dart';
-
-import '../../../fhir_types/fhir_types.dart';
-import '../../../logging/logging.dart';
-import '../../../resource_provider/resource_provider.dart';
-import '../../questionnaires.dart';
 
 /// Models a questionnaire.
 ///

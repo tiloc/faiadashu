@@ -1,4 +1,4 @@
-import '../../../questionnaires.dart';
+import 'package:faiadashu/questionnaires/model/model.dart';
 
 class DisplayItemModel extends FillerItemModel {
   DisplayItemModel(

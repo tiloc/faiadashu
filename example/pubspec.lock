@@ -81,10 +81,10 @@ packages:
   fhir_auth:
     dependency: "direct main"
     description:
-      name: fhir_auth
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.5.0-8"
+      path: "../../fhir/fhir_auth"
+      relative: true
+    source: path
+    version: "0.5.0-9"
   fhir_path:
     dependency: transitive
     description:

@@ -1,7 +1,6 @@
+import 'package:faiabench/fhir_resource.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'fhir_resource.dart';
 
 class FhirResourceNotifier extends StateNotifier<AsyncValue<FhirResource>> {
   final String? assetPath;

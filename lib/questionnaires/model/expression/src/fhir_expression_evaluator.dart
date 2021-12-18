@@ -1,8 +1,6 @@
+import 'package:faiadashu/questionnaires/model/expression/expression.dart';
 import 'package:fhir/r4/metadata_types/metadata_types.dart';
 import 'package:fhir/r4/resource/resource.dart';
-
-import 'expression_evaluator.dart';
-import 'fhirpath_expression_evaluator.dart';
 
 abstract class FhirExpressionEvaluator extends ExpressionEvaluator {
   FhirExpressionEvaluator(

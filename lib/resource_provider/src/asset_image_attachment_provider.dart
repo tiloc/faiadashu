@@ -1,7 +1,6 @@
+import 'package:faiadashu/resource_provider/resource_provider.dart';
 import 'package:fhir/r4/resource/resource.dart';
 import 'package:flutter/material.dart';
-
-import 'fhir_resource_provider.dart';
 
 /// Provide images based on urls.
 ///

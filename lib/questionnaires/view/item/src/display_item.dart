@@ -1,7 +1,6 @@
+import 'package:faiadashu/logging/logging.dart';
+import 'package:faiadashu/questionnaires/questionnaires.dart';
 import 'package:flutter/material.dart';
-
-import '../../../../logging/logging.dart';
-import '../../../questionnaires.dart';
 
 /// A view for filler items of type "display".
 class DisplayItem extends QuestionnaireItemFiller {

@@ -18,7 +18,9 @@ dependencies:
 #  fhir:
 #    path: /Users/tilo/Projects/fhir/fhir
 
-  fhir_auth: ^0.5.0-8
+#  fhir_auth: ^0.5.0-8
+  fhir_auth:
+    path: ../../fhir/fhir_auth
 
   flutter:
     sdk: flutter

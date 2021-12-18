@@ -1,7 +1,6 @@
+import 'package:faiadashu/questionnaires/questionnaires.dart';
+import 'package:faiadashu/resource_provider/resource_provider.dart';
 import 'package:flutter/material.dart';
-
-import '../../../resource_provider/resource_provider.dart';
-import '../../questionnaires.dart';
 
 /// A [QuestionnaireScroller] with a scaffold.
 ///
