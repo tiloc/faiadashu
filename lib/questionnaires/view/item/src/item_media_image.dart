@@ -66,6 +66,7 @@ class ItemMediaImage extends StatelessWidget {
     return _fromAttachment(
       optionModel.mediaAttachment,
       optionModel.questionnaireItemModel.questionnaireModel,
+      key: key,
     );
   }
 

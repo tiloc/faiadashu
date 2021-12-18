@@ -6,12 +6,12 @@ import 'package:flutter/material.dart';
 ///
 /// Uses techniques to reduce flicker and avoid repeat decoding of the base64.
 class Base64Image extends StatefulWidget {
-  // TODO: How can I get rid of the base64String once the image has been constructed?
   final String base64String;
   final String? semanticLabel;
   final double? width;
   final double? height;
 
+  /// [key] should be a [ValueKey] for most efficient caching.
   const Base64Image(
     this.base64String, {
     this.semanticLabel,
@@ -30,11 +30,16 @@ class _Base64ImageState extends State<Base64Image> {
   @override
   void initState() {
     super.initState();
+    final key = widget.key;
+
     _image = Image.memory(
       base64.decode(widget.base64String),
       width: widget.width,
       height: widget.height,
       semanticLabel: widget.semanticLabel,
+      key: (key != null && key is ValueKey)
+          ? ValueKey<String>('${key.value.toString()}-img')
+          : null,
     );
   }
 

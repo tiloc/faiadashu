@@ -264,7 +264,12 @@ Widget _createStyledOption(
   CodingAnswerOptionModel optionModel,
 ) {
   if (optionModel.hasMedia) {
-    final mediaWidget = ItemMediaImage.fromAnswerOption(optionModel);
+    final mediaWidget = ItemMediaImage.fromAnswerOption(
+      optionModel,
+      key: ValueKey<String>(
+        '${answerModel.nodeUid}-option-${optionModel.optionText.plainText}-media',
+      ),
+    );
     if (mediaWidget != null) {
       return mediaWidget;
     }
@@ -285,6 +290,9 @@ Widget _createStyledOption(
         answerModel.responseItemModel.questionnaireItemModel.questionnaireModel,
     imageWidth: 100,
     imageHeight: 100,
+    key: ValueKey<String>(
+      '${answerModel.nodeUid}-option-${optionModel.optionText.plainText}-title',
+    ),
   );
 
   return styledOptionTitle;
