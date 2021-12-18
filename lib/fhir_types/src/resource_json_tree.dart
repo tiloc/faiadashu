@@ -1,3 +1,4 @@
+import 'package:faiadashu/questionnaires/view/view.dart' show variant600Opacity;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -240,8 +241,8 @@ class _JsonViewerListNodeState extends _JsonNodeState<_JsonViewerListNode> {
             ' ($count)',
             style: (count > 0)
                 ? TextStyle(
-                    color:
-                        themeData.textTheme.bodyText1?.color?.withOpacity(0.54),
+                    color: themeData.textTheme.bodyText1?.color
+                        ?.withOpacity(variant600Opacity),
                   )
                 : TextStyle(color: themeData.errorColor),
           ),
@@ -293,6 +294,8 @@ class _JsonViewerGenericNode extends StatelessWidget {
       }
     }
 
+    const infiniteLines = 999;
+
     return Padding(
       padding: const EdgeInsets.only(left: 24),
       child: Row(
@@ -301,7 +304,8 @@ class _JsonViewerGenericNode extends StatelessWidget {
           Text(
             nodeName,
             style: TextStyle(
-              color: themeData.textTheme.bodyText1?.color?.withOpacity(0.54),
+              color: themeData.textTheme.bodyText1?.color
+                  ?.withOpacity(variant600Opacity),
             ),
           ),
           const Text(' : '),
@@ -311,7 +315,7 @@ class _JsonViewerGenericNode extends StatelessWidget {
                 child: Text(
                   nodeValue.toString(),
                   softWrap: true,
-                  maxLines: 999,
+                  maxLines: infiniteLines,
                   style: TextStyle(color: color),
                 ),
                 onTap: () {

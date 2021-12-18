@@ -1,3 +1,4 @@
+import 'package:faiadashu/questionnaires/view/view.dart' show variant600Opacity;
 import 'package:flutter/material.dart';
 
 class NullDashText extends StatelessWidget {
@@ -5,8 +6,6 @@ class NullDashText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const variant600Opacity = 0.54;
-
     return Text(
       '   ',
       style: Theme.of(context).textTheme.bodyText2?.copyWith(
