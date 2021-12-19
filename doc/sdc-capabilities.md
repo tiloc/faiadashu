@@ -121,10 +121,15 @@ Question items share many commonalities. Individual item types may offer additio
 ###### entryFormat
 Supported. Displays the guidance text next to the input control.
 
+###### initial
+Supported for `integer`, `decimal`, and `string` 
+
 ###### required
-Supported. 
+Supported 
 * Renders an asterisk (*) after the label
 * Evaluated as a constraint on check for completeness
+
+Not supported: Dynamic calculation of `required`.
 
 ###### repeats
 Supported. Renders a multi-selection for items of type `choice`. Not supported for `open-choice`. 
@@ -142,17 +147,11 @@ Text is displayed immediately below the containing question item (typically as a
 
 ###### itemMedia
 An image to display as a visual accompaniment to the question being asked.
-> Only inlined images are supported. 
-> Only small image formats are supported.
+> * Only inlined images are supported. 
+> * Only small (< 200 kB) image formats are recommended.
 
 Reference: 
 [sdc-questionnaire-itemMedia](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-itemMedia.html)
-
----
-#### boolean
-Comprehensive support, incl. tri-state for "not answered"
-
-See: http://build.fhir.org/questionnaire.html#booleans for a discussion of tri-state.
 
 ---
 ### Commonalities: quantity, decimal, integer
@@ -227,6 +226,12 @@ Comprehensive support. Keyboard type can be hinted.
 - regex  
 - questionnaire-itemControl: text-box 
 - sdc-questionnaire-keyboard: email, phone, number
+
+---
+#### boolean
+Comprehensive support, incl. tri-state for "not answered"
+
+See: http://build.fhir.org/questionnaire.html#booleans for a discussion of tri-state.
 
 ---
 ### choice
@@ -353,8 +358,12 @@ Will be set to the current time.
 A narrative will be auto-generated. Its status will be `generated`. Empty narratives will be omitted entirely.
 
 ### Subject
-A reference to the subject will be added if a subject with an `id` is present. The SDK can be requested to place the
-entire `Patient` into the `contained` section of the QuestionnaireResponse.
+A reference to the subject will be added if a subject with an `id` is present. 
+
+> The SDK can be requested to place the entire `Patient` into the `contained` section of the QuestionnaireResponse.
+>
+> This is helpful in certain data exchange scenarios, but is **_not_** in line with FHIR policies!  
+ 
 
 ### Answers
 All detail from the questions in the questionnaire carries over into the Response.

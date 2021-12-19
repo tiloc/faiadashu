@@ -625,7 +625,7 @@
       "type": "integer",
       "initial": [
         {
-          "valueInteger": 50
+          "valueInteger": 70
         }
       ]
     },

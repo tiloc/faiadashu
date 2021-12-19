@@ -3,6 +3,7 @@ import 'package:faiadashu/fhir_types/fhir_types.dart';
 import 'package:faiadashu/logging/logging.dart';
 import 'package:faiadashu/questionnaires/questionnaires.dart';
 import 'package:fhir/r4.dart';
+import 'package:fhir/r4/r4.dart';
 import 'package:fhir_path/fhir_path.dart';
 
 /// Model a response item to a question.
@@ -266,7 +267,45 @@ class QuestionItemModel extends ResponseItemModel {
       firstAnswerModel.populateFromExpression(initialEvaluationResult);
     } else {
       // initial.value[x]
-      // TODO: Implement
+      final initialValues = questionnaireItem.initial;
+
+      if (initialValues != null) {
+        final type = questionnaireItem.type;
+
+        if (type != QuestionnaireItemType.choice &&
+            type != QuestionnaireItemType.open_choice) {
+          if (initialValues.length != 1) {
+            throw QuestionnaireFormatException(
+              'Expected 1 initial value, found ${initialValues.length}',
+              questionnaireItem,
+            );
+          }
+
+          final initialValue = initialValues.first;
+
+          switch (questionnaireItem.type) {
+            case QuestionnaireItemType.integer:
+              firstAnswerModel
+                  .populateFromExpression(initialValue.valueInteger?.value);
+              break;
+            case QuestionnaireItemType.decimal:
+              firstAnswerModel
+                  .populateFromExpression(initialValue.valueDecimal?.value);
+              break;
+            case QuestionnaireItemType.string:
+              firstAnswerModel.populateFromExpression(initialValue.valueString);
+              break;
+            default:
+              // TODO: Implement for more types
+              _qimLogger.warn(
+                'No support for initial value on ${questionnaireItem.linkId}.',
+              );
+          }
+        } else {
+          _qimLogger
+              .warn('No support for initial on choice or open_choice items.');
+        }
+      }
     }
   }
 
