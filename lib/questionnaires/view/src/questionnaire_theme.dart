@@ -67,19 +67,19 @@ class QuestionnaireTheme {
       return QuestionResponseItemFiller(
         questionnaireFiller,
         fillerItemModel,
-//      key: key,  // TODO: What should be the key handling?
+        key: key,
       );
     } else if (fillerItemModel is GroupItemModel) {
       return GroupItem(
         questionnaireFiller,
         fillerItemModel,
-//      key: key,  // TODO: What should be the key handling?
+        key: key,
       );
     } else if (fillerItemModel is DisplayItemModel) {
       return DisplayItem(
         questionnaireFiller,
         fillerItemModel,
-//      key: key,  // TODO: What should be the key handling?
+        key: key,
       );
     } else {
       throw UnsupportedError('Cannot generate filler for $fillerItemModel');

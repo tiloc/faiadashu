@@ -6,8 +6,9 @@ import 'package:flutter/material.dart';
 class GroupItem extends ResponseItemFiller {
   GroupItem(
     QuestionnaireFillerData questionnaireFiller,
-    ResponseItemModel responseItemModel,
-  ) : super(questionnaireFiller, responseItemModel);
+    ResponseItemModel responseItemModel, {
+    Key? key,
+  }) : super(questionnaireFiller, responseItemModel, key: key);
 
   @override
   State<StatefulWidget> createState() => _GroupItemState();

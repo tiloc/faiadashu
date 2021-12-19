@@ -68,11 +68,18 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     required this.launchContext,
     required List<Aggregator>? aggregators,
   }) : _aggregators = aggregators {
-    // FIXME: According to spec I need to map launchcontext items to names from launchContext extension
+    _setupLaunchContext();
+    _setupVariables();
+  }
+
+  void _setupLaunchContext() {
+    // RESEARCH: Not sure what I truly need to do here???
     _launchContextExpressions = [
       ResourceExpressionEvaluator('patient', () => launchContext.patient),
     ];
+  }
 
+  void _setupVariables() {
     final variableExtensions = questionnaireModel.questionnaire.extension_
         ?.where((ext) => ext.url == variableExtensionUrl);
 

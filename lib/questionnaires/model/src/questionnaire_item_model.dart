@@ -294,7 +294,7 @@ class QuestionnaireItemModel with Diagnosticable {
         : null;
   }
 
-  // TODO: Should this be a RenderString?
+  // RESEARCH: Should this be a RenderString?
   /// Returns the `shortText` provided for the item, or null.
   String? get shortText {
     return questionnaireItem.extension_

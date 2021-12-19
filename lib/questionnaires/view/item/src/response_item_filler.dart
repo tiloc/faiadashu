@@ -9,14 +9,13 @@ abstract class ResponseItemFiller extends QuestionnaireItemFiller {
 
   ResponseItemFiller(
     QuestionnaireFillerData questionnaireFiller,
-    this.responseItemModel,
-  )   : questionnaireItemModel = responseItemModel.questionnaireItemModel,
+    this.responseItemModel, {
+    Key? key,
+  })  : questionnaireItemModel = responseItemModel.questionnaireItemModel,
         super(
           questionnaireFiller,
           responseItemModel,
-          key: ValueKey<String>(
-            responseItemModel.nodeUid,
-          ),
+          key: key,
         );
 }
 

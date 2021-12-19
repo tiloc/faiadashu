@@ -166,7 +166,7 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                       icon: const Icon(Icons.cloud_upload),
                       onPressed: () {
                         // Generate a response and upload it to a FHIR server.
-                        // TODO: In a real-world scenario this should have more state handling.
+                        // In a real-world scenario this would have more robust state handling.
                         widget.uploadResponseFunction?.call(
                           widget.questionnairePath,
                           QuestionnaireResponseFiller.of(context)
