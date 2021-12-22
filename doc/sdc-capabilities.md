@@ -3,7 +3,7 @@ The Form Filler is based on a specification called [Structured Data Capture (SDC
 
 Information on Structured Data Capture can be found here:
 * [SDC Home Page](https://hl7.org/fhir/uv/sdc/2019May/)
-* [YT Video from FHIR DevDays](https://www.youtube.com/watch?v=WPudaF4S7Bk)
+* [YT Video from FHIR DevDays June 2021](https://youtu.be/pPjcvjISpU4)
 * There is a chat channel at https://chat.fhir.org stream `#questionnaire`.
 
 **Click this video to watch the capabilities in action**

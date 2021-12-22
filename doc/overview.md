@@ -8,11 +8,12 @@ Follow the instructions on pub.dev: https://pub.dev/packages/faiadashu/install
 The library is trying to make as few assumptions as possible about its operating environment.
 
 ### Supported versions of Flutter™ SDK
-This library depends on Flutter™ SDK 2.0, or later. It is null-safe. It cannot be used with earlier versions of the SDK.
+This library depends on Flutter™ SDK 2.8.0, or later. It is null-safe. It cannot be used with earlier versions of the SDK.
 
 ### Support for the FHIR Standard
-Faiadashu FHIRDash focuses on the user interface. The underlying data models and specifications are adopted from the FHIR standard and
-the FHIR-FLI `fhir` library.
+Faiadashu focuses on the user interface. The underlying data models and specifications are adopted from the FHIR standard and
+the FHIR-FLI `fhir` library. It uses the R4 version of the library, and thus is aligned with the R4 editions
+of FHIR, or any other Implementation Guide it supports.
 
 [![Pub Version](https://img.shields.io/pub/v/fhir?label=pub.dev&labelColor=333940&logo=dart)](https://pub.dev/packages/fhir)
 https://pub.dev/packages/fhir
@@ -26,17 +27,24 @@ Discussions and support around Faiadashu and the FHIR-FLI library can be found o
 Support for the FHIR Standard is focussed on the R4 release which is located here: [![FHIR R4](fhir-logo-www.png)](https://hl7.org/fhir/R4/)  https://hl7.org/fhir/R4/
 
 ### Theme
-## Styles
+#### Styles
 Styles - including text and colors - is obtained through the Material theme of the app. Both dark and light schemes work.
 
-## Views and behaviors
-Several behaviors of the questionnaire filler can be influenced by instantiating a `QuestionnaireTheme` and passing it
-into the filler through any constructor which has a `questionnaireTheme` parameter.
+#### Questionnaire theming
+Behaviors of the questionnaire filler that affect visualizations, but don't have an equivalent in the presentation model,
+can be influenced by instantiating a `QuestionnaireTheme` and passing it  into the filler through any constructor which
+has a `questionnaireTheme` parameter.
 
 **Examples are:**
 * should an option to skip questions be presented?
-* should questions be prefixed with a number?
-* should coded questions offer an option to answer with a `null` = no answer?
+* should coding questions offer an option to answer with a `null` = no answer?
+
+Behaviors that are driven by the presentation model can be influenced by instantiating a `QuestionnaireModelDefaults`
+and passing it into the filler through the `questionnaireModelDefaults` parameter.
+
+**Examples are:**
+* auto-generated question prefixes (for instance to count questions)
+* default maximum value for sliders
 
 ### Locale
 Locale is explicitly passed to the library during the initialization of the `QuestionnaireFiller`.
