@@ -153,9 +153,15 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
 
       // Attach individual listeners to parent answers underneath which this item is nested
       if (questionnaireItemModel.isNestedItem) {
-        // FIXME: This is super-hacky!!!
+        final parentNode = this.parentNode;
+        assert(parentNode != null);
+        assert(parentNode is AnswerModel);
+        final predecessorResponseNode = parentNode!.parentNode;
+        assert(predecessorResponseNode != null);
+        assert(predecessorResponseNode is ResponseItemModel);
+
         // Update the enable status when the response which owns the parent answer has changed.
-        (parentNode!.parentNode! as ResponseItemModel)
+        (predecessorResponseNode! as ResponseItemModel)
             .addListener(() => questionnaireResponseModel.updateEnabledItems());
       }
 
@@ -189,13 +195,10 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
     final enableWhenExpression =
         ArgumentError.checkNotNull(_enableWhenExpression);
 
-    final fhirPathResult = await enableWhenExpression.fetchValue();
-
-    // Evaluate result
-    if (!isFhirPathResultTrue(
-      fhirPathResult,
-      enableWhenExpression,
+    if (!await (enableWhenExpression as FhirPathExpressionEvaluator)
+        .fetchBoolValue(
       unknownValue: false,
+      location: nodeUid,
     )) {
       _disableWithChildren();
     }
@@ -210,9 +213,16 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
   }
 
   ResponseItemModel fromLinkId(String linkId) {
-    // TODO: This makes a crude assumption about 1:1 relationship question/response
+    // TODO: This makes a simplifying assumption about 1:1 relationship question/response
     // Expected behavior according to spec:
-    // If multiple question occurrences are present for the same question (same linkId), then this refers to the nearest question occurrence reachable by tracing first the "ancestor" axis and then the "preceding" axis and then the "following" axis. If there are multiple items with the same linkId and all are equadistant (e.g. a question references a question that appears in a separate repeating group), that is an error. (Consider using the enableWhenExpression extension to define logic to handle such a situation.)
+    // If multiple question occurrences are present for the same question
+    // (same linkId), then this refers to the nearest question occurrence
+    // reachable by tracing first the "ancestor" axis and then the "preceding"
+    // axis and then the "following" axis. If there are multiple items with the
+    // same linkId and all are equidistant (e.g. a question references a
+    // question that appears in a separate repeating group), that is an error.
+    //
+    // (Consider using the enableWhenExpression extension to define logic to handle such a situation.)
     // https://stackoverflow.com/questions/22455959/xpath-difference-between-preceding-and-ancestor/22456251
     return questionnaireResponseModel
         .orderedResponseItemModels()
@@ -360,35 +370,6 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
   bool get isEnabled => _isEnabled;
 
   bool get isNotEnabled => !_isEnabled;
-
-  // FIXME: Move to evaluators
-  bool isFhirPathResultTrue(
-    dynamic fhirPathResult,
-    ExpressionEvaluator expressionEvaluator, {
-    required bool unknownValue,
-  }) {
-    // Proper behavior is undefined: http://jira.hl7.org/browse/FHIR-33295
-    // Using singleton collection evaluation: https://hl7.org/fhirpath/#singleton-evaluation-of-collections
-    if (fhirPathResult == null) {
-      return unknownValue;
-    }
-
-    if (fhirPathResult is! List) {
-      throw ArgumentError('Expected List', 'fhirPathResult');
-    }
-
-    if (fhirPathResult.isEmpty) {
-      return unknownValue;
-    } else if (fhirPathResult.first is! bool) {
-      _fimLogger.warn(
-        'Questionnaire design issue: "$expressionEvaluator" at $nodeUid results in $fhirPathResult. Expected a bool.',
-      );
-
-      return fhirPathResult.first != null;
-    } else {
-      return fhirPathResult.first as bool;
-    }
-  }
 }
 
 class _EnableWhenTrigger {

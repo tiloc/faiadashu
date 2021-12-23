@@ -2,7 +2,7 @@ import 'package:faiadashu/coding/coding.dart';
 import 'package:faiadashu/fhir_types/fhir_types.dart';
 import 'package:faiadashu/logging/logging.dart';
 import 'package:faiadashu/questionnaires/questionnaires.dart';
-import 'package:fhir/r4.dart';
+import 'package:fhir/primitive_types/primitive_types.dart';
 import 'package:fhir/r4/r4.dart';
 import 'package:fhir_path/fhir_path.dart';
 

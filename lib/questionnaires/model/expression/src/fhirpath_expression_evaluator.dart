@@ -72,4 +72,35 @@ class FhirPathExpressionEvaluator extends FhirExpressionEvaluator {
       StringProperty('FHIRPath', fhirPath),
     );
   }
+
+  /// Evaluates a FHIRPath expression and interprets the result as a [bool].
+  ///
+  /// Proper behavior is undefined: http://jira.hl7.org/browse/FHIR-33295
+  /// Using singleton collection evaluation: https://hl7.org/fhirpath/#singleton-evaluation-of-collections
+  Future<bool> fetchBoolValue({
+    String? location,
+    required bool unknownValue,
+  }) async {
+    final fhirPathResult = await fetchValue();
+
+    if (fhirPathResult == null) {
+      return unknownValue;
+    }
+
+    if (fhirPathResult is! List) {
+      throw ArgumentError('Expected List', 'fhirPathResult');
+    }
+
+    if (fhirPathResult.isEmpty) {
+      return unknownValue;
+    } else if (fhirPathResult.first is! bool) {
+      _logger.warn(
+        'Questionnaire design issue: "$this" at $location results in $fhirPathResult. Expected a bool.',
+      );
+
+      return fhirPathResult.first != null;
+    } else {
+      return fhirPathResult.first as bool;
+    }
+  }
 }

@@ -194,16 +194,16 @@ or communication.
 The structural definition of a questionnaire is not visible, and thus no view for it exists.
 They offer a presentation model to support the views of the questionnaire response.
 
-|          Presentation Model  |  Domain Model (FHIR) |
-|----------------------|---------------------|
-| QuestionnaireModel| Questionnaire |
-| QuestionnaireItemModel| QuestionnaireItem | 
+| Presentation Model     | Domain Model (FHIR) |
+|------------------------|---------------------|
+| QuestionnaireModel     | Questionnaire       |
+| QuestionnaireItemModel | QuestionnaireItem   | 
 
 ###### Questionnaire Response
 The questionnaire response is modeled through the following models.
 
-| View                |          Presentation Model  |  Domain Model (FHIR) |
-|---------------------|----------------------|---------------------|
-| QuestionnaireResponseFiller | QuestionnaireResponseModel _(with references to QuestionnaireModel)_ |  QuestionnaireResponse |
+| View                            | Presentation Model                                                           | Domain Model (FHIR)       |
+|---------------------------------|------------------------------------------------------------------------------|---------------------------|
+| QuestionnaireResponseFiller     | QuestionnaireResponseModel _(with references to QuestionnaireModel)_         | QuestionnaireResponse     |
 | QuestionnaireResponseItemFiller | QuestionnaireResponseItemModel _(with references to QuestionnaireItemModel)_ | QuestionnaireResponseItem | 
-| QuestionnaireAnswerFiller | AnswerModel|  QuestionnaireAnswerItem |
+| QuestionnaireAnswerFiller       | AnswerModel                                                                  | QuestionnaireAnswerItem   |

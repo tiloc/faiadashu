@@ -92,12 +92,9 @@ abstract class ResponseItemModel extends FillerItemModel {
       return true;
     }
 
-    final fhirPathResult = await constraintExpression.fetchValue();
-
-    return isFhirPathResultTrue(
-      fhirPathResult,
-      constraintExpression,
+    return constraintExpression.fetchBoolValue(
       unknownValue: true,
+      location: nodeUid,
     );
   }
 }
