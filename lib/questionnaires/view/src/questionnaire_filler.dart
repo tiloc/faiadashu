@@ -91,7 +91,8 @@ class _QuestionnaireResponseFillerState
     if (_handleQuestionnaireResponseModelChangeListenerFunction != null &&
         _questionnaireResponseModel != null) {
       _questionnaireResponseModel!.removeListener(
-          _handleQuestionnaireResponseModelChangeListenerFunction!);
+        _handleQuestionnaireResponseModelChangeListenerFunction!,
+      );
       _questionnaireResponseModel = null;
       _handleQuestionnaireResponseModelChangeListenerFunction = null;
     }

@@ -724,21 +724,30 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   /// * All filled fields are valid
   /// * All expression-based constraints are satisfied
   ///
-  /// Returns true, if everything is complete.
-  /// Returns false, if items are incomplete.
-  Future<bool> get isQuestionnaireComplete async {
+  /// Returns empty map, if everything is complete.
+  /// Returns a map (UID -> error text) with incomplete entries, if items are incomplete.
+  Future<Map<String, String?>> get incompleteItems async {
+    final incompleteMap = <String, String?>{};
+
     for (final itemModel in orderedResponseItemModels()) {
       final isItemComplete = await itemModel.isComplete;
       if (!isItemComplete) {
         _logger.debug('$itemModel not complete.');
 
-        return false;
+        incompleteMap[itemModel.nodeUid] = itemModel.errorText;
       }
     }
 
-    return true;
+    return incompleteMap;
   }
 
-  // TODO: Is it enough for this to be a bool? Or should it be a Set of UIDs?
-  final isValidNotifier = ValueNotifier<bool?>(null);
+  /// A map of UIDs -> error texts of invalid [ResponseNode]s.
+  ///
+  /// This should only be updated when a global response is desired,
+  /// such as the overall filler navigating to an invalid item.
+  ///
+  /// For local responses, only the local error text, data absent reason, etc.
+  /// should be updated.
+  final isInvalidNotifier =
+      ValueNotifier<Map<String, String?>>(<String, String?>{});
 }

@@ -358,14 +358,14 @@ class QuestionItemModel extends ResponseItemModel {
               ? rawEvaluationResult.first
               : null;
 
-      // TODO: should this be able to populate multiple answers?
+      // TODO: This should be able to populate multiple answers from a list of results
       // Write the value back to the answer model
       firstAnswerModel.populateFromExpression(evaluationResult);
     } catch (ex) {
       errorText =
           (ex is FhirPathEvaluationException) ? ex.message : ex.toString();
-      questionnaireResponseModel.isValidNotifier.value = false;
       _qimLogger.warn('Calculation problem: $_calculatedExpression', error: ex);
+      notifyListeners(); // This could be added to a setter for errorText, but might have side-effects.
     }
   }
 }

@@ -243,9 +243,9 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
                 ?.addListener(_onQuestionnaireResponseChanged);
           }
 
-          // Listen for new error flags and then scroll to the first one.
-          questionnaireResponseModel.isValidNotifier.addListener(() {
-            if (questionnaireResponseModel.isValidNotifier.value ?? true) {
+          // Listen for new invalid items and then scroll to the first one.
+          questionnaireResponseModel.isInvalidNotifier.addListener(() {
+            if (questionnaireResponseModel.isInvalidNotifier.value.isEmpty) {
               return;
             }
 
