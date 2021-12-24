@@ -67,7 +67,7 @@ class _QuestionnaireResponseFillerState
 
   late final Future<QuestionnaireResponseModel> builderFuture;
   QuestionnaireResponseModel? _questionnaireResponseModel;
-  VoidCallback? _onQuestionnaireResponseModelChangeListenerFunction;
+  VoidCallback? _handleQuestionnaireResponseModelChangeListenerFunction;
   // ignore: use_late_for_private_fields_and_variables
   QuestionnaireFillerData? _questionnaireFillerData;
 
@@ -88,12 +88,12 @@ class _QuestionnaireResponseFillerState
   void dispose() {
     _logger.trace('dispose');
 
-    if (_onQuestionnaireResponseModelChangeListenerFunction != null &&
+    if (_handleQuestionnaireResponseModelChangeListenerFunction != null &&
         _questionnaireResponseModel != null) {
-      _questionnaireResponseModel!
-          .removeListener(_onQuestionnaireResponseModelChangeListenerFunction!);
+      _questionnaireResponseModel!.removeListener(
+          _handleQuestionnaireResponseModelChangeListenerFunction!);
       _questionnaireResponseModel = null;
-      _onQuestionnaireResponseModelChangeListenerFunction = null;
+      _handleQuestionnaireResponseModelChangeListenerFunction = null;
     }
     super.dispose();
   }
@@ -155,11 +155,12 @@ class _QuestionnaireResponseFillerState
                   _questionnaireResponseModel!.orderedFillerItemModels().length;
 
               // OPTIMIZE: There has got to be a more elegant way? Goal is to register the listener exactly once, after the future has completed.
-              if (_onQuestionnaireResponseModelChangeListenerFunction == null) {
-                _onQuestionnaireResponseModelChangeListenerFunction =
+              if (_handleQuestionnaireResponseModelChangeListenerFunction ==
+                  null) {
+                _handleQuestionnaireResponseModelChangeListenerFunction =
                     () => _onQuestionnaireResponseModelChange();
                 _questionnaireResponseModel!.addListener(
-                  _onQuestionnaireResponseModelChangeListenerFunction!,
+                  _handleQuestionnaireResponseModelChangeListenerFunction!,
                 );
 
                 _questionnaireFillerData = QuestionnaireFillerData._(

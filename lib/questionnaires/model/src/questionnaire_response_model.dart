@@ -612,7 +612,12 @@ class QuestionnaireResponseModel extends ChangeNotifier {
         }
       }
 
-      // FIXME: Add visibility change on response status change.
+      // Add visibility change on response status change.
+      responseStatusNotifier.addListener(() {
+        for (final itemModel in orderedFillerItemModels()) {
+          itemModel.handleResponseStatusChange();
+        }
+      });
 
       _visibilityActivated = true;
     }
