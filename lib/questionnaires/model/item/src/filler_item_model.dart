@@ -5,6 +5,18 @@ import 'package:faiadashu/questionnaires/questionnaires.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/foundation.dart';
 
+/// Codes that guide the display of questionnaire items
+enum DisplayVisibility {
+  /// Item is fully visible
+  shown,
+
+  /// Item is completely hidden
+  hidden,
+
+  /// Item is visible, but read-only
+  protected,
+}
+
 /// An item entry for a questionnaire filler.
 ///
 /// This is a common base-class for items that can generate responses (questions, groups),
@@ -136,15 +148,24 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
                 questionnaireResponseModel.responseItemByUid(nodeUid),
           )
         : null;
+
+    _displayVisibility = _calculateDisplayVisibility();
   }
 
   QuestionnaireItem get questionnaireItem =>
       questionnaireItemModel.questionnaireItem;
 
-  /// Activate the enablement behavior for this item.
+  /// Returns whether the enablement of this item can ever change.
+  bool get isDynamicallyEnabled {
+    return questionnaireItemModel.isEnabledWhen ||
+        questionnaireItemModel.hasEnabledWhenExpression ||
+        questionnaireItemModel.isNestedItem;
+  }
+
+  /// Activate the dynamic aspects of enableWhen for this item.
   ///
-  /// Idempotent - does nothing if behavior is already activated.
-  void activateEnableBehavior() {
+  /// Idempotent - does nothing if enableWhen is already activated.
+  void activateEnableWhen() {
     if (!_enableWhenActivated) {
       questionnaireItemModel.forEnableWhens((qew) {
         fromLinkId(qew.question!)
@@ -160,7 +181,7 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
         assert(predecessorResponseNode != null);
         assert(predecessorResponseNode is ResponseItemModel);
 
-        // Update the enable status when the response which owns the parent answer has changed.
+        // Update the enablement status when the response which owns the parent answer has changed.
         (predecessorResponseNode! as ResponseItemModel)
             .addListener(() => questionnaireResponseModel.updateEnabledItems());
       }
@@ -179,7 +200,7 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
 
     if (questionnaireItemModel.isEnabledWhen) {
       _updateEnabledByEnableWhen();
-    } else if (questionnaireItemModel.isEnabledWhenExpression) {
+    } else if (questionnaireItemModel.hasEnabledWhenExpression) {
       _updateEnabledByEnableWhenExpression();
     } else if (questionnaireItemModel.isNestedItem) {
       _updateEnabledByParentAnswer();
@@ -200,15 +221,15 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
       unknownValue: false,
       location: nodeUid,
     )) {
-      _disableWithChildren();
+      _nextGenerationDisableWithDescendants();
     }
   }
 
-  void _disableWithChildren() {
-    _isEnabled = false;
+  void _nextGenerationDisableWithDescendants() {
+    _nextGenerationIsEnabled = false;
     for (final child in questionnaireResponseModel
         .orderedFillerItemModelsWithParent(parent: this)) {
-      child._disableWithChildren();
+      child._nextGenerationDisableWithDescendants();
     }
   }
 
@@ -270,12 +291,12 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
       case QuestionnaireItemEnableBehavior.any:
       case null:
         if (!enableWhenTrigger.anyTriggered) {
-          _disableWithChildren();
+          _nextGenerationDisableWithDescendants();
         }
         break;
       case QuestionnaireItemEnableBehavior.all:
         if (!enableWhenTrigger.allTriggered) {
-          _disableWithChildren();
+          _nextGenerationDisableWithDescendants();
         }
         break;
       case QuestionnaireItemEnableBehavior.unknown:
@@ -357,19 +378,63 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
 
   void _updateEnabledByParentAnswer() {
     if ((parentNode! as AnswerModel).isUnanswered) {
-      _disableWithChildren();
+      _nextGenerationDisableWithDescendants();
     }
   }
 
-  /// INTERNAL USE: Enable the item.
-  void enable() {
-    _isEnabled = true;
+  /// INTERNAL USE: The item will be enabled in the next generation.
+  void nextGenerationEnable() {
+    _nextGenerationIsEnabled = true;
   }
+
+  /// INTERNAL USE: Enable the item as determined for the next generation.
+  bool enableNextGeneration() {
+    final hasChanged = _isEnabled ^ _nextGenerationIsEnabled;
+
+    if (hasChanged) {
+      _isEnabled = _nextGenerationIsEnabled;
+      _displayVisibility = _calculateDisplayVisibility();
+      notifyListeners();
+    }
+
+    return hasChanged;
+  }
+
+  DisplayVisibility _calculateDisplayVisibility() {
+    return questionnaireResponseModel.responseStatus ==
+            QuestionnaireResponseStatus.completed
+        ? isEnabled
+            ? DisplayVisibility.protected
+            : DisplayVisibility.hidden
+        : isEnabled
+            ? DisplayVisibility.shown
+            : DisplayVisibility.hidden;
+  }
+
+  /// Handle changes to a questionnaire response's completion status.
+  ///
+  /// This may affect an items visibility.
+  ///
+  /// **INTERNAL USE ONLY**
+  void handleResponseStatusChange() {
+    // The overall questionnaire response going from amended to completed
+    // might change the visibility
+    final newVisibility = _calculateDisplayVisibility();
+    if (newVisibility != _displayVisibility) {
+      _displayVisibility = newVisibility;
+      notifyListeners();
+    }
+  }
+
+  bool _nextGenerationIsEnabled = true;
 
   bool _isEnabled = true;
   bool get isEnabled => _isEnabled;
 
   bool get isNotEnabled => !_isEnabled;
+
+  late DisplayVisibility _displayVisibility;
+  DisplayVisibility get displayVisibility => _displayVisibility;
 }
 
 class _EnableWhenTrigger {

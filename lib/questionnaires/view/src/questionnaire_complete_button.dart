@@ -27,12 +27,12 @@ class _QuestionnaireCompleteButtonState
     return ElevatedButton.icon(
       onPressed: () async {
         final qf = QuestionnaireResponseFiller.of(context);
-        final qm = qf.questionnaireResponseModel;
-        final currentResponseStatus = qm.responseStatus;
+        final qrm = qf.questionnaireResponseModel;
+        final currentResponseStatus = qrm.responseStatus;
 
         if (currentResponseStatus != QuestionnaireResponseStatus.completed) {
-          final isComplete = await qm.isQuestionnaireComplete;
-          qm.isValid.value = isComplete;
+          final isComplete = await qrm.isQuestionnaireComplete;
+          qrm.isValidNotifier.value = isComplete;
 
           if (!isComplete) {
             return;
@@ -45,7 +45,7 @@ class _QuestionnaireCompleteButtonState
                 : QuestionnaireResponseStatus.completed;
 
         setState(() {
-          qm.responseStatus = newResponseStatus;
+          qrm.responseStatus = newResponseStatus;
         });
 
         if (newResponseStatus == QuestionnaireResponseStatus.completed) {

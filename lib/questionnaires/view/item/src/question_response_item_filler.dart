@@ -95,6 +95,8 @@ class QuestionResponseItemFillerState
 
     final promptText = _promptText;
 
+    // TODO: Should this also move into the visibility calculation in filler item?
+    // TODO: Should visible - but disabled - items have a focus node?
     return (questionnaireItemModel.isNotHidden &&
             questionnaireItemModel.isShownDuringCapture)
         ? Focus(
@@ -103,82 +105,79 @@ class QuestionResponseItemFillerState
 /*            onFocusChange: (gainedFocus) {
               debugDumpFocusTree();
             }, */
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 500),
-              child: AnimatedBuilder(
-                animation: widget.responseItemModel.questionnaireResponseModel,
-                builder: (context, _) {
-                  const int twoThirds = 2;
+            child: AnimatedBuilder(
+              animation: widget.responseItemModel,
+              builder: (context, _) {
+                const int twoThirds = 2;
 
-                  return widget.responseItemModel.isEnabled
-                      ? LayoutBuilder(
-                          builder: (
-                            BuildContext context,
-                            BoxConstraints constraints,
-                          ) {
-                            // Wide landscape screen: Use horizontal layout
-                            return AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 500),
-                              child: (constraints.maxWidth >
-                                      questionnaireTheme.landscapeBreakpoint)
-                                  ? Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            if (titleWidget != null)
-                                              Expanded(
-                                                child: titleWidget!,
-                                              )
-                                            else
-                                              Expanded(child: Container()),
+                return widget.responseItemModel.displayVisibility !=
+                        DisplayVisibility.hidden
+                    ? LayoutBuilder(
+                        builder: (
+                          BuildContext context,
+                          BoxConstraints constraints,
+                        ) {
+                          // Wide landscape screen: Use horizontal layout
+                          return AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 500),
+                            child: (constraints.maxWidth >
+                                    questionnaireTheme.landscapeBreakpoint)
+                                ? Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          if (titleWidget != null)
                                             Expanded(
-                                              flex: twoThirds,
-                                              child:
-                                                  _buildAnswerFillers(context),
-                                            ),
-                                          ],
+                                              child: titleWidget!,
+                                            )
+                                          else
+                                            Expanded(child: Container()),
+                                          Expanded(
+                                            flex: twoThirds,
+                                            child: _buildAnswerFillers(context),
+                                          ),
+                                        ],
+                                      ),
+                                      if (promptText != null)
+                                        const SizedBox(height: 8.0),
+                                      if (promptText != null)
+                                        Xhtml.fromXhtmlString(
+                                          context,
+                                          promptText,
                                         ),
-                                        if (promptText != null)
-                                          const SizedBox(height: 8.0),
-                                        if (promptText != null)
-                                          Xhtml.fromXhtmlString(
-                                            context,
-                                            promptText,
-                                          ),
-                                        const SizedBox(height: 16.0),
-                                      ],
-                                    )
-                                  // Narrow, portrait screen: Use vertical layout
-                                  : Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        if (titleWidget != null)
-                                          Container(
-                                            padding:
-                                                const EdgeInsets.only(top: 8),
-                                            child: titleWidget,
-                                          ),
-                                        _buildAnswerFillers(context),
-                                        if (promptText != null)
-                                          Xhtml.fromXhtmlString(
-                                            context,
-                                            promptText,
-                                          ),
-                                        const SizedBox(width: 8),
-                                      ],
-                                    ),
-                            );
-                          },
-                        )
-                      : const SizedBox();
-                },
-              ),
+                                      const SizedBox(height: 16.0),
+                                    ],
+                                  )
+                                // Narrow, portrait screen: Use vertical layout
+                                : Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      if (titleWidget != null)
+                                        Container(
+                                          padding:
+                                              const EdgeInsets.only(top: 8),
+                                          child: titleWidget,
+                                        ),
+                                      _buildAnswerFillers(context),
+                                      if (promptText != null)
+                                        Xhtml.fromXhtmlString(
+                                          context,
+                                          promptText,
+                                        ),
+                                      const SizedBox(width: 8),
+                                    ],
+                                  ),
+                          );
+                        },
+                      )
+                    : const SizedBox();
+              },
             ),
           )
         : const SizedBox();

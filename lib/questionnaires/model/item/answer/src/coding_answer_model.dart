@@ -247,6 +247,11 @@ class CodingAnswerModel extends AnswerModel<Set<String>, Set<String>> {
 
   @override
   String? validateInput(Set<String>? inValue) {
+    return validateValue(inValue);
+  }
+
+  @override
+  String? validateValue(Set<String>? inValue) {
     if (inValue == null) {
       return null;
     }
@@ -314,17 +319,6 @@ class CodingAnswerModel extends AnswerModel<Set<String>, Set<String>> {
   bool get hasCodingAnswers => true;
 
   @override
-  String? get isComplete {
-    if (value == null && minOccurs > 0) {
-      return lookupFDashLocalizations(locale).validatorMinOccurs(minOccurs);
-    }
-
-    final validationText = validateInput(value);
-
-    return (validationText == null) ? null : validationText;
-  }
-
-  @override
   bool get isUnanswered => value == null;
 
   @override
@@ -344,7 +338,7 @@ class CodingAnswerModel extends AnswerModel<Set<String>, Set<String>> {
           answer.valueCoding?.display ??
           answer.valueString;
 
-      // TODO: Currently not possible, due to open-choice
+      // TODO: Not yet possible, due to open-choice
 /*      if (matchCode == null) {
         throw QuestionnaireFormatException(
           'QuestionnaireResponseAnswer $answer requires either a valueCoding or a valueString.',

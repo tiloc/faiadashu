@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 
 /// Answer questions which require code(s) as a response.
 ///
-/// R5 release of the FHIR standard will have a `coding` item type.
+/// R5 release of the FHIR standard will have a `coding` item type,
+/// and model the "openness" in a separate extension.
 class CodingAnswerFiller extends QuestionnaireAnswerFiller {
   CodingAnswerFiller(
     QuestionResponseItemFillerState responseFillerState,
@@ -19,10 +20,6 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
     CodingAnswerFiller, CodingAnswerModel> {
   late final TextEditingController? _openTextController;
 
-  String? _errorText;
-
-  String? get errorText => _errorText ?? answerModel.errorText;
-
   _CodingAnswerState();
 
   @override
@@ -30,8 +27,6 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
     if (qi.type == QuestionnaireItemType.open_choice) {
       _openTextController = TextEditingController(text: answerModel.openText);
     }
-
-    _errorText = answerModel.validateInput(value);
   }
 
   @override
@@ -77,9 +72,9 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
       firstFocusNode: firstFocusNode,
       locale: locale,
       answerModel: answerModel,
-      errorText: errorText,
+      errorText: answerModel.errorText,
       onChanged: (uid) {
-        value = answerModel.selectOption(uid);
+        answerModel.value = answerModel.selectOption(uid);
       },
     );
   }
@@ -95,12 +90,12 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
             ? _HorizontalCodingChoices(
                 firstFocusNode: firstFocusNode,
                 choices: choices,
-                errorText: errorText,
+                errorText: answerModel.errorText,
               )
             : _VerticalCodingChoices(
                 firstFocusNode: firstFocusNode,
                 answerModel: answerModel,
-                errorText: errorText,
+                errorText: answerModel.errorText,
                 choices: choices,
               );
       },
@@ -128,7 +123,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
       },
       onSelected: (answerModel.isEnabled)
           ? (CodingAnswerOptionModel selectedOption) {
-              value = answerModel.selectOption(selectedOption.uid);
+              answerModel.value = answerModel.selectOption(selectedOption.uid);
             }
           : null,
     );
@@ -150,7 +145,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
             groupValue: answerModel.singleSelectionUid,
             onChanged: (answerModel.isEnabled)
                 ? (String? newValue) {
-                    value = answerModel.selectOption(newValue);
+                    answerModel.value = answerModel.selectOption(newValue);
                   }
                 : null,
           ),
@@ -179,8 +174,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
                               final newValue = answerModel.toggleOption(
                                 answerOption.uid,
                               );
-                              _errorText = answerModel.validateInput(newValue);
-                              value = newValue;
+                              answerModel.value = newValue;
                             }
                           : null,
                     ),
@@ -195,8 +189,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
                               final newValue = answerModel.toggleOption(
                                 answerOption.uid,
                               );
-                              _errorText = answerModel.validateInput(newValue);
-                              value = newValue;
+                              answerModel.value = newValue;
                             }
                           : null,
                     ),
@@ -211,7 +204,8 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
                   onChanged: (answerModel.isEnabled)
                       ? (String? newValue) {
                           Focus.of(context).requestFocus();
-                          value = answerModel.selectOption(newValue);
+                          answerModel.value =
+                              answerModel.selectOption(newValue);
                         }
                       : null,
                 ),
@@ -232,7 +226,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
             onChanged: (answerModel.isEnabled)
                 ? (String? newValue) {
                     Focus.of(context).requestFocus();
-                    value = answerModel
+                    answerModel.value = answerModel
                         .selectOption(CodingAnswerOptionModel.openChoiceCode);
                   }
                 : null,
@@ -241,7 +235,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
               enabled: answerModel.isEnabled,
               onChanged: (newText) {
                 answerModel.openText = newText;
-                value = answerModel
+                answerModel.value = answerModel
                     .selectOption(CodingAnswerOptionModel.openChoiceCode);
               },
             ),

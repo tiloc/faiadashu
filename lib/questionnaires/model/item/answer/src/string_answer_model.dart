@@ -64,26 +64,31 @@ class StringAnswerModel extends AnswerModel<String, String> {
   String? validateInput(String? inValue) {
     final checkValue = inValue?.trim();
 
-    if (checkValue == null || checkValue.isEmpty) {
+    return validateValue(checkValue);
+  }
+
+  @override
+  String? validateValue(String? inputValue) {
+    if (inputValue == null || inputValue.isEmpty) {
       return null;
     }
 
-    if (checkValue.length < minLength) {
+    if (inputValue.length < minLength) {
       return lookupFDashLocalizations(locale).validatorMinLength(minLength);
     }
 
-    if (maxLength != null && checkValue.length > maxLength!) {
+    if (maxLength != null && inputValue.length > maxLength!) {
       return lookupFDashLocalizations(locale).validatorMaxLength(maxLength!);
     }
 
     if (qi.type == QuestionnaireItemType.url) {
-      if (!_urlRegExp.hasMatch(checkValue)) {
+      if (!_urlRegExp.hasMatch(inputValue)) {
         return lookupFDashLocalizations(locale).validatorUrl;
       }
     }
 
     if (regExp != null) {
-      if (!regExp!.hasMatch(checkValue)) {
+      if (!regExp!.hasMatch(inputValue)) {
         return (entryFormat != null)
             ? lookupFDashLocalizations(locale)
                 .validatorEntryFormat(entryFormat!)
@@ -123,11 +128,6 @@ class StringAnswerModel extends AnswerModel<String, String> {
                 item: items,
               )
         : null;
-  }
-
-  @override
-  String? get isComplete {
-    return validateInput(value);
   }
 
   @override

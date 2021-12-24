@@ -28,7 +28,8 @@ class _DateTimeAnswerState extends QuestionnaireAnswerFillerState<FhirDateTime,
   Widget buildInputControl(BuildContext context) {
     final itemType = qi.type;
 
-    final initialDate = (itemType != QuestionnaireItemType.time) ? value : null;
+    final initialDate =
+        (itemType != QuestionnaireItemType.time) ? answerModel.value : null;
 
     final pickerType = ArgumentError.checkNotNull(
       const {
@@ -58,7 +59,7 @@ class _DateTimeAnswerState extends QuestionnaireAnswerFillerState<FhirDateTime,
                     )
                   : null,
             ),
-        onChanged: (fhirDatetime) => value = fhirDatetime,
+        onChanged: (fhirDatetime) => answerModel.value = fhirDatetime,
       ),
     );
   }

@@ -28,7 +28,9 @@ class BooleanAnswerModel extends AnswerModel<Boolean, Boolean> {
   }
 
   @override
-  String? get isComplete => null;
+  String? validateValue(Boolean? inputValue) {
+    return null;
+  }
 
   @override
   bool get isUnanswered => value == null;

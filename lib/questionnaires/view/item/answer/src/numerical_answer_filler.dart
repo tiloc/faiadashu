@@ -28,8 +28,9 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
     _numberInputFormatter =
         NumericalTextInputFormatter(answerModel.numberFormat);
 
-    final initialValue =
-        (value?.value != null) ? value!.value!.format(locale) : '';
+    final initialValue = (answerModel.value?.value != null)
+        ? answerModel.value!.value!.format(locale)
+        : '';
 
     _editingController.value = TextEditingValue(
       text: initialValue,
@@ -39,8 +40,8 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
     );
 
     const averageDivisor = 2.0;
-    _sliderValueDuringChange = (value != null)
-        ? value!.value!.value!
+    _sliderValueDuringChange = (answerModel.value != null)
+        ? answerModel.value!.value!.value!
         : (answerModel.maxValue - answerModel.minValue) / averageDivisor;
   }
 
@@ -66,7 +67,7 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
                 hint: const NullDashText(),
                 onChanged: (answerModel.isEnabled)
                     ? (String? newValue) {
-                        value = answerModel.copyWithUnit(newValue);
+                        answerModel.value = answerModel.copyWithUnit(newValue);
                       }
                     : null,
                 items: [
@@ -88,8 +89,9 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
   Widget buildInputControl(BuildContext context) {
     // Calculated items need an automated entry into the text field.
     if (itemModel.isCalculated) {
-      final currentValue =
-          (value?.value != null) ? value!.value!.format(locale) : '';
+      final currentValue = (answerModel.value?.value != null)
+          ? answerModel.value!.value!.format(locale)
+          : '';
 
       _editingController.value = TextEditingValue(
         text: currentValue,
@@ -130,7 +132,7 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
                       onChangeEnd: answerModel.isEnabled
                           ? (sliderValue) {
                               _sliderValueDuringChange = sliderValue;
-                              value = answerModel
+                              answerModel.value = answerModel
                                   .copyWithValue(Decimal(sliderValue));
                             }
                           : null,
@@ -219,7 +221,8 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
                         ? AutovalidateMode.disabled
                         : AutovalidateMode.always,
                     onChanged: (content) {
-                      value = answerModel.copyWithTextInput(content);
+                      answerModel.value =
+                          answerModel.copyWithTextInput(content);
                     },
                   ),
                 ),

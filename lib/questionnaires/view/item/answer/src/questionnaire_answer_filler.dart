@@ -90,7 +90,7 @@ abstract class QuestionnaireAnswerFillerState<
       WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
         // Focus.of could otherwise fail with: Looking up a deactivated widget's ancestor is unsafe.
         if (mounted) {
-          Focus.maybeOf(context)?.addListener(_focusHasChanged);
+          Focus.maybeOf(context)?.addListener(_handleFocusChange);
         }
       });
       _isFocusHookedUp = true;
@@ -99,7 +99,7 @@ abstract class QuestionnaireAnswerFillerState<
     return buildInputControl(context);
   }
 
-  void _focusHasChanged() {
+  void _handleFocusChange() {
     if ((firstFocusNode.parent?.hasPrimaryFocus ?? false) &&
         !firstFocusNode.hasPrimaryFocus) {
       firstFocusNode.requestFocus();
@@ -108,22 +108,10 @@ abstract class QuestionnaireAnswerFillerState<
 
   Widget buildInputControl(BuildContext context);
 
-  set value(V? newValue) {
-    if (mounted) {
-      setState(() {
-        // Updating an answer resets its error marker
-        widget.responseItemModel.errorText = null;
-        answerModel.value = newValue;
-      });
-    }
-  }
-
-  V? get value => answerModel.value;
-
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: widget.responseItemModel.questionnaireResponseModel,
+      animation: widget.responseItemModel,
       builder: (context, _) {
         return _guardedBuildInputControl(context);
       },

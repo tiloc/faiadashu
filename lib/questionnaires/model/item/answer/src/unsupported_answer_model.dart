@@ -22,7 +22,9 @@ class UnsupportedAnswerModel extends AnswerModel<Object, Object> {
   }
 
   @override
-  String? get isComplete => null;
+  String? validateValue(Object? inputValue) {
+    return null;
+  }
 
   @override
   bool get isUnanswered => false;

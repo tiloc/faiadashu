@@ -27,7 +27,7 @@ class _StringAnswerState extends QuestionnaireAnswerFillerState<String,
 
   @override
   void postInitState() {
-    final initialValue = value ?? '';
+    final initialValue = answerModel.value ?? '';
 
     _editingController.value = TextEditingValue(
       text: initialValue,
@@ -71,7 +71,7 @@ class _StringAnswerState extends QuestionnaireAnswerFillerState<String,
         validator: (inputValue) => answerModel.validateInput(inputValue),
         autovalidateMode: AutovalidateMode.always,
         onChanged: (content) {
-          value = content;
+          answerModel.value = content;
         },
         maxLength: answerModel.maxLength,
       ),

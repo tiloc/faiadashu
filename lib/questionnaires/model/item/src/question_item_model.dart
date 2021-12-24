@@ -62,7 +62,7 @@ class QuestionItemModel extends ResponseItemModel {
   /// Triggers all required activities when any of the answers have changed.
   ///
   /// Creates nested fillers if needed.
-  void onAnswerChanged(AnswerModel answerModel) {
+  void handleChangedAnswer(AnswerModel answerModel) {
     if (answerModel.value != null) {
       // An answer has been provided, check whether a nested filler structure needs to be created.
       if (questionnaireItemModel.hasChildren) {
@@ -75,12 +75,14 @@ class QuestionItemModel extends ResponseItemModel {
 
         // Activate dynamic behavior
         for (final item in descendantItems) {
-          item.activateEnableBehavior();
+          item.activateEnableWhen();
         }
 
         questionnaireResponseModel.updateEnabledItems();
       }
     }
+
+    errorText = answerModel.validateValue(answerModel.value);
 
     nextGeneration();
   }
@@ -362,7 +364,7 @@ class QuestionItemModel extends ResponseItemModel {
     } catch (ex) {
       errorText =
           (ex is FhirPathEvaluationException) ? ex.message : ex.toString();
-      questionnaireResponseModel.isValid.value = false;
+      questionnaireResponseModel.isValidNotifier.value = false;
       _qimLogger.warn('Calculation problem: $_calculatedExpression', error: ex);
     }
   }

@@ -46,7 +46,7 @@ class QuestionnaireItemModel with Diagnosticable {
   }
 
   /// Returns whether the item is enabled/disabled through an enabledWhenExpression condition.
-  bool get isEnabledWhenExpression {
+  bool get hasEnabledWhenExpression {
     return questionnaireItem.extension_?.extensionOrNull(
           'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression',
         ) !=

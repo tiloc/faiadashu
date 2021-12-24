@@ -13,6 +13,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
   // In which generation were the enabled items last determined?
   int _updateEnabledGeneration = -1;
+
   final List<Aggregator>? _aggregators;
 
   final QuestionnaireModel questionnaireModel;
@@ -57,7 +58,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
   late final Iterable<ExpressionEvaluator> _launchContextExpressions;
 
-  bool _enableWhenExpressionsActivated = false;
+  bool _visibilityActivated = false;
 
   /// Constructor for empty model.
   ///
@@ -204,7 +205,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
         .addListener(questionnaireResponseModel._updateCalculations);
 
     // Set up enableWhen behavior on items
-    questionnaireResponseModel._activateEnableBehavior();
+    questionnaireResponseModel._activateEnablement();
 
     return questionnaireResponseModel;
   }
@@ -386,14 +387,15 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   /// Returns a number that indicates whether the model has changed.
   int get generation => _generation;
 
-  QuestionnaireResponseStatus _responseStatus =
-      QuestionnaireResponseStatus.in_progress;
+  final responseStatusNotifier = ValueNotifier<QuestionnaireResponseStatus>(
+    QuestionnaireResponseStatus.in_progress,
+  );
 
-  QuestionnaireResponseStatus get responseStatus => _responseStatus;
+  QuestionnaireResponseStatus get responseStatus =>
+      responseStatusNotifier.value;
 
   set responseStatus(QuestionnaireResponseStatus newStatus) {
-    _responseStatus = newStatus;
-    nextGeneration();
+    responseStatusNotifier.value = newStatus;
   }
 
   void _populateItems(
@@ -536,13 +538,6 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     });
   }
 
-  /// Returns a bitfield of the items with `isEnabled` == true.
-  List<bool> get _currentlyEnabledItems => List<bool>.generate(
-        orderedFillerItemModels().length,
-        (index) => orderedFillerItemModels().elementAt(index).isEnabled,
-        growable: false,
-      );
-
   /// Update the current enablement status of all items.
   ///
   /// This updates enablement through enableWhen and enableWhenExpression.
@@ -559,13 +554,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
     _updateEnabledGeneration = _generation;
 
-    // OPTIMIZE: Is this check worth it?
-    if (!orderedFillerItemModels().any(
-      (fim) =>
-          fim.questionnaireItemModel.isEnabledWhen ||
-          fim.questionnaireItemModel.isEnabledWhenExpression ||
-          fim.questionnaireItemModel.isNestedItem,
-    )) {
+    if (!questionnaireModel.isDynamicallyEnabled) {
       _logger.debug(
         'updateEnabledItems: no conditionally enabled items',
       );
@@ -573,55 +562,60 @@ class QuestionnaireResponseModel extends ChangeNotifier {
       return;
     }
 
-    final previouslyEnabled = _currentlyEnabledItems;
-    _logger.trace('prevEnabled: $previouslyEnabled');
     for (final itemModel in orderedFillerItemModels()) {
-      itemModel.enable();
+      itemModel.nextGenerationEnable();
     }
 
+    bool hasEnablementChanged = false;
     for (final fim in orderedFillerItemModels().where(
-      (fim) =>
-          fim.questionnaireItemModel.isEnabledWhen ||
-          fim.questionnaireItemModel.isEnabledWhenExpression ||
-          fim.questionnaireItemModel.isNestedItem,
+      (fim) => fim.isDynamicallyEnabled,
     )) {
       fim.updateEnabled();
+      hasEnablementChanged |= fim.enableNextGeneration();
     }
 
-    final nowEnabled = _currentlyEnabledItems;
-    _logger.trace('nowEnabled: $nowEnabled');
-
-    if (!listEquals(previouslyEnabled, nowEnabled)) {
+    if (hasEnablementChanged) {
       nextGeneration(notifyListeners: notifyListeners);
     } else {
       _logger.debug('Enabled items unchanged.');
     }
   }
 
-  /// Activate the enable behavior.
+  /// Activate the dynamic enablement and visibility behaviors.
   ///
-  /// Adds the required listeners to evaluate enableWhen and
+  /// * Adds the required listeners to evaluate enableWhen and
   /// enableWhenExpression as items are changed.
-  void _activateEnableBehavior() {
-    final hasEnabledWhenExpressions = orderedFillerItemModels()
-        .any((fim) => fim.questionnaireItemModel.isEnabledWhenExpression);
+  ///
+  /// * Adds the required listeners to update visibility based on
+  /// questionnaire response status
+  ///
+  /// Idempotent: Will only execute once during the lifetime of this model.
+  void _activateEnablement() {
+    if (!_visibilityActivated) {
+      // Initial calculation of all enablement.
+      updateEnabledItems();
 
-    if (hasEnabledWhenExpressions) {
-      // When enableWhenExpression is involved we need to add listeners to every
-      // non-static item (or the overall response model), as we have no way to
-      // find out which items are referenced by the FHIRPath expression.
-      if (!_enableWhenExpressionsActivated) {
-        addListener(() => updateEnabledItems());
-        _enableWhenExpressionsActivated = true;
+      final hasEnabledWhenExpressions = orderedFillerItemModels()
+          .any((fim) => fim.questionnaireItemModel.hasEnabledWhenExpression);
+
+      if (hasEnabledWhenExpressions) {
+        // When enableWhenExpression is involved we need to add listeners to every
+        // non-static item as we have no way to
+        // find out which items are referenced by the FHIRPath expression.
+        for (final itemModel in orderedResponseItemModels()) {
+          itemModel.addListener(() => updateEnabledItems());
+        }
+      } else {
+        // Activate enable behavior on individual items with surgical precision
+        for (final itemModel in orderedFillerItemModels()) {
+          itemModel.activateEnableWhen();
+        }
       }
-    } else {
-      // Activate enable behavior on individual items
-      for (final itemModel in orderedFillerItemModels()) {
-        itemModel.activateEnableBehavior();
-      }
+
+      // FIXME: Add visibility change on response status change.
+
+      _visibilityActivated = true;
     }
-
-    updateEnabledItems();
   }
 
   /// Returns the index of the first [FillerItemModel] which matches the predicate function.
@@ -731,6 +725,8 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     for (final itemModel in orderedResponseItemModels()) {
       final isItemComplete = await itemModel.isComplete;
       if (!isItemComplete) {
+        _logger.debug('$itemModel not complete.');
+
         return false;
       }
     }
@@ -739,5 +735,5 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   }
 
   // TODO: Is it enough for this to be a bool? Or should it be a Set of UIDs?
-  final isValid = ValueNotifier<bool?>(null);
+  final isValidNotifier = ValueNotifier<bool?>(null);
 }

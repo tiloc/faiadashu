@@ -17,6 +17,8 @@ class QuestionnaireModelDefaults {
 
   final RenderingString? Function(FillerItemModel)? prefixBuilder;
 
+  final QuestionnaireDisabledDisplay disabledDisplay;
+
   /// Returns a prefix, starting with 1, that provides the number
   /// of the [QuestionItemModel] within the ordered sequence of [QuestionItemModels].
   ///
@@ -49,5 +51,6 @@ class QuestionnaireModelDefaults {
     this.sliderMaxValue = defaultSliderMaxValue,
     this.usageMode = usageModeCaptureDisplayNonEmptyCode,
     this.prefixBuilder,
+    this.disabledDisplay = QuestionnaireDisabledDisplay.protectedNonEmpty,
   });
 }
