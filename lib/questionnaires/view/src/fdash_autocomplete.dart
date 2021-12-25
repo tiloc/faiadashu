@@ -167,7 +167,7 @@ class _AutoCompleteFieldState extends State<_AutocompleteField> {
       focusNode: widget.focusNode,
       decoration: InputDecoration(
         filled: true,
-        errorText: widget.answerModel?.errorText,
+        errorText: widget.answerModel?.displayErrorText,
         hintText: FDashLocalizations.of(context).autoCompleteSearchTermInput,
       ),
       onFieldSubmitted: (String value) {

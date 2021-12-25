@@ -72,7 +72,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
       firstFocusNode: firstFocusNode,
       locale: locale,
       answerModel: answerModel,
-      errorText: answerModel.errorText,
+      errorText: answerModel.displayErrorText,
       onChanged: (uid) {
         answerModel.value = answerModel.selectOption(uid);
       },
@@ -90,12 +90,12 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
             ? _HorizontalCodingChoices(
                 firstFocusNode: firstFocusNode,
                 choices: choices,
-                errorText: answerModel.errorText,
+                errorText: answerModel.displayErrorText,
               )
             : _VerticalCodingChoices(
                 firstFocusNode: firstFocusNode,
                 answerModel: answerModel,
-                errorText: answerModel.errorText,
+                errorText: answerModel.displayErrorText,
                 choices: choices,
               );
       },
@@ -335,7 +335,7 @@ class _CodingDropdown extends StatelessWidget {
       onChanged: answerModel.isEnabled ? onChanged : null,
       focusNode: firstFocusNode,
       items: dropdownItems,
-      decoration: InputDecoration(errorText: answerModel.errorText),
+      decoration: InputDecoration(errorText: answerModel.displayErrorText),
     );
   }
 }

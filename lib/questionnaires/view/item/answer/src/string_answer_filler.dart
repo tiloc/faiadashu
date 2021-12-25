@@ -59,7 +59,7 @@ class _StringAnswerState extends QuestionnaireAnswerFillerState<String,
             ? questionnaireTheme.maxLinesForTextItem
             : 1,
         decoration: questionnaireTheme.createDecoration().copyWith(
-              errorText: answerModel.errorText,
+              errorText: answerModel.displayErrorText,
               errorStyle: (itemModel
                       .isCalculated) // Force display of error text on calculated item
                   ? TextStyle(

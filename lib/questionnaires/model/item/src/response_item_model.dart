@@ -68,20 +68,37 @@ abstract class ResponseItemModel extends FillerItemModel {
   /// Localized text if an error exists. Or null if no error exists.
   String? errorText;
 
-  Future<Map<String, String>?> validate() async {
+  Future<Map<String, String>?> validate({
+    bool updateErrorText = true,
+    bool notifyListeners = false,
+  }) async {
+    String? newErrorText;
+
     if (questionnaireItemModel.isRequired && isUnanswered) {
-      return {
-        nodeUid: lookupFDashLocalizations(questionnaireResponseModel.locale)
-            .validatorRequiredItem,
-      };
+      newErrorText = lookupFDashLocalizations(questionnaireResponseModel.locale)
+          .validatorRequiredItem;
     }
 
     final constraintError = await validateConstraint();
-    if (constraintError != null) {
-      return {nodeUid: constraintError};
+    newErrorText ??= constraintError;
+
+    if (errorText != newErrorText) {
+      if (updateErrorText) {
+        errorText = newErrorText;
+      }
+      if (notifyListeners) {
+        this.notifyListeners();
+      }
     }
 
-    return null;
+    if (newErrorText == null) {
+      return null;
+    } else {
+      final resultMap = <String, String>{};
+      resultMap[nodeUid] = newErrorText;
+
+      return resultMap;
+    }
   }
 
   /// Returns whether the item is satisfying the `questionnaire-constraint`.

@@ -184,7 +184,7 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
                     textAlignVertical: TextAlignVertical.center,
                     textAlign: TextAlign.end,
                     decoration: questionnaireTheme.createDecoration().copyWith(
-                          errorText: answerModel.errorText,
+                          errorText: answerModel.displayErrorText,
                           errorStyle: (itemModel
                                   .isCalculated) // Force display of error text on calculated item
                               ? TextStyle(
@@ -195,7 +195,7 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
                           prefixIcon: itemModel.isCalculated
                               ? Icon(
                                   Icons.calculate,
-                                  color: (answerModel.errorText != null)
+                                  color: (answerModel.displayErrorText != null)
                                       ? Theme.of(context).errorColor
                                       : null,
                                 )
