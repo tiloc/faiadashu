@@ -15,59 +15,47 @@ class GroupItem extends ResponseItemFiller {
 }
 
 class _GroupItemState extends ResponseItemFillerState<GroupItem> {
-  static final _glogger = Logger(GroupItem);
+  static final _gLogger = Logger(GroupItem);
 
   _GroupItemState();
 
   @override
   Widget build(BuildContext context) {
-    _glogger.trace(
-      'build group ${widget.responseItemModel.nodeUid} hidden: ${widget.responseItemModel.questionnaireItemModel.isHidden}, enabled: ${widget.responseItemModel.isEnabled}',
+    _gLogger.trace(
+      'build group ${widget.responseItemModel}',
     );
-
-    final errorText = widget.responseItemModel.errorText;
 
     final titleWidget = this.titleWidget;
 
-    final questionnaireItemModel =
-        widget.fillerItemModel.questionnaireItemModel;
+    return AnimatedBuilder(
+      animation: widget.responseItemModel,
+      builder: (context, _) {
+        final errorText = widget.responseItemModel.errorText;
 
-    return (questionnaireItemModel.isNotHidden &&
-            questionnaireItemModel.isShownDuringCapture)
-        ? Focus(
-            focusNode: focusNode,
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 500),
-              child: AnimatedBuilder(
-                animation: widget.responseItemModel.questionnaireResponseModel,
-                builder: (context, _) {
-                  return widget.responseItemModel.isEnabled
-                      ? Column(
-                          children: [
-                            if (titleWidget != null) titleWidget,
-                            if (errorText != null)
-                              Container(
-                                padding: const EdgeInsets.only(top: 4.0),
-                                child: Text(
-                                  errorText,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .subtitle1!
-                                      .copyWith(
-                                        color: Theme.of(context).errorColor,
-                                      ),
-                                ),
-                              ),
-                            const SizedBox(
-                              height: 16.0,
+        return widget.responseItemModel.displayVisibility !=
+                DisplayVisibility.hidden
+            ? Column(
+                children: [
+                  if (titleWidget != null) titleWidget,
+                  if (errorText != null)
+                    Container(
+                      padding: const EdgeInsets.only(top: 4.0),
+                      child: Text(
+                        errorText,
+                        style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                              color: Theme.of(context).errorColor,
                             ),
-                          ],
-                        )
-                      : const SizedBox();
-                },
-              ),
-            ),
-          )
-        : const SizedBox();
+                      ),
+                    ),
+                  const SizedBox(
+                    height: 16.0,
+                  ),
+                ],
+              )
+            : const SizedBox(
+                height: 16.0,
+              );
+      },
+    );
   }
 }

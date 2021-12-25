@@ -65,7 +65,7 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
               child: DropdownButton<String>(
                 value: answerModel.keyOfUnit,
                 hint: const NullDashText(),
-                onChanged: (answerModel.isEnabled)
+                onChanged: (answerModel.isControlEnabled)
                     ? (String? newValue) {
                         answerModel.value = answerModel.copyWithUnit(newValue);
                       }
@@ -122,14 +122,14 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
                       label: Decimal(_sliderValueDuringChange).format(locale),
                       // Changes are only propagated to the model at change-end time.
                       // onChange would cause very high-frequency storm of model updates
-                      onChanged: answerModel.isEnabled
+                      onChanged: answerModel.isControlEnabled
                           ? (sliderValue) {
                               setState(() {
                                 _sliderValueDuringChange = sliderValue;
                               });
                             }
                           : null, // Method required, or it gets disabled. setState required for updates.
-                      onChangeEnd: answerModel.isEnabled
+                      onChangeEnd: answerModel.isControlEnabled
                           ? (sliderValue) {
                               _sliderValueDuringChange = sliderValue;
                               answerModel.value = answerModel
@@ -179,12 +179,12 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
                 Expanded(
                   child: TextFormField(
                     focusNode: firstFocusNode,
-                    enabled: answerModel.isEnabled,
+                    enabled: answerModel.isControlEnabled,
                     controller: _editingController,
                     textAlignVertical: TextAlignVertical.center,
                     textAlign: TextAlign.end,
                     decoration: questionnaireTheme.createDecoration().copyWith(
-                          errorText: answerModel.errorText,
+                          errorText: answerModel.displayErrorText,
                           errorStyle: (itemModel
                                   .isCalculated) // Force display of error text on calculated item
                               ? TextStyle(
@@ -195,7 +195,7 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
                           prefixIcon: itemModel.isCalculated
                               ? Icon(
                                   Icons.calculate,
-                                  color: (answerModel.errorText != null)
+                                  color: (answerModel.displayErrorText != null)
                                       ? Theme.of(context).errorColor
                                       : null,
                                 )

@@ -41,9 +41,7 @@ abstract class AnswerModel<I, V> extends ResponseNode {
   ///
   /// * true: users may manipulate the control
   /// * false: users may not manipulate the control
-  bool get isEnabled =>
-      !questionnaireItemModel
-          .isReadOnly && // TODO: Should this go into the visibility calculation?
+  bool get isControlEnabled =>
       responseItemModel.displayVisibility == DisplayVisibility.shown;
 
   /// Returns the human-readable entry format.
@@ -71,14 +69,12 @@ abstract class AnswerModel<I, V> extends ResponseNode {
   String? validateInput(I? inputValue);
 
   /// Validates a value against the constraints of the answer model.
-  /// Does not change the [value].
+  /// Does not change the [value] of the answer model.
   ///
   /// Returns null when it is valid, or a localized message when it is not.
-  ///
-  /// This is used to determine whether all constraints are met by the current [value].
   String? validateValue(V? inputValue);
 
-  /// Validates whether the answer will pass the completeness check.
+  /// Validates whether the current [value] will pass the completeness check.
   ///
   /// Completeness means that the validity criteria are met,
   /// in order to submit a [QuestionnaireResponse] as complete.
@@ -88,7 +84,29 @@ abstract class AnswerModel<I, V> extends ResponseNode {
   ///
   /// Returns null when the answer is valid, or an error text,
   /// when it is not.
-  String? validate() => validateValue(value);
+  ///
+  String? validate({
+    bool updateErrorText = true,
+    bool notifyListeners = false,
+  }) {
+    final newErrorText = validateValue(
+      value,
+    );
+
+    if (errorText == newErrorText) {
+      return newErrorText;
+    }
+
+    if (updateErrorText) {
+      errorText = newErrorText;
+    }
+    if (notifyListeners) {
+      // TODO: answerModels cannot have listeners yet.
+//      notifyListeners();
+    }
+
+    return newErrorText;
+  }
 
   /// Returns whether any answer (valid or invalid) has been provided.
   bool get isAnswered => !isUnanswered;
@@ -96,8 +114,12 @@ abstract class AnswerModel<I, V> extends ResponseNode {
   /// Returns whether this question is unanswered.
   bool get isUnanswered;
 
-  // TODO: Should each answer be able to hold its own error text?
-  String? get errorText => responseItemModel.errorText;
+  String? errorText;
+
+  /// Returns an error text for display in the answer's control.
+  ///
+  /// This might return an error text from the parent [QuestionItemModel].
+  String? get displayErrorText => errorText ?? responseItemModel.errorText;
 
   /// Returns a [QuestionnaireResponseAnswer] based on the current value.
   ///

@@ -21,34 +21,26 @@ class _DisplayItemState extends QuestionnaireItemFillerState<DisplayItem> {
   @override
   Widget build(BuildContext context) {
     _dlogger.trace(
-      'build display item ${widget.fillerItemModel.nodeUid} hidden: ${widget.fillerItemModel.questionnaireItemModel.isHidden}, enabled: ${widget.fillerItemModel.isEnabled}',
+      'build ${widget.fillerItemModel}',
     );
 
     final titleWidget = this.titleWidget;
 
-    final questionnaireItemModel =
-        widget.fillerItemModel.questionnaireItemModel;
-
-    return (questionnaireItemModel.isNotHidden &&
-            questionnaireItemModel.isShownDuringCapture)
-        ? Focus(
-            focusNode: focusNode,
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 500),
-              child: widget.fillerItemModel.isEnabled
-                  ? Column(
-                      children: [
-                        if (titleWidget != null) titleWidget,
-                        const SizedBox(
-                          height: 16.0,
-                        ),
-                      ],
-                    )
-                  : const SizedBox(),
-            ),
-          )
-        : const SizedBox(
-            height: 16.0,
-          );
+    return AnimatedBuilder(
+      animation: widget.fillerItemModel,
+      builder: (context, _) {
+        return widget.fillerItemModel.displayVisibility !=
+                DisplayVisibility.hidden
+            ? Column(
+                children: [
+                  if (titleWidget != null) titleWidget,
+                  const SizedBox(
+                    height: 16.0,
+                  ),
+                ],
+              )
+            : const SizedBox(height: 16.0);
+      },
+    );
   }
 }

@@ -401,14 +401,51 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
   }
 
   DisplayVisibility _calculateDisplayVisibility() {
-    return questionnaireResponseModel.responseStatus ==
-            QuestionnaireResponseStatus.completed
-        ? isEnabled
-            ? DisplayVisibility.protected
-            : DisplayVisibility.hidden
-        : isEnabled
-            ? DisplayVisibility.shown
-            : DisplayVisibility.hidden;
+    DisplayVisibility resultVisibility = DisplayVisibility.shown;
+
+    if (questionnaireResponseModel.responseStatus ==
+        QuestionnaireResponseStatus.completed) {
+      resultVisibility =
+          _maxVisibility(resultVisibility, DisplayVisibility.protected);
+    }
+
+    if (isNotEnabled) {
+      resultVisibility =
+          _maxVisibility(resultVisibility, DisplayVisibility.hidden);
+    }
+
+    if (questionnaireItemModel.isHidden) {
+      resultVisibility =
+          _maxVisibility(resultVisibility, DisplayVisibility.hidden);
+    }
+
+    if (!questionnaireItemModel.isShownDuringCapture) {
+      resultVisibility =
+          _maxVisibility(resultVisibility, DisplayVisibility.hidden);
+    }
+
+    if (questionnaireItemModel.isReadOnly) {
+      resultVisibility =
+          _maxVisibility(resultVisibility, DisplayVisibility.protected);
+    }
+
+    return resultVisibility;
+  }
+
+  DisplayVisibility _maxVisibility(
+    DisplayVisibility visibility1,
+    DisplayVisibility visibility2,
+  ) {
+    if (visibility1 == DisplayVisibility.hidden ||
+        visibility2 == DisplayVisibility.hidden) {
+      return DisplayVisibility.hidden;
+    }
+    if (visibility1 == DisplayVisibility.protected ||
+        visibility2 == DisplayVisibility.protected) {
+      return DisplayVisibility.protected;
+    }
+
+    return DisplayVisibility.shown;
   }
 
   /// Handle changes to a questionnaire response's completion status.

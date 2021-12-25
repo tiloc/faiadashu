@@ -33,11 +33,11 @@ class _BooleanItemState extends QuestionnaireAnswerFillerState<Boolean,
         Checkbox(
           focusNode: firstFocusNode,
           value: answerModel.value?.value,
-          activeColor: (answerModel.errorText != null)
+          activeColor: (answerModel.displayErrorText != null)
               ? Theme.of(context).errorColor
               : null,
           tristate: true,
-          onChanged: (answerModel.isEnabled)
+          onChanged: (answerModel.isControlEnabled)
               ? (newValue) {
                   firstFocusNode.requestFocus();
                   answerModel.value =
@@ -45,9 +45,9 @@ class _BooleanItemState extends QuestionnaireAnswerFillerState<Boolean,
                 }
               : null,
         ),
-        if (answerModel.errorText != null)
+        if (answerModel.displayErrorText != null)
           Text(
-            answerModel.errorText!,
+            answerModel.displayErrorText!,
             style: Theme.of(context)
                 .textTheme
                 .caption!

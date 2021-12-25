@@ -82,7 +82,8 @@ class QuestionItemModel extends ResponseItemModel {
       }
     }
 
-    errorText = answerModel.validateValue(answerModel.value);
+    // Updates all error texts, but will not notify.
+    validate();
 
     nextGeneration();
   }
@@ -133,15 +134,25 @@ class QuestionItemModel extends ResponseItemModel {
   }
 
   @override
-  Future<Map<String, String>?> validate() async {
+  Future<Map<String, String>?> validate({
+    bool updateErrorText = true,
+    bool notifyListeners = false,
+  }) async {
     // Non-existent answer models can be invalid, e.g. if minOccurs is not met.
     _ensureAnswerModel();
 
-    final responseErrorTexts = await super.validate() ?? <String, String>{};
+    final responseErrorTexts = await super.validate(
+          updateErrorText: updateErrorText,
+          notifyListeners: notifyListeners,
+        ) ??
+        <String, String>{};
 
     final answersErrorTexts = <String, String>{};
     for (final am in answerModels) {
-      final answerValidationText = am.validate();
+      final answerValidationText = am.validate(
+        updateErrorText: updateErrorText,
+        notifyListeners: notifyListeners,
+      );
 
       if (answerValidationText != null) {
         answersErrorTexts[am.nodeUid] = answerValidationText;

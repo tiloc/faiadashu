@@ -52,14 +52,14 @@ class _StringAnswerState extends QuestionnaireAnswerFillerState<String,
       padding: const EdgeInsets.only(top: 8, bottom: 8),
       child: TextFormField(
         focusNode: firstFocusNode,
-        enabled: answerModel.isEnabled,
+        enabled: answerModel.isControlEnabled,
         keyboardType: _keyboardType,
         controller: _editingController,
         maxLines: (qi.type == QuestionnaireItemType.text)
             ? questionnaireTheme.maxLinesForTextItem
             : 1,
         decoration: questionnaireTheme.createDecoration().copyWith(
-              errorText: answerModel.errorText,
+              errorText: answerModel.displayErrorText,
               errorStyle: (itemModel
                       .isCalculated) // Force display of error text on calculated item
                   ? TextStyle(

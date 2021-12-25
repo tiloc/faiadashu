@@ -43,7 +43,7 @@ class _DateTimeAnswerState extends QuestionnaireAnswerFillerState<FhirDateTime,
       padding: const EdgeInsets.only(top: 8, bottom: 8),
       child: FhirDateTimePicker(
         focusNode: firstFocusNode,
-        enabled: answerModel.isEnabled,
+        enabled: answerModel.isControlEnabled,
         locale: locale,
         initialDateTime: initialDate,
         // TODO: This can be specified through minValue / maxValue
@@ -51,7 +51,7 @@ class _DateTimeAnswerState extends QuestionnaireAnswerFillerState<FhirDateTime,
         lastDate: DateTime(2050),
         pickerType: pickerType,
         decoration: questionnaireTheme.createDecoration().copyWith(
-              errorText: answerModel.errorText,
+              errorText: answerModel.displayErrorText,
               errorStyle: (itemModel
                       .isCalculated) // Force display of error text on calculated item
                   ? TextStyle(

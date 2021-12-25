@@ -72,7 +72,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
       firstFocusNode: firstFocusNode,
       locale: locale,
       answerModel: answerModel,
-      errorText: answerModel.errorText,
+      errorText: answerModel.displayErrorText,
       onChanged: (uid) {
         answerModel.value = answerModel.selectOption(uid);
       },
@@ -90,12 +90,12 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
             ? _HorizontalCodingChoices(
                 firstFocusNode: firstFocusNode,
                 choices: choices,
-                errorText: answerModel.errorText,
+                errorText: answerModel.displayErrorText,
               )
             : _VerticalCodingChoices(
                 firstFocusNode: firstFocusNode,
                 answerModel: answerModel,
-                errorText: answerModel.errorText,
+                errorText: answerModel.displayErrorText,
                 choices: choices,
               );
       },
@@ -121,7 +121,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
               .contains(textEditingValue.text.toLowerCase());
         });
       },
-      onSelected: (answerModel.isEnabled)
+      onSelected: (answerModel.isControlEnabled)
           ? (CodingAnswerOptionModel selectedOption) {
               answerModel.value = answerModel.selectOption(selectedOption.uid);
             }
@@ -143,7 +143,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
             title: const NullDashText(),
             value: null,
             groupValue: answerModel.singleSelectionUid,
-            onChanged: (answerModel.isEnabled)
+            onChanged: (answerModel.isControlEnabled)
                 ? (String? newValue) {
                     answerModel.value = answerModel.selectOption(newValue);
                   }
@@ -168,7 +168,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
                       title: styledOptionTitle,
                       groupValue: answerModel.exclusiveSelectionUid,
                       value: answerOption.uid,
-                      onChanged: (answerModel.isEnabled)
+                      onChanged: (answerModel.isControlEnabled)
                           ? (_) {
                               Focus.of(context).requestFocus();
                               final newValue = answerModel.toggleOption(
@@ -183,7 +183,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
                     child: CheckboxListTile(
                       title: styledOptionTitle,
                       value: answerModel.isSelected(answerOption.uid),
-                      onChanged: (answerModel.isEnabled)
+                      onChanged: (answerModel.isControlEnabled)
                           ? (bool? newValue) {
                               Focus.of(context).requestFocus();
                               final newValue = answerModel.toggleOption(
@@ -201,7 +201,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
                   // allows value to be set to null on repeat tap
                   toggleable: true,
                   groupValue: answerModel.singleSelectionUid,
-                  onChanged: (answerModel.isEnabled)
+                  onChanged: (answerModel.isControlEnabled)
                       ? (String? newValue) {
                           Focus.of(context).requestFocus();
                           answerModel.value =
@@ -223,7 +223,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
                     false)
                 ? CodingAnswerOptionModel.openChoiceCode
                 : null,
-            onChanged: (answerModel.isEnabled)
+            onChanged: (answerModel.isControlEnabled)
                 ? (String? newValue) {
                     Focus.of(context).requestFocus();
                     answerModel.value = answerModel
@@ -232,7 +232,7 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
                 : null,
             title: TextFormField(
               controller: _openTextController,
-              enabled: answerModel.isEnabled,
+              enabled: answerModel.isControlEnabled,
               onChanged: (newText) {
                 answerModel.openText = newText;
                 answerModel.value = answerModel
@@ -332,10 +332,10 @@ class _CodingDropdown extends StatelessWidget {
       onTap: () {
         firstFocusNode.requestFocus();
       },
-      onChanged: answerModel.isEnabled ? onChanged : null,
+      onChanged: answerModel.isControlEnabled ? onChanged : null,
       focusNode: firstFocusNode,
       items: dropdownItems,
-      decoration: InputDecoration(errorText: answerModel.errorText),
+      decoration: InputDecoration(errorText: answerModel.displayErrorText),
     );
   }
 }
@@ -365,7 +365,7 @@ class _VerticalCodingChoices extends StatelessWidget {
         Focus(
           focusNode: firstFocusNode,
           child: Card(
-            shape: (firstFocusNode.hasFocus && answerModel.isEnabled)
+            shape: (firstFocusNode.hasFocus && answerModel.isControlEnabled)
                 ? RoundedRectangleBorder(
                     side: BorderSide(
                       color: (errorText == null)

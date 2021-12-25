@@ -753,11 +753,17 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   ///
   /// Returns null, if everything is complete.
   /// Returns a map (UID -> error text) with incomplete entries, if items are incomplete.
-  Future<Map<String, String>?> validate() async {
+  Future<Map<String, String>?> validate({
+    bool updateErrorText = true,
+    bool notifyListeners = false,
+  }) async {
     final invalidMap = <String, String>{};
 
     for (final itemModel in orderedResponseItemModels()) {
-      final errorTexts = await itemModel.validate();
+      final errorTexts = await itemModel.validate(
+        updateErrorText: updateErrorText,
+        notifyListeners: notifyListeners,
+      );
       if (errorTexts != null) {
         _logger.debug('$itemModel is invalid.');
 
