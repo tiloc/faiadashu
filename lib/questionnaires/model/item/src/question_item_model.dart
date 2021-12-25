@@ -46,7 +46,7 @@ class QuestionItemModel extends ResponseItemModel {
               ...itemWithPredecessorsExpressionEvaluators,
             ],
             jsonBuilder: () =>
-                questionnaireResponseModel.responseItemByUid(nodeUid),
+                questionnaireResponseModel.fhirResponseItemByUid(nodeUid),
           )
         : null;
   }
@@ -133,23 +133,26 @@ class QuestionItemModel extends ResponseItemModel {
   }
 
   @override
-  Future<bool> get isComplete async {
-    // Non-existent answer models can be incomplete, e.g. if minOccurs is not met.
+  Future<Map<String, String>?> validate() async {
+    // Non-existent answer models can be invalid, e.g. if minOccurs is not met.
     _ensureAnswerModel();
 
-    final isResponseComplete = await super.isComplete;
+    final responseErrorTexts = await super.validate() ?? <String, String>{};
 
-    bool isAnswersComplete = true;
+    final answersErrorTexts = <String, String>{};
     for (final am in answerModels) {
-      final answerCompletionMessage = am.isComplete;
+      final answerValidationText = am.validate();
 
-      if (answerCompletionMessage != null) {
-        isAnswersComplete = false;
-        errorText = answerCompletionMessage;
+      if (answerValidationText != null) {
+        answersErrorTexts[am.nodeUid] = answerValidationText;
       }
     }
 
-    return isResponseComplete && isAnswersComplete;
+    final combinedErrorTexts = responseErrorTexts..addAll(answersErrorTexts);
+
+    return responseErrorTexts.isEmpty && answersErrorTexts.isEmpty
+        ? null
+        : combinedErrorTexts;
   }
 
   @override

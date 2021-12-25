@@ -54,7 +54,7 @@ class _QuestionnaireScrollerPanelState
     QuestionnaireResponseModel? questionnaireResponseModel,
   ) {
     final questionnaireResponse =
-        questionnaireResponseModel?.questionnaireResponse;
+        questionnaireResponseModel?.createQuestionnaireResponse();
 
     final FhirResource resource = (questionnaireResponse != null)
         ? FhirResource.fromResource(questionnaireResponse)

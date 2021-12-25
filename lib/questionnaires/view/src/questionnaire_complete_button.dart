@@ -31,10 +31,10 @@ class _QuestionnaireCompleteButtonState
         final currentResponseStatus = qrm.responseStatus;
 
         if (currentResponseStatus != QuestionnaireResponseStatus.completed) {
-          final incompleteItems = await qrm.incompleteItems;
+          final incompleteItems = await qrm.validate();
           qrm.isInvalidNotifier.value = incompleteItems;
 
-          if (incompleteItems.isNotEmpty) {
+          if (incompleteItems != null) {
             return;
           }
         }

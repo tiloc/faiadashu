@@ -78,7 +78,7 @@ abstract class AnswerModel<I, V> extends ResponseNode {
   /// This is used to determine whether all constraints are met by the current [value].
   String? validateValue(V? inputValue);
 
-  /// Returns whether the answer will pass the completeness check.
+  /// Validates whether the answer will pass the completeness check.
   ///
   /// Completeness means that the validity criteria are met,
   /// in order to submit a [QuestionnaireResponse] as complete.
@@ -88,7 +88,7 @@ abstract class AnswerModel<I, V> extends ResponseNode {
   ///
   /// Returns null when the answer is valid, or an error text,
   /// when it is not.
-  String? get isComplete => validateValue(value);
+  String? validate() => validateValue(value);
 
   /// Returns whether any answer (valid or invalid) has been provided.
   bool get isAnswered => !isUnanswered;

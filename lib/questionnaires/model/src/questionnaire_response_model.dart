@@ -25,6 +25,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
   final List<FillerItemModel> _fillerItems = [];
 
+  /// Maps UIDs to [AnswerModel]s.
   final _answerModels = <String, AnswerModel>{};
 
   // Questionnaire-level variables
@@ -41,7 +42,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     // Questionnaire will be evaluated as the root of the QuestionnaireResponse.
     final questionnaireResponseExpression = ResourceExpressionEvaluator(
       'resource',
-      () => questionnaireResponse,
+      () => createQuestionnaireResponse(),
     );
 
     return [
@@ -97,7 +98,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
         }
 
         final variable = FhirExpressionEvaluator.fromExpression(
-          () => questionnaireResponse,
+          () => createQuestionnaireResponse(),
           variableExpression,
           [..._questionnaireBelowVariablesExpressionEvaluators, ...qLevelVars],
         );
@@ -336,13 +337,21 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   }
 
   /// Returns an [Aggregator] of the given type.
+  ///
+  /// Throws StateError if such an Aggregator does not exist.
   T aggregator<T extends Aggregator>() {
     if (_aggregators == null) {
       throw StateError('Aggregators have not been specified in constructor.');
     }
 
-    // FIXME: better handle non-existent aggregator of requested type.
-    return (_aggregators?.firstWhere((aggregator) => aggregator is T) as T?)!;
+    final aggregator =
+        _aggregators?.firstWhere((aggregator) => aggregator is T) as T?;
+
+    if (aggregator == null) {
+      throw StateError('Aggregator not found. Aggregators: $_aggregators');
+    } else {
+      return aggregator;
+    }
   }
 
   /// Changes the [generation] and notifies all listeners.
@@ -366,17 +375,17 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   Map<String, dynamic>? _cachedQuestionnaireResponse;
 
   /// INTERNAL ONLY - Returns a FHIR JSON fragment for a node with a given [uid].
-  Map<String, dynamic>? responseItemByUid(String uid) {
+  Map<String, dynamic>? fhirResponseItemByUid(String uid) {
     _cachedQuestionnaireResponse ??=
         aggregator<QuestionnaireResponseAggregator>().aggregateResponseItems();
 
     return _cachedQuestionnaireResponse?[uid] as Map<String, dynamic>?;
   }
 
-  /// Returns a [QuestionnaireResponse].
+  /// Returns a FHIR [QuestionnaireResponse].
   ///
   /// The response matches the model as of the current generation.
-  QuestionnaireResponse? get questionnaireResponse {
+  QuestionnaireResponse? createQuestionnaireResponse() {
     _cachedQuestionnaireResponse ??=
         aggregator<QuestionnaireResponseAggregator>().aggregateResponseItems();
 
@@ -717,31 +726,50 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     nextGeneration();
   }
 
-  /// Returns whether the questionnaire meets all completeness criteria.
+  /// Return the [FillerItemModel] that corresponds to the given [uid].
   ///
-  /// Completeness criteria include:
+  /// Will return the parent [QuestionItemModel] if uid corresponds to an answer.
+  FillerItemModel? fillerItemModelByUid(String uid) {
+    final fillerItem =
+        orderedFillerItemModels().firstWhereOrNull((fim) => fim.nodeUid == uid);
+    if (fillerItem != null) {
+      return fillerItem;
+    }
+
+    final answerModel = _answerModels[uid];
+
+    return answerModel == null
+        ? null
+        : answerModel.parentNode! as QuestionItemModel;
+  }
+
+  /// Validates whether the questionnaire meets all completeness criteria.
+  ///
+  /// **Completeness criteria:**
+  ///
   /// * All required fields are filled
   /// * All filled fields are valid
   /// * All expression-based constraints are satisfied
   ///
-  /// Returns empty map, if everything is complete.
+  /// Returns null, if everything is complete.
   /// Returns a map (UID -> error text) with incomplete entries, if items are incomplete.
-  Future<Map<String, String?>> get incompleteItems async {
-    final incompleteMap = <String, String?>{};
+  Future<Map<String, String>?> validate() async {
+    final invalidMap = <String, String>{};
 
     for (final itemModel in orderedResponseItemModels()) {
-      final isItemComplete = await itemModel.isComplete;
-      if (!isItemComplete) {
-        _logger.debug('$itemModel not complete.');
+      final errorTexts = await itemModel.validate();
+      if (errorTexts != null) {
+        _logger.debug('$itemModel is invalid.');
 
-        incompleteMap[itemModel.nodeUid] = itemModel.errorText;
+        invalidMap.addAll(errorTexts);
       }
     }
 
-    return incompleteMap;
+    return invalidMap.isNotEmpty ? invalidMap : null;
   }
 
   /// A map of UIDs -> error texts of invalid [ResponseNode]s.
+  /// Is [null] when no items are currently invalid.
   ///
   /// This should only be updated when a global response is desired,
   /// such as the overall filler navigating to an invalid item.
@@ -749,5 +777,5 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   /// For local responses, only the local error text, data absent reason, etc.
   /// should be updated.
   final isInvalidNotifier =
-      ValueNotifier<Map<String, String?>>(<String, String?>{});
+      ValueNotifier<Map<String, String>?>(<String, String>{});
 }

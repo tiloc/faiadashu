@@ -245,15 +245,19 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
 
           // Listen for new invalid items and then scroll to the first one.
           questionnaireResponseModel.isInvalidNotifier.addListener(() {
-            if (questionnaireResponseModel.isInvalidNotifier.value.isEmpty) {
+            final invalidNodes =
+                questionnaireResponseModel.isInvalidNotifier.value;
+
+            if (invalidNodes == null) {
               return;
             }
 
+            final firstInvalidUid = invalidNodes.keys.first;
             final firstInvalidItem = questionnaireResponseModel
-                .orderedResponseItemModels()
-                .where((rim) => rim.errorText != null)
-                .first;
-            scrollToItem(firstInvalidItem);
+                .fillerItemModelByUid(firstInvalidUid);
+            if (firstInvalidItem != null) {
+              scrollToItem(firstInvalidItem);
+            }
           });
 
           _focusIndex = questionnaireResponseModel.indexOfFillerItem(

@@ -24,7 +24,7 @@ abstract class ResponseItemModel extends FillerItemModel {
 
     _constraintExpression = constraintExpression != null
         ? FhirPathExpressionEvaluator(
-            () => questionnaireResponseModel.questionnaireResponse,
+            () => questionnaireResponseModel.createQuestionnaireResponse(),
             Expression(
               expression: constraintExpression,
               language: ExpressionLanguage.text_fhirpath,
@@ -63,38 +63,42 @@ abstract class ResponseItemModel extends FillerItemModel {
   /// Is the item invalid?
   bool get isInvalid;
 
-  /// Returns a description of an error situation with this response item.
+  /// Returns a description of the current error situation with this item.
+  ///
+  /// Localized text if an error exists. Or null if no error exists.
   String? errorText;
 
-  Future<bool> get isComplete async {
+  Future<Map<String, String>?> validate() async {
     if (questionnaireItemModel.isRequired && isUnanswered) {
-      errorText = lookupFDashLocalizations(questionnaireResponseModel.locale)
-          .validatorRequiredItem;
-
-      return false;
+      return {
+        nodeUid: lookupFDashLocalizations(questionnaireResponseModel.locale)
+            .validatorRequiredItem,
+      };
     }
 
-    if (!await isSatisfyingConstraint) {
-      errorText = questionnaireItemModel.constraintHuman;
-
-      return false;
+    final constraintError = await validateConstraint();
+    if (constraintError != null) {
+      return {nodeUid: constraintError};
     }
 
-    return true;
+    return null;
   }
 
   /// Returns whether the item is satisfying the `questionnaire-constraint`.
   ///
-  /// Returns true if no constraint is specified.
-  Future<bool> get isSatisfyingConstraint async {
+  /// Returns null if satisfied, or a human-readable text if not satisfied.
+  /// Returns null if no constraint is specified.
+  Future<String?> validateConstraint() async {
     final constraintExpression = _constraintExpression;
     if (constraintExpression == null) {
-      return true;
+      return null;
     }
 
-    return constraintExpression.fetchBoolValue(
+    final isSatisfied = await constraintExpression.fetchBoolValue(
       unknownValue: true,
       location: nodeUid,
     );
+
+    return isSatisfied ? null : questionnaireItemModel.constraintHuman;
   }
 }

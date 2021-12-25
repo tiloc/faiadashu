@@ -93,7 +93,7 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
           variableExpression,
           [...itemUpstream, ...qiLevelVars],
           jsonBuilder: () =>
-              questionnaireResponseModel.responseItemByUid(nodeUid),
+              questionnaireResponseModel.fhirResponseItemByUid(nodeUid),
         );
 
         qiLevelVars.add(variable);
@@ -145,7 +145,7 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
             enableWhenExtensionExpression,
             itemWithPredecessorsExpressionEvaluators,
             jsonBuilder: () =>
-                questionnaireResponseModel.responseItemByUid(nodeUid),
+                questionnaireResponseModel.fhirResponseItemByUid(nodeUid),
           )
         : null;
 
