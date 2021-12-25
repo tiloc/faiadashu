@@ -182,7 +182,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
       questionnaireResponseModel
           .orderedQuestionItemModels()
           .forEach((qim) async {
-        await qim.populateInitialValue();
+        qim.populateInitialValue();
       });
     } else {
       questionnaireResponseModel.populate(response);
@@ -537,12 +537,12 @@ class QuestionnaireResponseModel extends ChangeNotifier {
         questionnaireResponse.status ?? QuestionnaireResponseStatus.in_progress;
   }
 
-  Future<void> _updateCalculations() async {
+  void _updateCalculations() {
     orderedResponseItemModels()
         .where((rim) => rim.questionnaireItemModel.isCalculatedExpression)
         .forEach((rim) async {
       if (rim is QuestionItemModel) {
-        await rim.updateCalculatedExpression();
+        rim.updateCalculatedExpression();
       }
     });
   }
@@ -753,14 +753,14 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   ///
   /// Returns null, if everything is complete.
   /// Returns a map (UID -> error text) with incomplete entries, if items are incomplete.
-  Future<Map<String, String>?> validate({
+  Map<String, String>? validate({
     bool updateErrorText = true,
     bool notifyListeners = false,
-  }) async {
+  }) {
     final invalidMap = <String, String>{};
 
     for (final itemModel in orderedResponseItemModels()) {
-      final errorTexts = await itemModel.validate(
+      final errorTexts = itemModel.validate(
         updateErrorText: updateErrorText,
         notifyListeners: notifyListeners,
       );

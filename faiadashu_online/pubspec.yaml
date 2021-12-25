@@ -18,10 +18,10 @@ dependencies:
   faiadashu:
     path: ..
 
-  fhir: ^0.5.0-10
-#  fhir_auth: ^0.5.0-8
-  fhir_auth:
-    path: ../../fhir/fhir_auth
+  fhir: ^0.5.0-11
+  fhir_auth: ^0.5.0-9
+#  fhir_auth:
+#    path: ../../fhir/fhir_auth
 
   flutter:
     sdk: flutter

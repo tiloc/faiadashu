@@ -210,14 +210,13 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
   /// Updates the current enablement status of this item, based on enabledWhenExpression.
   ///
   /// Sets the [isEnabled] property
-  Future<void> _updateEnabledByEnableWhenExpression() async {
+  void _updateEnabledByEnableWhenExpression() {
     _fimLogger.trace('Enter _updateEnabledByEnableWhenExpression()');
 
     final enableWhenExpression =
         ArgumentError.checkNotNull(_enableWhenExpression);
 
-    if (!await (enableWhenExpression as FhirPathExpressionEvaluator)
-        .fetchBoolValue(
+    if (!(enableWhenExpression as FhirPathExpressionEvaluator).fetchBoolValue(
       unknownValue: false,
       location: nodeUid,
     )) {
@@ -496,10 +495,10 @@ class _QuestionnaireItemExpressionEvaluator extends ExpressionEvaluator {
   late final Map<String, dynamic> questionnaireItemJson;
 
   @override
-  Future<dynamic> fetchValue() {
+  dynamic evaluate() {
     final qi = questionnaireItemJson;
 
-    return Future.value([qi]);
+    return [qi];
   }
 
   _QuestionnaireItemExpressionEvaluator(

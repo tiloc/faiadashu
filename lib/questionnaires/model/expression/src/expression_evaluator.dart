@@ -27,10 +27,8 @@ abstract class ExpressionEvaluator with DiagnosticableTreeMixin {
 
   final Iterable<ExpressionEvaluator> upstreamExpressions;
 
-  /// Fetch the current value.
-  ///
-  /// This is async, as it might involve access to servers.
-  Future<dynamic> fetchValue();
+  /// Evaluate the current value.
+  dynamic evaluate();
 
   ExpressionEvaluator(
     this.name,

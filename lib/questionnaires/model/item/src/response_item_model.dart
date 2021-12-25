@@ -68,10 +68,10 @@ abstract class ResponseItemModel extends FillerItemModel {
   /// Localized text if an error exists. Or null if no error exists.
   String? errorText;
 
-  Future<Map<String, String>?> validate({
+  Map<String, String>? validate({
     bool updateErrorText = true,
     bool notifyListeners = false,
-  }) async {
+  }) {
     String? newErrorText;
 
     if (questionnaireItemModel.isRequired && isUnanswered) {
@@ -79,7 +79,7 @@ abstract class ResponseItemModel extends FillerItemModel {
           .validatorRequiredItem;
     }
 
-    final constraintError = await validateConstraint();
+    final constraintError = validateConstraint();
     newErrorText ??= constraintError;
 
     if (errorText != newErrorText) {
@@ -105,13 +105,13 @@ abstract class ResponseItemModel extends FillerItemModel {
   ///
   /// Returns null if satisfied, or a human-readable text if not satisfied.
   /// Returns null if no constraint is specified.
-  Future<String?> validateConstraint() async {
+  String? validateConstraint() {
     final constraintExpression = _constraintExpression;
     if (constraintExpression == null) {
       return null;
     }
 
-    final isSatisfied = await constraintExpression.fetchBoolValue(
+    final isSatisfied = constraintExpression.fetchBoolValue(
       unknownValue: true,
       location: nodeUid,
     );

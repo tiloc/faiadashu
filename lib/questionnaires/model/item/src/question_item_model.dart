@@ -134,14 +134,14 @@ class QuestionItemModel extends ResponseItemModel {
   }
 
   @override
-  Future<Map<String, String>?> validate({
+  Map<String, String>? validate({
     bool updateErrorText = true,
     bool notifyListeners = false,
-  }) async {
+  }) {
     // Non-existent answer models can be invalid, e.g. if minOccurs is not met.
     _ensureAnswerModel();
 
-    final responseErrorTexts = await super.validate(
+    final responseErrorTexts = super.validate(
           updateErrorText: updateErrorText,
           notifyListeners: notifyListeners,
         ) ??
@@ -274,12 +274,10 @@ class QuestionItemModel extends ResponseItemModel {
 
   /// Populates the initial value of the item.
   /// Does nothing if initial value is not specified.
-  ///
-  /// Currently only supports 'initialExpression'.
-  Future<void> populateInitialValue() async {
+  void populateInitialValue() {
     _qimLogger.debug('populateInitialValue: $nodeUid');
     if (questionnaireItemModel.hasInitialExpression) {
-      final initialEvaluationResult = await evaluateInitialExpression();
+      final initialEvaluationResult = evaluateInitialExpression();
       firstAnswerModel.populateFromExpression(initialEvaluationResult);
     } else {
       // initial.value[x]
@@ -329,7 +327,7 @@ class QuestionItemModel extends ResponseItemModel {
   ///
   /// Returns null if the item does not have an initialExpression,
   /// or it evaluates to an empty list.
-  Future<dynamic> evaluateInitialExpression() async {
+  dynamic evaluateInitialExpression() {
     final fhirPathExpression =
         questionnaireItemModel.questionnaireItem.extension_
             ?.extensionOrNull(
@@ -338,7 +336,7 @@ class QuestionItemModel extends ResponseItemModel {
             ?.valueExpression;
 
     if (fhirPathExpression == null) {
-      return Future.value(null);
+      return null;
     }
 
     final initialExpressionEvaluator = FhirExpressionEvaluator.fromExpression(
@@ -347,23 +345,23 @@ class QuestionItemModel extends ResponseItemModel {
       questionnaireResponseModel.questionnaireLevelExpressionEvaluators,
     );
 
-    final evaluationResult = await initialExpressionEvaluator.fetchValue();
+    final evaluationResult = initialExpressionEvaluator.evaluate();
 
     if (evaluationResult is! List || evaluationResult.isEmpty) {
-      return Future.value(null);
+      return null;
     }
 
-    return Future.value(evaluationResult.first);
+    return evaluationResult.first;
   }
 
-  Future<void> updateCalculatedExpression() async {
+  void updateCalculatedExpression() {
     final calculatedExpression = _calculatedExpression;
     if (calculatedExpression == null) {
       return;
     }
 
     try {
-      final rawEvaluationResult = await calculatedExpression.fetchValue();
+      final rawEvaluationResult = calculatedExpression.evaluate();
 
       _qimLogger.debug('calculatedExpression: $rawEvaluationResult');
 

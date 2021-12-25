@@ -63,7 +63,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.6.0-dev.2"
+    version: "0.6.0-dev.3"
   faiadashu_online:
     dependency: "direct main"
     description:
@@ -77,13 +77,13 @@ packages:
       name: fhir
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.5.0-10"
+    version: "0.5.0-11"
   fhir_auth:
     dependency: "direct main"
     description:
-      path: "../../fhir/fhir_auth"
-      relative: true
-    source: path
+      name: fhir_auth
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "0.5.0-9"
   fhir_path:
     dependency: transitive
@@ -98,7 +98,7 @@ packages:
       name: fhir_yaml
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.5.1"
+    version: "0.5.2"
   flutter:
     dependency: "direct main"
     description: flutter

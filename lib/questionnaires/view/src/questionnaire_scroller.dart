@@ -96,7 +96,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
     super.dispose();
   }
 
-  void _onQuestionnaireResponseChanged() {
+  void _handleChangedQuestionnaireResponse() {
     widget.onQuestionnaireResponseChanged?.call(_questionnaireResponseModel);
   }
 
@@ -240,7 +240,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
             //            _onQuestionnaireResponseChanged();
 
             _questionnaireResponseModel
-                ?.addListener(_onQuestionnaireResponseChanged);
+                ?.addListener(_handleChangedQuestionnaireResponse);
           }
 
           // Listen for new invalid items and then scroll to the first one.

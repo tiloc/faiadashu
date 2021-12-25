@@ -50,7 +50,7 @@ class _QuestionnaireScrollerPanelState
     );
   }
 
-  void _onQuestionnaireResponseChanged(
+  void _handleChangedQuestionnaireResponse(
     QuestionnaireResponseModel? questionnaireResponseModel,
   ) {
     final questionnaireResponse =
@@ -69,7 +69,7 @@ class _QuestionnaireScrollerPanelState
       fhirResourceProvider: _fhirResourceProvider,
       scaffoldBuilder: const _FaiabenchFillerScaffoldBuilder(),
       launchContext: widget.launchContext,
-      onQuestionnaireResponseChanged: _onQuestionnaireResponseChanged,
+      onQuestionnaireResponseChanged: _handleChangedQuestionnaireResponse,
     );
   }
 }

@@ -138,6 +138,7 @@
         <entry key="fhir">
           <value>
             <list>
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir-0.5.0-11/lib" />
               <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir-0.5.0-10/lib" />
             </list>
           </value>
@@ -145,7 +146,7 @@
         <entry key="fhir_auth">
           <value>
             <list>
-              <option value="$PROJECT_DIR$/../fhir/fhir_auth/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_auth-0.5.0-9/lib" />
             </list>
           </value>
         </entry>
@@ -159,6 +160,7 @@
         <entry key="fhir_yaml">
           <value>
             <list>
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_yaml-0.5.2/lib" />
               <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_yaml-0.5.1/lib" />
             </list>
           </value>
@@ -641,8 +643,11 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/dart_style-2.2.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fake_async-1.2.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir-0.5.0-10/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir-0.5.0-11/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_auth-0.5.0-9/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_path-0.5.0-17/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_yaml-0.5.1/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_yaml-0.5.2/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/file-6.1.2/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/flutter_highlight-0.7.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/flutter_riverpod-1.0.2/lib" />
@@ -703,7 +708,6 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/watcher-1.0.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/xml-5.3.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/yaml-3.1.0/lib" />
-      <root url="file://$PROJECT_DIR$/../fhir/fhir_auth/lib" />
       <root url="file://$USER_HOME$/development/flutter/bin/cache/pkg/sky_engine/lib" />
       <root url="file://$USER_HOME$/development/flutter/packages/flutter/lib" />
       <root url="file://$USER_HOME$/development/flutter/packages/flutter_localizations/lib" />

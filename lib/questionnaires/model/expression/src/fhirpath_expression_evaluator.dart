@@ -32,7 +32,7 @@ class FhirPathExpressionEvaluator extends FhirExpressionEvaluator {
   }
 
   @override
-  Future<dynamic> fetchValue() async {
+  dynamic evaluate() {
     final upstreamExpressions = this.upstreamExpressions;
 
     final upstreamMap = <String, dynamic>{};
@@ -42,7 +42,7 @@ class FhirPathExpressionEvaluator extends FhirExpressionEvaluator {
       final key = '%$name';
 
       try {
-        final value = await upstreamExpression.fetchValue();
+        final value = upstreamExpression.evaluate();
 
         upstreamMap[key] = value;
       } catch (ex) {
@@ -59,9 +59,7 @@ class FhirPathExpressionEvaluator extends FhirExpressionEvaluator {
 
     _logger.debug('${toStringShort()} $fhirPath: $fhirPathResult');
 
-    return Future.value(
-      fhirPathResult,
-    );
+    return fhirPathResult;
   }
 
   @override
@@ -77,11 +75,11 @@ class FhirPathExpressionEvaluator extends FhirExpressionEvaluator {
   ///
   /// Proper behavior is undefined: http://jira.hl7.org/browse/FHIR-33295
   /// Using singleton collection evaluation: https://hl7.org/fhirpath/#singleton-evaluation-of-collections
-  Future<bool> fetchBoolValue({
+  bool fetchBoolValue({
     String? location,
     required bool unknownValue,
-  }) async {
-    final fhirPathResult = await fetchValue();
+  }) {
+    final fhirPathResult = evaluate();
 
     if (fhirPathResult == null) {
       return unknownValue;

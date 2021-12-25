@@ -1,3 +1,17 @@
+## 0.6.0-dev.3
+* ### Faiadashu
+* Some support for initial.value[x]
+* Model visibility similar to R5 disabledDisplay extension
+* Remove many dependencies on centralized `ChangeNotifier` in QuestionnaireResponseModel  
+  * Drastically reduced number of repaints
+* Reverted the async madness
+* Allow each answer to have its own validation outcome `errorText`.
+* Updated dependencies
+* Changed from relative imports to absolute package imports
+
+* ### Faiadashu Online
+* Brought back the login/logout functionality, based on latest `fhir_auth` package.
+
 ## 0.6.0-dev.2
 * ### Introducing "Faiabench"
   * Using the best of `fhir`, `fhir_path`, and `faiadashu` to offer an IDE-like workbench experience
@@ -8,7 +22,7 @@
 > _Faiabench_ is pushing Dart and Flutter to the limit.
 > * only works on desktops or landscape tablets, due to screen size requirements
 > * requires Flutter 2.8 due to bugs in earlier versions of Flutter
-> * keyboard input to FHIR Path field broken on Mac, due to bugs in macOS Flutter: https://github.com/flutter/flutter/issues/82124
+> * keyboard input to FHIR Path field broken on Mac, due to bugs in macOS Flutter: https://github.com/flutter/flutter/issues/94633
 
 * ### Faiadashu Example / Gallery
 * Added demos of all the new capabilities listed for Faiadashu.
