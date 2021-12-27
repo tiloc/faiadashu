@@ -319,7 +319,7 @@ class CodingAnswerModel extends AnswerModel<Set<String>, Set<String>> {
   bool get hasCodingAnswers => true;
 
   @override
-  bool get isUnanswered => value == null;
+  bool get isEmpty => value == null;
 
   @override
   void populate(QuestionnaireResponseAnswer answer) {

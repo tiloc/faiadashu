@@ -101,18 +101,17 @@ abstract class AnswerModel<I, V> extends ResponseNode {
       errorText = newErrorText;
     }
     if (notifyListeners) {
-      // TODO: answerModels cannot have listeners yet.
-//      notifyListeners();
+      this.notifyListeners();
     }
 
     return newErrorText;
   }
 
   /// Returns whether any answer (valid or invalid) has been provided.
-  bool get isAnswered => !isUnanswered;
+  bool get isNotEmpty => !isEmpty;
 
   /// Returns whether this question is unanswered.
-  bool get isUnanswered;
+  bool get isEmpty;
 
   String? errorText;
 

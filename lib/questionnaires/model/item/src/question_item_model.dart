@@ -124,7 +124,7 @@ class QuestionItemModel extends ResponseItemModel {
   Decimal? get ordinalValue {
     final answerModel = firstAnswerModel;
 
-    return answerModel.isAnswered &&
+    return answerModel.isNotEmpty &&
             answerModel is CodingAnswerModel &&
             !questionnaireItemModel.isRepeating
         ? answerModel.singleSelection?.fhirOrdinalValue
@@ -184,7 +184,7 @@ class QuestionItemModel extends ResponseItemModel {
       return false;
     }
 
-    return answerModels.any((am) => am.isAnswered);
+    return answerModels.any((am) => am.isNotEmpty);
   }
 
   @override
@@ -193,10 +193,15 @@ class QuestionItemModel extends ResponseItemModel {
       return false;
     }
 
-    final returnValue = answerModels.every((am) => am.isUnanswered);
+    final returnValue = answerModels.every((am) => am.isEmpty);
     _qimLogger.debug('isUnanswered $nodeUid: $returnValue');
 
     return returnValue;
+  }
+
+  @override
+  bool get isPopulated {
+    return answerModels.any((am) => am.isNotEmpty);
   }
 
   /// Add the next answer to this response.
@@ -229,7 +234,7 @@ class QuestionItemModel extends ResponseItemModel {
 
   /// Returns the [AnswerModel]s which have been answered.
   Iterable<AnswerModel> get answeredAnswerModels {
-    return answerModels.where((am) => am.isAnswered);
+    return answerModels.where((am) => am.isNotEmpty);
   }
 
   /// Returns the [AnswerModel]s which have been answered,
@@ -239,7 +244,7 @@ class QuestionItemModel extends ResponseItemModel {
 
     final latestAnswerModel = this.latestAnswerModel;
 
-    return answerModels.where((am) => am.isAnswered || am == latestAnswerModel);
+    return answerModels.where((am) => am.isNotEmpty || am == latestAnswerModel);
   }
 
   /// Creates a new [AnswerModel] of the type for this question.

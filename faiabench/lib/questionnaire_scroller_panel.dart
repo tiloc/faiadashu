@@ -53,8 +53,9 @@ class _QuestionnaireScrollerPanelState
   void _handleChangedQuestionnaireResponse(
     QuestionnaireResponseModel? questionnaireResponseModel,
   ) {
-    final questionnaireResponse =
-        questionnaireResponseModel?.createQuestionnaireResponse();
+    final questionnaireResponse = questionnaireResponseModel
+        ?.aggregator<QuestionnaireResponseAggregator>()
+        .aggregate(containPatient: true);
 
     final FhirResource resource = (questionnaireResponse != null)
         ? FhirResource.fromResource(questionnaireResponse)

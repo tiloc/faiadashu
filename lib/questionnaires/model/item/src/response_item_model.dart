@@ -24,7 +24,8 @@ abstract class ResponseItemModel extends FillerItemModel {
 
     _constraintExpression = constraintExpression != null
         ? FhirPathExpressionEvaluator(
-            () => questionnaireResponseModel.createQuestionnaireResponse(),
+            () => questionnaireResponseModel
+                .createQuestionnaireResponseForFhirPath(),
             Expression(
               expression: constraintExpression,
               language: ExpressionLanguage.text_fhirpath,
@@ -47,21 +48,6 @@ abstract class ResponseItemModel extends FillerItemModel {
 
     return returnValue;
   }
-
-  /// Is the item answered?
-  ///
-  /// Static or read-only items are not answered.
-  /// Items which are not enabled are not answered.
-  bool get isAnswered;
-
-  /// Is the item unanswered?
-  ///
-  /// Static or read-only items are not unanswered.
-  /// Items which are not enabled are not unanswered.
-  bool get isUnanswered;
-
-  /// Is the item invalid?
-  bool get isInvalid;
 
   /// Returns a description of the current error situation with this item.
   ///

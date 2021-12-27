@@ -400,6 +400,18 @@ class _HomePageState extends State<HomePage> {
                 uploadResponseFunction: uploadResponseFunction,
               ),
               QuestionnaireLaunchTile(
+                title: 'enableWhenExpression Test',
+                subtitle:
+                    'Tests the correct implementation of enableWhenExpression.',
+                fhirResourceProvider: resourceBundleProvider,
+                launchContext: launchContext,
+                questionnairePath:
+                    'assets/instruments/enable_when_expression_test.json',
+                saveResponseFunction: _saveResponse,
+                restoreResponseFunction: _restoreResponse,
+                uploadResponseFunction: uploadResponseFunction,
+              ),
+              QuestionnaireLaunchTile(
                 title: 'Argonaut Questionnaire Sampler',
                 subtitle:
                     'Reference sample from the Argonaut Questionnaire Implementation Guide.',

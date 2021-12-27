@@ -42,7 +42,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     // Questionnaire will be evaluated as the root of the QuestionnaireResponse.
     final questionnaireResponseExpression = ResourceExpressionEvaluator(
       'resource',
-      () => createQuestionnaireResponse(),
+      () => createQuestionnaireResponseForFhirPath(),
     );
 
     return [
@@ -98,7 +98,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
         }
 
         final variable = FhirExpressionEvaluator.fromExpression(
-          () => createQuestionnaireResponse(),
+          () => createQuestionnaireResponseForFhirPath(),
           variableExpression,
           [..._questionnaireBelowVariablesExpressionEvaluators, ...qLevelVars],
         );
@@ -382,12 +382,18 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     return _cachedQuestionnaireResponse?[uid] as Map<String, dynamic>?;
   }
 
-  /// Returns a FHIR [QuestionnaireResponse].
+  /// Returns a FHIR [QuestionnaireResponse] for use with FHIRPath.
+  ///
+  /// Does not include disabled items, as these should not be visible to FHIRPath.
+  /// Does not include a narrative, as this is costly and not used in real-world.
   ///
   /// The response matches the model as of the current generation.
-  QuestionnaireResponse? createQuestionnaireResponse() {
+  QuestionnaireResponse? createQuestionnaireResponseForFhirPath() {
     _cachedQuestionnaireResponse ??=
-        aggregator<QuestionnaireResponseAggregator>().aggregateResponseItems();
+        aggregator<QuestionnaireResponseAggregator>().aggregateResponseItems(
+      responseStatus: QuestionnaireResponseStatus.completed,
+      generateNarrative: false,
+    );
 
     return _cachedQuestionnaireResponse?[QuestionnaireResponseAggregator
         .questionnaireResponseKey] as QuestionnaireResponse?;

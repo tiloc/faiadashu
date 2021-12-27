@@ -3,7 +3,6 @@ import 'package:faiadashu/fhir_types/fhir_types.dart';
 import 'package:faiadashu/logging/logging.dart';
 import 'package:faiadashu/questionnaires/questionnaires.dart';
 import 'package:fhir/r4.dart';
-import 'package:flutter/foundation.dart';
 
 /// Codes that guide the display of questionnaire items
 enum DisplayVisibility {
@@ -21,7 +20,7 @@ enum DisplayVisibility {
 ///
 /// This is a common base-class for items that can generate responses (questions, groups),
 /// and those that cannot (display).
-abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
+abstract class FillerItemModel extends ResponseNode {
   static final _fimLogger = Logger(FillerItemModel);
 
   final QuestionnaireResponseModel questionnaireResponseModel;
@@ -259,7 +258,6 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
     final enableWhenTrigger = _EnableWhenTrigger();
 
     questionnaireItemModel.forEnableWhens((qew) {
-      // TODO: implement the following rule: If enableWhen logic depends on an item that is disabled, the logic should proceed as though the item is not valued - even if a default value or other value might be retained in memory in the event of the item being re-enabled.
       final questionLinkId = qew.question;
       if (questionLinkId == null) {
         throw QuestionnaireFormatException(
@@ -315,7 +313,10 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
     if (question is QuestionItemModel) {
       final qim = fromLinkId(questionLinkId) as QuestionItemModel;
 
-      // If enableWhen logic depends on an item that is disabled, the logic should proceed as though the item is not valued - even if a default value or other value might be retained in memory in the event of the item being re-enabled.
+      // If enableWhen logic depends on an item that is disabled, the logic
+      // should proceed as though the item is not valued - even if a
+      // default value or other value might be retained in memory in the event
+      // of the item being re-enabled.
       final firstAnswer = (qim.isEnabled)
           ? (fromLinkId(questionLinkId) as QuestionItemModel)
               .answeredAnswerModels
@@ -366,7 +367,10 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
     final rim = fromLinkId(qew.question!);
     final shouldExist = qew.answerBoolean?.value ?? true;
 
-    // If enableWhen logic depends on an item that is disabled, the logic should proceed as though the item is not valued - even if a default value or other value might be retained in memory in the event of the item being re-enabled.
+    // If enableWhen logic depends on an item that is disabled, the logic should
+    // proceed as though the item is not valued - even if a default value or
+    // other value might be retained in memory in the event of the item being
+    // re-enabled.
     if (rim.isEnabled && rim.isAnswered == shouldExist) {
       enableWhenTrigger.trigger();
     }
@@ -376,7 +380,7 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
   }
 
   void _updateEnabledByParentAnswer() {
-    if ((parentNode! as AnswerModel).isUnanswered) {
+    if ((parentNode! as AnswerModel).isEmpty) {
       _nextGenerationDisableWithDescendants();
     }
   }
@@ -399,6 +403,30 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
     return hasChanged;
   }
 
+  /// Is the item answered?
+  ///
+  /// Static or read-only items are not answered.
+  /// Items which are not enabled are not answered.
+  bool get isAnswered;
+
+  /// Is the item unanswered?
+  ///
+  /// Static or read-only items are not unanswered.
+  /// Items which are not enabled are not unanswered.
+  bool get isUnanswered;
+
+  /// Is the item invalid?
+  bool get isInvalid;
+
+  /// Does the item have a value?
+  ///
+  /// This is regardless of enabled or read-only status.
+  bool get isPopulated;
+
+  // TODO: Get this from the R5 extension
+  QuestionnaireDisabledDisplay get disabledDisplay => questionnaireResponseModel
+      .questionnaireModel.questionnaireModelDefaults.disabledDisplay;
+
   DisplayVisibility _calculateDisplayVisibility() {
     DisplayVisibility resultVisibility = DisplayVisibility.shown;
 
@@ -409,8 +437,21 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
     }
 
     if (isNotEnabled) {
-      resultVisibility =
-          _maxVisibility(resultVisibility, DisplayVisibility.hidden);
+      switch (disabledDisplay) {
+        case QuestionnaireDisabledDisplay.hidden:
+          resultVisibility =
+              _maxVisibility(resultVisibility, DisplayVisibility.hidden);
+          break;
+        case QuestionnaireDisabledDisplay.protected:
+          resultVisibility =
+              _maxVisibility(resultVisibility, DisplayVisibility.protected);
+          break;
+        case QuestionnaireDisabledDisplay.protectedNonEmpty:
+          resultVisibility = isPopulated
+              ? _maxVisibility(resultVisibility, DisplayVisibility.protected)
+              : _maxVisibility(resultVisibility, DisplayVisibility.hidden);
+          break;
+      }
     }
 
     if (questionnaireItemModel.isHidden) {

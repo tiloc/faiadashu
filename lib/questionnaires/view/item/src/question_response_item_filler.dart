@@ -193,7 +193,7 @@ class QuestionResponseItemFillerState
           questionnaireTheme.buildAddRepetition(
             context,
             this,
-            (!questionResponseItemModel.latestAnswerModel.isUnanswered)
+            (questionResponseItemModel.latestAnswerModel.isNotEmpty)
                 ? () {
                     setState(() {
                       final newAnswerModel =

@@ -27,7 +27,7 @@ class UnsupportedAnswerModel extends AnswerModel<Object, Object> {
   }
 
   @override
-  bool get isUnanswered => false;
+  bool get isEmpty => false;
 
   @override
   void populate(QuestionnaireResponseAnswer answer) {

@@ -306,7 +306,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
   }
 
   @override
-  bool get isUnanswered => (value == null) || (value!.value == null);
+  bool get isEmpty => (value == null) || (value!.value == null);
 
   Quantity? _valueFromNumber(dynamic inputNumber) {
     final unitCoding = qi.computableUnit;

@@ -182,6 +182,7 @@ class QuestionnaireResponseAggregator
     QuestionnaireResponseStatus? responseStatus,
     bool notifyListeners = false,
     bool containPatient = false,
+    bool generateNarrative = true,
   }) {
     _logger.trace('QuestionnaireResponseAggregator.aggregateResponseItems');
 
@@ -193,9 +194,6 @@ class QuestionnaireResponseAggregator
     final responseItemRegistry = <String, dynamic>{};
     final responseItems =
         _fromResponseItems(null, responseStatus, responseItemRegistry);
-
-    final narrativeAggregator =
-        questionnaireResponseModel.aggregator<NarrativeAggregator>();
 
     final questionnaireUrl = questionnaireResponseModel
         .questionnaireModel.questionnaire.url
@@ -246,7 +244,11 @@ class QuestionnaireResponseAggregator
         ? Meta(profile: profiles.isNotEmpty ? profiles : null)
         : null;
 
-    final narrative = narrativeAggregator.aggregate();
+    final narrative = generateNarrative
+        ? questionnaireResponseModel
+            .aggregator<NarrativeAggregator>()
+            .aggregate()
+        : NarrativeAggregator.emptyNarrative;
 
     final questionnaireResponse = QuestionnaireResponse(
       status: responseStatus,

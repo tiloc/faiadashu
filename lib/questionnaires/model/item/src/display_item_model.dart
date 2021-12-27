@@ -10,4 +10,16 @@ class DisplayItemModel extends FillerItemModel {
           questionnaireResponseModel,
           questionnaireItemModel,
         );
+
+  @override
+  bool get isAnswered => false;
+
+  @override
+  bool get isUnanswered => false;
+
+  @override
+  bool get isInvalid => false;
+
+  @override
+  bool get isPopulated => false;
 }

@@ -17,7 +17,9 @@ enum QuestionnaireDisabledDisplay {
   /// enabled.
   protected,
 
-  /// Same as [protected] for answered items, same as [hidden] for unanswered items.
+  /// Same as [protected] for populated items, same as [hidden] for unpopulated items.
+  ///
+  /// see [FillerItemModel.isPopulated]
   protectedNonEmpty,
 }
 

@@ -4,6 +4,8 @@
 * Model visibility similar to R5 disabledDisplay extension
 * Remove many dependencies on centralized `ChangeNotifier` in QuestionnaireResponseModel  
   * Drastically reduced number of repaints
+* Drastic performance optimizations for evaluation of FHIRPath expressions
+* Don't take disabled answers into account for expressions
 * Reverted the async madness
 * Allow each answer to have its own validation outcome `errorText`.
 * Updated dependencies

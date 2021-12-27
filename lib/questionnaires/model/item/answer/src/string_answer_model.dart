@@ -131,7 +131,7 @@ class StringAnswerModel extends AnswerModel<String, String> {
   }
 
   @override
-  bool get isUnanswered => value?.trim().isEmpty ?? true;
+  bool get isEmpty => value?.trim().isEmpty ?? true;
 
   @override
   void populateFromExpression(dynamic evaluationResult) {

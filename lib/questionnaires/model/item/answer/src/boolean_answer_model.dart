@@ -33,7 +33,7 @@ class BooleanAnswerModel extends AnswerModel<Boolean, Boolean> {
   }
 
   @override
-  bool get isUnanswered => value == null;
+  bool get isEmpty => value == null;
 
   @override
   void populate(QuestionnaireResponseAnswer answer) {

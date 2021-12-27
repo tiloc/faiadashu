@@ -8,7 +8,8 @@ abstract class FhirExpressionEvaluator extends ExpressionEvaluator {
     Iterable<ExpressionEvaluator> upstreamExpressions, {
     String? debugLabel,
   }) : super(
-          fhirExpression.name?.value,
+          // Using .value breaks on real-world content with invalid identifiers.
+          fhirExpression.name?.toString(),
           upstreamExpressions,
           debugLabel: debugLabel,
         );
