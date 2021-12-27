@@ -2,7 +2,7 @@ import 'package:faiadashu/logging/logging.dart';
 import 'package:faiadashu/questionnaires/model/expression/expression.dart';
 import 'package:fhir/r4/metadata_types/metadata_types.dart';
 import 'package:fhir/r4/resource/resource.dart';
-import 'package:fhir_path/run_fhir_path.dart';
+import 'package:fhir_path/fhir_path.dart';
 import 'package:flutter/foundation.dart';
 
 class FhirPathExpressionEvaluator extends FhirExpressionEvaluator {
@@ -11,6 +11,8 @@ class FhirPathExpressionEvaluator extends FhirExpressionEvaluator {
   final Resource? Function()? resourceBuilder;
   final String fhirPath;
   final Map<String, dynamic>? Function()? jsonBuilder;
+
+  late final ParserList _parsedFhirPath;
 
   FhirPathExpressionEvaluator(
     this.resourceBuilder,
@@ -29,6 +31,8 @@ class FhirPathExpressionEvaluator extends FhirExpressionEvaluator {
         '$name has wrong language: ${fhirPathExpression.language.toString()}',
       );
     }
+
+    _parsedFhirPath = parseFhirPath(fhirPath);
   }
 
   @override
@@ -54,8 +58,12 @@ class FhirPathExpressionEvaluator extends FhirExpressionEvaluator {
 
     final jsonContext =
         resourceBuilder?.call()?.toJson() ?? jsonBuilder?.call();
-    final fhirPathResult =
-        walkFhirPath(jsonContext, fhirPath, environment: upstreamMap);
+    final fhirPathResult = executeFhirPath(
+      jsonContext,
+      _parsedFhirPath,
+      fhirPath,
+      environment: upstreamMap,
+    );
 
     _logger.debug('${toStringShort()} $fhirPath: $fhirPathResult');
 

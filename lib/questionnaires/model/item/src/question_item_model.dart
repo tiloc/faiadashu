@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:faiadashu/coding/coding.dart';
 import 'package:faiadashu/fhir_types/fhir_types.dart';
 import 'package:faiadashu/logging/logging.dart';
@@ -63,6 +65,8 @@ class QuestionItemModel extends ResponseItemModel {
   ///
   /// Creates nested fillers if needed.
   void handleChangedAnswer(AnswerModel answerModel) {
+    final flow = Flow.begin();
+    Timeline.startSync('handleChangedAnswer', flow: flow);
     if (answerModel.value != null) {
       // An answer has been provided, check whether a nested filler structure needs to be created.
       if (questionnaireItemModel.hasChildren) {
@@ -85,16 +89,23 @@ class QuestionItemModel extends ResponseItemModel {
     // Updates all error texts, but will not notify.
     validate();
 
-    nextGeneration();
+    nextGeneration(flow: Flow.end(flow.id));
+    Timeline.finishSync();
   }
 
   /// Changes the generation and notifies all listeners.
   ///
   /// Each generation is unique during a run of the application.
-  void nextGeneration() {
-    questionnaireResponseModel.nextGeneration();
-    // This notifies aggregators on changes to individual items
-    notifyListeners();
+  void nextGeneration({Flow? flow}) {
+    Timeline.timeSync(
+      'QuestionItemModel.nextGeneration',
+      () {
+        questionnaireResponseModel.nextGeneration();
+        // This notifies aggregators on changes to individual items
+        notifyListeners();
+      },
+      flow: flow,
+    );
   }
 
   /// Is this response invalid?
