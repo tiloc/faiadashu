@@ -277,9 +277,10 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<OptionsOrString,
             },
             decoration: InputDecoration(
               // Empty error texts triggers red border, but showing text would result in a duplicate.
-              errorText: (answerModel.displayErrorText?.isNotEmpty ?? false)
-                  ? ''
-                  : null,
+              errorStyle:
+                  const TextStyle(height: 0, color: Color.fromARGB(0, 0, 0, 0)),
+
+              errorText: answerModel.displayErrorText,
             ),
           ),
         ),
@@ -373,8 +374,9 @@ class _CodingDropdown extends StatelessWidget {
       items: dropdownItems,
       decoration: InputDecoration(
         // Empty error texts triggers red border, but showing text would result in a duplicate.
-        errorText:
-            (answerModel.displayErrorText?.isNotEmpty ?? false) ? '' : null,
+        errorStyle:
+            const TextStyle(height: 0, color: Color.fromARGB(0, 0, 0, 0)),
+        errorText: answerModel.displayErrorText,
       ),
     );
   }
@@ -407,8 +409,8 @@ class _VerticalCodingChoices extends StatelessWidget {
                 ? RoundedRectangleBorder(
                     side: BorderSide(
                       color: hasError
-                          ? Theme.of(context).colorScheme.secondary
-                          : Theme.of(context).colorScheme.error,
+                          ? Theme.of(context).colorScheme.error
+                          : Theme.of(context).colorScheme.secondary,
                       width: 2.0,
                     ),
                     borderRadius: BorderRadius.circular(4.0),
@@ -453,8 +455,8 @@ class _HorizontalCodingChoices extends StatelessWidget {
                 ? RoundedRectangleBorder(
                     side: BorderSide(
                       color: hasError
-                          ? Theme.of(context).colorScheme.secondary
-                          : Theme.of(context).colorScheme.error,
+                          ? Theme.of(context).colorScheme.error
+                          : Theme.of(context).colorScheme.secondary,
                       width: 2.0,
                     ),
                     borderRadius: BorderRadius.circular(4.0),
