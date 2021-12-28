@@ -5,8 +5,6 @@ import 'package:faiadashu/questionnaires/model/model.dart';
 import 'package:fhir/r4.dart';
 
 class CodingAnswerOptionModel {
-  static const openChoiceCode = 'x-faiadashu-open-choice';
-
   final String uid;
 
   final QuestionnaireItemModel questionnaireItemModel;
@@ -45,19 +43,6 @@ class CodingAnswerOptionModel {
     this.optionPrefix,
     this.isExclusive = false,
   });
-
-  factory CodingAnswerOptionModel.fromOpenChoice(
-    QuestionnaireItemModel questionnaireItemModel,
-    RenderingString openLabel,
-  ) {
-    return CodingAnswerOptionModel._(
-      uid: openChoiceCode,
-      questionnaireItemModel: questionnaireItemModel,
-      optionText: openLabel,
-      forDisplay: 'ERROR', // will never be used.
-      isExclusive: true,
-    );
-  }
 
   factory CodingAnswerOptionModel.fromValueSetCoding(
     String uid,
@@ -228,26 +213,21 @@ class CodingAnswerOptionModel {
   }
 
   Coding createFhirCoding() {
-    if (uid != openChoiceCode) {
-      final ordinalExtension = _createOrdinalExtension();
-      final codingExtensions = ordinalExtension;
-      final coding = this.coding;
+    final ordinalExtension = _createOrdinalExtension();
+    final codingExtensions = ordinalExtension;
+    final coding = this.coding;
 
-      // TODO: Emit XHTML
+    // TODO: Emit XHTML
 
-      return coding != null
-          ? coding.copyWith(
-              extension_:
-                  (codingExtensions.isNotEmpty) ? codingExtensions : null,
-              userSelected: Boolean(true),
-            )
-          : Coding(
-              display: forDisplay,
-              userSelected: Boolean(true),
-            );
-    } else {
-      throw StateError('open text option cannot create FHIR Coding.');
-    }
+    return coding != null
+        ? coding.copyWith(
+            extension_: (codingExtensions.isNotEmpty) ? codingExtensions : null,
+            userSelected: Boolean(true),
+          )
+        : Coding(
+            display: forDisplay,
+            userSelected: Boolean(true),
+          );
   }
 
   static List<FhirExtension>? _findChoiceColumns(

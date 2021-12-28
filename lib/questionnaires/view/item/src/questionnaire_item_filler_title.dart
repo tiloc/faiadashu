@@ -138,7 +138,7 @@ class _QuestionnaireItemFillerHelpState
       builder: (context) {
         return AlertDialog(
           title: const Text('Help'),
-          content: Xhtml.fromXhtmlString(
+          content: Xhtml.fromRenderingString(
             context,
             questionnaireItemModel.text ?? RenderingString.nullText,
             defaultTextStyle: Theme.of(context).textTheme.bodyText1,

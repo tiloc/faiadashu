@@ -122,7 +122,17 @@ Question items share many commonalities. Individual item types may offer additio
 Supported. Displays the guidance text next to the input control.
 
 ###### initial
-Supported for `integer`, `decimal`, `string`, `bool`, `date`, `datetime` 
+Support for:
+* `integer`
+* `decimal`
+* `string`
+* `bool`
+* `date`
+* `datetime`
+* `choice` (incl. support for `repeats` - multiple `initial.valueCoding`). 
+* `open-choice`: same as `choice`, plus supports a single open text.
+
+> Only supports a single value per question.
 
 ###### required
 Supported 

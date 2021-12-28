@@ -300,51 +300,47 @@ class QuestionItemModel extends ResponseItemModel {
       final initialValues = questionnaireItem.initial;
 
       if (initialValues != null) {
-        final type = questionnaireItem.type;
+        final initialValue = initialValues.first;
 
-        if (type != QuestionnaireItemType.choice &&
-            type != QuestionnaireItemType.open_choice) {
-          if (initialValues.length != 1) {
-            throw QuestionnaireFormatException(
-              'Expected 1 initial value, found ${initialValues.length}',
-              questionnaireItem,
+        switch (questionnaireItem.type) {
+          case QuestionnaireItemType.integer:
+            firstAnswerModel
+                .populateFromExpression(initialValue.valueInteger?.value);
+            break;
+          case QuestionnaireItemType.decimal:
+            firstAnswerModel
+                .populateFromExpression(initialValue.valueDecimal?.value);
+            break;
+          case QuestionnaireItemType.string:
+            firstAnswerModel.populateFromExpression(initialValue.valueString);
+            break;
+          case QuestionnaireItemType.date:
+            firstAnswerModel.populateFromExpression(initialValue.valueDate);
+            break;
+          case QuestionnaireItemType.datetime:
+            firstAnswerModel.populateFromExpression(initialValue.valueDateTime);
+            break;
+          case QuestionnaireItemType.boolean:
+            firstAnswerModel.populateFromExpression(initialValue.valueBoolean);
+            break;
+          case QuestionnaireItemType.choice:
+          case QuestionnaireItemType.open_choice:
+            final initialCodings = initialValues
+                .where((qiv) => qiv.valueCoding != null)
+                .map<Coding>((qiv) => qiv.valueCoding!);
+
+            final initialOpenTexts = initialValues
+                .where((qiv) => qiv.valueString != null)
+                .map<String>((qiv) => qiv.valueString!);
+
+            (firstAnswerModel as CodingAnswerModel)
+                .populateFromCodings(initialCodings, initialOpenTexts);
+            break;
+          default:
+            // TODO: Implement for more types
+            _qimLogger.warn(
+              'No support for initial value on ${questionnaireItem.linkId}.',
             );
-          }
-
-          final initialValue = initialValues.first;
-
-          switch (questionnaireItem.type) {
-            case QuestionnaireItemType.integer:
-              firstAnswerModel
-                  .populateFromExpression(initialValue.valueInteger?.value);
-              break;
-            case QuestionnaireItemType.decimal:
-              firstAnswerModel
-                  .populateFromExpression(initialValue.valueDecimal?.value);
-              break;
-            case QuestionnaireItemType.string:
-              firstAnswerModel.populateFromExpression(initialValue.valueString);
-              break;
-            case QuestionnaireItemType.date:
-              firstAnswerModel.populateFromExpression(initialValue.valueDate);
-              break;
-            case QuestionnaireItemType.datetime:
-              firstAnswerModel
-                  .populateFromExpression(initialValue.valueDateTime);
-              break;
-            case QuestionnaireItemType.boolean:
-              firstAnswerModel
-                  .populateFromExpression(initialValue.valueBoolean);
-              break;
-            default:
-              // TODO: Implement for more types
-              _qimLogger.warn(
-                'No support for initial value on ${questionnaireItem.linkId}.',
-              );
-          }
-        } else {
-          _qimLogger
-              .warn('No support for initial on choice or open_choice items.');
         }
       }
     }

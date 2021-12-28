@@ -102,6 +102,11 @@ class FDashLocalizationsJa extends FDashLocalizations {
   }
 
   @override
+  String validatorSingleSelectionOrSingleOpenString(Object openLabel) {
+    return 'Either select an option, or enter free text in \"$openLabel\".';
+  }
+
+  @override
   String get dataAbsentReasonAskedDeclinedInputLabel => '私は答えないことにしている。';
 
   @override

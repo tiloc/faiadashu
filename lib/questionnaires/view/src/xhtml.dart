@@ -30,7 +30,7 @@ class Xhtml extends StatelessWidget {
     final xhtmlString =
         RenderingString.fromText(plainText, extensions: extensions);
 
-    return Xhtml.fromXhtmlString(
+    return Xhtml.fromRenderingString(
       context,
       xhtmlString,
       questionnaireModel: questionnaireModel,
@@ -41,9 +41,9 @@ class Xhtml extends StatelessWidget {
     );
   }
 
-  factory Xhtml.fromXhtmlString(
+  factory Xhtml.fromRenderingString(
     BuildContext context,
-    RenderingString xhtmlString, {
+    RenderingString renderingString, {
     QuestionnaireModel? questionnaireModel,
     double? imageWidth,
     double? imageHeight,
@@ -51,12 +51,12 @@ class Xhtml extends StatelessWidget {
     int maxLines = defaultMaxLines,
     Key? key,
   }) {
-    _logger.trace('enter fromXhtmlString $xhtmlString');
+    _logger.trace('enter fromRenderingString $renderingString');
 
-    final xhtml = xhtmlString.xhtmlText;
-    final plainText = xhtmlString.plainText;
+    final xhtml = renderingString.xhtmlText;
+    final plainText = renderingString.plainText;
 
-    if (xhtmlString.isPlain) {
+    if (renderingString.isPlain) {
       return Xhtml._(
         Text(
           plainText,

@@ -217,6 +217,12 @@ abstract class FDashLocalizations {
   /// **'{maxOccurs, plural, =1 {Select up to one option.} other {Select up to {maxOccurs} options.}}'**
   String validatorMaxOccurs(int maxOccurs);
 
+  /// No description provided for @validatorSingleSelectionOrSingleOpenString.
+  ///
+  /// In en, this message translates to:
+  /// **'Either select an option, or enter free text in \"{openLabel}\".'**
+  String validatorSingleSelectionOrSingleOpenString(Object openLabel);
+
   /// No description provided for @dataAbsentReasonAskedDeclinedInputLabel.
   ///
   /// In en, this message translates to:

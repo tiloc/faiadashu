@@ -136,7 +136,7 @@ class QuestionResponseItemFillerState
                                 if (promptText != null)
                                   const SizedBox(height: 8.0),
                                 if (promptText != null)
-                                  Xhtml.fromXhtmlString(
+                                  Xhtml.fromRenderingString(
                                     context,
                                     promptText,
                                   ),
@@ -155,7 +155,7 @@ class QuestionResponseItemFillerState
                                   ),
                                 _buildAnswerFillers(context),
                                 if (promptText != null)
-                                  Xhtml.fromXhtmlString(
+                                  Xhtml.fromRenderingString(
                                     context,
                                     promptText,
                                   ),

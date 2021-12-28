@@ -7,7 +7,11 @@ import 'package:faiadashu/questionnaires/questionnaires.dart';
 import 'package:fhir/r4.dart';
 
 /// Model answers which are [Coding]s.
-class CodingAnswerModel extends AnswerModel<Set<String>, Set<String>> {
+///
+/// R5 release of the FHIR SDC IG will have a `coding` item type,
+/// and model the "open-ness" through the `answerConstraint` extension.
+/// This model is already modelling this methodology for R4.
+class CodingAnswerModel extends AnswerModel<OptionsOrString, OptionsOrString> {
   final _answerOptions = <String, CodingAnswerOptionModel>{};
   static final _logger = Logger(CodingAnswerModel);
 
@@ -15,7 +19,10 @@ class CodingAnswerModel extends AnswerModel<Set<String>, Set<String>> {
 
   int get numberOfOptions => _answerOptions.length;
 
-  String? openText;
+  bool get hasOpenStrings =>
+      value != null &&
+      value?.openStrings != null &&
+      value!.openStrings!.isNotEmpty;
 
   /// Returns an answer option by its [uid].
   ///
@@ -40,29 +47,31 @@ class CodingAnswerModel extends AnswerModel<Set<String>, Set<String>> {
   }
 
   String? get singleSelectionUid {
-    final value = this.value;
-    if (value == null) {
+    final selectedOptions = value?.selectedOptions;
+    if (selectedOptions == null) {
       return null;
     }
 
-    if (value.length != 1) {
-      throw StateError('Selection has ${value.length} elements. Expected 1.');
+    if (selectedOptions.length != 1) {
+      throw StateError(
+        'Selection has ${selectedOptions.length} elements. Expected 1.',
+      );
     }
 
-    return value.first;
+    return selectedOptions.first;
   }
 
-  bool isSelected(String uid) => value?.contains(uid) ?? false;
+  bool isSelected(String uid) => value?.selectedOptions?.contains(uid) ?? false;
 
   String? get exclusiveSelectionUid {
-    final value = this.value;
+    final selectedOptions = value?.selectedOptions;
 
-    if (value == null) {
+    if (selectedOptions == null) {
       return null;
     }
 
     final exclusiveSelection =
-        value.where((uid) => answerOptionByUid(uid).isExclusive);
+        selectedOptions.where((uid) => answerOptionByUid(uid).isExclusive);
     if (exclusiveSelection.isEmpty) {
       return null;
     }
@@ -86,9 +95,9 @@ class CodingAnswerModel extends AnswerModel<Set<String>, Set<String>> {
   Set<String>? toggleOption(String uid) {
     _logger.trace('Enter toggledValue $uid');
 
-    final value = this.value;
+    final selectedOptions = value?.selectedOptions;
 
-    if (value == null) {
+    if (selectedOptions == null) {
       return {uid};
     }
 
@@ -98,7 +107,7 @@ class CodingAnswerModel extends AnswerModel<Set<String>, Set<String>> {
       return {uid};
     }
 
-    final newSet = Set.of(value);
+    final newSet = Set.of(selectedOptions);
 
     if (newSet.contains(uid)) {
       newSet.remove(uid);
@@ -114,7 +123,7 @@ class CodingAnswerModel extends AnswerModel<Set<String>, Set<String>> {
   ///
   /// Implements the semantics as specified for enabledWhen
   bool equalsCoding(Coding? coding) {
-    return value?.any(
+    return value?.selectedOptions?.any(
           (uid) => _answerOptions[uid]?.coding?.match(coding) ?? false,
         ) ??
         false;
@@ -128,6 +137,8 @@ class CodingAnswerModel extends AnswerModel<Set<String>, Set<String>> {
   bool get isRadioButton => qi.isItemControl('radio-button');
 
   bool get isCheckbox => qi.isItemControl('check-box');
+
+  bool get isOptionsOrString => qi.type == QuestionnaireItemType.open_choice;
 
   RenderingString get openLabel => RenderingString.fromText(
         qi.extension_
@@ -184,14 +195,6 @@ class CodingAnswerModel extends AnswerModel<Set<String>, Set<String>> {
         }
       }
     }
-
-    if (qi.type == QuestionnaireItemType.open_choice) {
-      final optionModel = CodingAnswerOptionModel.fromOpenChoice(
-        questionnaireItemModel,
-        openLabel,
-      );
-      _answerOptions[optionModel.uid] = optionModel;
-    }
   }
 
   late final int minOccurs;
@@ -219,19 +222,30 @@ class CodingAnswerModel extends AnswerModel<Set<String>, Set<String>> {
   @override
   RenderingString get display {
     final value = this.value;
-    if (value == null || value.isEmpty) {
+    if (value == null) {
       return RenderingString.nullText;
     }
 
-    final xhtmlStrings = value.map<RenderingString>((uid) {
-      return uid != CodingAnswerOptionModel.openChoiceCode
-          ? answerOptionByUid(uid).optionText
-          : RenderingString.fromText(openText ?? AnswerModel.nullText);
-    });
+    final selectedOptions = value.selectedOptions;
+    if (selectedOptions == null || selectedOptions.isEmpty) {
+      return RenderingString.nullText;
+    }
+
+    final openStrings = value.openStrings;
+
+    final renderingStrings = selectedOptions
+        .map<RenderingString>((uid) => answerOptionByUid(uid).optionText)
+        .followedBy(
+          hasOpenStrings
+              ? openStrings!.map<RenderingString>(
+                  (openString) => RenderingString.fromText(openString),
+                )
+              : <RenderingString>[],
+        );
 
     // TODO: Localized or themed separator character?
 
-    return xhtmlStrings.concatenateXhtml('; ');
+    return renderingStrings.concatenateXhtml('; ');
   }
 
   /// Returns whether the choices should be presented horizontally.
@@ -246,23 +260,33 @@ class CodingAnswerModel extends AnswerModel<Set<String>, Set<String>> {
   }
 
   @override
-  String? validateInput(Set<String>? inValue) {
+  String? validateInput(OptionsOrString? inValue) {
     return validateValue(inValue);
   }
 
   @override
-  String? validateValue(Set<String>? inValue) {
+  String? validateValue(OptionsOrString? inValue) {
     if (inValue == null) {
       return null;
     }
 
-    final int length = inValue.length;
+    final selectedOptionsCount = inValue.selectedOptions?.length ?? 0;
+    final openStringsCount = inValue.openStrings?.length ?? 0;
 
-    if (length < minOccurs) {
+    final int totalCount = selectedOptionsCount + openStringsCount;
+
+    if (!(questionnaireItemModel.questionnaireItem.repeats?.value ?? false)) {
+      if (totalCount != 1) {
+        return lookupFDashLocalizations(locale)
+            .validatorSingleSelectionOrSingleOpenString(openLabel.plainText);
+      }
+    }
+
+    if (totalCount < minOccurs) {
       return lookupFDashLocalizations(locale).validatorMinOccurs(minOccurs);
     }
 
-    if (maxOccurs != null && length > maxOccurs!) {
+    if (maxOccurs != null && totalCount > maxOccurs!) {
       return lookupFDashLocalizations(locale).validatorMaxOccurs(maxOccurs!);
     }
   }
@@ -280,37 +304,32 @@ class CodingAnswerModel extends AnswerModel<Set<String>, Set<String>> {
   List<QuestionnaireResponseAnswer>? createFhirCodingAnswers(
     List<QuestionnaireResponseItem>? items,
   ) {
-    final value = this.value;
+    final selectedOptions = value?.selectedOptions;
 
-    if (value == null) {
+    if (selectedOptions == null) {
       return null;
     }
 
-    final responses = value.map<QuestionnaireResponseAnswer>((uid) {
-      if (uid != CodingAnswerOptionModel.openChoiceCode) {
-        final answerOption = answerOptionByUid(uid);
-        final answerExtensions = <FhirExtension>[
-          if (answerOption.hasMedia)
-            FhirExtension(
-              url: FhirUri(
-                'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemAnswerMedia',
-              ),
-              valueAttachment: answerOption.mediaAttachment,
+    final responses = selectedOptions.map<QuestionnaireResponseAnswer>((uid) {
+      final answerOption = answerOptionByUid(uid);
+      final answerExtensions = <FhirExtension>[
+        if (answerOption.hasMedia)
+          FhirExtension(
+            url: FhirUri(
+              'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemAnswerMedia',
             ),
-        ];
+            valueAttachment: answerOption.mediaAttachment,
+          ),
+      ];
 
-        return QuestionnaireResponseAnswer(
-          extension_: (answerExtensions.isNotEmpty) ? answerExtensions : null,
-          valueCoding: answerOption.createFhirCoding(),
-          item: items,
-        );
-      } else {
-        return QuestionnaireResponseAnswer(
-          valueCoding: Coding(display: openText),
-          item: items,
-        );
-      }
+      return QuestionnaireResponseAnswer(
+        extension_: (answerExtensions.isNotEmpty) ? answerExtensions : null,
+        valueCoding: answerOption.createFhirCoding(),
+        item: items,
+      );
     }).toList(growable: false);
+
+    // FIXME: Add openStrings
 
     return responses;
   }
@@ -326,37 +345,84 @@ class CodingAnswerModel extends AnswerModel<Set<String>, Set<String>> {
     throw UnimplementedError('populate not implemented.');
   }
 
-  @override
-  void populateCodingAnswers(List<QuestionnaireResponseAnswer>? answers) {
-    if (answers == null) {
-      return;
-    }
-
-    final popSet = <String>{};
-    for (final answer in answers) {
-      final matchCode = answer.valueCoding?.code?.value ??
-          answer.valueCoding?.display ??
-          answer.valueString;
-
-      // TODO: Not yet possible, due to open-choice
-/*      if (matchCode == null) {
-        throw QuestionnaireFormatException(
-          'QuestionnaireResponseAnswer $answer requires either a valueCoding or a valueString.',
-        );
-      }
-*/
+  void populateFromCodings(
+    Iterable<Coding> codings,
+    Iterable<String> openStrings,
+  ) {
+    final selectedOptions = <String>{};
+    for (final coding in codings) {
+      final matchCode = coding.code?.value ?? coding.display;
 
       final matchingOption = answerOptions
           .firstWhereOrNull((answerOption) => answerOption.matches(matchCode));
 
       if (matchingOption != null) {
-        popSet.add(matchingOption.uid);
+        selectedOptions.add(matchingOption.uid);
       } else {
-        popSet.add(CodingAnswerOptionModel.openChoiceCode);
-        openText = answer.valueCoding?.display ?? answer.valueString;
+        _logger.warn(
+          'initial.valueCoding $coding at ${responseItemModel.nodeUid} does not match any answer option.',
+        );
       }
     }
 
-    value = (popSet.isNotEmpty) ? popSet : null;
+    value =
+        OptionsOrString.fromSelectionsAndStrings(selectedOptions, openStrings);
+  }
+
+  @override
+  void populateCodingAnswers(List<QuestionnaireResponseAnswer>? answers) {
+    if (answers == null) {
+      // TODO: Should this rather result in an empty (value = null) answer?
+      return;
+    }
+
+    final openStrings = <String>[];
+
+    final selectedOptions = <String>{};
+    for (final answer in answers) {
+      final matchCode = answer.valueCoding?.code?.value ??
+          answer.valueCoding?.display ??
+          answer.valueString;
+
+      final matchingOption = answerOptions
+          .firstWhereOrNull((answerOption) => answerOption.matches(matchCode));
+
+      if (matchingOption != null) {
+        selectedOptions.add(matchingOption.uid);
+      } else {
+        final newOpenString = answer.valueCoding?.display ?? answer.valueString;
+        if (newOpenString != null) {
+          openStrings.add(newOpenString);
+        }
+      }
+    }
+
+    value =
+        OptionsOrString.fromSelectionsAndStrings(selectedOptions, openStrings);
+  }
+}
+
+/// DTO to hold selected options and/or open free-text strings.
+///
+/// Modeled according to the FHIR R5 answerConstraint of the same name.
+class OptionsOrString {
+  final Set<String>? selectedOptions;
+  final Iterable<String>? openStrings;
+
+  const OptionsOrString._(this.selectedOptions, this.openStrings);
+
+  static OptionsOrString? fromSelectionsAndStrings(
+    Set<String>? selectedOptions,
+    Iterable<String>? openStrings,
+  ) {
+    if ((selectedOptions == null || selectedOptions.isEmpty) &&
+        (openStrings == null || openStrings.isEmpty)) {
+      return null;
+    }
+
+    return OptionsOrString._(
+      (selectedOptions?.isEmpty ?? true) ? null : selectedOptions,
+      (openStrings?.isEmpty ?? true) ? null : openStrings,
+    );
   }
 }

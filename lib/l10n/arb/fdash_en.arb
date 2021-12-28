@@ -60,6 +60,12 @@
             "maxOccurs": {}
         }
     },
+    "validatorSingleSelectionOrSingleOpenString": "Either select an option, or enter free text in \"{openLabel}\".",
+    "@validatorSingleSelectionOrSingleOpenString": {
+        "placeholders": {
+            "openLabel": {}
+        }
+    },
     "dataAbsentReasonAskedDeclinedInputLabel": "I choose not to answer.",
     "dataAbsentReasonAskedDeclinedOutput": "Declined to answer",
     "dataAbsentReasonAsTextOutput": "[AS TEXT]",

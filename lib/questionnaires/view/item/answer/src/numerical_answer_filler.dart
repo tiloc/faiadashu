@@ -153,14 +153,14 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
                   children: [
                     const SizedBox(width: 8.0),
                     if (lowerSliderLabel != null)
-                      Xhtml.fromXhtmlString(
+                      Xhtml.fromRenderingString(
                         context,
                         lowerSliderLabel,
                         defaultTextStyle: Theme.of(context).textTheme.button,
                       ),
                     const Expanded(child: SizedBox()),
                     if (upperSliderLabel != null)
-                      Xhtml.fromXhtmlString(
+                      Xhtml.fromRenderingString(
                         context,
                         upperSliderLabel,
                         defaultTextStyle: Theme.of(context).textTheme.button,

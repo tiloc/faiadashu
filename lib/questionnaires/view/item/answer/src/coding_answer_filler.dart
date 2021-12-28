@@ -1,11 +1,7 @@
 import 'package:faiadashu/faiadashu.dart';
-import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
 /// Answer questions which require code(s) as a response.
-///
-/// R5 release of the FHIR standard will have a `coding` item type,
-/// and model the "openness" in a separate extension.
 class CodingAnswerFiller extends QuestionnaireAnswerFiller {
   CodingAnswerFiller(
     QuestionResponseItemFillerState responseFillerState,
@@ -16,21 +12,44 @@ class CodingAnswerFiller extends QuestionnaireAnswerFiller {
   State<StatefulWidget> createState() => _CodingAnswerState();
 }
 
-class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
+class _CodingAnswerState extends QuestionnaireAnswerFillerState<OptionsOrString,
     CodingAnswerFiller, CodingAnswerModel> {
-  late final TextEditingController? _openTextController;
+  late final TextEditingController? _openStringController;
 
   _CodingAnswerState();
 
   @override
   void postInitState() {
-    if (qi.type == QuestionnaireItemType.open_choice) {
-      _openTextController = TextEditingController(text: answerModel.openText);
+    if (answerModel.isOptionsOrString) {
+      // TODO: Add support for multiple open strings.
+      final openStrings = answerModel.value?.openStrings;
+      final initialOpenString = openStrings != null ? openStrings.first : '';
+      _openStringController = TextEditingController(text: initialOpenString);
     }
   }
 
   @override
   Widget buildInputControl(BuildContext context) {
+    final errorText = answerModel.displayErrorText;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildCodingControl(context),
+        if (answerModel.isOptionsOrString) _buildOpenStringsControl(context),
+        if (errorText != null)
+          Text(
+            errorText,
+            style: Theme.of(context)
+                .textTheme
+                .caption
+                ?.copyWith(color: Theme.of(context).errorColor),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildCodingControl(BuildContext context) {
     try {
       // Only checkbox choices currently support repeating answers.
       if (qi.repeats?.value ?? false) {
@@ -74,7 +93,10 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
       answerModel: answerModel,
       errorText: answerModel.displayErrorText,
       onChanged: (uid) {
-        answerModel.value = answerModel.selectOption(uid);
+        answerModel.value = OptionsOrString.fromSelectionsAndStrings(
+          answerModel.selectOption(uid),
+          answerModel.value?.openStrings,
+        );
       },
     );
   }
@@ -89,13 +111,12 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
                     questionnaireTheme.horizontalCodingBreakpoint
             ? _HorizontalCodingChoices(
                 firstFocusNode: firstFocusNode,
+                answerModel: answerModel,
                 choices: choices,
-                errorText: answerModel.displayErrorText,
               )
             : _VerticalCodingChoices(
                 firstFocusNode: firstFocusNode,
                 answerModel: answerModel,
-                errorText: answerModel.displayErrorText,
                 choices: choices,
               );
       },
@@ -123,7 +144,10 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
       },
       onSelected: (answerModel.isControlEnabled)
           ? (CodingAnswerOptionModel selectedOption) {
-              answerModel.value = answerModel.selectOption(selectedOption.uid);
+              answerModel.value = OptionsOrString.fromSelectionsAndStrings(
+                answerModel.selectOption(selectedOption.uid),
+                answerModel.value?.openStrings,
+              );
             }
           : null,
     );
@@ -145,7 +169,11 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
             groupValue: answerModel.singleSelectionUid,
             onChanged: (answerModel.isControlEnabled)
                 ? (String? newValue) {
-                    answerModel.value = answerModel.selectOption(newValue);
+                    answerModel.value =
+                        OptionsOrString.fromSelectionsAndStrings(
+                      answerModel.selectOption(newValue),
+                      answerModel.value?.openStrings,
+                    );
                   }
                 : null,
           ),
@@ -155,10 +183,6 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
     for (final answerOption in answerModel.answerOptions) {
       final styledOptionTitle =
           _createStyledOption(context, answerModel, answerOption);
-
-      if (answerOption.uid == CodingAnswerOptionModel.openChoiceCode) {
-        continue;
-      }
 
       choices.add(
         isMultipleChoice
@@ -174,7 +198,11 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
                               final newValue = answerModel.toggleOption(
                                 answerOption.uid,
                               );
-                              answerModel.value = newValue;
+                              answerModel.value =
+                                  OptionsOrString.fromSelectionsAndStrings(
+                                newValue,
+                                answerModel.value?.openStrings,
+                              );
                             }
                           : null,
                     ),
@@ -189,7 +217,11 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
                               final newValue = answerModel.toggleOption(
                                 answerOption.uid,
                               );
-                              answerModel.value = newValue;
+                              answerModel.value =
+                                  OptionsOrString.fromSelectionsAndStrings(
+                                newValue,
+                                answerModel.value?.openStrings,
+                              );
                             }
                           : null,
                     ),
@@ -205,7 +237,10 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
                       ? (String? newValue) {
                           Focus.of(context).requestFocus();
                           answerModel.value =
-                              answerModel.selectOption(newValue);
+                              OptionsOrString.fromSelectionsAndStrings(
+                            answerModel.selectOption(newValue),
+                            answerModel.value?.openStrings,
+                          );
                         }
                       : null,
                 ),
@@ -213,42 +248,43 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<Set<String>,
       );
     }
 
-    if (qi.type == QuestionnaireItemType.open_choice) {
-      choices.add(
-        Focus(
-          child: RadioListTile<String>(
-            value: CodingAnswerOptionModel.openChoiceCode,
-            groupValue: (answerModel.value
-                        ?.contains(CodingAnswerOptionModel.openChoiceCode) ??
-                    false)
-                ? CodingAnswerOptionModel.openChoiceCode
-                : null,
-            onChanged: (answerModel.isControlEnabled)
-                ? (String? newValue) {
-                    Focus.of(context).requestFocus();
-                    answerModel.value = answerModel
-                        .selectOption(CodingAnswerOptionModel.openChoiceCode);
-                  }
-                : null,
-            title: TextFormField(
-              controller: _openTextController,
-              enabled: answerModel.isControlEnabled,
-              onChanged: (newText) {
-                answerModel.openText = newText;
-                answerModel.value = answerModel
-                    .selectOption(CodingAnswerOptionModel.openChoiceCode);
-              },
-            ),
-            secondary: Xhtml.fromXhtmlString(
-              context,
-              answerModel.openLabel,
+    return choices;
+  }
+
+  Widget _buildOpenStringsControl(BuildContext context) {
+    return Row(
+      children: [
+        Xhtml.fromRenderingString(
+          context,
+          answerModel.openLabel,
+          defaultTextStyle: Theme.of(context)
+              .textTheme
+              .bodyText1
+              ?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(
+          width: 16.0,
+        ),
+        Expanded(
+          child: TextFormField(
+            controller: _openStringController,
+            enabled: answerModel.isControlEnabled,
+            onChanged: (newText) {
+              answerModel.value = OptionsOrString.fromSelectionsAndStrings(
+                answerModel.value?.selectedOptions,
+                newText.isNotEmpty ? [newText] : null,
+              );
+            },
+            decoration: InputDecoration(
+              // Empty error texts triggers red border, but showing text would result in a duplicate.
+              errorText: (answerModel.displayErrorText?.isNotEmpty ?? false)
+                  ? ''
+                  : null,
             ),
           ),
         ),
-      );
-    }
-
-    return choices;
+      ],
+    );
   }
 }
 
@@ -277,7 +313,7 @@ Widget _createStyledOption(
     if (optionPrefix != null) optionPrefix,
     optionText,
   ].concatenateXhtml(' ', '&nbsp;');
-  final styledOptionTitle = Xhtml.fromXhtmlString(
+  final styledOptionTitle = Xhtml.fromRenderingString(
     context,
     optionTitle,
     questionnaireModel:
@@ -335,7 +371,11 @@ class _CodingDropdown extends StatelessWidget {
       onChanged: answerModel.isControlEnabled ? onChanged : null,
       focusNode: firstFocusNode,
       items: dropdownItems,
-      decoration: InputDecoration(errorText: answerModel.displayErrorText),
+      decoration: InputDecoration(
+        // Empty error texts triggers red border, but showing text would result in a duplicate.
+        errorText:
+            (answerModel.displayErrorText?.isNotEmpty ?? false) ? '' : null,
+      ),
     );
   }
 }
@@ -345,18 +385,16 @@ class _VerticalCodingChoices extends StatelessWidget {
     Key? key,
     required this.firstFocusNode,
     required this.answerModel,
-    required this.errorText,
     required this.choices,
   }) : super(key: key);
 
   final FocusNode firstFocusNode;
   final CodingAnswerModel answerModel;
-  final String? errorText;
   final List<Widget> choices;
 
   @override
   Widget build(BuildContext context) {
-    final errorText = this.errorText;
+    final hasError = answerModel.displayErrorText != null;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -368,7 +406,7 @@ class _VerticalCodingChoices extends StatelessWidget {
             shape: (firstFocusNode.hasFocus && answerModel.isControlEnabled)
                 ? RoundedRectangleBorder(
                     side: BorderSide(
-                      color: (errorText == null)
+                      color: hasError
                           ? Theme.of(context).colorScheme.secondary
                           : Theme.of(context).colorScheme.error,
                       width: 2.0,
@@ -383,14 +421,6 @@ class _VerticalCodingChoices extends StatelessWidget {
             ),
           ),
         ),
-        if (errorText != null)
-          Text(
-            errorText,
-            style: Theme.of(context)
-                .textTheme
-                .caption
-                ?.copyWith(color: Theme.of(context).errorColor),
-          ),
       ],
     );
   }
@@ -400,16 +430,18 @@ class _HorizontalCodingChoices extends StatelessWidget {
   const _HorizontalCodingChoices({
     Key? key,
     required this.firstFocusNode,
+    required this.answerModel,
     required this.choices,
-    required this.errorText,
   }) : super(key: key);
 
   final FocusNode firstFocusNode;
+  final CodingAnswerModel answerModel;
   final List<Widget> choices;
-  final String? errorText;
 
   @override
   Widget build(BuildContext context) {
+    final hasError = answerModel.displayErrorText != null;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -420,7 +452,9 @@ class _HorizontalCodingChoices extends StatelessWidget {
             shape: (firstFocusNode.hasFocus)
                 ? RoundedRectangleBorder(
                     side: BorderSide(
-                      color: Theme.of(context).colorScheme.secondary,
+                      color: hasError
+                          ? Theme.of(context).colorScheme.secondary
+                          : Theme.of(context).colorScheme.error,
                       width: 2.0,
                     ),
                     borderRadius: BorderRadius.circular(4.0),
@@ -430,14 +464,6 @@ class _HorizontalCodingChoices extends StatelessWidget {
             child: Table(children: [TableRow(children: choices)]),
           ),
         ),
-        if (errorText != null)
-          Text(
-            errorText!,
-            style: Theme.of(context)
-                .textTheme
-                .caption!
-                .copyWith(color: Theme.of(context).errorColor),
-          ),
       ],
     );
   }

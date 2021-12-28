@@ -35,6 +35,7 @@ class _GroupItemState extends ResponseItemFillerState<GroupItem> {
         return widget.responseItemModel.displayVisibility !=
                 DisplayVisibility.hidden
             ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (titleWidget != null) titleWidget,
                   if (errorText != null)
