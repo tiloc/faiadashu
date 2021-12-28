@@ -325,6 +325,17 @@ class QuestionItemModel extends ResponseItemModel {
             case QuestionnaireItemType.string:
               firstAnswerModel.populateFromExpression(initialValue.valueString);
               break;
+            case QuestionnaireItemType.date:
+              firstAnswerModel.populateFromExpression(initialValue.valueDate);
+              break;
+            case QuestionnaireItemType.datetime:
+              firstAnswerModel
+                  .populateFromExpression(initialValue.valueDateTime);
+              break;
+            case QuestionnaireItemType.boolean:
+              firstAnswerModel
+                  .populateFromExpression(initialValue.valueBoolean);
+              break;
             default:
               // TODO: Implement for more types
               _qimLogger.warn(

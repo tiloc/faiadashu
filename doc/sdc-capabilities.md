@@ -122,7 +122,7 @@ Question items share many commonalities. Individual item types may offer additio
 Supported. Displays the guidance text next to the input control.
 
 ###### initial
-Supported for `integer`, `decimal`, and `string` 
+Supported for `integer`, `decimal`, `string`, `bool`, `date`, `datetime` 
 
 ###### required
 Supported 

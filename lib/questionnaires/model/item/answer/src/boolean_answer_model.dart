@@ -36,6 +36,24 @@ class BooleanAnswerModel extends AnswerModel<Boolean, Boolean> {
   bool get isEmpty => value == null;
 
   @override
+  void populateFromExpression(dynamic evaluationResult) {
+    if (evaluationResult == null) {
+      value = null;
+
+      return;
+    }
+
+    if (evaluationResult is Boolean) {
+      value = evaluationResult;
+    } else if (evaluationResult is bool) {
+      value = Boolean(evaluationResult);
+    } else {
+      // Non-empty, non-booleans are true
+      value = Boolean(true);
+    }
+  }
+
+  @override
   void populate(QuestionnaireResponseAnswer answer) {
     value = answer.valueBoolean;
   }

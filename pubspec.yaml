@@ -25,12 +25,12 @@ environment:
 
 dependencies:
   collection: ^1.15.0
-  fhir: ^0.5.0-11
+#  fhir: ^0.5.0-11
 #  fhir_path: ^0.5.0-17
+  fhir:
+    path: /Users/tilo/Projects/fhir/fhir
   fhir_path:
     path: /Users/tilo/Projects/fhir/fhir_path
-#  fhir:
-#    path: /Users/tilo/Projects/fhir/fhir
   flutter:
     sdk: flutter
   flutter_localizations:
@@ -49,6 +49,10 @@ dev_dependencies:
     sdk: flutter
 
   lint: ^1.8.1
+
+dependency_overrides:
+  fhir:
+    path: /Users/tilo/Projects/fhir/fhir
 
 
 # For information on the generic Dart part of this file, see the

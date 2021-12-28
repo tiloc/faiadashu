@@ -311,9 +311,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
   Quantity? _valueFromNumber(dynamic inputNumber) {
     final unitCoding = qi.computableUnit;
 
-    // OPTIMIZE: Submit improvement to Grey: Decimal factory should accept Decimal inValue
-    final quantityValue =
-        (inputNumber is Decimal) ? inputNumber : Decimal(inputNumber);
+    final quantityValue = Decimal(inputNumber);
 
     return Quantity(
       value: quantityValue,
@@ -353,7 +351,7 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
             ? Quantity(value: answer.valueDecimal)
             : (answer.valueInteger != null && answer.valueInteger!.isValid)
                 ? Quantity(
-                    value: Decimal(answer.valueInteger!.value!.toDouble()),
+                    value: Decimal(answer.valueInteger),
                   )
                 : null);
   }

@@ -412,6 +412,18 @@ class _HomePageState extends State<HomePage> {
                 uploadResponseFunction: uploadResponseFunction,
               ),
               QuestionnaireLaunchTile(
+                title: 'initial.value[x] Test',
+                subtitle:
+                    'Tests the correct implementation of initial.value[x] on various data types.',
+                fhirResourceProvider: resourceBundleProvider,
+                launchContext: launchContext,
+                questionnairePath:
+                    'assets/instruments/questionnaire-initialx.json',
+                saveResponseFunction: _saveResponse,
+                restoreResponseFunction: _restoreResponse,
+                uploadResponseFunction: uploadResponseFunction,
+              ),
+              QuestionnaireLaunchTile(
                 title: 'Argonaut Questionnaire Sampler',
                 subtitle:
                     'Reference sample from the Argonaut Questionnaire Implementation Guide.',
