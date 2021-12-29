@@ -48,9 +48,9 @@ abstract class QuestionnaireAnswerFillerState<
   void initState() {
     super.initState();
 
-    try {
-      answerModelError = null;
+    Object? answerModelError;
 
+    try {
       firstFocusNode = FocusNode(
         debugLabel:
             'AnswerFiller firstFocusNode: ${widget.responseItemModel.nodeUid}',
@@ -63,6 +63,8 @@ abstract class QuestionnaireAnswerFillerState<
         error: exception,
       );
       answerModelError = exception;
+    } finally {
+      this.answerModelError = answerModelError;
     }
   }
 
