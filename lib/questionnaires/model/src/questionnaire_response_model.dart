@@ -205,8 +205,14 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     questionnaireResponseModel
         .addListener(questionnaireResponseModel._updateCalculations);
 
-    // Set up enableWhen behavior on items
+    // Set up dynamic enableWhen behavior on items
     questionnaireResponseModel._activateEnablement();
+
+    // Calculate visibility for every item
+    for (final fillerItemModel
+        in questionnaireResponseModel.orderedFillerItemModels()) {
+      fillerItemModel.handleResponseStatusChange();
+    }
 
     return questionnaireResponseModel;
   }
@@ -586,6 +592,11 @@ class QuestionnaireResponseModel extends ChangeNotifier {
       (fim) => fim.isDynamicallyEnabled,
     )) {
       fim.updateEnabled();
+    }
+
+    // Go over all items, since the previous loop would not catch
+    // updates in descendants.
+    for (final fim in orderedFillerItemModels()) {
       hasEnablementChanged |= fim.enableNextGeneration();
     }
 

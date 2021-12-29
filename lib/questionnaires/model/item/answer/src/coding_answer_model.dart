@@ -226,25 +226,22 @@ class CodingAnswerModel extends AnswerModel<OptionsOrString, OptionsOrString> {
       return RenderingString.nullText;
     }
 
-    final selectedOptions = value.selectedOptions;
-    if (selectedOptions == null || selectedOptions.isEmpty) {
+    final renderingStrings = (value.selectedOptions?.map<RenderingString>(
+              (uid) => answerOptionByUid(uid).optionText,
+            ) ??
+            <RenderingString>[])
+        .followedBy(
+      value.openStrings?.map<RenderingString>(
+            (openString) => RenderingString.fromText(openString),
+          ) ??
+          <RenderingString>[],
+    );
+
+    if (renderingStrings.isEmpty) {
       return RenderingString.nullText;
     }
 
-    final openStrings = value.openStrings;
-
-    final renderingStrings = selectedOptions
-        .map<RenderingString>((uid) => answerOptionByUid(uid).optionText)
-        .followedBy(
-          hasOpenStrings
-              ? openStrings!.map<RenderingString>(
-                  (openString) => RenderingString.fromText(openString),
-                )
-              : <RenderingString>[],
-        );
-
     // TODO: Localized or themed separator character?
-
     return renderingStrings.concatenateXhtml('; ');
   }
 
@@ -304,34 +301,42 @@ class CodingAnswerModel extends AnswerModel<OptionsOrString, OptionsOrString> {
   List<QuestionnaireResponseAnswer>? createFhirCodingAnswers(
     List<QuestionnaireResponseItem>? items,
   ) {
-    final selectedOptions = value?.selectedOptions;
+    final optionResponses =
+        value?.selectedOptions?.map<QuestionnaireResponseAnswer>((uid) {
+              final answerOption = answerOptionByUid(uid);
+              final answerExtensions = <FhirExtension>[
+                if (answerOption.hasMedia)
+                  FhirExtension(
+                    url: FhirUri(
+                      'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemAnswerMedia',
+                    ),
+                    valueAttachment: answerOption.mediaAttachment,
+                  ),
+              ];
 
-    if (selectedOptions == null) {
-      return null;
-    }
+              return QuestionnaireResponseAnswer(
+                extension_:
+                    (answerExtensions.isNotEmpty) ? answerExtensions : null,
+                valueCoding: answerOption.createFhirCoding(),
+                item: items,
+              );
+            }) ??
+            <QuestionnaireResponseAnswer>[];
 
-    final responses = selectedOptions.map<QuestionnaireResponseAnswer>((uid) {
-      final answerOption = answerOptionByUid(uid);
-      final answerExtensions = <FhirExtension>[
-        if (answerOption.hasMedia)
-          FhirExtension(
-            url: FhirUri(
-              'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemAnswerMedia',
-            ),
-            valueAttachment: answerOption.mediaAttachment,
+    // Add openStrings
+    final openStringResponses = value?.openStrings?.map(
+          (openString) => QuestionnaireResponseAnswer(
+            valueString: openString,
+            item: items,
           ),
-      ];
+        ) ??
+        <QuestionnaireResponseAnswer>[];
 
-      return QuestionnaireResponseAnswer(
-        extension_: (answerExtensions.isNotEmpty) ? answerExtensions : null,
-        valueCoding: answerOption.createFhirCoding(),
-        item: items,
-      );
-    }).toList(growable: false);
+    final allResponses = optionResponses.followedBy(openStringResponses);
 
-    // FIXME: Add openStrings
-
-    return responses;
+    return allResponses.isNotEmpty
+        ? allResponses.toList(growable: false)
+        : null;
   }
 
   @override
