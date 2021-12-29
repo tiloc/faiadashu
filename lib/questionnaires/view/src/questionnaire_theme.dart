@@ -38,8 +38,12 @@ class QuestionnaireTheme {
   static const defaultMaxLinesForTextItem = 4;
   final int maxLinesForTextItem;
 
-  static const defaultLandscapeBreakpoint = 1000.0;
-  final double landscapeBreakpoint;
+  static const defaultMaxItemWidth = 800.0;
+
+  /// The maximum width of the questionnaire items
+  ///
+  /// They will not use more width, even if the display is wider.
+  final double maxItemWidth;
 
   static const defaultCodingControlPreference = CodingControlPreference.compact;
   final CodingControlPreference codingControlPreference;
@@ -49,10 +53,10 @@ class QuestionnaireTheme {
     this.showNullAnswerOption = true,
     this.showProgress = true,
     this.autoCompleteThreshold = defaultAutoCompleteThreshold,
-    this.landscapeBreakpoint = defaultLandscapeBreakpoint,
     this.horizontalCodingBreakpoint = defaultHorizontalCodingBreakpoint,
     this.maxLinesForTextItem = defaultMaxLinesForTextItem,
     this.codingControlPreference = defaultCodingControlPreference,
+    this.maxItemWidth = defaultMaxItemWidth,
   });
 
   /// Returns a [QuestionnaireItemFiller] for a given [QuestionnaireResponseFiller].

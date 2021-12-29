@@ -39,7 +39,7 @@ class _DisplayItemState extends QuestionnaireItemFillerState<DisplayItem> {
                   ),
                 ],
               )
-            : const SizedBox(height: 16.0);
+            : const SizedBox.shrink();
       },
     );
   }

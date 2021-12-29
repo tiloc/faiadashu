@@ -7,8 +7,6 @@ import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-// TODO: Some calculations regarding focus + front matter maybe currently off.
-
 /// Fills a [Questionnaire] through a vertically scrolling input form.
 ///
 /// Takes the [QuestionnaireItemFiller]s as provided by the [QuestionnaireResponseFiller]
@@ -29,8 +27,6 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 /// wraps the list in a ready-made [Scaffold], incl. some commonly used buttons.
 class QuestionnaireScroller extends StatefulWidget {
   final Locale? locale;
-  final List<Widget>? frontMatter;
-  final List<Widget>? backMatter;
   final FhirResourceProvider fhirResourceProvider;
   final LaunchContext launchContext;
   final List<Aggregator<dynamic>>? aggregators;
@@ -47,8 +43,6 @@ class QuestionnaireScroller extends StatefulWidget {
     required this.scaffoldBuilder,
     required this.fhirResourceProvider,
     required this.launchContext,
-    this.frontMatter,
-    this.backMatter,
     this.aggregators,
     this.onLinkTap,
     this.questionnaireTheme = const QuestionnaireTheme(),
@@ -173,11 +167,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
         _belowFillerContext = context;
         final questionnaireFiller = QuestionnaireResponseFiller.of(context);
 
-        final mainMatterLength = questionnaireFiller.fillerItemModels.length;
-        final frontMatterLength = widget.frontMatter?.length ?? 0;
-        final backMatterLength = widget.backMatter?.length ?? 0;
-        final totalLength =
-            frontMatterLength + mainMatterLength + backMatterLength;
+        final totalLength = questionnaireFiller.fillerItemModels.length;
 
         _logger.trace(
           'Scroll position: ${_itemPositionsListener.itemPositions.value}',
@@ -191,33 +181,35 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
             setStateCallback: (fn) {
               setState(fn);
             },
-            child: ScrollablePositionedList.builder(
-              itemScrollController: _listScrollController,
-              itemPositionsListener: _itemPositionsListener,
-              itemCount: totalLength,
-              padding: const EdgeInsets.all(8),
-              minCacheExtent: 200, // Allow tabbing to prev/next items
-              itemBuilder: (BuildContext context, int i) {
-                final frontMatterIndex = (i < frontMatterLength) ? i : -1;
-                final mainMatterIndex = (i >= frontMatterLength &&
-                        i < (frontMatterLength + mainMatterLength))
-                    ? (i - frontMatterLength)
-                    : -1;
-                final backMatterIndex =
-                    (i >= (frontMatterLength + mainMatterLength) &&
-                            i < totalLength)
-                        ? (i - (frontMatterLength + mainMatterLength))
-                        : -1;
-                if (mainMatterIndex != -1) {
-                  return QuestionnaireResponseFiller.of(context)
-                      .itemFillerAt(mainMatterIndex);
-                } else if (backMatterIndex != -1) {
-                  return widget.backMatter![backMatterIndex];
-                } else if (frontMatterIndex != -1) {
-                  return widget.frontMatter![frontMatterIndex];
-                } else {
-                  throw StateError('ListView index out of bounds: $i');
-                }
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                const edgeInsets = 8.0;
+                const twice = 2;
+
+                return ScrollablePositionedList.builder(
+                  itemScrollController: _listScrollController,
+                  itemPositionsListener: _itemPositionsListener,
+                  itemCount: totalLength,
+                  padding: const EdgeInsets.all(edgeInsets),
+                  minCacheExtent: 200, // Allow tabbing to prev/next items
+                  itemBuilder: (BuildContext context, int i) {
+                    return Row(
+                      children: [
+                        Container(
+                          constraints: BoxConstraints(
+                            maxWidth: widget.questionnaireTheme.maxItemWidth.clamp(
+                              constraints.minWidth,
+                              constraints.maxWidth - twice * edgeInsets,
+                            ),
+                          ),
+                          child: QuestionnaireResponseFiller.of(context)
+                              .itemFillerAt(i),
+                        ),
+                        const Spacer(),
+                      ],
+                    );
+                  },
+                );
               },
             ),
           ),

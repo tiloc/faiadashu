@@ -95,8 +95,6 @@ class QuestionResponseItemFillerState
     return AnimatedBuilder(
       animation: widget.responseItemModel,
       builder: (context, _) {
-        const int twoThirds = 2;
-
         return widget.responseItemModel.displayVisibility !=
                 DisplayVisibility.hidden
             ? Focus(
@@ -105,68 +103,26 @@ class QuestionResponseItemFillerState
               debugDumpFocusTree();
             }, */
                 focusNode: focusNode,
-                child: LayoutBuilder(
-                  builder: (
-                    BuildContext context,
-                    BoxConstraints constraints,
-                  ) {
-                    // Wide landscape screen: Use horizontal layout
-                    return AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 500),
-                      child: (constraints.maxWidth >
-                              questionnaireTheme.landscapeBreakpoint)
-                          ? Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    if (titleWidget != null)
-                                      Expanded(
-                                        child: titleWidget!,
-                                      )
-                                    else
-                                      Expanded(child: Container()),
-                                    Expanded(
-                                      flex: twoThirds,
-                                      child: _buildAnswerFillers(context),
-                                    ),
-                                  ],
-                                ),
-                                if (promptText != null)
-                                  const SizedBox(height: 8.0),
-                                if (promptText != null)
-                                  Xhtml.fromRenderingString(
-                                    context,
-                                    promptText,
-                                  ),
-                                const SizedBox(height: 16.0),
-                              ],
-                            )
-                          // Narrow, portrait screen: Use vertical layout
-                          : Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                if (titleWidget != null)
-                                  Container(
-                                    padding: const EdgeInsets.only(top: 8),
-                                    child: titleWidget,
-                                  ),
-                                _buildAnswerFillers(context),
-                                if (promptText != null)
-                                  Xhtml.fromRenderingString(
-                                    context,
-                                    promptText,
-                                  ),
-                                const SizedBox(width: 8),
-                              ],
-                            ),
-                    );
-                  },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (titleWidget != null)
+                      Container(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: titleWidget,
+                      ),
+                    if (promptText != null)
+                      Xhtml.fromRenderingString(
+                        context,
+                        promptText,
+                      ),
+                    _buildAnswerFillers(context),
+                    const SizedBox(height: 32),
+                  ],
                 ),
               )
-            : const SizedBox();
+            : const SizedBox.shrink();
       },
     );
   }

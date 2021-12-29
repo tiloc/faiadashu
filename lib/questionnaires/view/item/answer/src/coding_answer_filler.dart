@@ -38,12 +38,15 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<OptionsOrString,
         _buildCodingControl(context),
         if (answerModel.isOptionsOrString) _buildOpenStringsControl(context),
         if (errorText != null)
-          Text(
-            errorText,
-            style: Theme.of(context)
-                .textTheme
-                .caption
-                ?.copyWith(color: Theme.of(context).errorColor),
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16.0),
+            child: Text(
+              errorText,
+              style: Theme.of(context)
+                  .textTheme
+                  .caption
+                  ?.copyWith(color: Theme.of(context).errorColor),
+            ),
           ),
       ],
     );
@@ -259,8 +262,8 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<OptionsOrString,
           answerModel.openLabel,
           defaultTextStyle: Theme.of(context)
               .textTheme
-              .bodyText1
-              ?.copyWith(fontWeight: FontWeight.bold),
+              .bodyText2
+              ?.copyWith(fontWeight: FontWeight.w500),
         ),
         const SizedBox(
           width: 16.0,

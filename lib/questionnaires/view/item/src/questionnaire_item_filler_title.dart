@@ -37,16 +37,23 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
 
       final requiredTag = (questionnaireItemModel.isRequired) ? '*' : '';
 
-      final openStyleTag = (questionnaireItemModel.isGroup) ? '<h2>' : '<b>';
+      final openStyleTag = questionnaireItemModel.isGroup
+          ? '<h2>'
+          : questionnaireItemModel.isQuestion
+              ? '<b>'
+              : '<p>';
 
-      final closeStyleTag =
-          (questionnaireItemModel.isGroup) ? '</h2>' : '$requiredTag</b>';
+      final closeStyleTag = questionnaireItemModel.isGroup
+          ? '</h2>'
+          : questionnaireItemModel.isQuestion
+              ? '</b>'
+              : '</p>';
 
       final prefixText = fillerItem.prefix;
 
       final htmlTitleText = (prefixText != null)
-          ? '$openStyleTag${prefixText.xhtmlText}&nbsp;${text.xhtmlText}$closeStyleTag'
-          : '$openStyleTag${text.xhtmlText}$closeStyleTag';
+          ? '$openStyleTag${prefixText.xhtmlText}&nbsp;${text.xhtmlText}$requiredTag$closeStyleTag'
+          : '$openStyleTag${text.xhtmlText}$requiredTag$closeStyleTag';
 
       return QuestionnaireItemFillerTitle._(
         questionnaireTheme: questionnaireTheme,
@@ -61,22 +68,41 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final leading = this.leading;
+    final help = this.help;
+
     return Container(
       alignment: AlignmentDirectional.centerStart,
       padding: const EdgeInsets.only(top: 8.0),
-      child: Text.rich(
-        TextSpan(
-          children: <InlineSpan>[
-            if (leading != null) WidgetSpan(child: leading!),
-            HTML.toTextSpan(
-              context,
-              htmlTitleText,
-              defaultTextStyle: Theme.of(context).textTheme.bodyText1,
+      child: Row(
+        children: [
+          Expanded(
+            child: Text.rich(
+              TextSpan(
+                children: <InlineSpan>[
+                  if (leading != null)
+                    WidgetSpan(
+                      alignment: PlaceholderAlignment.middle,
+                      child: leading,
+                    ),
+                  if (leading != null)
+                    const WidgetSpan(
+                      child: SizedBox(
+                        width: 16.0,
+                      ),
+                    ),
+                  HTML.toTextSpan(
+                    context,
+                    htmlTitleText,
+                    defaultTextStyle: Theme.of(context).textTheme.bodyText2,
+                  ),
+                ],
+              ),
+              semanticsLabel: semanticsLabel,
             ),
-            if (help != null) WidgetSpan(child: help!),
-          ],
-        ),
-        semanticsLabel: semanticsLabel,
+          ),
+          if (help != null) help,
+        ],
       ),
     );
   }
@@ -141,7 +167,7 @@ class _QuestionnaireItemFillerHelpState
           content: Xhtml.fromRenderingString(
             context,
             questionnaireItemModel.text ?? RenderingString.nullText,
-            defaultTextStyle: Theme.of(context).textTheme.bodyText1,
+            defaultTextStyle: Theme.of(context).textTheme.bodyText2,
           ),
           actions: <Widget>[
             OutlinedButton(
@@ -212,6 +238,7 @@ class _QuestionnaireItemFillerTitleLeading extends StatelessWidget {
 
       return _QuestionnaireItemFillerTitleLeading._(leadingWidget);
     } else {
+      // TODO: Should itemImage be inlined? Should its size be constrained?
       final itemImageWidget = ItemMediaImage.fromQuestionnaireItem(
         fillerItemModel.questionnaireItemModel,
         height: 24.0,

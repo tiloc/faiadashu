@@ -61,7 +61,7 @@ class _NarrativeTileState extends State<NarrativeTile> {
     _narrativeRichText = HTML.toRichText(
       context,
       div,
-      defaultTextStyle: Theme.of(context).textTheme.bodyText1,
+      defaultTextStyle: Theme.of(context).textTheme.bodyText2,
     );
   }
 

@@ -48,14 +48,9 @@ class _GroupItemState extends ResponseItemFillerState<GroupItem> {
                             ),
                       ),
                     ),
-                  const SizedBox(
-                    height: 16.0,
-                  ),
                 ],
               )
-            : const SizedBox(
-                height: 16.0,
-              );
+            : const SizedBox.shrink();
       },
     );
   }

@@ -1,7 +1,14 @@
 ## 0.6.0-dev.3
 * ### Faiadashu
-* Some support for initial.value[x]
-* Model visibility similar to R5 disabledDisplay extension
+* Reworked visual style
+  * More space after each question
+  * Maximum width is clamped and can be controlled
+  * Font defaults to bodyText2 (oddly, bodyText1 is not the default for Material widgets)
+  * Removed the ability to put the label to the left of the question (best practice by Norman Nielsen group)
+  * Better alignment + spacing for title elements (leading, help)
+* Support for `initial.value[x]`
+* Reworked the choice/open-choice/coding model.
+* Model visibility similar to R5 `disabledDisplay`
 * Remove many dependencies on centralized `ChangeNotifier` in QuestionnaireResponseModel  
   * Drastically reduced number of repaints
 * Drastic performance optimizations for evaluation of FHIRPath expressions

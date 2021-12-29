@@ -12,12 +12,6 @@ class QuestionnaireScrollerPage extends QuestionnaireScroller {
     required LaunchContext launchContext,
     Widget? floatingActionButton,
     List<Widget>? persistentFooterButtons,
-    List<Widget>? frontMatter,
-    List<Widget>? backMatter = const [
-      SizedBox(
-        height: 80,
-      ),
-    ],
     List<Aggregator<dynamic>>? aggregators,
     void Function(BuildContext context, Uri url)? onLinkTap,
     QuestionnaireTheme questionnaireTheme = const QuestionnaireTheme(),
@@ -39,8 +33,6 @@ class QuestionnaireScrollerPage extends QuestionnaireScroller {
           ),
           fhirResourceProvider: fhirResourceProvider,
           launchContext: launchContext,
-          frontMatter: frontMatter,
-          backMatter: backMatter,
           aggregators: aggregators,
           onLinkTap: onLinkTap,
           questionnaireTheme: questionnaireTheme,
