@@ -120,7 +120,11 @@ abstract class QuestionnaireAnswerFillerState<
         : AnimatedBuilder(
             animation: widget.responseItemModel,
             builder: (context, _) {
-              return createInputControl();
+              try {
+                return createInputControl();
+              } catch (ex) {
+                return BrokenQuestionnaireItem.fromException(ex);
+              }
             },
           );
   }

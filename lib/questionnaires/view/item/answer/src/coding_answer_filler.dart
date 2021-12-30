@@ -70,43 +70,38 @@ class _CodingInputControl extends AnswerInputControl<CodingAnswerModel> {
   }
 
   Widget _createCodingControl() {
-    try {
-      // Only checkbox choices currently support repeating answers.
-      if (qi.repeats?.value ?? false) {
-        return _createChoiceAnswers();
-      }
+    // Only checkbox choices currently support repeating answers.
+    if (qi.repeats?.value ?? false) {
+      return _createChoiceAnswers();
+    }
 
-      final isSmartAutoComplete = answerModel.numberOfOptions >
-          questionnaireTheme.autoCompleteThreshold;
+    final isSmartAutoComplete =
+        answerModel.numberOfOptions > questionnaireTheme.autoCompleteThreshold;
 
-      // Large numbers of responses require auto-complete control
-      if (answerModel.isAutocomplete || isSmartAutoComplete) {
-        return _CodingAutoComplete(
-          answerModel,
-          questionnaireTheme: questionnaireTheme,
-          focusNode: focusNode,
-        );
-      }
+    // Large numbers of responses require auto-complete control
+    if (answerModel.isAutocomplete || isSmartAutoComplete) {
+      return _CodingAutoComplete(
+        answerModel,
+        questionnaireTheme: questionnaireTheme,
+        focusNode: focusNode,
+      );
+    }
 
-      if (answerModel.isCheckbox || answerModel.isRadioButton) {
-        return _createChoiceAnswers();
-      }
+    if (answerModel.isCheckbox || answerModel.isRadioButton) {
+      return _createChoiceAnswers();
+    }
 
-      // Explicitly specified drop-down
-      if (answerModel.isDropdown) {
+    // Explicitly specified drop-down
+    if (answerModel.isDropdown) {
+      return _createDropdownAnswers();
+    }
+
+    // No explicitly specified control, let the theme decide.
+    switch (questionnaireTheme.codingControlPreference) {
+      case CodingControlPreference.compact:
         return _createDropdownAnswers();
-      }
-
-      // No explicitly specified control, let the theme decide.
-      switch (questionnaireTheme.codingControlPreference) {
-        case CodingControlPreference.compact:
-          return _createDropdownAnswers();
-        case CodingControlPreference.expanded:
-          return _createChoiceAnswers();
-      }
-    } catch (exception) {
-      // FIXME: This should be done one level higher up.
-      return BrokenQuestionnaireItem.fromException(exception);
+      case CodingControlPreference.expanded:
+        return _createChoiceAnswers();
     }
   }
 
@@ -119,52 +114,11 @@ class _CodingInputControl extends AnswerInputControl<CodingAnswerModel> {
   }
 
   Widget _createChoiceAnswers() {
-    final choices = _createChoices();
-
-    return LayoutBuilder(
-      builder: (BuildContext _, BoxConstraints constraints) {
-        return answerModel.isHorizontal &&
-                constraints.maxWidth >
-                    questionnaireTheme.horizontalCodingBreakpoint
-            ? _HorizontalCodingChoices(
-                answerModel,
-                choices,
-                focusNode: focusNode,
-                questionnaireTheme: questionnaireTheme,
-              )
-            : _VerticalCodingChoices(
-                answerModel,
-                choices,
-                focusNode: focusNode,
-                questionnaireTheme: questionnaireTheme,
-              );
-      },
+    return _CodingChoices(
+      answerModel,
+      questionnaireTheme: questionnaireTheme,
+      focusNode: focusNode,
     );
-  }
-
-  List<Widget> _createChoices() {
-    final isCheckBox = qi.isItemControl('check-box');
-    final isMultipleChoice = qi.repeats?.value ?? isCheckBox;
-    final isShowingNull = questionnaireTheme.showNullAnswerOption;
-
-    final choices = <Widget>[];
-
-    if (!isMultipleChoice) {
-      if (isShowingNull) {
-        choices.add(
-          _NullRadioChoice(answerModel),
-        );
-      }
-    }
-    for (final answerOption in answerModel.answerOptions) {
-      choices.add(
-        isMultipleChoice
-            ? _CheckboxChoice(answerModel, answerOption)
-            : _RadioChoice(answerModel, answerOption),
-      );
-    }
-
-    return choices;
   }
 }
 
@@ -414,6 +368,72 @@ class _VerticalCodingChoices extends AnswerInputControl<CodingAnswerModel> {
         ),
       ],
     );
+  }
+}
+
+class _CodingChoices extends AnswerInputControl<CodingAnswerModel> {
+  late final List<Widget> _choices;
+
+  _CodingChoices(
+    CodingAnswerModel answerModel, {
+    Key? key,
+    FocusNode? focusNode,
+    required QuestionnaireTheme questionnaireTheme,
+  }) : super(
+          answerModel,
+          questionnaireTheme: questionnaireTheme,
+          focusNode: focusNode,
+          key: key,
+        ) {
+    _choices = _createChoices();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (BuildContext _, BoxConstraints constraints) {
+        return answerModel.isHorizontal &&
+                constraints.maxWidth >
+                    questionnaireTheme.horizontalCodingBreakpoint
+            ? _HorizontalCodingChoices(
+                answerModel,
+                _choices,
+                focusNode: focusNode,
+                questionnaireTheme: questionnaireTheme,
+              )
+            : _VerticalCodingChoices(
+                answerModel,
+                _choices,
+                focusNode: focusNode,
+                questionnaireTheme: questionnaireTheme,
+              );
+      },
+    );
+  }
+
+  List<Widget> _createChoices() {
+    final isCheckBox = qi.isItemControl('check-box');
+    final isMultipleChoice = qi.repeats?.value ?? isCheckBox;
+    final isShowingNull = questionnaireTheme.showNullAnswerOption;
+
+    final choices = <Widget>[];
+
+    if (!isMultipleChoice) {
+      if (isShowingNull) {
+        choices.add(
+          _NullRadioChoice(answerModel),
+        );
+      }
+    }
+    for (final answerOption in answerModel.answerOptions) {
+      choices.add(
+        isMultipleChoice
+            ? _CheckboxChoice(answerModel, answerOption)
+            : _RadioChoice(answerModel, answerOption),
+      );
+    }
+
+    return choices;
   }
 }
 
