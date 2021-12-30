@@ -118,6 +118,9 @@ abstract class QuestionnaireAnswerFillerState<
     return answerModelError != null
         ? BrokenQuestionnaireItem.fromException(answerModelError)
         : AnimatedBuilder(
+            // FIXME: It should be possible to change this to answerModel, but leads to severe malfunctions
+            // Coding answers not working
+            // No redraw when validity of question item changes
             animation: widget.responseItemModel,
             builder: (context, _) {
               try {
