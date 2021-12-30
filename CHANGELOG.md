@@ -5,9 +5,11 @@
   * Maximum width is clamped and can be controlled
   * InputDecorations are now entirely driven by ThemeData
   * Style of filler for choice/open-choice/coding is determined by ThemeData
+  * Exclusive choices use checkbox instead of radio button. The old way was more "logical", but looked ugly
   * Font defaults to bodyText2 (oddly, bodyText1 is not the default for Material widgets)
   * Removed the ability to put the label to the left of the question (best practice by Norman Nielsen group)
   * Better alignment + spacing for title elements (leading, help)
+* WIP: Rework to move away from helper methods to small Widgets
 * Support for `initial.value[x]`
 * Reworked the choice/open-choice/coding model.
 * Model visibility similar to R5 `disabledDisplay`

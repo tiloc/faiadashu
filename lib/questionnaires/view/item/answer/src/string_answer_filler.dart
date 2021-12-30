@@ -15,7 +15,6 @@ class StringAnswerFiller extends QuestionnaireAnswerFiller {
 class _StringAnswerState extends QuestionnaireAnswerFillerState<String,
     StringAnswerFiller, StringAnswerModel> {
   final _editingController = TextEditingController();
-  late final TextInputType _keyboardType;
 
   _StringAnswerState();
 
@@ -35,8 +34,37 @@ class _StringAnswerState extends QuestionnaireAnswerFillerState<String,
         TextPosition(offset: initialValue.length),
       ),
     );
+  }
 
-    _keyboardType = const {
+  @override
+  Widget createInputControl() => _StringAnswerInputControl(
+        answerModel,
+        focusNode: firstFocusNode,
+        questionnaireTheme: questionnaireTheme,
+        editingController: _editingController,
+      );
+}
+
+class _StringAnswerInputControl extends AnswerInputControl<StringAnswerModel> {
+  final TextEditingController editingController;
+
+  const _StringAnswerInputControl(
+    StringAnswerModel answerModel, {
+    required this.editingController,
+    required QuestionnaireTheme questionnaireTheme,
+    FocusNode? focusNode,
+    Key? key,
+  }) : super(
+          answerModel,
+          focusNode: focusNode,
+          questionnaireTheme: questionnaireTheme,
+          key: key,
+        );
+
+  @override
+  Widget build(BuildContext context) {
+    final answerModel = this.answerModel;
+    final keyboardType = const {
       StringAnswerKeyboard.plain: TextInputType.text,
       StringAnswerKeyboard.email: TextInputType.emailAddress,
       StringAnswerKeyboard.phone: TextInputType.phone,
@@ -44,17 +72,14 @@ class _StringAnswerState extends QuestionnaireAnswerFillerState<String,
       StringAnswerKeyboard.url: TextInputType.url,
       StringAnswerKeyboard.multiline: TextInputType.multiline,
     }[answerModel.keyboard]!;
-  }
 
-  @override
-  Widget buildInputControl(BuildContext context) {
     return Container(
       padding: const EdgeInsets.only(top: 8, bottom: 8),
       child: TextFormField(
-        focusNode: firstFocusNode,
+        focusNode: focusNode,
         enabled: answerModel.isControlEnabled,
-        keyboardType: _keyboardType,
-        controller: _editingController,
+        keyboardType: keyboardType,
+        controller: editingController,
         maxLines: (qi.type == QuestionnaireItemType.text)
             ? questionnaireTheme.maxLinesForTextItem
             : 1,

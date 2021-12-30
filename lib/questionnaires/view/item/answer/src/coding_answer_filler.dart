@@ -14,29 +14,46 @@ class CodingAnswerFiller extends QuestionnaireAnswerFiller {
 
 class _CodingAnswerState extends QuestionnaireAnswerFillerState<OptionsOrString,
     CodingAnswerFiller, CodingAnswerModel> {
-  late final TextEditingController? _openStringController;
-
   _CodingAnswerState();
 
   @override
-  void postInitState() {
-    if (answerModel.isOptionsOrString) {
-      // TODO: Add support for multiple open strings.
-      final openStrings = answerModel.value?.openStrings;
-      final initialOpenString = openStrings != null ? openStrings.first : '';
-      _openStringController = TextEditingController(text: initialOpenString);
-    }
+  Widget createInputControl() {
+    return _CodingInputControl(
+      answerModel,
+      questionnaireTheme: questionnaireTheme,
+      focusNode: firstFocusNode,
+    );
   }
 
   @override
-  Widget buildInputControl(BuildContext context) {
+  // ignore: no-empty-block
+  void postInitState() {
+    // Intentionally do nothing
+  }
+}
+
+class _CodingInputControl extends AnswerInputControl<CodingAnswerModel> {
+  const _CodingInputControl(
+    CodingAnswerModel answerModel, {
+    Key? key,
+    FocusNode? focusNode,
+    required QuestionnaireTheme questionnaireTheme,
+  }) : super(
+          answerModel,
+          key: key,
+          focusNode: focusNode,
+          questionnaireTheme: questionnaireTheme,
+        );
+
+  @override
+  Widget build(BuildContext context) {
     final errorText = answerModel.displayErrorText;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildCodingControl(context),
-        if (answerModel.isOptionsOrString) _buildOpenStringsControl(context),
+        _createCodingControl(),
+        if (answerModel.isOptionsOrString) _OpenStringInputControl(answerModel),
         if (errorText != null)
           Container(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16.0),
@@ -52,11 +69,11 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<OptionsOrString,
     );
   }
 
-  Widget _buildCodingControl(BuildContext context) {
+  Widget _createCodingControl() {
     try {
       // Only checkbox choices currently support repeating answers.
       if (qi.repeats?.value ?? false) {
-        return _buildChoiceAnswers(context);
+        return _createChoiceAnswers();
       }
 
       final isSmartAutoComplete = answerModel.numberOfOptions >
@@ -64,71 +81,434 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<OptionsOrString,
 
       // Large numbers of responses require auto-complete control
       if (answerModel.isAutocomplete || isSmartAutoComplete) {
-        return _buildAutocompleteAnswers(context);
+        return _CodingAutoComplete(
+          answerModel,
+          questionnaireTheme: questionnaireTheme,
+          focusNode: focusNode,
+        );
       }
 
       if (answerModel.isCheckbox || answerModel.isRadioButton) {
-        return _buildChoiceAnswers(context);
+        return _createChoiceAnswers();
       }
 
       // Explicitly specified drop-down
       if (answerModel.isDropdown) {
-        return _buildDropdownAnswers(context);
+        return _createDropdownAnswers();
       }
 
       // No explicitly specified control, let the theme decide.
       switch (questionnaireTheme.codingControlPreference) {
         case CodingControlPreference.compact:
-          return _buildDropdownAnswers(context);
+          return _createDropdownAnswers();
         case CodingControlPreference.expanded:
-          return _buildChoiceAnswers(context);
+          return _createChoiceAnswers();
       }
     } catch (exception) {
+      // FIXME: This should be done one level higher up.
       return BrokenQuestionnaireItem.fromException(exception);
     }
   }
 
-  Widget _buildDropdownAnswers(BuildContext context) {
+  Widget _createDropdownAnswers() {
     return _CodingDropdown(
+      answerModel,
       questionnaireTheme: questionnaireTheme,
-      firstFocusNode: firstFocusNode,
-      locale: locale,
-      answerModel: answerModel,
-      errorText: answerModel.displayErrorText,
-      onChanged: (uid) {
-        answerModel.value = OptionsOrString.fromSelectionsAndStrings(
-          answerModel.selectOption(uid),
-          answerModel.value?.openStrings,
-        );
-      },
+      focusNode: focusNode,
     );
   }
 
-  Widget _buildChoiceAnswers(BuildContext context) {
-    final choices = _createChoices(context);
+  Widget _createChoiceAnswers() {
+    final choices = _createChoices();
 
     return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
+      builder: (BuildContext _, BoxConstraints constraints) {
         return answerModel.isHorizontal &&
                 constraints.maxWidth >
                     questionnaireTheme.horizontalCodingBreakpoint
             ? _HorizontalCodingChoices(
-                firstFocusNode: firstFocusNode,
-                answerModel: answerModel,
-                choices: choices,
+                answerModel,
+                choices,
+                focusNode: focusNode,
+                questionnaireTheme: questionnaireTheme,
               )
             : _VerticalCodingChoices(
-                firstFocusNode: firstFocusNode,
-                answerModel: answerModel,
-                choices: choices,
+                answerModel,
+                choices,
+                focusNode: focusNode,
+                questionnaireTheme: questionnaireTheme,
               );
       },
     );
   }
 
-  Widget _buildAutocompleteAnswers(BuildContext context) {
+  List<Widget> _createChoices() {
+    final isCheckBox = qi.isItemControl('check-box');
+    final isMultipleChoice = qi.repeats?.value ?? isCheckBox;
+    final isShowingNull = questionnaireTheme.showNullAnswerOption;
+
+    final choices = <Widget>[];
+
+    if (!isMultipleChoice) {
+      if (isShowingNull) {
+        choices.add(
+          _NullRadioChoice(answerModel),
+        );
+      }
+    }
+    for (final answerOption in answerModel.answerOptions) {
+      choices.add(
+        isMultipleChoice
+            ? _CheckboxChoice(answerModel, answerOption)
+            : _RadioChoice(answerModel, answerOption),
+      );
+    }
+
+    return choices;
+  }
+}
+
+class _StyledOption extends StatefulWidget {
+  final CodingAnswerModel answerModel;
+  final CodingAnswerOptionModel optionModel;
+
+  const _StyledOption(
+    this.answerModel,
+    this.optionModel, {
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  _StyledOptionState createState() => _StyledOptionState();
+}
+
+class _StyledOptionState extends State<_StyledOption> {
+  late Widget _cachedChild;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _cachedChild = _createStyledOption(context);
+  }
+
+  Widget _createStyledOption(
+    BuildContext context,
+  ) {
+    final optionModel = widget.optionModel;
+    final answerModel = widget.answerModel;
+
+    if (optionModel.hasMedia) {
+      final mediaWidget = ItemMediaImage.fromAnswerOption(
+        optionModel,
+        key: ValueKey<String>(
+          '${answerModel.nodeUid}-option-${optionModel.optionText.plainText}-media',
+        ),
+      );
+      if (mediaWidget != null) {
+        return mediaWidget;
+      }
+      // continue if widget generation failed for any reason...
+    }
+
+    final optionPrefix = optionModel.optionPrefix;
+    final optionText = optionModel.optionText;
+
+    final optionTitle = <RenderingString>[
+      if (optionPrefix != null) optionPrefix,
+      optionText,
+    ].concatenateXhtml(' ', '&nbsp;');
+    final styledOptionTitle = Xhtml.fromRenderingString(
+      context,
+      optionTitle,
+      questionnaireModel: answerModel
+          .responseItemModel.questionnaireItemModel.questionnaireModel,
+      imageWidth: 100,
+      imageHeight: 100,
+      key: ValueKey<String>(
+        '${answerModel.nodeUid}-option-${optionModel.optionText.plainText}-title',
+      ),
+    );
+
+    return styledOptionTitle;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _cachedChild;
+  }
+}
+
+class _CheckboxChoice extends StatelessWidget {
+  final CodingAnswerOptionModel answerOption;
+  final CodingAnswerModel answerModel;
+
+  const _CheckboxChoice(this.answerModel, this.answerOption, {Key? key})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Focus(
+      child: CheckboxListTile(
+        title: _StyledOption(
+          answerModel,
+          answerOption,
+        ),
+        value: answerModel.isSelected(answerOption.uid),
+        onChanged: (answerModel.isControlEnabled)
+            ? (bool? newValue) {
+                Focus.of(context).requestFocus();
+                final newValue = answerModel.toggleOption(
+                  answerOption.uid,
+                );
+                answerModel.value = OptionsOrString.fromSelectionsAndStrings(
+                  newValue,
+                  answerModel.value?.openStrings,
+                );
+              }
+            : null,
+      ),
+    );
+  }
+}
+
+class _NullRadioChoice extends StatelessWidget {
+  final CodingAnswerModel answerModel;
+
+  const _NullRadioChoice(this.answerModel, {Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return RadioListTile<String?>(
+      title: const NullDashText(),
+      value: null,
+      groupValue: answerModel.singleSelectionUid,
+      onChanged: (answerModel.isControlEnabled)
+          ? (String? newValue) {
+              answerModel.value = OptionsOrString.fromSelectionsAndStrings(
+                answerModel.selectOption(newValue),
+                answerModel.value?.openStrings,
+              );
+            }
+          : null,
+    );
+  }
+}
+
+class _RadioChoice extends StatelessWidget {
+  final CodingAnswerOptionModel answerOption;
+  final CodingAnswerModel answerModel;
+
+  const _RadioChoice(this.answerModel, this.answerOption, {Key? key})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Focus(
+      child: RadioListTile<String>(
+        title: _StyledOption(
+          answerModel,
+          answerOption,
+        ),
+        value: answerOption.uid,
+        // allows value to be set to null on repeat tap
+        toggleable: true,
+        groupValue: answerModel.singleSelectionUid,
+        onChanged: (answerModel.isControlEnabled)
+            ? (String? newValue) {
+                Focus.of(context).requestFocus();
+                answerModel.value = OptionsOrString.fromSelectionsAndStrings(
+                  answerModel.selectOption(newValue),
+                  answerModel.value?.openStrings,
+                );
+              }
+            : null,
+      ),
+    );
+  }
+}
+
+class _CodingDropdown extends AnswerInputControl<CodingAnswerModel> {
+  const _CodingDropdown(
+    CodingAnswerModel answerModel, {
+    Key? key,
+    FocusNode? focusNode,
+    required QuestionnaireTheme questionnaireTheme,
+  }) : super(
+          answerModel,
+          key: key,
+          focusNode: focusNode,
+          questionnaireTheme: questionnaireTheme,
+        );
+
+  @override
+  Widget build(BuildContext context) {
+    final dropdownItems = [
+      if (questionnaireTheme.showNullAnswerOption)
+        const DropdownMenuItem<String>(
+          child: NullDashText(),
+        ),
+      ...answerModel.answerOptions
+          .map<DropdownMenuItem<String>>((answerOption) {
+        return DropdownMenuItem<String>(
+          value: answerOption.uid,
+          child: _StyledOption(answerModel, answerOption),
+        );
+      }),
+    ];
+
+    return DropdownButtonFormField<String>(
+      isExpanded: true,
+      value: answerModel.singleSelectionUid,
+      onTap: () {
+        focusNode?.requestFocus();
+      },
+      onChanged: answerModel.isControlEnabled
+          ? (uid) {
+              answerModel.value = OptionsOrString.fromSelectionsAndStrings(
+                answerModel.selectOption(uid),
+                answerModel.value?.openStrings,
+              );
+            }
+          : null,
+      focusNode: focusNode,
+      items: dropdownItems,
+      decoration: InputDecoration(
+        // Empty error texts triggers red border, but showing text would result in a duplicate.
+        errorStyle:
+            const TextStyle(height: 0, color: Color.fromARGB(0, 0, 0, 0)),
+        errorText: answerModel.displayErrorText,
+      ),
+    );
+  }
+}
+
+class _VerticalCodingChoices extends AnswerInputControl<CodingAnswerModel> {
+  const _VerticalCodingChoices(
+    CodingAnswerModel answerModel,
+    this.choices, {
+    Key? key,
+    FocusNode? focusNode,
+    required QuestionnaireTheme questionnaireTheme,
+  }) : super(
+          answerModel,
+          key: key,
+          focusNode: focusNode,
+          questionnaireTheme: questionnaireTheme,
+        );
+
+  final List<Widget> choices;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _CodingChoiceDecorator(
+          answerModel,
+          focusNode: focusNode,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: choices,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _HorizontalCodingChoices extends AnswerInputControl<CodingAnswerModel> {
+  const _HorizontalCodingChoices(
+    CodingAnswerModel answerModel,
+    this.choices, {
+    Key? key,
+    FocusNode? focusNode,
+    required QuestionnaireTheme questionnaireTheme,
+  }) : super(
+          answerModel,
+          questionnaireTheme: questionnaireTheme,
+          focusNode: focusNode,
+          key: key,
+        );
+
+  final List<Widget> choices;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _CodingChoiceDecorator(
+          answerModel,
+          focusNode: focusNode,
+          child: Table(children: [TableRow(children: choices)]),
+        ),
+      ],
+    );
+  }
+}
+
+class _CodingChoiceDecorator extends StatelessWidget {
+  final AnswerModel answerModel;
+  final FocusNode? focusNode;
+  final Widget? child;
+
+  const _CodingChoiceDecorator(
+    this.answerModel, {
+    this.focusNode,
+    this.child,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Focus(
+      focusNode: focusNode,
+      child: AnimatedBuilder(
+        animation: Focus.of(context),
+        builder: (context, child) {
+          final hasError = answerModel.displayErrorText != null;
+          final decoTheme = Theme.of(context).inputDecorationTheme;
+
+          // TODO: Return something borderless when filled = true
+          return Card(
+            shape: Focus.of(context).hasFocus
+                ? hasError
+                    ? decoTheme.focusedErrorBorder
+                    : decoTheme.focusedBorder
+                : hasError
+                    ? decoTheme.errorBorder
+                    : answerModel.isControlEnabled
+                        ? decoTheme.enabledBorder
+                        : decoTheme.disabledBorder,
+            margin: const EdgeInsets.only(top: 8, bottom: 8),
+            child: child,
+          );
+        },
+        child: child,
+      ),
+    );
+  }
+}
+
+class _CodingAutoComplete extends AnswerInputControl<CodingAnswerModel> {
+  const _CodingAutoComplete(
+    CodingAnswerModel answerModel, {
+    Key? key,
+    FocusNode? focusNode,
+    required QuestionnaireTheme questionnaireTheme,
+  }) : super(
+          answerModel,
+          key: key,
+          focusNode: focusNode,
+          questionnaireTheme: questionnaireTheme,
+        );
+
+  @override
+  Widget build(BuildContext context) {
     return FDashAutocomplete<CodingAnswerOptionModel>(
-      focusNode: firstFocusNode,
+      focusNode: focusNode,
       answerModel: answerModel,
       initialValue: answerModel.singleSelection?.optionText.plainText,
       displayStringForOption: (answerOption) =>
@@ -155,106 +535,32 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<OptionsOrString,
           : null,
     );
   }
+}
 
-  List<Widget> _createChoices(BuildContext context) {
-    final isCheckBox = qi.isItemControl('check-box');
-    final isMultipleChoice = qi.repeats?.value ?? isCheckBox;
-    final isShowingNull = questionnaireTheme.showNullAnswerOption;
+/// Input field for a single open string.
+class _OpenStringInputControl extends StatefulWidget {
+  final CodingAnswerModel answerModel;
 
-    final choices = <Widget>[];
+  const _OpenStringInputControl(this.answerModel, {Key? key}) : super(key: key);
 
-    if (!isMultipleChoice) {
-      if (isShowingNull) {
-        choices.add(
-          RadioListTile<String?>(
-            title: const NullDashText(),
-            value: null,
-            groupValue: answerModel.singleSelectionUid,
-            onChanged: (answerModel.isControlEnabled)
-                ? (String? newValue) {
-                    answerModel.value =
-                        OptionsOrString.fromSelectionsAndStrings(
-                      answerModel.selectOption(newValue),
-                      answerModel.value?.openStrings,
-                    );
-                  }
-                : null,
-          ),
-        );
-      }
-    }
-    for (final answerOption in answerModel.answerOptions) {
-      final styledOptionTitle =
-          _createStyledOption(context, answerModel, answerOption);
+  @override
+  _OpenStringInputControlState createState() => _OpenStringInputControlState();
+}
 
-      choices.add(
-        isMultipleChoice
-            ? answerOption.isExclusive
-                ? Focus(
-                    child: RadioListTile<String>(
-                      title: styledOptionTitle,
-                      groupValue: answerModel.exclusiveSelectionUid,
-                      value: answerOption.uid,
-                      onChanged: (answerModel.isControlEnabled)
-                          ? (_) {
-                              Focus.of(context).requestFocus();
-                              final newValue = answerModel.toggleOption(
-                                answerOption.uid,
-                              );
-                              answerModel.value =
-                                  OptionsOrString.fromSelectionsAndStrings(
-                                newValue,
-                                answerModel.value?.openStrings,
-                              );
-                            }
-                          : null,
-                    ),
-                  )
-                : Focus(
-                    child: CheckboxListTile(
-                      title: styledOptionTitle,
-                      value: answerModel.isSelected(answerOption.uid),
-                      onChanged: (answerModel.isControlEnabled)
-                          ? (bool? newValue) {
-                              Focus.of(context).requestFocus();
-                              final newValue = answerModel.toggleOption(
-                                answerOption.uid,
-                              );
-                              answerModel.value =
-                                  OptionsOrString.fromSelectionsAndStrings(
-                                newValue,
-                                answerModel.value?.openStrings,
-                              );
-                            }
-                          : null,
-                    ),
-                  )
-            : Focus(
-                child: RadioListTile<String>(
-                  title: styledOptionTitle,
-                  value: answerOption.uid,
-                  // allows value to be set to null on repeat tap
-                  toggleable: true,
-                  groupValue: answerModel.singleSelectionUid,
-                  onChanged: (answerModel.isControlEnabled)
-                      ? (String? newValue) {
-                          Focus.of(context).requestFocus();
-                          answerModel.value =
-                              OptionsOrString.fromSelectionsAndStrings(
-                            answerModel.selectOption(newValue),
-                            answerModel.value?.openStrings,
-                          );
-                        }
-                      : null,
-                ),
-              ),
-      );
-    }
+class _OpenStringInputControlState extends State<_OpenStringInputControl> {
+  final TextEditingController _openStringController = TextEditingController();
 
-    return choices;
+  @override
+  void initState() {
+    super.initState();
+    _openStringController.text =
+        widget.answerModel.value?.openStrings?.first ?? '';
   }
 
-  Widget _buildOpenStringsControl(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
+    final answerModel = widget.answerModel;
+
     return Row(
       children: [
         Xhtml.fromRenderingString(
@@ -285,187 +591,6 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<OptionsOrString,
 
               errorText: answerModel.displayErrorText,
             ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-Widget _createStyledOption(
-  BuildContext context,
-  CodingAnswerModel answerModel,
-  CodingAnswerOptionModel optionModel,
-) {
-  if (optionModel.hasMedia) {
-    final mediaWidget = ItemMediaImage.fromAnswerOption(
-      optionModel,
-      key: ValueKey<String>(
-        '${answerModel.nodeUid}-option-${optionModel.optionText.plainText}-media',
-      ),
-    );
-    if (mediaWidget != null) {
-      return mediaWidget;
-    }
-    // continue if widget generation failed for any reason...
-  }
-
-  final optionPrefix = optionModel.optionPrefix;
-  final optionText = optionModel.optionText;
-
-  final optionTitle = <RenderingString>[
-    if (optionPrefix != null) optionPrefix,
-    optionText,
-  ].concatenateXhtml(' ', '&nbsp;');
-  final styledOptionTitle = Xhtml.fromRenderingString(
-    context,
-    optionTitle,
-    questionnaireModel:
-        answerModel.responseItemModel.questionnaireItemModel.questionnaireModel,
-    imageWidth: 100,
-    imageHeight: 100,
-    key: ValueKey<String>(
-      '${answerModel.nodeUid}-option-${optionModel.optionText.plainText}-title',
-    ),
-  );
-
-  return styledOptionTitle;
-}
-
-class _CodingDropdown extends StatelessWidget {
-  const _CodingDropdown({
-    Key? key,
-    required this.firstFocusNode,
-    required this.questionnaireTheme,
-    required this.locale,
-    required this.answerModel,
-    required this.errorText,
-    required this.onChanged,
-  }) : super(key: key);
-
-  final FocusNode firstFocusNode;
-  final QuestionnaireTheme questionnaireTheme;
-  final Locale locale;
-  final CodingAnswerModel answerModel;
-  final String? errorText;
-  final void Function(String?) onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final dropdownItems = [
-      if (questionnaireTheme.showNullAnswerOption)
-        const DropdownMenuItem<String>(
-          child: NullDashText(),
-        ),
-      ...answerModel.answerOptions
-          .map<DropdownMenuItem<String>>((answerOption) {
-        return DropdownMenuItem<String>(
-          value: answerOption.uid,
-          child: _createStyledOption(context, answerModel, answerOption),
-        );
-      }),
-    ];
-
-    return DropdownButtonFormField<String>(
-      isExpanded: true,
-      value: answerModel.singleSelectionUid,
-      onTap: () {
-        firstFocusNode.requestFocus();
-      },
-      onChanged: answerModel.isControlEnabled ? onChanged : null,
-      focusNode: firstFocusNode,
-      items: dropdownItems,
-      decoration: InputDecoration(
-        // Empty error texts triggers red border, but showing text would result in a duplicate.
-        errorStyle:
-            const TextStyle(height: 0, color: Color.fromARGB(0, 0, 0, 0)),
-        errorText: answerModel.displayErrorText,
-      ),
-    );
-  }
-}
-
-class _VerticalCodingChoices extends StatelessWidget {
-  const _VerticalCodingChoices({
-    Key? key,
-    required this.firstFocusNode,
-    required this.answerModel,
-    required this.choices,
-  }) : super(key: key);
-
-  final FocusNode firstFocusNode;
-  final CodingAnswerModel answerModel;
-  final List<Widget> choices;
-
-  @override
-  Widget build(BuildContext context) {
-    final hasError = answerModel.displayErrorText != null;
-    final decoTheme = Theme.of(context).inputDecorationTheme;
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Focus(
-          focusNode: firstFocusNode,
-          child: Card(
-            shape: (firstFocusNode.hasFocus)
-                ? hasError
-                    ? decoTheme.focusedErrorBorder
-                    : decoTheme.focusedBorder
-                : hasError
-                    ? decoTheme.errorBorder
-                    : answerModel.isControlEnabled
-                        ? decoTheme.enabledBorder
-                        : decoTheme.disabledBorder,
-            margin: const EdgeInsets.only(top: 8, bottom: 8),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: choices,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _HorizontalCodingChoices extends StatelessWidget {
-  const _HorizontalCodingChoices({
-    Key? key,
-    required this.firstFocusNode,
-    required this.answerModel,
-    required this.choices,
-  }) : super(key: key);
-
-  final FocusNode firstFocusNode;
-  final CodingAnswerModel answerModel;
-  final List<Widget> choices;
-
-  @override
-  Widget build(BuildContext context) {
-    final hasError = answerModel.displayErrorText != null;
-
-    final decoTheme = Theme.of(context).inputDecorationTheme;
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Focus(
-          focusNode: firstFocusNode,
-          child: Card(
-            shape: (firstFocusNode.hasFocus)
-                ? hasError
-                    ? decoTheme.focusedErrorBorder
-                    : decoTheme.focusedBorder
-                : hasError
-                    ? decoTheme.errorBorder
-                    : answerModel.isControlEnabled
-                        ? decoTheme.enabledBorder
-                        : decoTheme.disabledBorder,
-            margin: const EdgeInsets.only(top: 8, bottom: 8),
-            child: Table(children: [TableRow(children: choices)]),
           ),
         ),
       ],

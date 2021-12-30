@@ -23,7 +23,26 @@ class _BooleanItemState extends QuestionnaireAnswerFillerState<Boolean,
   }
 
   @override
-  Widget buildInputControl(BuildContext context) {
+  Widget createInputControl() => _BooleanInputControl(
+        answerModel,
+        questionnaireTheme: questionnaireTheme,
+        focusNode: firstFocusNode,
+      );
+}
+
+class _BooleanInputControl extends AnswerInputControl<BooleanAnswerModel> {
+  const _BooleanInputControl(
+    BooleanAnswerModel answerModel, {
+    required QuestionnaireTheme questionnaireTheme,
+    FocusNode? focusNode,
+  }) : super(
+          answerModel,
+          questionnaireTheme: questionnaireTheme,
+          focusNode: focusNode,
+        );
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -31,7 +50,7 @@ class _BooleanItemState extends QuestionnaireAnswerFillerState<Boolean,
           height: 8,
         ),
         Checkbox(
-          focusNode: firstFocusNode,
+          focusNode: focusNode,
           value: answerModel.value?.value,
           activeColor: (answerModel.displayErrorText != null)
               ? Theme.of(context).errorColor
@@ -39,7 +58,7 @@ class _BooleanItemState extends QuestionnaireAnswerFillerState<Boolean,
           tristate: true,
           onChanged: (answerModel.isControlEnabled)
               ? (newValue) {
-                  firstFocusNode.requestFocus();
+                  focusNode?.requestFocus();
                   answerModel.value =
                       (newValue != null) ? Boolean(newValue) : null;
                 }

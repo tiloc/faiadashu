@@ -25,7 +25,26 @@ class _DateTimeAnswerState extends QuestionnaireAnswerFillerState<FhirDateTime,
   }
 
   @override
-  Widget buildInputControl(BuildContext context) {
+  Widget createInputControl() => _DateTimeInputControl(
+        answerModel,
+        questionnaireTheme: questionnaireTheme,
+        focusNode: firstFocusNode,
+      );
+}
+
+class _DateTimeInputControl extends AnswerInputControl<DateTimeAnswerModel> {
+  const _DateTimeInputControl(
+    DateTimeAnswerModel answerModel, {
+    required QuestionnaireTheme questionnaireTheme,
+    FocusNode? focusNode,
+  }) : super(
+          answerModel,
+          questionnaireTheme: questionnaireTheme,
+          focusNode: focusNode,
+        );
+
+  @override
+  Widget build(BuildContext context) {
     final itemType = qi.type;
 
     final initialDate =
@@ -42,7 +61,7 @@ class _DateTimeAnswerState extends QuestionnaireAnswerFillerState<FhirDateTime,
     return Container(
       padding: const EdgeInsets.only(top: 8, bottom: 8),
       child: FhirDateTimePicker(
-        focusNode: firstFocusNode,
+        focusNode: focusNode,
         enabled: answerModel.isControlEnabled,
         locale: locale,
         initialDateTime: initialDate,

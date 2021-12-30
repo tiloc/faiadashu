@@ -32,7 +32,7 @@ abstract class QuestionnaireAnswerFillerState<
   late final Object? answerModelError;
 
   late final FocusNode firstFocusNode;
-  bool _isFocusHookedUp = false;
+  FocusNode? _parentFocusNode;
 
   QuestionnaireItem get qi => widget.questionnaireItemModel.questionnaireItem;
   Locale get locale =>
@@ -68,6 +68,7 @@ abstract class QuestionnaireAnswerFillerState<
     }
   }
 
+  // TODO: Can this be eliminated in favor of the normal initState?
   /// Initialize the filler after the model has been successfully finished.
   ///
   /// Do not place initialization code into [initState], but place it here.
@@ -77,46 +78,50 @@ abstract class QuestionnaireAnswerFillerState<
 
   @override
   void dispose() {
+    _parentFocusNode?.removeListener(_handleFocusChange);
     firstFocusNode.dispose();
     super.dispose();
   }
 
-  Widget _guardedBuildInputControl(BuildContext context) {
-    if (answerModelError != null) {
-      return BrokenQuestionnaireItem.fromException(answerModelError!);
-    }
-
-    // OPTIMIZE: Is there a more elegant solution? Do I have to unregister the listener?
-    // Listen to the parent FocusNode and become focussed when it does.
-    if (!_isFocusHookedUp) {
-      WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-        // Focus.of could otherwise fail with: Looking up a deactivated widget's ancestor is unsafe.
-        if (mounted) {
-          Focus.maybeOf(context)?.addListener(_handleFocusChange);
-        }
-      });
-      _isFocusHookedUp = true;
-    }
-
-    return buildInputControl(context);
-  }
-
+  // FIXME: This assumes that questions can only have a single answer.
   void _handleFocusChange() {
-    if ((firstFocusNode.parent?.hasPrimaryFocus ?? false) &&
+    if ((_parentFocusNode?.hasPrimaryFocus ?? false) &&
         !firstFocusNode.hasPrimaryFocus) {
       firstFocusNode.requestFocus();
     }
   }
 
-  Widget buildInputControl(BuildContext context);
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    _parentFocusNode?.removeListener(_handleFocusChange);
+
+    _parentFocusNode = Focus.maybeOf(context);
+    _abstractLogger.debug('parentFocusNode: $_parentFocusNode');
+
+    _parentFocusNode?.addListener(_handleFocusChange);
+  }
+
+  /// Factory method to create an input control for the answer.
+  ///
+  /// Will have guaranteed availability of [answerModel].
+  ///
+  /// Will be invoked everytime the [answerModel] changes.
+  /// Thus, the returned Widget should preferably be const Stateless.
+  Widget createInputControl();
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: widget.responseItemModel,
-      builder: (context, _) {
-        return _guardedBuildInputControl(context);
-      },
-    );
+    final answerModelError = this.answerModelError;
+
+    return answerModelError != null
+        ? BrokenQuestionnaireItem.fromException(answerModelError)
+        : AnimatedBuilder(
+            animation: widget.responseItemModel,
+            builder: (context, _) {
+              return createInputControl();
+            },
+          );
   }
 }
