@@ -3,6 +3,8 @@
 * Reworked visual style
   * More space after each question
   * Maximum width is clamped and can be controlled
+  * InputDecorations are now entirely driven by ThemeData
+  * Style of filler for choice/open-choice/coding is determined by ThemeData
   * Font defaults to bodyText2 (oddly, bodyText1 is not the default for Material widgets)
   * Removed the ability to put the label to the left of the question (best practice by Norman Nielsen group)
   * Better alignment + spacing for title elements (leading, help)
@@ -20,6 +22,10 @@
 
 * ### Faiadashu Online
 * Brought back the login/logout functionality, based on latest `fhir_auth` package.
+
+* ### Faiadashu Example / Gallery
+* Added more functional testing questionnaires
+* More comprehensive demo of theming, including InputDecoration and font.
 
 ## 0.6.0-dev.2
 * ### Introducing "Faiabench"

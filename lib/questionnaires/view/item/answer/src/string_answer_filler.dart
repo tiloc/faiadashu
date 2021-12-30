@@ -58,16 +58,16 @@ class _StringAnswerState extends QuestionnaireAnswerFillerState<String,
         maxLines: (qi.type == QuestionnaireItemType.text)
             ? questionnaireTheme.maxLinesForTextItem
             : 1,
-        decoration: questionnaireTheme.createDecoration().copyWith(
-              errorText: answerModel.displayErrorText,
-              errorStyle: (itemModel
-                      .isCalculated) // Force display of error text on calculated item
-                  ? TextStyle(
-                      color: Theme.of(context).errorColor,
-                    )
-                  : null,
-              hintText: answerModel.entryFormat,
-            ),
+        decoration: InputDecoration(
+          errorText: answerModel.displayErrorText,
+          errorStyle: (itemModel
+                  .isCalculated) // Force display of error text on calculated item
+              ? TextStyle(
+                  color: Theme.of(context).errorColor,
+                )
+              : null,
+          hintText: answerModel.entryFormat,
+        ),
         validator: (inputValue) => answerModel.validateInput(inputValue),
         autovalidateMode: AutovalidateMode.always,
         onChanged: (content) {

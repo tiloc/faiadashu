@@ -17,9 +17,12 @@ import 'package:fhir_auth/r4/smart_client/smart_client.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:logging/logging.dart' as dartlog;
 
 void main() {
+//  debugRepaintRainbowEnabled = true;
+
   if (kDebugMode || kIsWeb) {
     dartlog.Logger.root.level = dartlog.Level.FINE;
     dartlog.Logger.root.onRecord.listen((dartlog.LogRecord rec) {
@@ -51,7 +54,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.light(),
+      theme: ThemeData.light().copyWith(
+        inputDecorationTheme: ThemeData.light().inputDecorationTheme.copyWith(
+              filled: true,
+            ),
+      ),
       darkTheme: ThemeData.dark(),
       title: 'Faiadashu™ FHIRDash Gallery',
       localizationsDelegates: const [
@@ -522,7 +529,6 @@ class _HomePageState extends State<HomePage> {
                         ]),
                         launchContext: launchContext,
                         questionnaireTheme: const QuestionnaireTheme(
-                          canSkipQuestions: true,
                           showNullAnswerOption: false,
                         ),
                         questionnaireModelDefaults:
@@ -602,7 +608,41 @@ class _CherryBlossomScaffoldBuilder extends QuestionnairePageScaffoldBuilder {
     required Widget child,
   }) {
     return Theme(
-      data: ThemeData.light(), // Make it always light
+      data: ThemeData.light().copyWith(
+        textTheme: GoogleFonts.ralewayTextTheme(),
+        inputDecorationTheme: ThemeData.light().inputDecorationTheme.copyWith(
+              enabledBorder: const OutlineInputBorder(
+                borderSide: BorderSide(
+                  width: 2.0,
+                  color: Color.fromRGBO(0, 0, 0, 0.12),
+                ),
+              ),
+              disabledBorder: const OutlineInputBorder(
+                borderSide: BorderSide(
+                  width: 0,
+                  color: Color.fromRGBO(0, 0, 0, 0.0),
+                ),
+              ),
+              focusedErrorBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  width: 2.0,
+                  color: ThemeData.light().errorColor,
+                ),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  width: 2.0,
+                  color: ThemeData.light().errorColor.withOpacity(0.12),
+                ),
+              ),
+              focusedBorder: const OutlineInputBorder(
+                borderSide: BorderSide(
+                  width: 2.0,
+                  color: Color.fromRGBO(0, 0, 0, 0.54),
+                ),
+              ),
+            ),
+      ), // Make it always light
       // We have to take care of SafeArea ourselves
       child: SafeArea(
         // This surround Card provides the Material parent that is required by

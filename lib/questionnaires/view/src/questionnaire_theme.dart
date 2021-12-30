@@ -151,13 +151,6 @@ class QuestionnaireTheme {
     }
   }
 
-  /// Returns a decoration for [TextFormField]s.
-  ///
-  /// Used for consistent styling of all text fields in the filler.
-  InputDecoration createDecoration() {
-    return const InputDecoration(filled: true);
-  }
-
   /// Decorate a [QuestionnaireAnswerFiller] with UI elements.
   ///
   ///

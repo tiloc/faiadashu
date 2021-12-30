@@ -400,6 +400,7 @@ class _VerticalCodingChoices extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasError = answerModel.displayErrorText != null;
+    final decoTheme = Theme.of(context).inputDecorationTheme;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -408,17 +409,15 @@ class _VerticalCodingChoices extends StatelessWidget {
         Focus(
           focusNode: firstFocusNode,
           child: Card(
-            shape: (firstFocusNode.hasFocus && answerModel.isControlEnabled)
-                ? RoundedRectangleBorder(
-                    side: BorderSide(
-                      color: hasError
-                          ? Theme.of(context).colorScheme.error
-                          : Theme.of(context).colorScheme.secondary,
-                      width: 2.0,
-                    ),
-                    borderRadius: BorderRadius.circular(4.0),
-                  )
-                : null,
+            shape: (firstFocusNode.hasFocus)
+                ? hasError
+                    ? decoTheme.focusedErrorBorder
+                    : decoTheme.focusedBorder
+                : hasError
+                    ? decoTheme.errorBorder
+                    : answerModel.isControlEnabled
+                        ? decoTheme.enabledBorder
+                        : decoTheme.disabledBorder,
             margin: const EdgeInsets.only(top: 8, bottom: 8),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -447,6 +446,8 @@ class _HorizontalCodingChoices extends StatelessWidget {
   Widget build(BuildContext context) {
     final hasError = answerModel.displayErrorText != null;
 
+    final decoTheme = Theme.of(context).inputDecorationTheme;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -455,16 +456,14 @@ class _HorizontalCodingChoices extends StatelessWidget {
           focusNode: firstFocusNode,
           child: Card(
             shape: (firstFocusNode.hasFocus)
-                ? RoundedRectangleBorder(
-                    side: BorderSide(
-                      color: hasError
-                          ? Theme.of(context).colorScheme.error
-                          : Theme.of(context).colorScheme.secondary,
-                      width: 2.0,
-                    ),
-                    borderRadius: BorderRadius.circular(4.0),
-                  )
-                : null,
+                ? hasError
+                    ? decoTheme.focusedErrorBorder
+                    : decoTheme.focusedBorder
+                : hasError
+                    ? decoTheme.errorBorder
+                    : answerModel.isControlEnabled
+                        ? decoTheme.enabledBorder
+                        : decoTheme.disabledBorder,
             margin: const EdgeInsets.only(top: 8, bottom: 8),
             child: Table(children: [TableRow(children: choices)]),
           ),

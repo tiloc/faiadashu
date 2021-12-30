@@ -99,8 +99,8 @@ class _QuestionnaireResponseFillerState
     super.dispose();
   }
 
-  void _onQuestionnaireResponseModelChange() {
-    _logger.trace('_onQuestionnaireResponseModelChange');
+  void _handleQuestionnaireResponseModelChange() {
+    _logger.trace('_handleQuestionnaireResponseModelChange');
 
     final newFillerItems =
         _questionnaireResponseModel!.orderedFillerItemModels();
@@ -159,7 +159,7 @@ class _QuestionnaireResponseFillerState
               if (_handleQuestionnaireResponseModelChangeListenerFunction ==
                   null) {
                 _handleQuestionnaireResponseModelChangeListenerFunction =
-                    () => _onQuestionnaireResponseModelChange();
+                    () => _handleQuestionnaireResponseModelChange();
                 _questionnaireResponseModel!.addListener(
                   _handleQuestionnaireResponseModelChangeListenerFunction!,
                 );

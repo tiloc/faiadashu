@@ -25,20 +25,24 @@ class QuestionnaireFillerCircularProgress extends StatelessWidget {
       child: AnimatedBuilder(
         animation:
             QuestionnaireResponseFiller.of(context).questionnaireResponseModel,
-        builder: (_, __) => CustomPaint(
-          painter: _ProgressPainter(
-            radius,
-            colors: QuestionnaireResponseFiller.of(context)
-                .questionnaireResponseModel
-                .orderedResponseItemModels()
-                .where((rim) => rim.isAnswerable)
-                .map<Color?>(
-              (rim) {
-                return rim.isAnswered ? Colors.green : null;
-              },
+        builder: (context, __) {
+          final newColors = QuestionnaireResponseFiller.of(context)
+              .questionnaireResponseModel
+              .orderedResponseItemModels()
+              .where((rim) => rim.isAnswerable)
+              .map<Color?>(
+            (rim) {
+              return rim.isAnswered ? Colors.green : null;
+            },
+          );
+
+          return CustomPaint(
+            painter: _ProgressPainter(
+              radius,
+              colors: newColors,
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
@@ -89,7 +93,13 @@ class _ProgressPainter extends CustomPainter {
     });
   }
 
-  // OPTIMIZE: Come up with a criterion
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+  bool shouldRepaint(_ProgressPainter oldDelegate) {
+// OPTIMIZE: This is not behaving as expected: compares object to itself.
+    /*    final shouldRepaint =
+        !const IterableEquality().equals(oldDelegate.colors, colors);
+
+    return shouldRepaint; */
+    return true;
+  }
 }

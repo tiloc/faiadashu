@@ -183,30 +183,30 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
                     controller: _editingController,
                     textAlignVertical: TextAlignVertical.center,
                     textAlign: TextAlign.end,
-                    decoration: questionnaireTheme.createDecoration().copyWith(
-                          errorText: answerModel.displayErrorText,
-                          errorStyle: (itemModel
-                                  .isCalculated) // Force display of error text on calculated item
-                              ? TextStyle(
-                                  color: Theme.of(context).errorColor,
-                                )
-                              : null,
-                          hintText: answerModel.entryFormat,
-                          prefixIcon: itemModel.isCalculated
-                              ? Icon(
-                                  Icons.calculate,
-                                  color: (answerModel.displayErrorText != null)
-                                      ? Theme.of(context).errorColor
-                                      : null,
-                                )
-                              : null,
-                          suffixIcon: (answerModel.hasUnitChoices)
-                              ? SizedBox(
-                                  height: 16,
-                                  child: _buildDropDownFromUnits(context),
-                                )
-                              : null,
-                        ),
+                    decoration: InputDecoration(
+                      errorText: answerModel.displayErrorText,
+                      errorStyle: (itemModel
+                              .isCalculated) // Force display of error text on calculated item
+                          ? TextStyle(
+                              color: Theme.of(context).errorColor,
+                            )
+                          : null,
+                      hintText: answerModel.entryFormat,
+                      prefixIcon: itemModel.isCalculated
+                          ? Icon(
+                              Icons.calculate,
+                              color: (answerModel.displayErrorText != null)
+                                  ? Theme.of(context).errorColor
+                                  : null,
+                            )
+                          : null,
+                      suffixIcon: (answerModel.hasUnitChoices)
+                          ? SizedBox(
+                              height: 16,
+                              child: _buildDropDownFromUnits(context),
+                            )
+                          : null,
+                    ),
                     inputFormatters: [_numberInputFormatter],
                     keyboardType: TextInputType.numberWithOptions(
                       signed: answerModel.minValue < 0,
