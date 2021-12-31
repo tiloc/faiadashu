@@ -22,8 +22,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:logging/logging.dart' as dartlog;
 
 void main() {
-  debugRepaintRainbowEnabled = true;
-
   if (kDebugMode || kIsWeb) {
     dartlog.Logger.root.level = dartlog.Level.FINE;
     dartlog.Logger.root.onRecord.listen((dartlog.LogRecord rec) {
