@@ -9,12 +9,15 @@
   * Font defaults to bodyText2 (oddly, bodyText1 is not the default for Material widgets)
   * Removed the ability to put the label to the left of the question (best practice by Norman Nielsen group)
   * Better alignment + spacing for title elements (leading, help)
-* WIP: Rework to move away from helper methods to small Widgets
+* Moved away from helper methods to small Widgets
 * Support for `initial.value[x]`
 * Reworked the choice/open-choice/coding model.
 * Model visibility similar to R5 `disabledDisplay`
-* Remove many dependencies on centralized `ChangeNotifier` in QuestionnaireResponseModel  
+* Removed centralized `ChangeNotifier` in QuestionnaireResponseModel
+  * Introduce more focussed notifiers 
   * Drastically reduced number of repaints
+* Put a `RepaintBoundary` around the circular progress
+  * Reduces size of repainted area from full-screen to small rectangle 
 * Drastic performance optimizations for evaluation of FHIRPath expressions
 * Don't take disabled answers into account for expressions
 * Reverted the async madness

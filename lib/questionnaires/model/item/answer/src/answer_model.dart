@@ -18,9 +18,20 @@ abstract class AnswerModel<I, V> extends ResponseNode {
   /// This will also validate it and set the errorText accordingly.
   set value(V? newValue) {
     if (_value != newValue) {
+      final isAnswered = responseItemModel.isAnswered;
+      final isUnanswered = responseItemModel.isUnanswered;
+      final isPopulated = responseItemModel.isPopulated;
+
       _value = newValue;
 
-      responseItemModel.handleChangedAnswer(this);
+      final isAnsweredChange = isAnswered != responseItemModel.isAnswered ||
+          isUnanswered != responseItemModel.isUnanswered ||
+          isPopulated != responseItemModel.isPopulated;
+
+      responseItemModel.handleChangedAnswer(
+        this,
+        isAnsweredChange: isAnsweredChange,
+      );
     }
   }
 

@@ -16,12 +16,13 @@ import 'package:fhir_auth/r4/scopes/scopes.dart';
 import 'package:fhir_auth/r4/smart_client/smart_client.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:logging/logging.dart' as dartlog;
 
 void main() {
-//  debugRepaintRainbowEnabled = true;
+  debugRepaintRainbowEnabled = true;
 
   if (kDebugMode || kIsWeb) {
     dartlog.Logger.root.level = dartlog.Level.FINE;

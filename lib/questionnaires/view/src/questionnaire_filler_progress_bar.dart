@@ -20,7 +20,7 @@ class QuestionnaireFillerProgressBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation:
-          QuestionnaireResponseFiller.of(context).questionnaireResponseModel,
+          QuestionnaireResponseFiller.of(context).questionnaireResponseModel.answeredChangeNotifier,
       builder: (context, _) {
         return Row(
           children: QuestionnaireResponseFiller.of(context)

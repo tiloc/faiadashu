@@ -8,8 +8,36 @@ import 'package:fhir/r4/r4.dart';
 import 'package:flutter/foundation.dart';
 
 /// High-level model of a response to a questionnaire.
-class QuestionnaireResponseModel extends ChangeNotifier {
+class QuestionnaireResponseModel {
   static final _logger = Logger(QuestionnaireResponseModel);
+
+  /// Notifies listeners when items have been added or removed dynamically.
+  ///
+  /// This is meant for filler views to update their internal data model.
+  final structuralChangeNotifier = ValueNotifier<int>(-1);
+
+  /// Notifies listeners when the value of any answer has changed.
+  ///
+  /// This is meant for aggregators, such as total score.
+  ///
+  /// Since values also become valid/invalid when enablement changes, this
+  /// will also trigger when enablement has changed.
+  ///
+  /// Since values are also considered new/changed when the structure has changed,
+  /// this will also trigger when structure has changed.
+  final valueChangeNotifier = ValueNotifier<int>(-1);
+
+  // TODO: Notifying on changed validity would allow for richer progress bars.
+  /// Notifies listeners when answered/populated of any answer has changed.
+  ///
+  /// This is meant for progress bars.
+  ///
+  /// Since values also become answered/unanswered when enablement changes, this
+  /// will also trigger when enablement has changed.
+  ///
+  /// Since values are also considered new/changed when the structure has changed,
+  /// this will also trigger when structure has changed.
+  final answeredChangeNotifier = ValueNotifier<int>(-1);
 
   // In which generation were the enabled items last determined?
   int _updateEnabledGeneration = -1;
@@ -75,7 +103,8 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   }
 
   void _setupLaunchContext() {
-    // RESEARCH: Not sure what I truly need to do here???
+    // RESEARCH: The specification is very vague, but real-world use suggests
+    // that mapping the patient to %patient is the right thing to do.
     _launchContextExpressions = [
       ResourceExpressionEvaluator('patient', () => launchContext.patient),
     ];
@@ -202,7 +231,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
     // Set up calculatedExpressions on items
     questionnaireResponseModel._updateCalculations();
-    questionnaireResponseModel
+    questionnaireResponseModel.valueChangeNotifier
         .addListener(questionnaireResponseModel._updateCalculations);
 
     // Set up dynamic enableWhen behavior on items
@@ -363,10 +392,15 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   /// Changes the [generation] and notifies all listeners.
   ///
   /// Each generation is unique during a run of the application.
-  void nextGeneration({bool notifyListeners = true}) {
+  void nextGeneration({
+    bool notifyListeners = true,
+    bool isValueChange = true,
+    bool isStructuralChange = true,
+    bool isAnsweredChange = true,
+  }) {
     final newGeneration = _generation + 1;
     _logger.debug(
-      'nextGeneration $notifyListeners: $_generation -> $newGeneration',
+      'nextGeneration notify: $notifyListeners|value: $isValueChange|answered: $isAnsweredChange|structural: $isStructuralChange|$_generation -> $newGeneration',
     );
     _generation = newGeneration;
 
@@ -374,7 +408,15 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     _cachedQuestionnaireResponse = null;
 
     if (notifyListeners) {
-      this.notifyListeners();
+      if (isValueChange || isStructuralChange) {
+        valueChangeNotifier.value = newGeneration;
+      }
+      if (isStructuralChange) {
+        structuralChangeNotifier.value = newGeneration;
+      }
+      if (isAnsweredChange || isStructuralChange) {
+        answeredChangeNotifier.value = newGeneration;
+      }
     }
   }
 
@@ -601,7 +643,10 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     }
 
     if (hasEnablementChanged) {
-      nextGeneration(notifyListeners: notifyListeners);
+      nextGeneration(
+        notifyListeners: notifyListeners,
+        isStructuralChange: false,
+      );
     } else {
       _logger.debug('Enabled items unchanged.');
     }
@@ -799,6 +844,8 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   ///
   /// For local responses, only the local error text, data absent reason, etc.
   /// should be updated.
-  final isInvalidNotifier =
+  ///
+  /// see: [answeredChangeNotifier]
+  final invalidityNotifier =
       ValueNotifier<Map<String, String>?>(<String, String>{});
 }

@@ -310,27 +310,30 @@ class _CodingDropdown extends AnswerInputControl<CodingAnswerModel> {
       }),
     ];
 
-    return DropdownButtonFormField<String>(
-      isExpanded: true,
-      value: answerModel.singleSelectionUid,
-      onTap: () {
-        focusNode?.requestFocus();
-      },
-      onChanged: answerModel.isControlEnabled
-          ? (uid) {
-              answerModel.value = OptionsOrString.fromSelectionsAndStrings(
-                answerModel.selectOption(uid),
-                answerModel.value?.openStrings,
-              );
-            }
-          : null,
-      focusNode: focusNode,
-      items: dropdownItems,
-      decoration: InputDecoration(
-        // Empty error texts triggers red border, but showing text would result in a duplicate.
-        errorStyle:
-            const TextStyle(height: 0, color: Color.fromARGB(0, 0, 0, 0)),
-        errorText: answerModel.displayErrorText,
+    return Container(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: DropdownButtonFormField<String>(
+        isExpanded: true,
+        value: answerModel.singleSelectionUid,
+        onTap: () {
+          focusNode?.requestFocus();
+        },
+        onChanged: answerModel.isControlEnabled
+            ? (uid) {
+                answerModel.value = OptionsOrString.fromSelectionsAndStrings(
+                  answerModel.selectOption(uid),
+                  answerModel.value?.openStrings,
+                );
+              }
+            : null,
+        focusNode: focusNode,
+        items: dropdownItems,
+        decoration: InputDecoration(
+          // Empty error texts triggers red border, but showing text would result in a duplicate.
+          errorStyle:
+              const TextStyle(height: 0, color: Color.fromARGB(0, 0, 0, 0)),
+          errorText: answerModel.displayErrorText,
+        ),
       ),
     );
   }

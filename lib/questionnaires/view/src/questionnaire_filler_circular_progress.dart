@@ -23,8 +23,9 @@ class QuestionnaireFillerCircularProgress extends StatelessWidget {
       width: radius,
       height: radius,
       child: AnimatedBuilder(
-        animation:
-            QuestionnaireResponseFiller.of(context).questionnaireResponseModel,
+        animation: QuestionnaireResponseFiller.of(context)
+            .questionnaireResponseModel
+            .answeredChangeNotifier,
         builder: (context, __) {
           final newColors = QuestionnaireResponseFiller.of(context)
               .questionnaireResponseModel
@@ -36,10 +37,12 @@ class QuestionnaireFillerCircularProgress extends StatelessWidget {
             },
           );
 
-          return CustomPaint(
-            painter: _ProgressPainter(
-              radius,
-              colors: newColors,
+          return RepaintBoundary(
+            child: CustomPaint(
+              painter: _ProgressPainter(
+                radius,
+                colors: newColors,
+              ),
             ),
           );
         },

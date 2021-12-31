@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:collection/collection.dart';
 import 'package:faiadashu/coding/coding.dart';
 import 'package:faiadashu/fhir_types/fhir_types.dart';
 import 'package:faiadashu/logging/logging.dart';
@@ -24,7 +25,10 @@ class QuestionItemModel extends ResponseItemModel {
   set dataAbsentReason(Code? newDataAbsentReason) {
     if (_dataAbsentReason != newDataAbsentReason) {
       _dataAbsentReason = newDataAbsentReason;
-      nextGeneration();
+      nextGeneration(
+        isStructuralChange: false,
+        isAnsweredChange: true,
+      );
     }
   }
 
@@ -64,18 +68,34 @@ class QuestionItemModel extends ResponseItemModel {
   /// Triggers all required activities when any of the answers have changed.
   ///
   /// Creates nested fillers if needed.
-  void handleChangedAnswer(AnswerModel answerModel) {
+  void handleChangedAnswer(
+    AnswerModel answerModel, {
+    required bool isAnsweredChange,
+  }) {
     final flow = Flow.begin();
     Timeline.startSync('handleChangedAnswer', flow: flow);
+    bool isStructuralChange = false;
+
     if (answerModel.value != null) {
       // An answer has been provided, check whether a nested filler structure needs to be created.
       if (questionnaireItemModel.hasChildren) {
+        final fillerItems = questionnaireResponseModel
+            .orderedFillerItemModels()
+            .toList(growable: false);
+
         // Nested structural items exist. Create fillers.
         final descendantItems =
             questionnaireResponseModel.insertFillerItemsIfAbsent(
           answerModel,
           questionnaireItemModel.children,
         );
+
+        final newFillerItems = questionnaireResponseModel
+            .orderedFillerItemModels()
+            .toList(growable: false);
+
+        isStructuralChange =
+            const ListEquality().equals(fillerItems, newFillerItems);
 
         // Activate dynamic behavior
         for (final item in descendantItems) {
@@ -89,18 +109,29 @@ class QuestionItemModel extends ResponseItemModel {
     // Updates all error texts, but will not notify.
     validate();
 
-    nextGeneration(flow: Flow.end(flow.id));
+    nextGeneration(
+      flow: Flow.end(flow.id),
+      isAnsweredChange: isAnsweredChange,
+      isStructuralChange: isStructuralChange,
+    );
     Timeline.finishSync();
   }
 
   /// Changes the generation and notifies all listeners.
   ///
   /// Each generation is unique during a run of the application.
-  void nextGeneration({Flow? flow}) {
+  void nextGeneration({
+    Flow? flow,
+    required bool isAnsweredChange,
+    required bool isStructuralChange,
+  }) {
     Timeline.timeSync(
       'QuestionItemModel.nextGeneration',
       () {
-        questionnaireResponseModel.nextGeneration();
+        questionnaireResponseModel.nextGeneration(
+          isAnsweredChange: isAnsweredChange,
+          isStructuralChange: isStructuralChange,
+        );
         // This notifies aggregators on changes to individual items
         notifyListeners();
       },

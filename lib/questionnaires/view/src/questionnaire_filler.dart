@@ -88,29 +88,31 @@ class _QuestionnaireResponseFillerState
   void dispose() {
     _logger.trace('dispose');
 
-    if (_handleQuestionnaireResponseModelChangeListenerFunction != null &&
-        _questionnaireResponseModel != null) {
-      _questionnaireResponseModel!.removeListener(
-        _handleQuestionnaireResponseModelChangeListenerFunction!,
+    final qrmListener = _handleQuestionnaireResponseModelChangeListenerFunction;
+
+    if (qrmListener != null) {
+      _questionnaireResponseModel?.structuralChangeNotifier.removeListener(
+        qrmListener,
       );
-      _questionnaireResponseModel = null;
-      _handleQuestionnaireResponseModelChangeListenerFunction = null;
     }
+    _questionnaireResponseModel = null;
+    _handleQuestionnaireResponseModelChangeListenerFunction = null;
+
     super.dispose();
   }
 
-  void _handleQuestionnaireResponseModelChange() {
-    _logger.trace('_handleQuestionnaireResponseModelChange');
+  void _handleQuestionnaireResponseModelStructuralChange() {
+    _logger
+        .debug('Response model structure has changed. Updating filler views.');
 
-    final newFillerItems =
-        _questionnaireResponseModel!.orderedFillerItemModels();
-    final newFillerItemCount = newFillerItems.length;
+    final newFillerItemCount =
+        _questionnaireResponseModel!.orderedFillerItemModels().length;
 
     if (mounted) {
-      setState(() {
-        if (_fillerItemCount != newFillerItemCount) {
-          _logger
-              .debug('Filler item count has changed. Updating filler views.');
+      // This operation is very expensive. Make sure the code only reaches it
+      // when something truly relevant has changed.
+      setState(
+        () {
           _fillerItemCount = newFillerItemCount;
           _questionnaireFillerData = QuestionnaireFillerData._(
             _questionnaireResponseModel!,
@@ -120,8 +122,8 @@ class _QuestionnaireResponseFillerState
             onDataAvailable: widget.onDataAvailable,
             questionnaireTheme: widget.questionnaireTheme,
           );
-        }
-      });
+        },
+      );
     }
   }
 
@@ -159,8 +161,9 @@ class _QuestionnaireResponseFillerState
               if (_handleQuestionnaireResponseModelChangeListenerFunction ==
                   null) {
                 _handleQuestionnaireResponseModelChangeListenerFunction =
-                    () => _handleQuestionnaireResponseModelChange();
-                _questionnaireResponseModel!.addListener(
+                    () => _handleQuestionnaireResponseModelStructuralChange();
+                _questionnaireResponseModel?.structuralChangeNotifier
+                    .addListener(
                   _handleQuestionnaireResponseModelChangeListenerFunction!,
                 );
 

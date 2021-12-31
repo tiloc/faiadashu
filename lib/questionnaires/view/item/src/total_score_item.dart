@@ -44,14 +44,14 @@ class _TotalScoreItemState extends State<TotalScoreItem> {
       _logger.debug(
         'Adding listener to ${widget.questionnaireItemModel} for calculated expression',
       );
-      widget.responseItemModel.questionnaireResponseModel
+      widget.responseItemModel.questionnaireResponseModel.valueChangeNotifier
           .addListener(_questionnaireChanged);
     }
   }
 
   @override
   void dispose() {
-    widget.responseItemModel.questionnaireResponseModel
+    widget.responseItemModel.questionnaireResponseModel.valueChangeNotifier
         .removeListener(_questionnaireChanged);
     super.dispose();
   }

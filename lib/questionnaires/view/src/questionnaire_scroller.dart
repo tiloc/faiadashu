@@ -197,7 +197,8 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
                       children: [
                         Container(
                           constraints: BoxConstraints(
-                            maxWidth: widget.questionnaireTheme.maxItemWidth.clamp(
+                            maxWidth:
+                                widget.questionnaireTheme.maxItemWidth.clamp(
                               constraints.minWidth,
                               constraints.maxWidth - twice * edgeInsets,
                             ),
@@ -229,16 +230,17 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
 
           if (widget.onQuestionnaireResponseChanged != null) {
             // TODO: Ideally an initial state should be broadcast, but this is leading to exceptions for UI updates/setState.
-            //            _onQuestionnaireResponseChanged();
+            //            _handleChangedQuestionnaireResponse();
 
-            _questionnaireResponseModel
-                ?.addListener(_handleChangedQuestionnaireResponse);
+            // FIXME: What is this listening for???
+            _questionnaireResponseModel?.valueChangeNotifier
+                .addListener(_handleChangedQuestionnaireResponse);
           }
 
           // Listen for new invalid items and then scroll to the first one.
-          questionnaireResponseModel.isInvalidNotifier.addListener(() {
+          questionnaireResponseModel.invalidityNotifier.addListener(() {
             final invalidNodes =
-                questionnaireResponseModel.isInvalidNotifier.value;
+                questionnaireResponseModel.invalidityNotifier.value;
 
             if (invalidNodes == null) {
               return;
