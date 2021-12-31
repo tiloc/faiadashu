@@ -7,11 +7,11 @@ class BrokenAnswerFiller extends QuestionnaireAnswerFiller {
   final Object exception;
 
   BrokenAnswerFiller(
-    QuestionResponseItemFillerState responseFillerState,
     AnswerModel answerModel,
+    QuestionnaireTheme questionnaireTheme,
     this.exception, {
     Key? key,
-  }) : super(responseFillerState, answerModel, key: key);
+  }) : super(answerModel, questionnaireTheme, key: key);
 
   @override
   State<StatefulWidget> createState() => _BrokenItemState();

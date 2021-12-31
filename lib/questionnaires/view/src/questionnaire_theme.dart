@@ -94,12 +94,11 @@ class QuestionnaireTheme {
   ///
   /// Can be overridden through inheritance of [QuestionnaireTheme].
   QuestionnaireAnswerFiller createAnswerFiller(
-    QuestionResponseItemFillerState responseFiller,
     AnswerModel answerModel, {
     Key? key,
   }) {
     try {
-      final responseModel = responseFiller.responseItemModel;
+      final responseModel = answerModel.responseItemModel;
 
       _logger.debug(
         'Creating AnswerFiller for ${responseModel.questionnaireItemModel} - $answerModel',
@@ -118,19 +117,19 @@ class QuestionnaireTheme {
       }
 
       if (responseModel.questionnaireItemModel.isTotalScore) {
-        return TotalScoreItem(responseFiller, answerModel, key: key);
+        return TotalScoreItem(answerModel, this, key: key);
       }
 
       if (answerModel is NumericalAnswerModel) {
-        return NumericalAnswerFiller(responseFiller, answerModel, key: key);
+        return NumericalAnswerFiller(answerModel, this, key: key);
       } else if (answerModel is StringAnswerModel) {
-        return StringAnswerFiller(responseFiller, answerModel, key: key);
+        return StringAnswerFiller(answerModel, this, key: key);
       } else if (answerModel is DateTimeAnswerModel) {
-        return DateTimeAnswerFiller(responseFiller, answerModel, key: key);
+        return DateTimeAnswerFiller(answerModel, this, key: key);
       } else if (answerModel is CodingAnswerModel) {
-        return CodingAnswerFiller(responseFiller, answerModel, key: key);
+        return CodingAnswerFiller(answerModel, this, key: key);
       } else if (answerModel is BooleanAnswerModel) {
-        return BooleanAnswerFiller(responseFiller, answerModel, key: key);
+        return BooleanAnswerFiller(answerModel, this, key: key);
       } else if (answerModel is UnsupportedAnswerModel) {
         throw QuestionnaireFormatException(
           'Unsupported item type: ${answerModel.qi.type}',
@@ -143,8 +142,8 @@ class QuestionnaireTheme {
       _logger.warn('Cannot create answer filler:', error: exception);
 
       return BrokenAnswerFiller(
-        responseFiller,
         answerModel,
+        this,
         exception,
         key: key,
       );
@@ -177,12 +176,10 @@ class QuestionnaireTheme {
   /// Will be disabled if [callback] is null.
   Widget buildAddRepetition(
     BuildContext context,
-    QuestionResponseItemFillerState responseFiller,
+    ResponseItemModel responseItemModel,
     VoidCallback? callback, {
     Key? key,
   }) {
-    final responseModel = responseFiller.responseItemModel;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -191,8 +188,8 @@ class QuestionnaireTheme {
           key: key,
           label: Text(
             FDashLocalizations.of(context).fillerAddAnotherItemLabel(
-              responseModel.questionnaireItemModel.shortText ??
-                  responseModel.questionnaireItemModel.text?.plainText ??
+              responseItemModel.questionnaireItemModel.shortText ??
+                  responseItemModel.questionnaireItemModel.text?.plainText ??
                   '',
             ),
           ),

@@ -12,10 +12,10 @@ import 'package:simple_html_css/simple_html_css.dart';
 /// sundhed.dk questionnaire-feedback extension.
 class TotalScoreItem extends QuestionnaireAnswerFiller {
   TotalScoreItem(
-    QuestionResponseItemFillerState responseItemFillerState,
-    AnswerModel answerModel, {
+    AnswerModel answerModel,
+    QuestionnaireTheme questionnaireTheme, {
     Key? key,
-  }) : super(responseItemFillerState, answerModel, key: key);
+  }) : super(answerModel, questionnaireTheme, key: key);
   @override
   State<StatefulWidget> createState() => _TotalScoreItemState();
 }

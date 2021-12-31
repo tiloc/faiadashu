@@ -5,20 +5,18 @@ import 'package:flutter/material.dart';
 
 /// Filler for an individual [QuestionnaireResponseAnswer].
 abstract class QuestionnaireAnswerFiller extends StatefulWidget {
-  final QuestionResponseItemFillerState responseFillerState;
   final AnswerModel answerModel;
   final QuestionnaireItemModel questionnaireItemModel;
   final QuestionItemModel responseItemModel;
   final QuestionnaireTheme questionnaireTheme;
 
   QuestionnaireAnswerFiller(
-    this.responseFillerState,
-    this.answerModel, {
+    this.answerModel,
+    this.questionnaireTheme, {
     Key? key,
-  })  : responseItemModel = responseFillerState.questionResponseItemModel,
+  })  : responseItemModel = answerModel.responseItemModel,
         questionnaireItemModel =
-            responseFillerState.responseItemModel.questionnaireItemModel,
-        questionnaireTheme = responseFillerState.questionnaireTheme,
+            answerModel.responseItemModel.questionnaireItemModel,
         super(key: key);
 }
 
@@ -39,8 +37,7 @@ abstract class QuestionnaireAnswerFillerState<
       widget.responseItemModel.questionnaireResponseModel.locale;
   QuestionnaireItemModel get itemModel => widget.questionnaireItemModel;
 
-  QuestionnaireTheme get questionnaireTheme =>
-      widget.responseFillerState.questionnaireTheme;
+  QuestionnaireTheme get questionnaireTheme => widget.questionnaireTheme;
 
   QuestionnaireAnswerFillerState();
 

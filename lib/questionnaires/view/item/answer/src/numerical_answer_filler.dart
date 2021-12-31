@@ -7,10 +7,10 @@ import 'package:flutter/services.dart';
 /// Filler for answers of type [Integer], [Decimal], and [Quantity].
 class NumericalAnswerFiller extends QuestionnaireAnswerFiller {
   NumericalAnswerFiller(
-    QuestionResponseItemFillerState responseFillerState,
-    AnswerModel answerModel, {
+    AnswerModel answerModel,
+    QuestionnaireTheme questionnaireTheme, {
     Key? key,
-  }) : super(responseFillerState, answerModel, key: key);
+  }) : super(answerModel, questionnaireTheme, key: key);
 
   @override
   State<NumericalAnswerFiller> createState() => _NumericalAnswerState();

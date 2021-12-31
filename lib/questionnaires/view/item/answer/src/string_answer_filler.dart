@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 
 class StringAnswerFiller extends QuestionnaireAnswerFiller {
   StringAnswerFiller(
-    QuestionResponseItemFillerState responseFillerState,
-    AnswerModel answerModel, {
+    AnswerModel answerModel,
+    QuestionnaireTheme questionnaireTheme, {
     Key? key,
-  }) : super(responseFillerState, answerModel, key: key);
+  }) : super(answerModel, questionnaireTheme, key: key);
   @override
   State<StatefulWidget> createState() => _StringAnswerState();
 }

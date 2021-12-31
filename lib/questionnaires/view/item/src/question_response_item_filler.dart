@@ -25,8 +25,6 @@ class QuestionResponseItemFillerState
 
   late final QuestionItemModel questionResponseItemModel;
 
-  final _answerFillers = <String, QuestionnaireAnswerFiller>{};
-
   late final FocusNode _skipSwitchFocusNode;
 
   late final RenderingString? _promptText;
@@ -44,8 +42,6 @@ class QuestionResponseItemFillerState
       debugLabel: 'SkipSwitch ${responseItemModel.nodeUid}',
     );
 
-    _initAnswerFillers();
-
     _promptText =
         questionResponseItemModel.questionnaireItemModel.promptTextItem?.text;
   }
@@ -54,26 +50,6 @@ class QuestionResponseItemFillerState
   void dispose() {
     _skipSwitchFocusNode.dispose();
     super.dispose();
-  }
-
-  void _initAnswerFillers() {
-    final fillableAnswerModels = questionResponseItemModel.fillableAnswerModels;
-    for (final answerModel in fillableAnswerModels) {
-      _answerFillers[answerModel.nodeUid] =
-          questionnaireTheme.createAnswerFiller(
-        this,
-        answerModel,
-        key: ValueKey<String>('answer-filler-${answerModel.nodeUid}'),
-      );
-    }
-  }
-
-  void _addAnswerFiller(AnswerModel answerModel) {
-    _answerFillers[answerModel.nodeUid] = questionnaireTheme.createAnswerFiller(
-      this,
-      answerModel,
-      key: ValueKey<String>('answer-filler-${answerModel.nodeUid}'),
-    );
   }
 
   void _setDataAbsentReason(Code? dataAbsentReason) {
@@ -89,6 +65,8 @@ class QuestionResponseItemFillerState
     _qrimLogger.trace(
       'build ${widget.responseItemModel} hidden: ${widget.responseItemModel.questionnaireItemModel.isHidden}, enabled: ${widget.responseItemModel.isEnabled}',
     );
+
+    final canSkipQuestions = questionnaireTheme.canSkipQuestions;
 
     final promptText = _promptText;
 
@@ -117,7 +95,29 @@ class QuestionResponseItemFillerState
                         context,
                         promptText,
                       ),
-                    _buildAnswerFillers(context),
+                    _HorizontalAnswerFillers(questionResponseItemModel, questionnaireTheme),
+                    if (canSkipQuestions &&
+                        !widget.questionnaireItemModel.isReadOnly &&
+                        !widget.questionnaireItemModel.isRequired)
+                      Row(
+                        children: [
+                          Text(
+                            FDashLocalizations.of(context)
+                                .dataAbsentReasonAskedDeclinedInputLabel,
+                          ),
+                          Switch(
+                            focusNode: _skipSwitchFocusNode,
+                            value: questionResponseItemModel.isAskedButDeclined,
+                            onChanged: (bool value) {
+                              _setDataAbsentReason(
+                                value
+                                    ? dataAbsentReasonAskedButDeclinedCode
+                                    : null,
+                              );
+                            },
+                          ),
+                        ],
+                      ),
                     const SizedBox(height: 32),
                   ],
                 ),
@@ -126,61 +126,65 @@ class QuestionResponseItemFillerState
       },
     );
   }
+}
 
-  Widget _buildAnswerFillers(BuildContext context) {
-    final canSkipQuestions = questionnaireTheme.canSkipQuestions;
+class _HorizontalAnswerFillers extends StatefulWidget {
+  final QuestionItemModel questionResponseItemModel;
+  final QuestionnaireTheme questionnaireTheme;
 
-    final isRepeating = widget.questionnaireItemModel.isRepeating;
-    final hasMoreThanOneAnswer = _answerFillers.length > 1;
+  const _HorizontalAnswerFillers(
+    this.questionResponseItemModel,
+    this.questionnaireTheme, {
+    Key? key,
+  }) : super(key: key);
 
-    final decoratedAnswerFillers =
-        _decorateAnswerFillers(context, isRepeating, hasMoreThanOneAnswer);
+  @override
+  _HorizontalAnswerFillersState createState() =>
+      _HorizontalAnswerFillersState();
+}
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (!questionResponseItemModel.isAskedButDeclined)
-          ...decoratedAnswerFillers,
-        if (isRepeating &&
-            widget.responseItemModel.questionnaireResponseModel
-                    .responseStatus ==
-                QuestionnaireResponseStatus.in_progress)
-          questionnaireTheme.buildAddRepetition(
-            context,
-            this,
-            (questionResponseItemModel.latestAnswerModel.isNotEmpty)
-                ? () {
-                    setState(() {
-                      final newAnswerModel =
-                          questionResponseItemModel.addAnswerModel();
-                      _addAnswerFiller(newAnswerModel);
-                    });
-                  }
-                : null,
-          ),
-        if (canSkipQuestions &&
-            !widget.questionnaireItemModel.isReadOnly &&
-            !widget.questionnaireItemModel.isRequired)
-          Row(
-            children: [
-              Text(
-                FDashLocalizations.of(context)
-                    .dataAbsentReasonAskedDeclinedInputLabel,
-              ),
-              Switch(
-                focusNode: _skipSwitchFocusNode,
-                value: questionResponseItemModel.isAskedButDeclined,
-                onChanged: (bool value) {
-                  _setDataAbsentReason(
-                    value ? dataAbsentReasonAskedButDeclinedCode : null,
-                  );
-                },
-              ),
-            ],
-          ),
-      ],
+class _HorizontalAnswerFillersState extends State<_HorizontalAnswerFillers> {
+  static final _logger = Logger(_HorizontalAnswerFillersState);
+
+  final _answerFillers = <String, QuestionnaireAnswerFiller>{};
+
+  @override
+  void initState() {
+    super.initState();
+
+    _initAnswerFillers();
+  }
+
+  void _initAnswerFillers() {
+    final fillableAnswerModels =
+        widget.questionResponseItemModel.fillableAnswerModels;
+    for (final answerModel in fillableAnswerModels) {
+      _answerFillers[answerModel.nodeUid] =
+          widget.questionnaireTheme.createAnswerFiller(
+        answerModel,
+        key: ValueKey<String>('answer-filler-${answerModel.nodeUid}'),
+      );
+    }
+  }
+
+  void _addAnswerFiller(AnswerModel answerModel) {
+    _answerFillers[answerModel.nodeUid] =
+        widget.questionnaireTheme.createAnswerFiller(
+      answerModel,
+      key: ValueKey<String>('answer-filler-${answerModel.nodeUid}'),
     );
+  }
+
+  void _removeAnswerFiller(QuestionnaireAnswerFiller answerFiller) {
+    final answerModel = answerFiller.answerModel;
+
+    setState(() {
+      widget.questionResponseItemModel.removeAnswerModel(answerModel);
+      final removedAnswerFiller = _answerFillers.remove(answerModel.nodeUid);
+      _logger.debug(
+        'Removed answerfiller: $removedAnswerFiller',
+      );
+    });
   }
 
   Iterable<Widget> _decorateAnswerFillers(
@@ -190,12 +194,12 @@ class QuestionResponseItemFillerState
   ) {
     return isRepeating
         ? _answerFillers.values.map<Widget>(
-            (answerFiller) => questionnaireTheme.decorateRepeatingAnswer(
+            (answerFiller) => widget.questionnaireTheme.decorateRepeatingAnswer(
               context,
               answerFiller,
               hasMoreThanOneAnswer &&
-                      widget.responseItemModel.questionnaireResponseModel
-                              .responseStatus ==
+                      widget.questionResponseItemModel
+                              .questionnaireResponseModel.responseStatus ==
                           QuestionnaireResponseStatus.in_progress
                   ? () {
                       _removeAnswerFiller(answerFiller);
@@ -206,15 +210,39 @@ class QuestionResponseItemFillerState
         : _answerFillers.values;
   }
 
-  void _removeAnswerFiller(QuestionnaireAnswerFiller answerFiller) {
-    final answerModel = answerFiller.answerModel;
+  @override
+  Widget build(BuildContext context) {
+    final isRepeating =
+        widget.questionResponseItemModel.questionnaireItemModel.isRepeating;
+    final hasMoreThanOneAnswer = _answerFillers.length > 1;
 
-    setState(() {
-      questionResponseItemModel.removeAnswerModel(answerModel);
-      final removedAnswerFiller = _answerFillers.remove(answerModel.nodeUid);
-      _qrimLogger.debug(
-        'Removed answerfiller: $removedAnswerFiller',
-      );
-    });
+    final decoratedAnswerFillers =
+        _decorateAnswerFillers(context, isRepeating, hasMoreThanOneAnswer);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (!widget.questionResponseItemModel.isAskedButDeclined)
+          ...decoratedAnswerFillers,
+        if (isRepeating &&
+            widget.questionResponseItemModel.questionnaireResponseModel
+                    .responseStatus ==
+                QuestionnaireResponseStatus.in_progress)
+          widget.questionnaireTheme.buildAddRepetition(
+            context,
+            widget.questionResponseItemModel,
+            (widget.questionResponseItemModel.latestAnswerModel.isNotEmpty)
+                ? () {
+                    setState(() {
+                      final newAnswerModel =
+                          widget.questionResponseItemModel.addAnswerModel();
+                      _addAnswerFiller(newAnswerModel);
+                    });
+                  }
+                : null,
+          ),
+      ],
+    );
   }
 }
