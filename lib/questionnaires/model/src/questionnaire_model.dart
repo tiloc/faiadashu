@@ -48,7 +48,8 @@ class QuestionnaireModel {
 
   /// Direct access to [FhirResourceProvider]s for special use-cases.
   ///
-  /// see: [getResource] for the preferred access method.
+  /// See also:
+  /// * [getResource], which is the preferred access method.
   final FhirResourceProvider fhirResourceProvider;
 
   final QuestionnaireModelDefaults questionnaireModelDefaults;
