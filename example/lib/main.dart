@@ -496,7 +496,7 @@ class _HomePageState extends State<HomePage> {
                           questionnaireResourceUri,
                           'assets/instruments/phq9_instrument.json',
                         ),
-                        questionnaireTheme: const QuestionnaireTheme(
+                        questionnaireTheme: const QuestionnaireThemeData(
                           // It is better for a wizard to overtly present all choices on each screen.
                           codingControlPreference:
                               CodingControlPreference.expanded,
@@ -526,13 +526,11 @@ class _HomePageState extends State<HomePage> {
                           )
                         ]),
                         launchContext: launchContext,
-                        questionnaireTheme: const QuestionnaireTheme(
-                          showNullAnswerOption: false,
-                        ),
                         questionnaireModelDefaults:
                             const QuestionnaireModelDefaults(
                           prefixBuilder: QuestionnaireModelDefaults
                               .questionNumeralPrefixBuilder,
+                          implicitNullOption: false,
                         ),
                       ),
                     ),
@@ -608,6 +606,9 @@ class _CherryBlossomScaffoldBuilder extends QuestionnairePageScaffoldBuilder {
     return Theme(
       data: ThemeData.light().copyWith(
         textTheme: GoogleFonts.ralewayTextTheme(),
+        iconTheme: ThemeData.light().iconTheme.copyWith(
+              color: const Color(0xFF5C1349),
+            ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(
             textStyle: MaterialStateProperty.all(

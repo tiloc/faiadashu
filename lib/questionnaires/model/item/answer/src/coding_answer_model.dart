@@ -24,6 +24,9 @@ class CodingAnswerModel extends AnswerModel<OptionsOrString, OptionsOrString> {
       value?.openStrings != null &&
       value!.openStrings!.isNotEmpty;
 
+  bool get hasNullOption => questionnaireItemModel
+      .questionnaireModel.questionnaireModelDefaults.implicitNullOption;
+
   /// Returns an answer option by its [uid].
   ///
   /// Throws if it doesn't exist.

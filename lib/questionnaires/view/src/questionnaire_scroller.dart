@@ -32,7 +32,6 @@ class QuestionnaireScroller extends StatefulWidget {
   final List<Aggregator<dynamic>>? aggregators;
   final void Function(BuildContext context, Uri url)? onLinkTap;
   final QuestionnairePageScaffoldBuilder scaffoldBuilder;
-  final QuestionnaireTheme questionnaireTheme;
   final QuestionnaireModelDefaults questionnaireModelDefaults;
 
   final void Function(QuestionnaireResponseModel?)?
@@ -45,7 +44,6 @@ class QuestionnaireScroller extends StatefulWidget {
     required this.launchContext,
     this.aggregators,
     this.onLinkTap,
-    this.questionnaireTheme = const QuestionnaireTheme(),
     this.questionnaireModelDefaults = const QuestionnaireModelDefaults(),
     this.onQuestionnaireResponseChanged,
     Key? key,
@@ -161,7 +159,6 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
       fhirResourceProvider: widget.fhirResourceProvider,
       launchContext: widget.launchContext,
       locale: locale,
-      questionnaireTheme: widget.questionnaireTheme,
       questionnaireModelDefaults: widget.questionnaireModelDefaults,
       builder: (BuildContext context) {
         _belowFillerContext = context;
@@ -197,11 +194,12 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
                       children: [
                         Container(
                           constraints: BoxConstraints(
-                            maxWidth:
-                                widget.questionnaireTheme.maxItemWidth.clamp(
-                              constraints.minWidth,
-                              constraints.maxWidth - twice * edgeInsets,
-                            ),
+                            maxWidth: QuestionnaireTheme.of(context)
+                                .maxItemWidth
+                                .clamp(
+                                  constraints.minWidth,
+                                  constraints.maxWidth - twice * edgeInsets,
+                                ),
                           ),
                           child: QuestionnaireResponseFiller.of(context)
                               .itemFillerAt(i),

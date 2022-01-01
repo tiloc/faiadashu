@@ -18,7 +18,7 @@ class QuestionnaireResponseFiller extends StatefulWidget {
   final List<Aggregator<dynamic>>? aggregators;
   final void Function(BuildContext context, Uri url)? onLinkTap;
   final void Function(QuestionnaireResponseModel)? onDataAvailable;
-  final QuestionnaireTheme questionnaireTheme;
+  final QuestionnaireThemeData questionnaireTheme;
   final QuestionnaireModelDefaults questionnaireModelDefaults;
 
   final FhirResourceProvider fhirResourceProvider;
@@ -43,7 +43,7 @@ class QuestionnaireResponseFiller extends StatefulWidget {
     this.aggregators,
     this.onDataAvailable,
     this.onLinkTap,
-    this.questionnaireTheme = const QuestionnaireTheme(),
+    this.questionnaireTheme = const QuestionnaireThemeData(),
     this.questionnaireModelDefaults = const QuestionnaireModelDefaults(),
   }) : super(key: key);
 
@@ -190,7 +190,7 @@ class QuestionnaireFillerData extends InheritedWidget {
 
   final void Function(BuildContext context, Uri url)? onLinkTap;
   final void Function(QuestionnaireResponseModel)? onDataAvailable;
-  final QuestionnaireTheme questionnaireTheme;
+  final QuestionnaireThemeData questionnaireTheme;
   late final List<QuestionnaireItemFiller?> _itemFillers;
   final Map<String, QuestionnaireItemFillerState> _itemFillerStates = {};
   late final int _generation;

@@ -4,10 +4,9 @@ import 'package:flutter/material.dart';
 
 class BooleanAnswerFiller extends QuestionnaireAnswerFiller {
   BooleanAnswerFiller(
-    AnswerModel answerModel,
-    QuestionnaireTheme questionnaireTheme, {
+    AnswerModel answerModel, {
     Key? key,
-  }) : super(answerModel, questionnaireTheme, key: key);
+  }) : super(answerModel, key: key);
   @override
   State<StatefulWidget> createState() => _BooleanItemState();
 }
@@ -25,7 +24,6 @@ class _BooleanItemState extends QuestionnaireAnswerFillerState<Boolean,
   @override
   Widget createInputControl() => _BooleanInputControl(
         answerModel,
-        questionnaireTheme: questionnaireTheme,
         focusNode: firstFocusNode,
       );
 }
@@ -33,11 +31,9 @@ class _BooleanItemState extends QuestionnaireAnswerFillerState<Boolean,
 class _BooleanInputControl extends AnswerInputControl<BooleanAnswerModel> {
   const _BooleanInputControl(
     BooleanAnswerModel answerModel, {
-    required QuestionnaireTheme questionnaireTheme,
     FocusNode? focusNode,
   }) : super(
           answerModel,
-          questionnaireTheme: questionnaireTheme,
           focusNode: focusNode,
         );
 

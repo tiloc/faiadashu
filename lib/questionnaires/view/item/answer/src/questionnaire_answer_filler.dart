@@ -8,11 +8,9 @@ abstract class QuestionnaireAnswerFiller extends StatefulWidget {
   final AnswerModel answerModel;
   final QuestionnaireItemModel questionnaireItemModel;
   final QuestionItemModel responseItemModel;
-  final QuestionnaireTheme questionnaireTheme;
 
   QuestionnaireAnswerFiller(
-    this.answerModel,
-    this.questionnaireTheme, {
+    this.answerModel, {
     Key? key,
   })  : responseItemModel = answerModel.responseItemModel,
         questionnaireItemModel =
@@ -36,8 +34,6 @@ abstract class QuestionnaireAnswerFillerState<
   Locale get locale =>
       widget.responseItemModel.questionnaireResponseModel.locale;
   QuestionnaireItemModel get itemModel => widget.questionnaireItemModel;
-
-  QuestionnaireTheme get questionnaireTheme => widget.questionnaireTheme;
 
   QuestionnaireAnswerFillerState();
 

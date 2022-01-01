@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 class StringAnswerFiller extends QuestionnaireAnswerFiller {
   StringAnswerFiller(
     AnswerModel answerModel,
-    QuestionnaireTheme questionnaireTheme, {
+   {
     Key? key,
-  }) : super(answerModel, questionnaireTheme, key: key);
+  }) : super(answerModel, key: key);
   @override
   State<StatefulWidget> createState() => _StringAnswerState();
 }
@@ -40,7 +40,6 @@ class _StringAnswerState extends QuestionnaireAnswerFillerState<String,
   Widget createInputControl() => _StringAnswerInputControl(
         answerModel,
         focusNode: firstFocusNode,
-        questionnaireTheme: questionnaireTheme,
         editingController: _editingController,
       );
 }
@@ -51,13 +50,11 @@ class _StringAnswerInputControl extends AnswerInputControl<StringAnswerModel> {
   const _StringAnswerInputControl(
     StringAnswerModel answerModel, {
     required this.editingController,
-    required QuestionnaireTheme questionnaireTheme,
     FocusNode? focusNode,
     Key? key,
   }) : super(
           answerModel,
           focusNode: focusNode,
-          questionnaireTheme: questionnaireTheme,
           key: key,
         );
 
@@ -81,7 +78,7 @@ class _StringAnswerInputControl extends AnswerInputControl<StringAnswerModel> {
         keyboardType: keyboardType,
         controller: editingController,
         maxLines: (qi.type == QuestionnaireItemType.text)
-            ? questionnaireTheme.maxLinesForTextItem
+            ? QuestionnaireTheme.of(context).maxLinesForTextItem
             : 1,
         decoration: InputDecoration(
           errorText: answerModel.displayErrorText,

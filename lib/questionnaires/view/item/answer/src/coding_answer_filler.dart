@@ -4,10 +4,9 @@ import 'package:flutter/material.dart';
 /// Answer questions which require code(s) as a response.
 class CodingAnswerFiller extends QuestionnaireAnswerFiller {
   CodingAnswerFiller(
-    AnswerModel answerModel,
-    QuestionnaireTheme questionnaireTheme, {
+    AnswerModel answerModel, {
     Key? key,
-  }) : super(answerModel, questionnaireTheme, key: key);
+  }) : super(answerModel, key: key);
   @override
   State<StatefulWidget> createState() => _CodingAnswerState();
 }
@@ -20,7 +19,6 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<OptionsOrString,
   Widget createInputControl() {
     return _CodingInputControl(
       answerModel,
-      questionnaireTheme: questionnaireTheme,
       focusNode: firstFocusNode,
     );
   }
@@ -37,12 +35,10 @@ class _CodingInputControl extends AnswerInputControl<CodingAnswerModel> {
     CodingAnswerModel answerModel, {
     Key? key,
     FocusNode? focusNode,
-    required QuestionnaireTheme questionnaireTheme,
   }) : super(
           answerModel,
           key: key,
           focusNode: focusNode,
-          questionnaireTheme: questionnaireTheme,
         );
 
   @override
@@ -52,7 +48,7 @@ class _CodingInputControl extends AnswerInputControl<CodingAnswerModel> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _createCodingControl(),
+        _buildCodingControl(context),
         if (answerModel.isOptionsOrString) _OpenStringInputControl(answerModel),
         if (errorText != null)
           Container(
@@ -69,11 +65,13 @@ class _CodingInputControl extends AnswerInputControl<CodingAnswerModel> {
     );
   }
 
-  Widget _createCodingControl() {
+  Widget _buildCodingControl(BuildContext context) {
     // Only checkbox choices currently support repeating answers.
     if (qi.repeats?.value ?? false) {
       return _createChoiceAnswers();
     }
+
+    final questionnaireTheme = QuestionnaireTheme.of(context);
 
     final isSmartAutoComplete =
         answerModel.numberOfOptions > questionnaireTheme.autoCompleteThreshold;
@@ -82,7 +80,6 @@ class _CodingInputControl extends AnswerInputControl<CodingAnswerModel> {
     if (answerModel.isAutocomplete || isSmartAutoComplete) {
       return _CodingAutoComplete(
         answerModel,
-        questionnaireTheme: questionnaireTheme,
         focusNode: focusNode,
       );
     }
@@ -108,7 +105,6 @@ class _CodingInputControl extends AnswerInputControl<CodingAnswerModel> {
   Widget _createDropdownAnswers() {
     return _CodingDropdown(
       answerModel,
-      questionnaireTheme: questionnaireTheme,
       focusNode: focusNode,
     );
   }
@@ -116,7 +112,6 @@ class _CodingInputControl extends AnswerInputControl<CodingAnswerModel> {
   Widget _createChoiceAnswers() {
     return _CodingChoices(
       answerModel,
-      questionnaireTheme: questionnaireTheme,
       focusNode: focusNode,
     );
   }
@@ -289,18 +284,16 @@ class _CodingDropdown extends AnswerInputControl<CodingAnswerModel> {
     CodingAnswerModel answerModel, {
     Key? key,
     FocusNode? focusNode,
-    required QuestionnaireTheme questionnaireTheme,
   }) : super(
           answerModel,
           key: key,
           focusNode: focusNode,
-          questionnaireTheme: questionnaireTheme,
         );
 
   @override
   Widget build(BuildContext context) {
     final dropdownItems = [
-      if (questionnaireTheme.showNullAnswerOption)
+      if (answerModel.hasNullOption)
         const DropdownMenuItem<String>(
           child: NullDashText(),
         ),
@@ -348,12 +341,10 @@ class _VerticalCodingChoices extends AnswerInputControl<CodingAnswerModel> {
     this.choices, {
     Key? key,
     FocusNode? focusNode,
-    required QuestionnaireTheme questionnaireTheme,
   }) : super(
           answerModel,
           key: key,
           focusNode: focusNode,
-          questionnaireTheme: questionnaireTheme,
         );
 
   final List<Widget> choices;
@@ -384,10 +375,8 @@ class _CodingChoices extends AnswerInputControl<CodingAnswerModel> {
     CodingAnswerModel answerModel, {
     Key? key,
     FocusNode? focusNode,
-    required QuestionnaireTheme questionnaireTheme,
   }) : super(
           answerModel,
-          questionnaireTheme: questionnaireTheme,
           focusNode: focusNode,
           key: key,
         ) {
@@ -400,18 +389,16 @@ class _CodingChoices extends AnswerInputControl<CodingAnswerModel> {
       builder: (BuildContext _, BoxConstraints constraints) {
         return answerModel.isHorizontal &&
                 constraints.maxWidth >
-                    questionnaireTheme.horizontalCodingBreakpoint
+                    QuestionnaireTheme.of(context).horizontalCodingBreakpoint
             ? _HorizontalCodingChoices(
                 answerModel,
                 _choices,
                 focusNode: focusNode,
-                questionnaireTheme: questionnaireTheme,
               )
             : _VerticalCodingChoices(
                 answerModel,
                 _choices,
                 focusNode: focusNode,
-                questionnaireTheme: questionnaireTheme,
               );
       },
     );
@@ -420,7 +407,7 @@ class _CodingChoices extends AnswerInputControl<CodingAnswerModel> {
   List<Widget> _createChoices() {
     final isCheckBox = qi.isItemControl('check-box');
     final isMultipleChoice = qi.repeats?.value ?? isCheckBox;
-    final isShowingNull = questionnaireTheme.showNullAnswerOption;
+    final isShowingNull = answerModel.hasNullOption;
 
     final choices = <Widget>[];
 
@@ -449,10 +436,8 @@ class _HorizontalCodingChoices extends AnswerInputControl<CodingAnswerModel> {
     this.choices, {
     Key? key,
     FocusNode? focusNode,
-    required QuestionnaireTheme questionnaireTheme,
   }) : super(
           answerModel,
-          questionnaireTheme: questionnaireTheme,
           focusNode: focusNode,
           key: key,
         );
@@ -531,12 +516,10 @@ class _CodingAutoComplete extends AnswerInputControl<CodingAnswerModel> {
     CodingAnswerModel answerModel, {
     Key? key,
     FocusNode? focusNode,
-    required QuestionnaireTheme questionnaireTheme,
   }) : super(
           answerModel,
           key: key,
           focusNode: focusNode,
-          questionnaireTheme: questionnaireTheme,
         );
 
   @override

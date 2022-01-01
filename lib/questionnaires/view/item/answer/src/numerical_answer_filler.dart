@@ -7,10 +7,9 @@ import 'package:flutter/services.dart';
 /// Filler for answers of type [Integer], [Decimal], and [Quantity].
 class NumericalAnswerFiller extends QuestionnaireAnswerFiller {
   NumericalAnswerFiller(
-    AnswerModel answerModel,
-    QuestionnaireTheme questionnaireTheme, {
+    AnswerModel answerModel, {
     Key? key,
-  }) : super(answerModel, questionnaireTheme, key: key);
+  }) : super(answerModel, key: key);
 
   @override
   State<NumericalAnswerFiller> createState() => _NumericalAnswerState();
@@ -53,14 +52,12 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
   Widget createInputControl() => answerModel.isSliding
       ? _SliderInputControl(
           answerModel,
-          questionnaireTheme: questionnaireTheme,
           focusNode: firstFocusNode,
           sliderValueDuringChange: _sliderValueDuringChange,
         )
       : _NumberFieldInputControl(
           answerModel,
           editingController: _editingController,
-          questionnaireTheme: questionnaireTheme,
         );
 }
 
@@ -70,13 +67,11 @@ class _SliderInputControl extends AnswerInputControl<NumericalAnswerModel> {
   const _SliderInputControl(
     NumericalAnswerModel answerModel, {
     required this.sliderValueDuringChange,
-    required QuestionnaireTheme questionnaireTheme,
     FocusNode? focusNode,
     Key? key,
   }) : super(
           answerModel,
           focusNode: focusNode,
-          questionnaireTheme: questionnaireTheme,
           key: key,
         );
 
@@ -125,7 +120,6 @@ class _SliderInputControl extends AnswerInputControl<NumericalAnswerModel> {
                 height: 16,
                 child: _UnitDropDown(
                   answerModel,
-                  questionnaireTheme: questionnaireTheme,
                 ),
               ),
           ],
@@ -164,7 +158,6 @@ class _NumberFieldInputControl
   _NumberFieldInputControl(
     NumericalAnswerModel answerModel, {
     required this.editingController,
-    required QuestionnaireTheme questionnaireTheme,
     FocusNode? focusNode,
     Key? key,
   })  : numberInputFormatter =
@@ -172,7 +165,6 @@ class _NumberFieldInputControl
         super(
           answerModel,
           focusNode: focusNode,
-          questionnaireTheme: questionnaireTheme,
           key: key,
         );
 
@@ -229,7 +221,6 @@ class _NumberFieldInputControl
                         height: 16,
                         child: _UnitDropDown(
                           answerModel,
-                          questionnaireTheme: questionnaireTheme,
                         ),
                       )
                     : null,
@@ -260,9 +251,8 @@ class _NumberFieldInputControl
 
 class _UnitDropDown extends AnswerInputControl<NumericalAnswerModel> {
   const _UnitDropDown(
-    NumericalAnswerModel answerModel, {
-    required QuestionnaireTheme questionnaireTheme,
-  }) : super(answerModel, questionnaireTheme: questionnaireTheme);
+    NumericalAnswerModel answerModel,
+  ) : super(answerModel);
 
   @override
   Widget build(BuildContext context) {

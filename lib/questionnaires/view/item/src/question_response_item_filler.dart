@@ -133,7 +133,7 @@ class QuestionResponseItemFillerState
 
 class _HorizontalAnswerFillers extends StatefulWidget {
   final QuestionItemModel questionResponseItemModel;
-  final QuestionnaireTheme questionnaireTheme;
+  final QuestionnaireThemeData questionnaireTheme;
 
   const _HorizontalAnswerFillers(
     this.questionResponseItemModel,
@@ -152,8 +152,8 @@ class _HorizontalAnswerFillersState extends State<_HorizontalAnswerFillers> {
   final _answerFillers = <String, QuestionnaireAnswerFiller>{};
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
 
     _initAnswerFillers();
   }
@@ -163,7 +163,7 @@ class _HorizontalAnswerFillersState extends State<_HorizontalAnswerFillers> {
         widget.questionResponseItemModel.fillableAnswerModels;
     for (final answerModel in fillableAnswerModels) {
       _answerFillers[answerModel.nodeUid] =
-          widget.questionnaireTheme.createAnswerFiller(
+          QuestionnaireTheme.of(context).createQuestionnaireAnswerFiller(
         answerModel,
         key: ValueKey<String>('answer-filler-${answerModel.nodeUid}'),
       );
@@ -172,7 +172,7 @@ class _HorizontalAnswerFillersState extends State<_HorizontalAnswerFillers> {
 
   void _addAnswerFiller(AnswerModel answerModel) {
     _answerFillers[answerModel.nodeUid] =
-        widget.questionnaireTheme.createAnswerFiller(
+        QuestionnaireTheme.of(context).createQuestionnaireAnswerFiller(
       answerModel,
       key: ValueKey<String>('answer-filler-${answerModel.nodeUid}'),
     );

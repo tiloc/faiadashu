@@ -6,10 +6,9 @@ import 'package:flutter/material.dart';
 
 class DateTimeAnswerFiller extends QuestionnaireAnswerFiller {
   DateTimeAnswerFiller(
-    AnswerModel answerModel,
-    QuestionnaireTheme questionnaireTheme, {
+    AnswerModel answerModel, {
     Key? key,
-  }) : super(answerModel, questionnaireTheme, key: key);
+  }) : super(answerModel, key: key);
   @override
   State<StatefulWidget> createState() => _DateTimeAnswerState();
 }
@@ -27,7 +26,6 @@ class _DateTimeAnswerState extends QuestionnaireAnswerFillerState<FhirDateTime,
   @override
   Widget createInputControl() => _DateTimeInputControl(
         answerModel,
-        questionnaireTheme: questionnaireTheme,
         focusNode: firstFocusNode,
       );
 }
@@ -35,11 +33,9 @@ class _DateTimeAnswerState extends QuestionnaireAnswerFillerState<FhirDateTime,
 class _DateTimeInputControl extends AnswerInputControl<DateTimeAnswerModel> {
   const _DateTimeInputControl(
     DateTimeAnswerModel answerModel, {
-    required QuestionnaireTheme questionnaireTheme,
     FocusNode? focusNode,
   }) : super(
           answerModel,
-          questionnaireTheme: questionnaireTheme,
           focusNode: focusNode,
         );
 

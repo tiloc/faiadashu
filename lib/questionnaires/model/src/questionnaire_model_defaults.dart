@@ -19,6 +19,9 @@ class QuestionnaireModelDefaults {
 
   final QuestionnaireDisabledDisplay disabledDisplay;
 
+  /// Returns whether questions should offer an option to not answer the question
+  final bool implicitNullOption;
+
   /// Returns a prefix, starting with 1, that provides the number
   /// of the [QuestionItemModel] within the ordered sequence of [QuestionItemModels].
   ///
@@ -52,5 +55,6 @@ class QuestionnaireModelDefaults {
     this.usageMode = usageModeCaptureDisplayNonEmptyCode,
     this.prefixBuilder,
     this.disabledDisplay = QuestionnaireDisabledDisplay.protectedNonEmpty,
+    this.implicitNullOption = true,
   });
 }

@@ -9,10 +9,8 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
   final Widget? help;
   final String htmlTitleText;
   final String semanticsLabel;
-  final QuestionnaireTheme questionnaireTheme;
 
   const QuestionnaireItemFillerTitle._({
-    required this.questionnaireTheme,
     required this.htmlTitleText,
     this.leading,
     this.help,
@@ -22,7 +20,7 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
 
   static Widget? fromFillerItem({
     required FillerItemModel fillerItem,
-    required QuestionnaireTheme questionnaireTheme,
+    required QuestionnaireThemeData questionnaireTheme,
     Key? key,
   }) {
     final questionnaireItemModel = fillerItem.questionnaireItemModel;
@@ -56,7 +54,6 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
           : '$openStyleTag${text.xhtmlText}$requiredTag$closeStyleTag';
 
       return QuestionnaireItemFillerTitle._(
-        questionnaireTheme: questionnaireTheme,
         htmlTitleText: htmlTitleText,
         leading: leading,
         help: help,
@@ -196,7 +193,6 @@ class _QuestionnaireItemFillerSupportLink extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       mouseCursor: SystemMouseCursors.help,
-      color: Theme.of(context).colorScheme.secondary,
       icon: const Icon(Icons.info_outline),
       onPressed: () {
         _logger.debug("supportLink '${supportLink.toString()}'");
