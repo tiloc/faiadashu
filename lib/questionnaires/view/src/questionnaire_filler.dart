@@ -71,8 +71,6 @@ class _QuestionnaireResponseFillerState
   // ignore: use_late_for_private_fields_and_variables
   QuestionnaireFillerData? _questionnaireFillerData;
 
-  int _fillerItemCount = -1;
-
   @override
   void initState() {
     super.initState();
@@ -105,15 +103,11 @@ class _QuestionnaireResponseFillerState
     _logger
         .debug('Response model structure has changed. Updating filler views.');
 
-    final newFillerItemCount =
-        _questionnaireResponseModel!.orderedFillerItemModels().length;
-
     if (mounted) {
       // This operation is very expensive. Make sure the code only reaches it
       // when something truly relevant has changed.
       setState(
         () {
-          _fillerItemCount = newFillerItemCount;
           _questionnaireFillerData = QuestionnaireFillerData._(
             _questionnaireResponseModel!,
             locale: widget.locale,
@@ -153,9 +147,6 @@ class _QuestionnaireResponseFillerState
             if (snapshot.hasData) {
               _logger.debug('FutureBuilder hasData');
               _questionnaireResponseModel = snapshot.data;
-
-              _fillerItemCount =
-                  _questionnaireResponseModel!.orderedFillerItemModels().length;
 
               // OPTIMIZE: There has got to be a more elegant way? Goal is to register the listener exactly once, after the future has completed.
               if (_handleQuestionnaireResponseModelChangeListenerFunction ==
