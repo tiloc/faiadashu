@@ -97,5 +97,6 @@
         "placeholders": {
             "itemLabel": {}
         }
-    }
+    },
+    "fillerExclusiveOptionLabel": "(exclusive)"
 }

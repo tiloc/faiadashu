@@ -16,7 +16,6 @@ import 'package:fhir_auth/r4/scopes/scopes.dart';
 import 'package:fhir_auth/r4/smart_client/smart_client.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:logging/logging.dart' as dartlog;
@@ -511,7 +510,7 @@ class _HomePageState extends State<HomePage> {
               ListTile(
                 title: const Text('🌸 Cherry blossom Filler 🌸'),
                 subtitle: const Text(
-                  'Illustrates embedding of questionnaire (no Scaffold)',
+                  'Theming and a bespoke Scaffold',
                 ),
                 onTap: () {
                   Navigator.push(
@@ -609,6 +608,28 @@ class _CherryBlossomScaffoldBuilder extends QuestionnairePageScaffoldBuilder {
     return Theme(
       data: ThemeData.light().copyWith(
         textTheme: GoogleFonts.ralewayTextTheme(),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(
+              const Color(0xFF5C1349),
+            ),
+          ),
+        ),
+        checkboxTheme: ThemeData.light().checkboxTheme.copyWith(
+              fillColor: MaterialStateProperty.all(
+                const Color(0xFFE30425),
+              ),
+            ),
+        radioTheme: ThemeData.light().radioTheme.copyWith(
+              fillColor: MaterialStateProperty.all(
+                const Color(0xFFE30425),
+              ),
+            ),
+        sliderTheme: ThemeData.light().sliderTheme.copyWith(
+              thumbColor: const Color(0xFFE30425),
+              activeTrackColor: const Color(0xFFE30425),
+              inactiveTrackColor: const Color(0x60E30425),
+            ),
         inputDecorationTheme: ThemeData.light().inputDecorationTheme.copyWith(
               enabledBorder: const OutlineInputBorder(
                 borderSide: BorderSide(
@@ -661,9 +682,9 @@ class _CherryBlossomScaffoldBuilder extends QuestionnairePageScaffoldBuilder {
               Expanded(child: child), // This child is the actual scroller
               const Divider(),
               // We're putting our own exit button in here
-              Container(
+              Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
-                child: OutlinedButton(
+                child: ElevatedButton(
                   onPressed: () => Navigator.pop(context),
                   child: const Text('桜の園からの帰り道'),
                 ),

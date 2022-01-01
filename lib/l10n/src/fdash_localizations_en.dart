@@ -172,4 +172,7 @@ class FDashLocalizationsEn extends FDashLocalizations {
   String fillerAddAnotherItemLabel(Object itemLabel) {
     return 'Add another \"$itemLabel\"';
   }
+
+  @override
+  String get fillerExclusiveOptionLabel => '(exclusive)';
 }

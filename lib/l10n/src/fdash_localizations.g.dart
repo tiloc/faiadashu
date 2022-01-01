@@ -354,6 +354,12 @@ abstract class FDashLocalizations {
   /// In en, this message translates to:
   /// **'Add another \"{itemLabel}\"'**
   String fillerAddAnotherItemLabel(Object itemLabel);
+
+  /// No description provided for @fillerExclusiveOptionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'(exclusive)'**
+  String get fillerExclusiveOptionLabel;
 }
 
 class _FDashLocalizationsDelegate

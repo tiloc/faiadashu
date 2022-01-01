@@ -17,7 +17,8 @@
   * Introduce more focussed notifiers 
   * Drastically reduced number of repaints
 * Put a `RepaintBoundary` around the circular progress
-  * Reduces size of repainted area from full-screen to small rectangle 
+  * Reduces size of repainted area from full-screen to small rectangle
+* Trained a Skia shader to reduce yank.
 * Drastic performance optimizations for evaluation of FHIRPath expressions
 * Don't take disabled answers into account for expressions
 * Reverted the async madness
@@ -30,7 +31,7 @@
 
 * ### Faiadashu Example / Gallery
 * Added more functional testing questionnaires
-* More comprehensive demo of theming, including InputDecoration and font.
+* More comprehensive demo of theming, including InputDecoration, colors, and font.
 
 ## 0.6.0-dev.2
 * ### Introducing "Faiabench"

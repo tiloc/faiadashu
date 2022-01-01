@@ -207,6 +207,9 @@ class _CheckboxChoice extends StatelessWidget {
           answerModel,
           answerOption,
         ),
+        subtitle: answerOption.isExclusive
+            ? Text(FDashLocalizations.of(context).fillerExclusiveOptionLabel)
+            : null,
         value: answerModel.isSelected(answerOption.uid),
         onChanged: (answerModel.isControlEnabled)
             ? (bool? newValue) {
@@ -465,7 +468,15 @@ class _HorizontalCodingChoices extends AnswerInputControl<CodingAnswerModel> {
         _CodingChoiceDecorator(
           answerModel,
           focusNode: focusNode,
-          child: Table(children: [TableRow(children: choices)]),
+          child: Row(
+            children: choices.map<Widget>(
+              (choice) {
+                return choice is _NullRadioChoice
+                    ? SizedBox(width: 96, child: choice)
+                    : Expanded(child: choice);
+              },
+            ).toList(growable: false),
+          ),
         ),
       ],
     );

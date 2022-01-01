@@ -95,7 +95,8 @@ class QuestionResponseItemFillerState
                         context,
                         promptText,
                       ),
-                    _HorizontalAnswerFillers(questionResponseItemModel, questionnaireTheme),
+                    _HorizontalAnswerFillers(
+                        questionResponseItemModel, questionnaireTheme),
                     if (canSkipQuestions &&
                         !widget.questionnaireItemModel.isReadOnly &&
                         !widget.questionnaireItemModel.isRequired)
