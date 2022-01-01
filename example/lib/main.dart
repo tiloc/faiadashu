@@ -610,8 +610,16 @@ class _CherryBlossomScaffoldBuilder extends QuestionnairePageScaffoldBuilder {
         textTheme: GoogleFonts.ralewayTextTheme(),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(
+            textStyle: MaterialStateProperty.all(
+              GoogleFonts.raleway(fontWeight: FontWeight.w600),
+            ),
             backgroundColor: MaterialStateProperty.all(
               const Color(0xFF5C1349),
+            ),
+            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18.0),
+              ),
             ),
           ),
         ),
