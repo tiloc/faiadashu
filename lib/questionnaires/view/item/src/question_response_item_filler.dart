@@ -121,7 +121,7 @@ class QuestionResponseItemFillerState
                           ),
                         ],
                       ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 8),
                   ],
                 ),
               )

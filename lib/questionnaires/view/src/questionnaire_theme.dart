@@ -112,7 +112,7 @@ class QuestionnaireThemeData {
     }
   }
 
-  /// Returns a [QuestionnaireAnswerFiller] for a given [QuestionnaireResponseFiller].
+  /// Returns a [QuestionnaireAnswerFiller] for a given [AnswerModel].
   static QuestionnaireAnswerFiller _createDefaultAnswerFiller(
     AnswerModel answerModel, {
     Key? key,
