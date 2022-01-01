@@ -491,17 +491,19 @@ class _HomePageState extends State<HomePage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => QuestionnaireStepperPage(
-                        fhirResourceProvider: AssetResourceProvider.singleton(
-                          questionnaireResourceUri,
-                          'assets/instruments/phq9_instrument.json',
-                        ),
-                        questionnaireTheme: const QuestionnaireThemeData(
+                      builder: (context) => QuestionnaireTheme(
+                        data: const QuestionnaireThemeData(
                           // It is better for a wizard to overtly present all choices on each screen.
                           codingControlPreference:
                               CodingControlPreference.expanded,
                         ),
-                        launchContext: launchContext,
+                        child: QuestionnaireStepperPage(
+                          fhirResourceProvider: AssetResourceProvider.singleton(
+                            questionnaireResourceUri,
+                            'assets/instruments/phq9_instrument.json',
+                          ),
+                          launchContext: launchContext,
+                        ),
                       ),
                     ),
                   );
