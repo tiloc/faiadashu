@@ -50,17 +50,16 @@ class _CodingInputControl extends AnswerInputControl<CodingAnswerModel> {
       children: [
         _buildCodingControl(context),
         if (answerModel.isOptionsOrString) _OpenStringInputControl(answerModel),
-        if (errorText != null)
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16.0),
-            child: Text(
-              errorText,
-              style: Theme.of(context)
-                  .textTheme
-                  .caption
-                  ?.copyWith(color: Theme.of(context).errorColor),
-            ),
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16.0),
+          child: Text(
+            errorText ?? '',
+            style: Theme.of(context)
+                .textTheme
+                .caption
+                ?.copyWith(color: Theme.of(context).errorColor),
           ),
+        ),
       ],
     );
   }

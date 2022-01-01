@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 
 class StringAnswerFiller extends QuestionnaireAnswerFiller {
   StringAnswerFiller(
-    AnswerModel answerModel,
-   {
+    AnswerModel answerModel, {
     Key? key,
   }) : super(answerModel, key: key);
   @override
@@ -72,30 +71,33 @@ class _StringAnswerInputControl extends AnswerInputControl<StringAnswerModel> {
 
     return Container(
       padding: const EdgeInsets.only(top: 8, bottom: 8),
-      child: TextFormField(
-        focusNode: focusNode,
-        enabled: answerModel.isControlEnabled,
-        keyboardType: keyboardType,
-        controller: editingController,
-        maxLines: (qi.type == QuestionnaireItemType.text)
-            ? QuestionnaireTheme.of(context).maxLinesForTextItem
-            : 1,
-        decoration: InputDecoration(
-          errorText: answerModel.displayErrorText,
-          errorStyle: (itemModel
-                  .isCalculated) // Force display of error text on calculated item
-              ? TextStyle(
-                  color: Theme.of(context).errorColor,
-                )
-              : null,
-          hintText: answerModel.entryFormat,
+      child: SizedBox(
+        height: 72, // Same height with and without error text
+        child: TextFormField(
+          focusNode: focusNode,
+          enabled: answerModel.isControlEnabled,
+          keyboardType: keyboardType,
+          controller: editingController,
+          maxLines: (qi.type == QuestionnaireItemType.text)
+              ? QuestionnaireTheme.of(context).maxLinesForTextItem
+              : 1,
+          decoration: InputDecoration(
+            errorText: answerModel.displayErrorText,
+            errorStyle: (itemModel
+                    .isCalculated) // Force display of error text on calculated item
+                ? TextStyle(
+                    color: Theme.of(context).errorColor,
+                  )
+                : null,
+            hintText: answerModel.entryFormat,
+          ),
+          validator: (inputValue) => answerModel.validateInput(inputValue),
+          autovalidateMode: AutovalidateMode.always,
+          onChanged: (content) {
+            answerModel.value = content;
+          },
+          maxLength: answerModel.maxLength,
         ),
-        validator: (inputValue) => answerModel.validateInput(inputValue),
-        autovalidateMode: AutovalidateMode.always,
-        onChanged: (content) {
-          answerModel.value = content;
-        },
-        maxLength: answerModel.maxLength,
       ),
     );
   }

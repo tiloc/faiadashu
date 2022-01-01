@@ -189,61 +189,64 @@ class _NumberFieldInputControl
 
     return Container(
       padding: const EdgeInsets.only(top: 8, bottom: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: TextFormField(
-              focusNode: focusNode,
-              enabled: answerModel.isControlEnabled,
-              controller: editingController,
-              textAlignVertical: TextAlignVertical.center,
-              textAlign: TextAlign.end,
-              decoration: InputDecoration(
-                errorText: answerModel.displayErrorText,
-                errorStyle: (itemModel
-                        .isCalculated) // Force display of error text on calculated item
-                    ? TextStyle(
-                        color: Theme.of(context).errorColor,
-                      )
-                    : null,
-                hintText: answerModel.entryFormat,
-                prefixIcon: itemModel.isCalculated
-                    ? Icon(
-                        Icons.calculate,
-                        color: (answerModel.displayErrorText != null)
-                            ? Theme.of(context).errorColor
-                            : null,
-                      )
-                    : null,
-                suffixIcon: (answerModel.hasUnitChoices)
-                    ? SizedBox(
-                        height: 16,
-                        child: _UnitDropDown(
-                          answerModel,
-                        ),
-                      )
-                    : null,
+      child: SizedBox(
+        height: 72, // Same height with and without error text
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: TextFormField(
+                focusNode: focusNode,
+                enabled: answerModel.isControlEnabled,
+                controller: editingController,
+                textAlignVertical: TextAlignVertical.center,
+                textAlign: TextAlign.end,
+                decoration: InputDecoration(
+                  errorText: answerModel.displayErrorText,
+                  errorStyle: (itemModel
+                          .isCalculated) // Force display of error text on calculated item
+                      ? TextStyle(
+                          color: Theme.of(context).errorColor,
+                        )
+                      : null,
+                  hintText: answerModel.entryFormat,
+                  prefixIcon: itemModel.isCalculated
+                      ? Icon(
+                          Icons.calculate,
+                          color: (answerModel.displayErrorText != null)
+                              ? Theme.of(context).errorColor
+                              : null,
+                        )
+                      : null,
+                  suffixIcon: (answerModel.hasUnitChoices)
+                      ? SizedBox(
+                          height: 16,
+                          child: _UnitDropDown(
+                            answerModel,
+                          ),
+                        )
+                      : null,
+                ),
+                inputFormatters: [numberInputFormatter],
+                keyboardType: TextInputType.numberWithOptions(
+                  signed: answerModel.minValue < 0,
+                  decimal: answerModel.maxDecimal > 0,
+                ),
+                validator: (itemModel.isCalculated)
+                    ? null
+                    : (inputValue) {
+                        return answerModel.validateInput(inputValue);
+                      },
+                autovalidateMode: (itemModel.isCalculated)
+                    ? AutovalidateMode.disabled
+                    : AutovalidateMode.always,
+                onChanged: (content) {
+                  answerModel.value = answerModel.copyWithTextInput(content);
+                },
               ),
-              inputFormatters: [numberInputFormatter],
-              keyboardType: TextInputType.numberWithOptions(
-                signed: answerModel.minValue < 0,
-                decimal: answerModel.maxDecimal > 0,
-              ),
-              validator: (itemModel.isCalculated)
-                  ? null
-                  : (inputValue) {
-                      return answerModel.validateInput(inputValue);
-                    },
-              autovalidateMode: (itemModel.isCalculated)
-                  ? AutovalidateMode.disabled
-                  : AutovalidateMode.always,
-              onChanged: (content) {
-                answerModel.value = answerModel.copyWithTextInput(content);
-              },
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

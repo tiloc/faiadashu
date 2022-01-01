@@ -10,6 +10,7 @@
   * Font defaults to bodyText2 (oddly, bodyText1 is not the default for Material widgets)
   * Removed the ability to put the label to the left of the question (best practice by Norman Nielsen group)
   * Better alignment + spacing for title elements (leading, help)
+  * Error text doesn't make the text fields jump
 * Moved away from helper methods to small Widgets
 * Converted QuestionnaireTheme to InheritedWidget for alignment with general theming in Flutter
 * Support for `initial.value[x]`

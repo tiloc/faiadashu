@@ -235,8 +235,51 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Widget _launchQuestionnaire(
+    String title,
+    String subtitle,
+    String questionnairePath,
+  ) {
+    return QuestionnaireLaunchTile(
+      title: title,
+      subtitle: subtitle,
+      fhirResourceProvider: resourceBundleProvider,
+      launchContext: launchContext,
+      questionnairePath: questionnairePath,
+      saveResponseFunction: _saveResponse,
+      restoreResponseFunction: _restoreResponse,
+      uploadResponseFunction: _uploadResponse,
+    );
+  }
+
+  Widget _headline(
+    BuildContext context,
+    String title,
+    String subtitle,
+  ) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Column(
+          children: [
+            Text(
+              title,
+              style: Theme.of(context)
+                  .textTheme
+                  .headline6
+                  ?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            Text(subtitle)
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    // TODO: What is the best way here? Always offering upload may result
+    // in implicit login, which is OK?
     final uploadResponseFunction =
 //    smartClient.isLoggedIn() ? _uploadResponse : null;
         _uploadResponse;
@@ -268,71 +311,7 @@ class _HomePageState extends State<HomePage> {
           child: ListView(
             controller: _listScrollController,
             children: [
-              ListTile(
-                title: const Text('About Faiadashu™ FHIRDash'),
-                subtitle: const Text(
-                  '[(ファイアダッシュ)]',
-                  style: TextStyle(fontStyle: FontStyle.italic),
-                ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const AboutPage(),
-                    ),
-                  );
-                },
-              ),
-              ListTile(
-                title: const Text('Disclaimers'),
-                subtitle: const Text('Legalese'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const DisclaimerPage(),
-                    ),
-                  );
-                },
-              ),
-              ListTile(
-                title: const Text('Primitive Types'),
-                subtitle: const Text(
-                  'Formatted, internationalized text output of FHIR primitive types.',
-                ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const PrimitivePage(),
-                    ),
-                  );
-                },
-              ),
-              ListTile(
-                title: const Text('Observation'),
-                subtitle: const Text(
-                  'Formatted, internationalized text output of observations.',
-                ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ObservationPage(),
-                    ),
-                  );
-                },
-              ),
-              QuestionnaireLaunchTile(
-                title: 'SDC Demo Scroller',
-                subtitle: 'A gallery of SDC feature support.',
-                fhirResourceProvider: resourceBundleProvider,
-                launchContext: launchContext,
-                questionnairePath: 'assets/instruments/sdc_demo.json',
-                saveResponseFunction: _saveResponse,
-                restoreResponseFunction: _restoreResponse,
-                uploadResponseFunction: uploadResponseFunction,
-              ),
+              _headline(context, 'Specialties', 'The fancy stuff'),
               QuestionnaireLaunchTile(
                 title: 'FHIR Hot Beverage IG',
                 subtitle:
@@ -359,85 +338,139 @@ class _HomePageState extends State<HomePage> {
                   },
                 ),
               ),
+              ListTile(
+                title: const Text('🌸 Cherry blossom Filler 🌸'),
+                subtitle: const Text(
+                  'Theming and a bespoke Scaffold',
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => QuestionnaireScroller(
+                        scaffoldBuilder: const _CherryBlossomScaffoldBuilder(),
+                        fhirResourceProvider: RegistryFhirResourceProvider([
+                          resourceBundleProvider,
+                          AssetResourceProvider.singleton(
+                            questionnaireResourceUri,
+                            'assets/instruments/sdc_demo.json',
+                          )
+                        ]),
+                        launchContext: launchContext,
+                        questionnaireModelDefaults:
+                            const QuestionnaireModelDefaults(
+                          prefixBuilder: QuestionnaireModelDefaults
+                              .questionNumeralPrefixBuilder,
+                          implicitNullOption: false,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              _headline(
+                context,
+                'SDC Features',
+                'SDC IG support – Advanced Rendering and Behavior',
+              ),
+              _launchQuestionnaire(
+                'SDC Demo Scroller',
+                'A gallery of SDC feature support.',
+                'assets/instruments/sdc_demo.json',
+              ),
+              _launchQuestionnaire(
+                'SDC Profile Example Render',
+                'The reference questionnaire for SDC render features.',
+                'assets/instruments/sdc-example-render.json',
+              ),
+              _launchQuestionnaire(
+                'SDC LOINC AHRQ Example',
+                'WIP: Extensive use of ValueSets and a repeating group.',
+                'assets/instruments/sdc-loinc-ahrq.json',
+              ),
+              _launchQuestionnaire(
+                'Weight/Height Tracking',
+                'Example for BMI calculation with FHIRPath',
+                'assets/instruments/weight-height-tracking.json',
+              ),
+              _headline(
+                context,
+                'Real-World',
+                '🩺 Real surveys from real use-cases. 🩺',
+              ),
+              _launchQuestionnaire(
+                'PHQ9 Questionnaire Scroller',
+                'Simple choice-based survey with a total score.',
+                'assets/instruments/phq9_instrument.json',
+              ),
+              ListTile(
+                title: const Text('PHQ9 Questionnaire Stepper'),
+                subtitle: const Text(
+                  'Simple choice-based survey with a total score.',
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => QuestionnaireTheme(
+                        data: const QuestionnaireThemeData(
+                          // It is better for a wizard to overtly present all choices on each screen.
+                          codingControlPreference:
+                              CodingControlPreference.expanded,
+                        ),
+                        child: QuestionnaireStepperPage(
+                          fhirResourceProvider: AssetResourceProvider.singleton(
+                            questionnaireResourceUri,
+                            'assets/instruments/phq9_instrument.json',
+                          ),
+                          launchContext: launchContext,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              _launchQuestionnaire(
+                'Heart Failure Survey',
+                'A heart failure survey with a total score.',
+                'assets/instruments/hf_instrument.json',
+              ),
+              _launchQuestionnaire(
+                'PRAPARE Survey',
+                'Real-world, mixed-type survey from the US',
+                'assets/instruments/prapare_instrument.json',
+              ),
               QuestionnaireLaunchTile(
-                title: 'SDC LOINC AHRQ Example',
-                subtitle:
-                    'WIP: Extensive use of ValueSets and a repeating group.',
-                fhirResourceProvider: resourceBundleProvider,
+                title: 'Bluebook Survey',
+                subtitle: 'Real-world, mixed-type survey from Australia',
+                // Provide a hard-coded response for initial population
+                fhirResourceProvider: RegistryFhirResourceProvider([
+                  AssetResourceProvider.singleton(
+                    questionnaireResponseResourceUri,
+                    'assets/responses/bluebook_response.json',
+                  ),
+                  resourceBundleProvider
+                ]),
                 launchContext: launchContext,
-                questionnairePath: 'assets/instruments/sdc-loinc-ahrq.json',
+                questionnairePath: 'assets/instruments/bluebook.json',
                 saveResponseFunction: _saveResponse,
                 restoreResponseFunction: _restoreResponse,
                 uploadResponseFunction: uploadResponseFunction,
               ),
-              QuestionnaireLaunchTile(
-                title: 'SDC Profile Example Render',
-                subtitle:
-                    'The reference questionnaire for SDC render features.',
-                fhirResourceProvider: resourceBundleProvider,
-                launchContext: launchContext,
-                questionnairePath: 'assets/instruments/sdc-example-render.json',
-                saveResponseFunction: _saveResponse,
-                restoreResponseFunction: _restoreResponse,
-                uploadResponseFunction: uploadResponseFunction,
+              _launchQuestionnaire(
+                'WHO COVID19 Surveillance',
+                'Real-world example with very long ValueSets and enableWhen',
+                'assets/instruments/who_covid19.json',
               ),
-              QuestionnaireLaunchTile(
-                title: 'Weight/Height Tracking',
-                subtitle: 'Example for BMI calculation with FHIRPath',
-                fhirResourceProvider: resourceBundleProvider,
-                launchContext: launchContext,
-                questionnairePath:
-                    'assets/instruments/weight-height-tracking.json',
-                saveResponseFunction: _saveResponse,
-                restoreResponseFunction: _restoreResponse,
-                uploadResponseFunction: uploadResponseFunction,
+              _headline(
+                context,
+                'Internationalization',
+                '🌎 Have stethoscope, will travel… 🌎',
               ),
-              QuestionnaireLaunchTile(
-                title: 'Variable Scope Test',
-                subtitle:
-                    'Tests the visibility of questionnaire-level and item-level variables.',
-                fhirResourceProvider: resourceBundleProvider,
-                launchContext: launchContext,
-                questionnairePath:
-                    'assets/instruments/variable_scope_test.json',
-                saveResponseFunction: _saveResponse,
-                restoreResponseFunction: _restoreResponse,
-                uploadResponseFunction: uploadResponseFunction,
-              ),
-              QuestionnaireLaunchTile(
-                title: 'enableWhenExpression Test',
-                subtitle:
-                    'Tests the correct implementation of enableWhenExpression.',
-                fhirResourceProvider: resourceBundleProvider,
-                launchContext: launchContext,
-                questionnairePath:
-                    'assets/instruments/enable_when_expression_test.json',
-                saveResponseFunction: _saveResponse,
-                restoreResponseFunction: _restoreResponse,
-                uploadResponseFunction: uploadResponseFunction,
-              ),
-              QuestionnaireLaunchTile(
-                title: 'initial.value[x] Test',
-                subtitle:
-                    'Tests the correct implementation of initial.value[x] on various data types.',
-                fhirResourceProvider: resourceBundleProvider,
-                launchContext: launchContext,
-                questionnairePath:
-                    'assets/instruments/questionnaire-initialx.json',
-                saveResponseFunction: _saveResponse,
-                restoreResponseFunction: _restoreResponse,
-                uploadResponseFunction: uploadResponseFunction,
-              ),
-              QuestionnaireLaunchTile(
-                title: 'Argonaut Questionnaire Sampler',
-                subtitle:
-                    'Reference sample from the Argonaut Questionnaire Implementation Guide.',
-                fhirResourceProvider: resourceBundleProvider,
-                launchContext: launchContext,
-                questionnairePath: 'assets/instruments/argonaut_sampler.json',
-                saveResponseFunction: _saveResponse,
-                restoreResponseFunction: _restoreResponse,
-                uploadResponseFunction: uploadResponseFunction,
+              _launchQuestionnaire(
+                'Argonaut Questionnaire Sampler',
+                'US English reference sample from the Argonaut Questionnaire Implementation Guide.',
+                'assets/instruments/argonaut_sampler.json',
               ),
               QuestionnaireLaunchTile(
                 locale: const Locale('de', 'DE'),
@@ -472,120 +505,84 @@ class _HomePageState extends State<HomePage> {
                 restoreResponseFunction: _restoreResponse,
                 uploadResponseFunction: uploadResponseFunction,
               ),
-              QuestionnaireLaunchTile(
-                title: 'PHQ9 Questionnaire Scroller',
-                subtitle: 'Simple choice-based survey with a total score.',
-                fhirResourceProvider: resourceBundleProvider,
-                launchContext: launchContext,
-                questionnairePath: 'assets/instruments/phq9_instrument.json',
-                saveResponseFunction: _saveResponse,
-                restoreResponseFunction: _restoreResponse,
-                uploadResponseFunction: uploadResponseFunction,
+              _headline(
+                  context, 'Unit Tests', 'Bland exercises for SDC features.'),
+              _launchQuestionnaire(
+                'Variable Scope Test',
+                'Tests the visibility of questionnaire-level and item-level variables.',
+                'assets/instruments/variable_scope_test.json',
+              ),
+              _launchQuestionnaire(
+                'enableWhenExpression Test',
+                'Tests the correct implementation of enableWhenExpression.',
+                'assets/instruments/enable_when_expression_test.json',
+              ),
+              _launchQuestionnaire(
+                'initial.value[x] Test',
+                'Tests the correct implementation of initial.value[x] on various data types.',
+                'assets/instruments/questionnaire-initialx.json',
+              ),
+              _headline(
+                context,
+                'Generic FHIR examples',
+                'Examples not related to FHIR SDC IG / Questionnaires.',
               ),
               ListTile(
-                title: const Text('PHQ9 Questionnaire Stepper'),
+                title: const Text('Primitive Types'),
                 subtitle: const Text(
-                  'Simple choice-based survey with a total score.',
+                  'Formatted, internationalized text output of FHIR primitive types.',
                 ),
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => QuestionnaireTheme(
-                        data: const QuestionnaireThemeData(
-                          // It is better for a wizard to overtly present all choices on each screen.
-                          codingControlPreference:
-                              CodingControlPreference.expanded,
-                        ),
-                        child: QuestionnaireStepperPage(
-                          fhirResourceProvider: AssetResourceProvider.singleton(
-                            questionnaireResourceUri,
-                            'assets/instruments/phq9_instrument.json',
-                          ),
-                          launchContext: launchContext,
-                        ),
-                      ),
+                      builder: (context) => const PrimitivePage(),
                     ),
                   );
                 },
               ),
               ListTile(
-                title: const Text('🌸 Cherry blossom Filler 🌸'),
+                title: const Text('Observation'),
                 subtitle: const Text(
-                  'Theming and a bespoke Scaffold',
+                  'Formatted, internationalized text output of observations.',
                 ),
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => QuestionnaireScroller(
-                        scaffoldBuilder: const _CherryBlossomScaffoldBuilder(),
-                        fhirResourceProvider: RegistryFhirResourceProvider([
-                          resourceBundleProvider,
-                          AssetResourceProvider.singleton(
-                            questionnaireResourceUri,
-                            'assets/instruments/sdc_demo.json',
-                          )
-                        ]),
-                        launchContext: launchContext,
-                        questionnaireModelDefaults:
-                            const QuestionnaireModelDefaults(
-                          prefixBuilder: QuestionnaireModelDefaults
-                              .questionNumeralPrefixBuilder,
-                          implicitNullOption: false,
-                        ),
-                      ),
+                      builder: (context) => ObservationPage(),
                     ),
                   );
                 },
               ),
-              QuestionnaireLaunchTile(
-                title: 'HF Questionnaire Scroller',
-                subtitle: 'A heart failure survey with a total score.',
-                fhirResourceProvider: resourceBundleProvider,
-                launchContext: launchContext,
-                questionnairePath: 'assets/instruments/hf_instrument.json',
-                saveResponseFunction: _saveResponse,
-                restoreResponseFunction: _restoreResponse,
-                uploadResponseFunction: uploadResponseFunction,
+              _headline(
+                  context, 'Info', '📰 Extra! Extra! Read all about it! 📰'),
+              ListTile(
+                title: const Text('About Faiadashu™ FHIRDash'),
+                subtitle: const Text(
+                  '[(ファイアダッシュ)]',
+                  style: TextStyle(fontStyle: FontStyle.italic),
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AboutPage(),
+                    ),
+                  );
+                },
               ),
-              QuestionnaireLaunchTile(
-                title: 'PRAPARE Questionnaire Scroller',
-                subtitle: 'Real-world, mixed-type survey from the US',
-                fhirResourceProvider: resourceBundleProvider,
-                launchContext: launchContext,
-                questionnairePath: 'assets/instruments/prapare_instrument.json',
-                saveResponseFunction: _saveResponse,
-                restoreResponseFunction: _restoreResponse,
-                uploadResponseFunction: uploadResponseFunction,
-              ),
-              QuestionnaireLaunchTile(
-                title: 'Bluebook Questionnaire Scroller',
-                subtitle: 'Real-world, mixed-type survey from Australia',
-                // Provide a hard-coded response for initial population
-                fhirResourceProvider: RegistryFhirResourceProvider([
-                  AssetResourceProvider.singleton(
-                    questionnaireResponseResourceUri,
-                    'assets/responses/bluebook_response.json',
-                  ),
-                  resourceBundleProvider
-                ]),
-                launchContext: launchContext,
-                questionnairePath: 'assets/instruments/bluebook.json',
-                saveResponseFunction: _saveResponse,
-                restoreResponseFunction: _restoreResponse,
-                uploadResponseFunction: uploadResponseFunction,
-              ),
-              QuestionnaireLaunchTile(
-                title: 'WHO COVID19 Surveillance',
-                subtitle:
-                    'Real-world example with very long ValueSets and enableWhen',
-                fhirResourceProvider: resourceBundleProvider,
-                launchContext: launchContext,
-                questionnairePath: 'assets/instruments/who_covid19.json',
-                saveResponseFunction: _saveResponse,
-                restoreResponseFunction: _restoreResponse,
-                uploadResponseFunction: uploadResponseFunction,
+              ListTile(
+                title: const Text('Disclaimers'),
+                subtitle: const Text('Legalese'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const DisclaimerPage(),
+                    ),
+                  );
+                },
               ),
             ],
           ),
