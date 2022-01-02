@@ -73,59 +73,66 @@ class QuestionResponseItemFillerState
     return AnimatedBuilder(
       animation: widget.responseItemModel,
       builder: (context, _) {
-        return widget.responseItemModel.displayVisibility !=
-                DisplayVisibility.hidden
-            ? Focus(
+        return AnimatedCrossFade(
+          alignment: Alignment.topLeft,
+          firstChild: Focus(
 // Only enable for low-level focus coding
 /*            onFocusChange: (gainedFocus) {
               debugDumpFocusTree();
             }, */
-                focusNode: focusNode,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (titleWidget != null)
-                      Container(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: titleWidget,
-                      ),
-                    if (promptText != null)
-                      Xhtml.fromRenderingString(
-                        context,
-                        promptText,
-                      ),
-                    _HorizontalAnswerFillers(
-                      questionResponseItemModel,
-                      questionnaireTheme,
-                    ),
-                    if (canSkipQuestions &&
-                        !widget.questionnaireItemModel.isReadOnly &&
-                        !widget.questionnaireItemModel.isRequired)
-                      Row(
-                        children: [
-                          Text(
-                            FDashLocalizations.of(context)
-                                .dataAbsentReasonAskedDeclinedInputLabel,
-                          ),
-                          Switch(
-                            focusNode: _skipSwitchFocusNode,
-                            value: questionResponseItemModel.isAskedButDeclined,
-                            onChanged: (bool value) {
-                              _setDataAbsentReason(
-                                value
-                                    ? dataAbsentReasonAskedButDeclinedCode
-                                    : null,
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    const SizedBox(height: 8),
-                  ],
+            focusNode: focusNode,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (titleWidget != null)
+                  Container(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: titleWidget,
+                  ),
+                if (promptText != null)
+                  Xhtml.fromRenderingString(
+                    context,
+                    promptText,
+                  ),
+                _HorizontalAnswerFillers(
+                  questionResponseItemModel,
+                  questionnaireTheme,
                 ),
-              )
-            : const SizedBox.shrink();
+                if (canSkipQuestions &&
+                    !widget.questionnaireItemModel.isReadOnly &&
+                    !widget.questionnaireItemModel.isRequired)
+                  Row(
+                    children: [
+                      Text(
+                        FDashLocalizations.of(context)
+                            .dataAbsentReasonAskedDeclinedInputLabel,
+                      ),
+                      Switch(
+                        focusNode: _skipSwitchFocusNode,
+                        value: questionResponseItemModel.isAskedButDeclined,
+                        onChanged: (bool value) {
+                          _setDataAbsentReason(
+                            value ? dataAbsentReasonAskedButDeclinedCode : null,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                const SizedBox(height: 8),
+              ],
+            ),
+          ),
+          secondChild: const SizedBox(
+            height: 0,
+            width: double.infinity,
+          ),
+          crossFadeState: questionResponseItemModel.displayVisibility !=
+                  DisplayVisibility.hidden
+              ? CrossFadeState.showFirst
+              : CrossFadeState.showSecond,
+          duration: const Duration(milliseconds: 300),
+        );
       },
     );
   }

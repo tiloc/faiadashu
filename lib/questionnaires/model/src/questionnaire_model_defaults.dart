@@ -54,7 +54,7 @@ class QuestionnaireModelDefaults {
     this.sliderMaxValue = defaultSliderMaxValue,
     this.usageMode = usageModeCaptureDisplayNonEmptyCode,
     this.prefixBuilder,
-    this.disabledDisplay = QuestionnaireDisabledDisplay.protectedNonEmpty,
+    this.disabledDisplay = QuestionnaireDisabledDisplay.hidden,
     this.implicitNullOption = true,
   });
 }
