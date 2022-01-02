@@ -23,6 +23,7 @@
 * Put a `RepaintBoundary` around the circular progress
   * Reduces size of repainted area from full-screen to small rectangle
 * Trained a Skia shader to reduce yank.
+* Parallelize initialization of FHIR resources. Noticeable speed up.
 * Drastic performance optimizations for evaluation of FHIRPath expressions
 * Don't take disabled answers into account for expressions
 * Reverted the async madness

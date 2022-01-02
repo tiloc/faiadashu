@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:collection/collection.dart';
 import 'package:faiadashu/logging/logging.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/services.dart' show rootBundle;
@@ -52,9 +53,12 @@ class RegistryFhirResourceProvider extends FhirResourceProvider {
 
   @override
   Future<void> init() async {
-    for (final externalResourceProvider in fhirResourceProviders) {
-      await externalResourceProvider.init();
-    }
+    await Future.wait<void>(
+      fhirResourceProviders.map<Future<void>>(
+        (externalResourceProvider) => externalResourceProvider.init(),
+      ),
+      eagerError: true,
+    );
   }
 
   @override
@@ -101,12 +105,17 @@ class AssetResourceProvider extends FhirResourceProvider {
 
   @override
   Future<void> init() async {
-    for (final assetEntry in assetMap.entries) {
-      final resourceJsonString = await rootBundle.loadString(assetEntry.value);
-      resources[assetEntry.key] = Resource.fromJson(
-        json.decode(resourceJsonString) as Map<String, dynamic>,
+    final resourceJsonStrings = await Future.wait<String>(
+      assetMap.values
+          .map<Future<String>>((assetPath) => rootBundle.loadString(assetPath)),
+      eagerError: true,
+    );
+
+    assetMap.keys.forEachIndexed((i, resourceUrl) {
+      resources[resourceUrl] = Resource.fromJson(
+        json.decode(resourceJsonStrings[i]) as Map<String, dynamic>,
       );
-    }
+    });
   }
 
   @override
