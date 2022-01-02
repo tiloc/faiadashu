@@ -128,7 +128,7 @@ class QuestionResponseItemFillerState
             width: double.infinity,
           ),
           crossFadeState: questionResponseItemModel.displayVisibility !=
-                  DisplayVisibility.hidden
+                  DisplayVisibility.hidden && questionResponseItemModel.structuralState == StructuralState.present
               ? CrossFadeState.showFirst
               : CrossFadeState.showSecond,
           duration: const Duration(milliseconds: 300),

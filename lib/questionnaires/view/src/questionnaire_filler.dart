@@ -118,6 +118,14 @@ class _QuestionnaireResponseFillerState
           );
         },
       );
+
+      // Trigger animation effects for newly added items.
+      // Can only be done after initial frame has been drawn.
+      // This way AnimationXXX Widgets start out in the `adding` state and then
+      // animate towards the fully visible `present` state.
+      WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+        _questionnaireResponseModel?.structuralNextGeneration();
+      });
     }
   }
 

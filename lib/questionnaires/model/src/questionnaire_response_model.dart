@@ -240,6 +240,7 @@ class QuestionnaireResponseModel {
     // Calculate visibility for every item
     for (final fillerItemModel
         in questionnaireResponseModel.orderedFillerItemModels()) {
+      fillerItemModel.structuralNextGeneration(notifyListeners: false);
       fillerItemModel.handleResponseStatusChange();
     }
 
@@ -712,6 +713,12 @@ class QuestionnaireResponseModel {
     }
 
     return notFound;
+  }
+
+  void structuralNextGeneration({bool notifyListeners = true}) {
+    orderedFillerItemModels().forEach((fim) {
+      fim.structuralNextGeneration(notifyListeners: notifyListeners);
+    });
   }
 
   /// Returns the n-th item from the [orderedFillerItemModels].

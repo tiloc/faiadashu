@@ -4,6 +4,15 @@ import 'package:faiadashu/logging/logging.dart';
 import 'package:faiadashu/questionnaires/questionnaires.dart';
 import 'package:fhir/r4.dart';
 
+/// Express changes to the response model structure
+enum StructuralState {
+  /// Item has recently been added
+  adding,
+
+  /// Item is present
+  present,
+}
+
 /// Codes that guide the display of questionnaire items
 enum DisplayVisibility {
   /// Item is fully visible
@@ -422,6 +431,19 @@ abstract class FillerItemModel extends ResponseNode {
   ///
   /// This is regardless of enabled or read-only status.
   bool get isPopulated;
+
+  StructuralState _structuralState = StructuralState.adding;
+  StructuralState get structuralState => _structuralState;
+
+  void structuralNextGeneration({bool notifyListeners = true}) {
+    if (structuralState == StructuralState.adding) {
+      _structuralState = StructuralState.present;
+      _displayVisibility = _calculateDisplayVisibility();
+      if (notifyListeners) {
+        this.notifyListeners();
+      }
+    }
+  }
 
   // TODO: Get this from the R5 extension
   QuestionnaireDisabledDisplay get disabledDisplay => questionnaireResponseModel
