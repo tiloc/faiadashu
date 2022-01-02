@@ -95,7 +95,7 @@ class QuestionItemModel extends ResponseItemModel {
             .toList(growable: false);
 
         isStructuralChange =
-            const ListEquality().equals(fillerItems, newFillerItems);
+            !const ListEquality().equals(fillerItems, newFillerItems);
 
         // Activate dynamic behavior
         for (final item in descendantItems) {

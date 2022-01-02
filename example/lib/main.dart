@@ -506,7 +506,20 @@ class _HomePageState extends State<HomePage> {
                 uploadResponseFunction: uploadResponseFunction,
               ),
               _headline(
-                  context, 'Unit Tests', 'Bland exercises for SDC features.'),
+                context,
+                'Unit Tests',
+                'Bland exercises for SDC features.',
+              ),
+              _launchQuestionnaire(
+                'Group under Question',
+                'Nesting a question underneath a group.',
+                'assets/instruments/group-under-question.R4.json',
+              ),
+              _launchQuestionnaire(
+                'Question under Question',
+                'Nesting a question underneath another question.',
+                'assets/instruments/question-under-question.R4.json',
+              ),
               _launchQuestionnaire(
                 'Variable Scope Test',
                 'Tests the visibility of questionnaire-level and item-level variables.',
