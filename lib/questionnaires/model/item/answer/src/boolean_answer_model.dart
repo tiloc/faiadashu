@@ -35,6 +35,9 @@ class BooleanAnswerModel extends AnswerModel<Boolean, Boolean> {
   @override
   bool get isEmpty => value == null;
 
+  bool get isTriState => questionnaireResponseModel
+      .questionnaireModel.questionnaireModelDefaults.booleanTriState;
+
   @override
   void populateFromExpression(dynamic evaluationResult) {
     if (evaluationResult == null) {

@@ -8,6 +8,7 @@ import 'package:simple_html_css/simple_html_css.dart';
 // OPTIMIZE: Can this wrapper around a child be avoided?
 
 /// Display XHTML formatted texts.
+@immutable
 class Xhtml extends StatelessWidget {
   static final Logger _logger = Logger(Xhtml);
 

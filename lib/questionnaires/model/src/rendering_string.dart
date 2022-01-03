@@ -9,6 +9,7 @@ import 'package:markdown/markdown.dart';
 /// information regarding styled rendering.
 ///
 /// See: http://hl7.org/fhir/R4/rendering-extensions.html
+@immutable
 class RenderingString with Diagnosticable {
   /// The plain, unstyled text. Suitable as a semantic label.
   final String plainText;

@@ -15,6 +15,8 @@
 * Reverted to the original Flutter Autocomplete widget, and use its new fieldViewBuilder parameter
   * Better theming
   * Keyboard navigation
+* Support for bi-state for boolean (tri-state still supported)
+  * Less confusing for the average user
 * Moved away from helper methods to small Widgets
 * Converted QuestionnaireTheme to InheritedWidget for alignment with general theming in Flutter
 * Support for `initial.value[x]`

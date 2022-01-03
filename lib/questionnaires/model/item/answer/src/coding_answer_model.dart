@@ -9,7 +9,8 @@ import 'package:fhir/r4.dart';
 /// Model answers which are [Coding]s.
 ///
 /// R5 release of the FHIR SDC IG will have a `coding` item type,
-/// and model the "open-ness" through the `answerConstraint` extension.
+/// and model the "open-ness" through the `answerConstraint`.
+///
 /// This model is already modelling this methodology for R4.
 class CodingAnswerModel extends AnswerModel<OptionsOrString, OptionsOrString> {
   final _answerOptions = <String, CodingAnswerOptionModel>{};
@@ -19,10 +20,12 @@ class CodingAnswerModel extends AnswerModel<OptionsOrString, OptionsOrString> {
 
   int get numberOfOptions => _answerOptions.length;
 
-  bool get hasOpenStrings =>
-      value != null &&
-      value?.openStrings != null &&
-      value!.openStrings!.isNotEmpty;
+  bool get hasOpenStrings {
+    final value = this.value;
+    final openStrings = value?.openStrings;
+
+    return value != null && openStrings != null && openStrings.isNotEmpty;
+  }
 
   bool get hasNullOption => questionnaireItemModel
       .questionnaireModel.questionnaireModelDefaults.implicitNullOption;
@@ -200,26 +203,25 @@ class CodingAnswerModel extends AnswerModel<OptionsOrString, OptionsOrString> {
     }
   }
 
-  late final int minOccurs;
-  late final int? maxOccurs;
+  final int minOccurs;
+  final int? maxOccurs;
 
-  CodingAnswerModel(QuestionItemModel responseModel) : super(responseModel) {
-    _createAnswerOptions();
-
-    minOccurs = qi.extension_
+  CodingAnswerModel(QuestionItemModel responseModel)
+      : minOccurs = responseModel.questionnaireItem.extension_
+                ?.extensionOrNull(
+                  'http://hl7.org/fhir/StructureDefinition/questionnaire-minOccurs',
+                )
+                ?.valueInteger
+                ?.value ??
+            0,
+        maxOccurs = responseModel.questionnaireItem.extension_
             ?.extensionOrNull(
-              'http://hl7.org/fhir/StructureDefinition/questionnaire-minOccurs',
+              'http://hl7.org/fhir/StructureDefinition/questionnaire-maxOccurs',
             )
             ?.valueInteger
-            ?.value ??
-        0;
-
-    maxOccurs = qi.extension_
-        ?.extensionOrNull(
-          'http://hl7.org/fhir/StructureDefinition/questionnaire-maxOccurs',
-        )
-        ?.valueInteger
-        ?.value;
+            ?.value,
+        super(responseModel) {
+    _createAnswerOptions();
   }
 
   @override

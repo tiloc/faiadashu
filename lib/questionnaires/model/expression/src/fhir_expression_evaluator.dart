@@ -31,6 +31,11 @@ abstract class FhirExpressionEvaluator extends ExpressionEvaluator {
           debugLabel: debugLabel,
         );
       case ExpressionLanguage.application_x_fhir_query:
+        return FhirQueryExpressionEvaluator(
+          fhirExpression,
+          upstreamExpressions,
+          debugLabel: debugLabel,
+        );
       case ExpressionLanguage.text_cql:
       case ExpressionLanguage.unknown:
         throw UnsupportedError(

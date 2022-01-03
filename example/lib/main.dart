@@ -579,7 +579,7 @@ class _HomePageState extends State<HomePage> {
                 },
               ),
               _headline(
-                  context, 'Info', '📰 Extra! Extra! Read all about it! 📰'),
+                  context, 'Info', '📰 Extra! Extra! Read all about it! 📰',),
               ListTile(
                 title: const Text('About Faiadashu™ FHIRDash'),
                 subtitle: const Text(
