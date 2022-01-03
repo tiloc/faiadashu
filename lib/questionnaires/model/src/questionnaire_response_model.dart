@@ -695,6 +695,9 @@ class QuestionnaireResponseModel {
     }
   }
 
+  // TODO: This is only used by QuestionnaireScrollerState
+  // Remove from public API?
+
   /// Returns the index of the first [FillerItemModel] which matches the predicate function.
   ///
   /// The items are examined as returned by [orderedFillerItemModels].
@@ -715,6 +718,16 @@ class QuestionnaireResponseModel {
     return notFound;
   }
 
+  // TODO: Should this live in the model, or should it go to a
+  // class on the view level (QuestionnaireResponseFiller)? Should I mirror
+  // AnimatedList?
+
+  /// Drive all structural model changes to the next stage.
+  ///
+  /// This changes all items in state [StructuralState.adding] to
+  /// [StructuralState.present] and notifies the listeners on the
+  /// items if such a change happened. For items already in state
+  /// [StructuralState.present] this is a no-op.
   void structuralNextGeneration({bool notifyListeners = true}) {
     orderedFillerItemModels().forEach((fim) {
       fim.structuralNextGeneration(notifyListeners: notifyListeners);

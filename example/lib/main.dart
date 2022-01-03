@@ -617,6 +617,12 @@ class _CherryBlossomScaffoldBuilder extends QuestionnairePageScaffoldBuilder {
   }) {
     return Theme(
       data: ThemeData.light().copyWith(
+        scrollbarTheme: ThemeData.light().scrollbarTheme.copyWith(
+              isAlwaysShown: true,
+              thumbColor: MaterialStateProperty.all(
+                const Color(0xFF5C1349),
+              ),
+            ),
         textTheme: GoogleFonts.ralewayTextTheme(),
         iconTheme: ThemeData.light().iconTheme.copyWith(
               color: const Color(0xFF5C1349),
@@ -700,7 +706,9 @@ class _CherryBlossomScaffoldBuilder extends QuestionnairePageScaffoldBuilder {
                   style: Theme.of(context).textTheme.headline4,
                 ),
               ),
-              Expanded(child: child), // This child is the actual scroller
+              Expanded(
+                child: child,
+              ), // This child is the actual scroller
               const Divider(),
               // We're putting our own exit button in here
               Padding(
