@@ -12,6 +12,9 @@
   * Better alignment + spacing for title elements (leading, help)
   * Error text doesn't make the text fields jump
   * Better cross-fades when questions become visible or invisible. 
+* Reverted to the original Flutter Autocomplete widget, and use its new fieldViewBuilder parameter
+  * Better theming
+  * Keyboard navigation
 * Moved away from helper methods to small Widgets
 * Converted QuestionnaireTheme to InheritedWidget for alignment with general theming in Flutter
 * Support for `initial.value[x]`

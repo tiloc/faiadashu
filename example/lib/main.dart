@@ -379,8 +379,13 @@ class _HomePageState extends State<HomePage> {
                 'assets/instruments/sdc_demo.json',
               ),
               _launchQuestionnaire(
-                'SDC Profile Example Render',
-                'The reference questionnaire for SDC render features.',
+                'SDC Profile Example Render - official version',
+                'The reference questionnaire version hl7.fhir.uv.sdc#3.0.0 based on FHIR 4.0.1',
+                'assets/instruments/questionnaire-sdc-profile-example-render.json',
+              ),
+              _launchQuestionnaire(
+                'SDC Profile Example Render - modified version',
+                'The reference questionnaire for SDC render features, with a few additions.',
                 'assets/instruments/sdc-example-render.json',
               ),
               _launchQuestionnaire(
@@ -534,6 +539,11 @@ class _HomePageState extends State<HomePage> {
                 'initial.value[x] Test',
                 'Tests the correct implementation of initial.value[x] on various data types.',
                 'assets/instruments/questionnaire-initialx.json',
+              ),
+              _launchQuestionnaire(
+                'answerExpression Test - currently unsupported',
+                'Tests support for answerExpression from a terminology server.',
+                'assets/instruments/rxterms.R4.json',
               ),
               _headline(
                 context,

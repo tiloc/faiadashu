@@ -521,34 +521,56 @@ class _CodingAutoComplete extends AnswerInputControl<CodingAnswerModel> {
           focusNode: focusNode,
         );
 
+  Widget _fieldViewBuilder(
+    BuildContext context,
+    TextEditingController textEditingController,
+    FocusNode focusNode,
+    VoidCallback onFieldSubmitted,
+  ) {
+    return _FDashAutocompleteField(
+      answerModel: answerModel,
+      focusNode: focusNode,
+      textEditingController: textEditingController,
+      onFieldSubmitted: onFieldSubmitted,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return FDashAutocomplete<CodingAnswerOptionModel>(
+    return Focus(
+      skipTraversal: true,
       focusNode: focusNode,
-      answerModel: answerModel,
-      initialValue: answerModel.singleSelection?.optionText.plainText,
-      displayStringForOption: (answerOption) =>
-          answerOption.optionText.plainText,
-      optionsBuilder: (TextEditingValue textEditingValue) {
-        if (textEditingValue.text.isEmpty) {
-          return const Iterable<CodingAnswerOptionModel>.empty();
-        }
-
-        return answerModel.answerOptions
-            .where((CodingAnswerOptionModel option) {
-          return option.optionText.plainText
-              .toLowerCase()
-              .contains(textEditingValue.text.toLowerCase());
-        });
-      },
-      onSelected: (answerModel.isControlEnabled)
-          ? (CodingAnswerOptionModel selectedOption) {
-              answerModel.value = OptionsOrString.fromSelectionsAndStrings(
-                answerModel.selectOption(selectedOption.uid),
-                answerModel.value?.openStrings,
-              );
+      child: Padding(
+        padding: const EdgeInsets.only(top: 8),
+        child: Autocomplete<CodingAnswerOptionModel>(
+          fieldViewBuilder: _fieldViewBuilder,
+          initialValue: TextEditingValue(
+            text: answerModel.singleSelection?.optionText.plainText ?? '',
+          ),
+          displayStringForOption: (answerOption) =>
+              answerOption.optionText.plainText,
+          optionsBuilder: (TextEditingValue textEditingValue) {
+            if (textEditingValue.text.isEmpty) {
+              return const Iterable<CodingAnswerOptionModel>.empty();
             }
-          : null,
+
+            return answerModel.answerOptions
+                .where((CodingAnswerOptionModel option) {
+              return option.optionText.plainText
+                  .toLowerCase()
+                  .contains(textEditingValue.text.toLowerCase());
+            });
+          },
+          onSelected: (answerModel.isControlEnabled)
+              ? (CodingAnswerOptionModel selectedOption) {
+                  answerModel.value = OptionsOrString.fromSelectionsAndStrings(
+                    answerModel.selectOption(selectedOption.uid),
+                    answerModel.value?.openStrings,
+                  );
+                }
+              : null,
+        ),
+      ),
     );
   }
 }
@@ -610,6 +632,39 @@ class _OpenStringInputControlState extends State<_OpenStringInputControl> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _FDashAutocompleteField extends StatelessWidget {
+  const _FDashAutocompleteField({
+    Key? key,
+    required this.answerModel,
+    required this.focusNode,
+    required this.textEditingController,
+    required this.onFieldSubmitted,
+  }) : super(key: key);
+
+  final AnswerModel answerModel;
+
+  final FocusNode focusNode;
+
+  final VoidCallback onFieldSubmitted;
+
+  final TextEditingController textEditingController;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: textEditingController,
+      focusNode: focusNode,
+      onFieldSubmitted: (String value) {
+        onFieldSubmitted();
+      },
+      decoration: InputDecoration(
+        errorText: answerModel.displayErrorText,
+        hintText: FDashLocalizations.of(context).autoCompleteSearchTermInput,
+      ),
     );
   }
 }

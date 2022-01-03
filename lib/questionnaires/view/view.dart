@@ -1,6 +1,5 @@
 export 'item/item.dart';
 export 'src/broken_questionnaire_item.dart';
-export 'src/fdash_autocomplete.dart';
 export 'src/narrative_drawer.dart';
 export 'src/narrative_page.dart';
 export 'src/narrative_tile.dart';
