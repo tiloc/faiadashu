@@ -97,9 +97,17 @@ class CodingAnswerModel extends AnswerModel<OptionsOrString, OptionsOrString> {
 
   /// Toggles the checkbox with the provided [checkboxValue].
   ///
-  /// Used in repeating items.
+  /// For repeating items, all exclusivity rules are evaluated.
+  /// For non-repeating items, the selected item is selected, and all others
+  /// are de-selected.
   Set<String>? toggleOption(String uid) {
     _logger.trace('Enter toggledValue $uid');
+
+    final isSingleChoiceExclusive =
+        !(questionnaireItemModel.questionnaireItem.repeats?.value ?? false);
+    if (isSingleChoiceExclusive) {
+      return {uid};
+    }
 
     final selectedOptions = value?.selectedOptions;
 
@@ -288,8 +296,9 @@ class CodingAnswerModel extends AnswerModel<OptionsOrString, OptionsOrString> {
       return lookupFDashLocalizations(locale).validatorMinOccurs(minOccurs);
     }
 
-    if (maxOccurs != null && totalCount > maxOccurs!) {
-      return lookupFDashLocalizations(locale).validatorMaxOccurs(maxOccurs!);
+    final maxOccurs = this.maxOccurs;
+    if (maxOccurs != null && totalCount > maxOccurs) {
+      return lookupFDashLocalizations(locale).validatorMaxOccurs(maxOccurs);
     }
   }
 
