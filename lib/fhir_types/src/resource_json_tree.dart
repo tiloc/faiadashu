@@ -296,6 +296,11 @@ class _JsonViewerGenericNode extends StatelessWidget {
 
     const infiniteLines = 999;
 
+    final nodeString = nodeValue.toString();
+    final nodeDisplay = (nodeString.length < 500)
+        ? nodeString
+        : '${nodeString.substring(0, 500)}…';
+
     return Padding(
       padding: const EdgeInsets.only(left: 24),
       child: Row(
@@ -313,7 +318,7 @@ class _JsonViewerGenericNode extends StatelessWidget {
             Expanded(
               child: GestureDetector(
                 child: Text(
-                  nodeValue.toString(),
+                  nodeDisplay,
                   softWrap: true,
                   maxLines: infiniteLines,
                   style: TextStyle(color: color),

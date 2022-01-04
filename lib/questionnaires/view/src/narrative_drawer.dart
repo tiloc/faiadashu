@@ -16,20 +16,16 @@ class NarrativeDrawer extends StatefulWidget {
 }
 
 class _NarrativeDrawerState extends State<NarrativeDrawer> {
-  late final ScrollController _responseScrollController;
-
   // false = narrative, true = JSON
   bool _drawerMode = false;
 
   @override
   void initState() {
     super.initState();
-    _responseScrollController = ScrollController();
   }
 
   @override
   void dispose() {
-    _responseScrollController.dispose();
     super.dispose();
   }
 
@@ -104,18 +100,12 @@ class _NarrativeDrawerState extends State<NarrativeDrawer> {
                   const Divider(),
                   Expanded(
                     child: _drawerMode
-                        ? Scrollbar(
-                            isAlwaysShown: true,
-                            controller: _responseScrollController,
-                            child: SingleChildScrollView(
-                              controller: _responseScrollController,
-                              child: ResourceJsonTree(
-                                QuestionnaireResponseFiller.of(context)
-                                    .aggregator<
-                                        QuestionnaireResponseAggregator>()
-                                    .aggregate(containPatient: true)
-                                    ?.toJson(),
-                              ),
+                        ? SingleChildScrollView(
+                            child: ResourceJsonTree(
+                              QuestionnaireResponseFiller.of(context)
+                                  .aggregator<QuestionnaireResponseAggregator>()
+                                  .aggregate(containPatient: true)
+                                  ?.toJson(),
                             ),
                           )
                         : const NarrativeTile(),

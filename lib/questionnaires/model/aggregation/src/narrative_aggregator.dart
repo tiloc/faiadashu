@@ -135,7 +135,10 @@ class NarrativeAggregator extends Aggregator<Narrative> {
       final filledAnswers = itemModel.answeredAnswerModels;
 
       final repeatPrefix =
-          itemModel.questionnaireItemModel.isRepeating ? '• ' : '';
+          itemModel.questionnaireItemModel.questionnaireItem.repeats?.value ??
+                  false
+              ? '• '
+              : '';
       for (final answerModel in filledAnswers) {
         if (answerModel is NumericalAnswerModel) {
           if (itemModel.questionnaireItemModel.isTotalScore) {

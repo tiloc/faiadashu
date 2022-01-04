@@ -3,9 +3,11 @@ import 'package:faiadashu/questionnaires/questionnaires.dart'
         NarrativeAggregator,
         QuestionnaireResponseFiller,
         QuestionnaireResponseModel;
+import 'package:faiadashu/questionnaires/view/src/webview_none.dart'
+    if (dart.library.io) 'package:faiadashu/questionnaires/view/src/webview_io.dart'
+    if (dart.library.html) 'package:faiadashu/questionnaires/view/src/webview_html.dart';
 import 'package:fhir/r4/special_types/special_types.dart';
 import 'package:flutter/material.dart';
-import 'package:simple_html_css/simple_html_css.dart';
 
 /// Display a narrative
 class NarrativeTile extends StatefulWidget {
@@ -28,13 +30,11 @@ class NarrativeTile extends StatefulWidget {
 }
 
 class _NarrativeTileState extends State<NarrativeTile> {
-  late final ScrollController _narrativeScrollController;
-  Widget? _narrativeRichText;
+  late Widget _narrativeHtmlView;
 
   @override
   void initState() {
     super.initState();
-    _narrativeScrollController = ScrollController();
   }
 
   @override
@@ -58,30 +58,11 @@ class _NarrativeTileState extends State<NarrativeTile> {
 
     div ??= NarrativeAggregator.emptyNarrative.div;
 
-    _narrativeRichText = HTML.toRichText(
-      context,
-      div,
-      defaultTextStyle: Theme.of(context).textTheme.bodyText2,
-    );
-  }
-
-  @override
-  void dispose() {
-    _narrativeScrollController.dispose();
-    super.dispose();
+    _narrativeHtmlView = createWebView(div);
   }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox.expand(
-      child: Scrollbar(
-        isAlwaysShown: true,
-        controller: _narrativeScrollController,
-        child: SingleChildScrollView(
-          controller: _narrativeScrollController,
-          child: _narrativeRichText,
-        ),
-      ),
-    );
+    return _narrativeHtmlView;
   }
 }

@@ -41,6 +41,8 @@ dependencies:
   meta: ^1.7.0
   scrollable_positioned_list: ^0.2.3
   simple_html_css: ^3.0.1
+  webview_flutter: ^3.0.0
+  webview_flutter_web: ^0.1.0
 
 dev_dependencies:
   dart_code_metrics: ^4.1.0
