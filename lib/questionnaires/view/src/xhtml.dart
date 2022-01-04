@@ -68,18 +68,17 @@ class Xhtml extends StatelessWidget {
       );
     }
 
-    const imgSuffix = "'/>";
-
     for (final contentType in [
       'image/png',
       'image/jpeg',
+      'image/jpg',
     ]) {
       final imgPrefix = "<img src='data:$contentType;base64,";
 
       if (xhtml.startsWith(imgPrefix)) {
         final base64String = xhtml.substring(
           imgPrefix.length,
-          xhtml.length - imgSuffix.length,
+          xhtml.lastIndexOf("'"),
         );
 
         _logger.debug('Length of base64: ${base64String.length}');
@@ -100,7 +99,7 @@ class Xhtml extends StatelessWidget {
     if (xhtml.startsWith(imgHashPrefix)) {
       final elementId = xhtml.substring(
         imgHashPrefix.length,
-        xhtml.length - imgSuffix.length + 1,
+        xhtml.lastIndexOf("'"),
       );
       if (questionnaireModel == null) {
         throw StateError(
