@@ -234,8 +234,8 @@ class _QuestionnaireItemFillerTitleLeading extends StatelessWidget {
       return _QuestionnaireItemFillerTitleLeading._(leadingWidget);
     } else {
       // TODO: Should itemImage be inlined? Should its size be constrained?
-      final itemImageWidget = ItemMediaImage.fromQuestionnaireItem(
-        fillerItemModel.questionnaireItemModel,
+      final itemImageWidget = ItemMediaImage.fromItemMedia(
+        fillerItemModel.questionnaireItemModel.itemMedia,
         height: 24.0,
       );
       if (itemImageWidget == null) {

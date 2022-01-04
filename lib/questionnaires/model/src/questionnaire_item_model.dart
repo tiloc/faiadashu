@@ -304,6 +304,17 @@ class QuestionnaireItemModel with Diagnosticable {
         ?.valueString;
   }
 
+  ItemMediaModel? _itemMedia;
+  ItemMediaModel? get itemMedia => _itemMedia ??= ItemMediaModel.fromAttachment(
+        questionnaireItem.extension_
+            ?.extensionOrNull(
+              'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemMedia',
+            )
+            ?.valueAttachment,
+        mediaProvider: questionnaireModel.fhirResourceProvider,
+        altText: text,
+      );
+
   /// Returns the `usageMode` for the item, or the default.
   Code get usageMode {
     return questionnaireItem.extension_?.usageMode ??

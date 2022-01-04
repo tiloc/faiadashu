@@ -232,6 +232,38 @@ class CodingAnswerModel extends AnswerModel<OptionsOrString, OptionsOrString> {
     _createAnswerOptions();
   }
 
+  Iterable<RenderingString> toDisplay({bool includeMedia = true}) {
+    final value = this.value;
+    if (value == null) {
+      return [RenderingString.nullText];
+    }
+
+    final renderingStrings =
+        (value.selectedOptions?.map<RenderingString>((uid) {
+                  final answerOption = answerOptionByUid(uid);
+
+                  return includeMedia && answerOption.hasMedia
+                      ? RenderingString.fromText(
+                          answerOption.optionText.plainText,
+                          xhtmlText: answerOption.itemMedia!.toXhtml(),
+                        )
+                      : answerOption.optionText;
+                }) ??
+                <RenderingString>[])
+            .followedBy(
+      value.openStrings?.map<RenderingString>(
+            (openString) => RenderingString.fromText(openString),
+          ) ??
+          <RenderingString>[],
+    );
+
+    if (renderingStrings.isEmpty) {
+      return [RenderingString.nullText];
+    }
+
+    return renderingStrings;
+  }
+
   @override
   RenderingString get display {
     final value = this.value;
@@ -324,7 +356,7 @@ class CodingAnswerModel extends AnswerModel<OptionsOrString, OptionsOrString> {
                     url: FhirUri(
                       'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemAnswerMedia',
                     ),
-                    valueAttachment: answerOption.mediaAttachment,
+                    valueAttachment: answerOption.itemMedia?.attachment,
                   ),
               ];
 

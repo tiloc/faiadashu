@@ -19,9 +19,9 @@ class CodingAnswerOptionModel {
   /// `choiceColumn` extension is used.
   final String forDisplay;
 
-  final Attachment? mediaAttachment;
+  final ItemMediaModel? itemMedia;
 
-  bool get hasMedia => mediaAttachment != null;
+  bool get hasMedia => itemMedia != null;
 
   final Decimal? fhirOrdinalValue;
   final RenderingString? optionPrefix;
@@ -37,7 +37,7 @@ class CodingAnswerOptionModel {
     required this.questionnaireItemModel,
     required this.optionText,
     required this.forDisplay,
-    this.mediaAttachment,
+    this.itemMedia,
     this.coding,
     this.fhirOrdinalValue,
     this.optionPrefix,
@@ -147,7 +147,6 @@ class CodingAnswerOptionModel {
         optionText = RenderingString.fromText(
           plainText,
           extensions: xhtmlExtensions,
-          mediaAttachment: mediaAttachment,
         );
       } else {
         final plainText =
@@ -155,7 +154,6 @@ class CodingAnswerOptionModel {
         forDisplay = _createForDisplay(coding, locale, questionnaireItemModel);
         optionText = RenderingString.fromText(
           plainText,
-          mediaAttachment: mediaAttachment,
         );
       }
     } else {
@@ -172,9 +170,15 @@ class CodingAnswerOptionModel {
       optionText = RenderingString.fromText(
         plainText,
         extensions: xhtmlExtensions,
-        mediaAttachment: mediaAttachment,
       );
     }
+
+    final itemMedia = ItemMediaModel.fromAttachment(
+      mediaAttachment,
+      mediaProvider:
+          questionnaireItemModel.questionnaireModel.fhirResourceProvider,
+      altText: optionText,
+    );
 
     return CodingAnswerOptionModel._(
       uid: uid,
@@ -185,7 +189,7 @@ class CodingAnswerOptionModel {
       fhirOrdinalValue: ordinalValue,
       isExclusive: isExclusive,
       optionPrefix: optionPrefix,
-      mediaAttachment: mediaAttachment,
+      itemMedia: itemMedia,
     );
   }
 

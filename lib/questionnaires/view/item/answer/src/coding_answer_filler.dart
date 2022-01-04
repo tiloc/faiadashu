@@ -146,8 +146,8 @@ class _StyledOptionState extends State<_StyledOption> {
     final answerModel = widget.answerModel;
 
     if (optionModel.hasMedia) {
-      final mediaWidget = ItemMediaImage.fromAnswerOption(
-        optionModel,
+      final mediaWidget = ItemMediaImage.fromItemMedia(
+        optionModel.itemMedia,
         key: ValueKey<String>(
           '${answerModel.nodeUid}-option-${optionModel.optionText.plainText}-media',
         ),
