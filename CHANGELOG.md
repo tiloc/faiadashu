@@ -15,6 +15,9 @@
 * Reverted to the original Flutter Autocomplete widget, and use its new fieldViewBuilder parameter
   * Better theming
   * Keyboard navigation
+* NarrativeTile uses native WebView when available.
+  * supported on Android, iOS, web
+  * supports <img> tags, and thus itemMedia, and XHTML with <img>
 * Support for bi-state for boolean (tri-state still supported)
   * Less confusing for the average user
 * Moved away from helper methods to small Widgets
