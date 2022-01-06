@@ -476,4 +476,9 @@ class OptionsOrString {
       (openStrings?.isEmpty ?? true) ? null : openStrings,
     );
   }
+
+  @override
+  String toString() {
+    return 'Options: $selectedOptions, Open: $openStrings';
+  }
 }

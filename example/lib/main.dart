@@ -540,6 +540,11 @@ class _HomePageState extends State<HomePage> {
                 'assets/instruments/enable_when_expression_test.json',
               ),
               _launchQuestionnaire(
+                'enableWhen Test',
+                'Tests the implementation of enableWhen - incomplete, and enableWhenExpression is far more capable.',
+                'assets/instruments/questionnaire-sdc-test-enable_when.json',
+              ),
+              _launchQuestionnaire(
                 'initial.value[x] Test',
                 'Tests the correct implementation of initial.value[x] on various data types.',
                 'assets/instruments/questionnaire-initialx.json',

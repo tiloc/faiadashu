@@ -285,6 +285,13 @@ abstract class FillerItemModel extends ResponseNode {
         case QuestionnaireEnableWhenOperator.ne:
           _evaluateEqualityOperator(questionLinkId, qew, enableWhenTrigger);
           break;
+        case QuestionnaireEnableWhenOperator.lt:
+        case QuestionnaireEnableWhenOperator.gt:
+        case QuestionnaireEnableWhenOperator.ge:
+        case QuestionnaireEnableWhenOperator.le:
+          _evaluateComparisonOperator(questionLinkId, qew, enableWhenTrigger);
+          break;
+        case QuestionnaireEnableWhenOperator.ne:
         default:
           _fimLogger.warn('Unsupported operator: ${qew.operator_}.');
           // Err on the side of caution: Enable fields when enableWhen cannot be evaluated.
@@ -311,6 +318,88 @@ abstract class FillerItemModel extends ResponseNode {
           'enableWhen with unknown enableBehavior: ${questionnaireItem.enableBehavior}',
           questionnaireItem,
         );
+    }
+  }
+
+  void _evaluateComparisonOperator(
+    String questionLinkId,
+    QuestionnaireEnableWhen qew,
+    _EnableWhenTrigger enableWhenTrigger,
+  ) {
+    final question = fromLinkId(questionLinkId);
+    if (question is QuestionItemModel) {
+      final qim = fromLinkId(questionLinkId) as QuestionItemModel;
+
+      // If enableWhen logic depends on an item that is disabled, the logic
+      // should proceed as though the item is not valued - even if a
+      // default value or other value might be retained in memory in the event
+      // of the item being re-enabled.
+      final firstAnswer = (qim.isEnabled)
+          ? (fromLinkId(questionLinkId) as QuestionItemModel)
+              .answeredAnswerModels
+              .firstOrNull
+          : null;
+
+      if (firstAnswer == null) {
+        return;
+      }
+
+      if (firstAnswer is NumericalAnswerModel) {
+        final answerValue = firstAnswer.value?.value;
+        if (answerValue == null) {
+          return;
+        }
+
+        final comparisonValue = qew.answerDecimal?.value ??
+            qew.answerInteger?.value ??
+            qew.answerQuantity?.value?.value;
+
+        if (comparisonValue == null) {
+          throw QuestionnaireFormatException(
+            'No number for comparison in enableWhen on $questionLinkId',
+          );
+        }
+
+        switch (qew.operator_) {
+          case QuestionnaireEnableWhenOperator.gt:
+            if (answerValue > comparisonValue) {
+              enableWhenTrigger.trigger();
+            }
+            break;
+          case QuestionnaireEnableWhenOperator.ge:
+            if (answerValue >= comparisonValue) {
+              enableWhenTrigger.trigger();
+            }
+            break;
+          case QuestionnaireEnableWhenOperator.lt:
+            if (answerValue < comparisonValue) {
+              enableWhenTrigger.trigger();
+            }
+            break;
+          case QuestionnaireEnableWhenOperator.le:
+            if (answerValue >= comparisonValue) {
+              enableWhenTrigger.trigger();
+            }
+            break;
+          default:
+            _fimLogger.warn(
+              'Unexpected operator: ${qew.operator_} at $questionLinkId.',
+            );
+            enableWhenTrigger.trigger();
+        }
+      } else {
+        _fimLogger.warn(
+          'Unsupported: Item with linkId is not a numerical question: $questionLinkId.',
+        );
+        // Err on the side of caution: Enable fields when enableWhen cannot be evaluated.
+        // See http://hl7.org/fhir/uv/sdc/2019May/expressions.html#missing-information for specification
+        enableWhenTrigger.trigger();
+      }
+    } else {
+      _fimLogger.warn('linkId refers to non-question item: $questionLinkId.');
+      // Err on the side of caution: Enable fields when enableWhen cannot be evaluated.
+      // See http://hl7.org/fhir/uv/sdc/2019May/expressions.html#missing-information for specification
+      enableWhenTrigger.trigger();
     }
   }
 
@@ -341,14 +430,14 @@ abstract class FillerItemModel extends ResponseNode {
       } else if (firstAnswer is CodingAnswerModel) {
         if (firstAnswer.equalsCoding(qew.answerCoding)) {
           _fimLogger.debug(
-            'enableWhen: $firstAnswer == ${qew.answerCoding}',
+            'enableWhen: ${firstAnswer.value} == ${qew.answerCoding}',
           );
           if (qew.operator_ == QuestionnaireEnableWhenOperator.eq) {
             enableWhenTrigger.trigger();
           }
         } else {
           _fimLogger.debug(
-            'enableWhen: $firstAnswer != ${qew.answerCoding}',
+            'enableWhen: ${firstAnswer.value} != ${qew.answerCoding}',
           );
           if (qew.operator_ == QuestionnaireEnableWhenOperator.ne) {
             enableWhenTrigger.trigger();

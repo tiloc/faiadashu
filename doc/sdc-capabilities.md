@@ -76,8 +76,9 @@ Items can be shown or hidden depending on dynamic conditions.
 Support for all behaviors: `any`, `all`
 
 Limited support for operators:
-* `=` only on `Coding`
+* `=`, `!=` only on `choice`
 * `exists` on all types
+* `<`, `<=`, `>`, `>=` only on `integer`, `decimal`, `quantity`  
 * All other operators: **unsupported** (always return true, as to not prevent filling of the questionnaire.)
 
 > `enableWhenExpression` can be used for more complex evaluations.
@@ -153,11 +154,10 @@ Supported.
 ###### itemControl: prompt
 Reference:
 [questionnaire-item-control-prompt](http://hl7.org/fhir/R4/codesystem-questionnaire-item-control.html#questionnaire-item-control-prompt)
-Text is displayed immediately below the containing question item (typically as a guide for what to enter)
+Text is displayed immediately above the containing question item (typically as a guide for what to enter)
 
 ###### itemMedia
 An image to display as a visual accompaniment to the question being asked.
-> * Only inlined images are supported. 
 > * Only small (< 200 kB) image formats are recommended.
 
 Reference: 
@@ -242,6 +242,8 @@ Comprehensive support. Keyboard type can be hinted.
 Comprehensive support, incl. tri-state for "not answered"
 
 See: http://build.fhir.org/questionnaire.html#booleans for a discussion of tri-state.
+
+> Tri-state is disabled by default, but can be enabled.
 
 ---
 ### choice
@@ -333,8 +335,8 @@ Specification: https://www.hl7.org/fhir/extension-variable.html
 The ordinalValue of all choice questions can be summed up into a total score.
 
 The total score will be entered into a field which meets one of the following characteristics:
-- is readOnly and has extension `http://hl7.org/fhir/StructureDefinition/questionnaire-unit` with *display* value = `{score}`
-- has a calculatedExpression with name 'score'
+1. is readOnly and has extension `http://hl7.org/fhir/StructureDefinition/questionnaire-unit` with *display* value = `{score}`
+2. has a calculatedExpression with name 'score'
 
 > The well-known [NLM Form Builder](https://lhcformbuilder.nlm.nih.gov) will set the `questionnaire-unit` extension
 > to `{score}`, but will not set the item to `readOnly`. Setting this manually to `true` will result in a questionnaire
