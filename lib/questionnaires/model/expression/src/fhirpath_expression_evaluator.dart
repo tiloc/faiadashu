@@ -14,6 +14,9 @@ class FhirPathExpressionEvaluator extends FhirExpressionEvaluator {
 
   late final ParserList _parsedFhirPath;
 
+  int? _generation;
+  dynamic _cachedResult;
+
   FhirPathExpressionEvaluator(
     this.resourceBuilder,
     Expression fhirPathExpression,
@@ -36,7 +39,11 @@ class FhirPathExpressionEvaluator extends FhirExpressionEvaluator {
   }
 
   @override
-  dynamic evaluate() {
+  dynamic evaluate({int? generation}) {
+    if (generation != null && _generation == generation) {
+      return _cachedResult;
+    }
+
     final upstreamExpressions = this.upstreamExpressions;
 
     final upstreamMap = <String, dynamic>{};
@@ -45,15 +52,20 @@ class FhirPathExpressionEvaluator extends FhirExpressionEvaluator {
       final name = ArgumentError.checkNotNull(upstreamExpression.name);
       final key = '%$name';
 
-      try {
-        final value = upstreamExpression.evaluate();
+/*      try {
+        final value = upstreamExpression.evaluate(generation: generation);
 
         upstreamMap[key] = value;
       } catch (ex) {
         // If resolving the value fails: silently put nothing into the map
         // If it was required it will fail later during FHIRPath eval. If not: great!
         _logger.warn('Cannot fetch upstream $upstreamExpression', error: ex);
-      }
+      } */
+      upstreamMap[key] = () {
+        _logger.debug('Lazy eval of: $key');
+
+        return upstreamExpression.evaluate(generation: generation);
+      };
     }
 
     final jsonContext =
@@ -66,6 +78,11 @@ class FhirPathExpressionEvaluator extends FhirExpressionEvaluator {
     );
 
     _logger.debug('${toStringShort()} $fhirPath: $fhirPathResult');
+
+    if (generation != null) {
+      _cachedResult = fhirPathResult;
+      _generation = generation;
+    }
 
     return fhirPathResult;
   }
@@ -85,9 +102,10 @@ class FhirPathExpressionEvaluator extends FhirExpressionEvaluator {
   /// Using singleton collection evaluation: https://hl7.org/fhirpath/#singleton-evaluation-of-collections
   bool fetchBoolValue({
     String? location,
+    int? generation,
     required bool unknownValue,
   }) {
-    final fhirPathResult = evaluate();
+    final fhirPathResult = evaluate(generation: generation);
 
     if (fhirPathResult == null) {
       return unknownValue;

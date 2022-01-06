@@ -60,6 +60,22 @@ class _StringAnswerInputControl extends AnswerInputControl<StringAnswerModel> {
   @override
   Widget build(BuildContext context) {
     final answerModel = this.answerModel;
+
+    // FIXME: What should be the repaint mechanism for calculated items?
+    // (it is getting repainted currently, but further optimization might break that)
+
+    // Calculated items need an automated entry into the text field.
+    if (itemModel.isCalculated) {
+      final currentValue = answerModel.value ?? '';
+
+      editingController.value = TextEditingValue(
+        text: currentValue,
+        selection: TextSelection.fromPosition(
+          TextPosition(offset: currentValue.length),
+        ),
+      );
+    }
+
     final keyboardType = const {
       StringAnswerKeyboard.plain: TextInputType.text,
       StringAnswerKeyboard.email: TextInputType.emailAddress,
@@ -90,6 +106,14 @@ class _StringAnswerInputControl extends AnswerInputControl<StringAnswerModel> {
                   )
                 : null,
             hintText: answerModel.entryFormat,
+            prefixIcon: itemModel.isCalculated
+                ? Icon(
+                    Icons.calculate,
+                    color: (answerModel.displayErrorText != null)
+                        ? Theme.of(context).errorColor
+                        : null,
+                  )
+                : null,
           ),
           validator: (inputValue) => answerModel.validateInput(inputValue),
           autovalidateMode: AutovalidateMode.always,

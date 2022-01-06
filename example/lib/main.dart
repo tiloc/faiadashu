@@ -441,6 +441,10 @@ class _HomePageState extends State<HomePage> {
                 'assets/instruments/hf_instrument.json',
               ),
               _launchQuestionnaire(
+                  'Framingham HCDC',
+                  'Real-world cardiac risk scoring. Very heavy use of FHIRPath.',
+                  'assets/instruments/framingham-hcdc.json'),
+              _launchQuestionnaire(
                 'PRAPARE Survey',
                 'Real-world, mixed-type survey from the US',
                 'assets/instruments/prapare_instrument.json',
@@ -579,7 +583,10 @@ class _HomePageState extends State<HomePage> {
                 },
               ),
               _headline(
-                  context, 'Info', '📰 Extra! Extra! Read all about it! 📰',),
+                context,
+                'Info',
+                '📰 Extra! Extra! Read all about it! 📰',
+              ),
               ListTile(
                 title: const Text('About Faiadashu™ FHIRDash'),
                 subtitle: const Text(

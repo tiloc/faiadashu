@@ -206,6 +206,15 @@ class QuestionnaireResponseModel {
     // * error flagging
     // ================================================================
 
+    // Aggregators (the [QuestionnaireResponseAggregator] in particular)
+    // need to be initialized for initialExpression to work.
+    final responseAggregators = questionnaireResponseModel._aggregators;
+    if (responseAggregators != null) {
+      for (final aggregator in responseAggregators) {
+        aggregator.init(questionnaireResponseModel);
+      }
+    }
+
     // Populate initial values if response == null
     if (response == null) {
       questionnaireResponseModel
@@ -218,10 +227,8 @@ class QuestionnaireResponseModel {
     }
 
     // Aggregators can only latch onto the model after its initial structure has been created
-    final responseAggregators = questionnaireResponseModel._aggregators;
     if (responseAggregators != null) {
       for (final aggregator in responseAggregators) {
-        aggregator.init(questionnaireResponseModel);
         // Assumption: aggregators that don't autoAggregate will have their aggregate method invoked manually when it matters.
         if (aggregator.autoAggregate) {
           aggregator.aggregate(notifyListeners: true);

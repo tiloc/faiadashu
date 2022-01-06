@@ -13,7 +13,7 @@ class FhirQueryExpressionEvaluator extends FhirExpressionEvaluator {
         );
 
   @override
-  dynamic evaluate() {
+  dynamic evaluate({int? generation}) {
     // TODO: implement evaluate
     return [];
   }

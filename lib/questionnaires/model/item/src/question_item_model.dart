@@ -399,7 +399,9 @@ class QuestionItemModel extends ResponseItemModel {
       questionnaireResponseModel.questionnaireLevelExpressionEvaluators,
     );
 
-    final evaluationResult = initialExpressionEvaluator.evaluate();
+    final evaluationResult = initialExpressionEvaluator.evaluate(
+      generation: questionnaireResponseModel.generation,
+    );
 
     if (evaluationResult is! List || evaluationResult.isEmpty) {
       return null;
@@ -415,7 +417,9 @@ class QuestionItemModel extends ResponseItemModel {
     }
 
     try {
-      final rawEvaluationResult = calculatedExpression.evaluate();
+      final rawEvaluationResult = calculatedExpression.evaluate(
+        generation: questionnaireResponseModel.generation,
+      );
 
       _qimLogger.debug('calculatedExpression: $rawEvaluationResult');
 

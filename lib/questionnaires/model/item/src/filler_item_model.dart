@@ -108,7 +108,7 @@ abstract class FillerItemModel extends ResponseNode {
       }
     }
 
-    _itemLevelExpressionEvaluators = [...itemUpstream, ...qiLevelVars];
+    _itemLevelExpressionEvaluators = [...qiLevelVars];
   }
 
   /// Returns the [ExpressionEvaluator]s for this item, such as item-level variables
@@ -226,6 +226,7 @@ abstract class FillerItemModel extends ResponseNode {
 
     if (!(enableWhenExpression as FhirPathExpressionEvaluator).fetchBoolValue(
       unknownValue: false,
+      generation: questionnaireResponseModel.generation,
       location: nodeUid,
     )) {
       _nextGenerationDisableWithDescendants();
@@ -558,7 +559,7 @@ class _QuestionnaireItemExpressionEvaluator extends ExpressionEvaluator {
   late final Map<String, dynamic> questionnaireItemJson;
 
   @override
-  dynamic evaluate() {
+  dynamic evaluate({int? generation}) {
     final qi = questionnaireItemJson;
 
     return [qi];

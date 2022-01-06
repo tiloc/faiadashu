@@ -99,6 +99,7 @@ abstract class ResponseItemModel extends FillerItemModel {
 
     final isSatisfied = constraintExpression.fetchBoolValue(
       unknownValue: true,
+      generation: questionnaireResponseModel.generation,
       location: nodeUid,
     );
 

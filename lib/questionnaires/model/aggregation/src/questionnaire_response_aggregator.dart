@@ -16,12 +16,6 @@ class QuestionnaireResponseAggregator
   QuestionnaireResponseAggregator()
       : super(QuestionnaireResponse(), autoAggregate: false);
 
-  /// Initialize the aggregator.
-  @override
-  void init(QuestionnaireResponseModel questionnaireResponseModel) {
-    super.init(questionnaireResponseModel);
-  }
-
   QuestionnaireResponseItem? _fromQuestionItem(
     QuestionItemModel itemModel,
     QuestionnaireResponseStatus responseStatus,
