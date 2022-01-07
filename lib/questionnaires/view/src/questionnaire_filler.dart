@@ -242,6 +242,7 @@ class QuestionnaireFillerData extends InheritedWidget {
   ///
   /// The item filler will be determined as by [itemFillerAt].
   void requestFocus(int index) {
+    assert(index >= 0);
     _logger.trace('requestFocus $index');
     final fillerUid = fillerItemModels.elementAt(index).nodeUid;
     final itemFillerState = _itemFillerStates[fillerUid];

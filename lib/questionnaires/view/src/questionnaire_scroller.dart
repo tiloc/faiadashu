@@ -265,8 +265,8 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
           }
         }
 
-        if (_focusIndex <= 0) {
-          return;
+        if (_focusIndex == -1) {
+          return; // Nothing found, nothing to focus.
         }
 
         _logger.debug(

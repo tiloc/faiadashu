@@ -163,6 +163,7 @@
             <list>
               <option value="$PROJECT_DIR$/../fhir/fhir_path/lib" />
               <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_path-0.5.0-17/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_path-0.5.0-18/lib" />
             </list>
           </value>
         </entry>
@@ -479,6 +480,7 @@
           <value>
             <list>
               <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/plugin_platform_interface-2.0.2/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/plugin_platform_interface-2.1.0/lib" />
             </list>
           </value>
         </entry>
@@ -703,6 +705,7 @@
           <value>
             <list>
               <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/webview_flutter_platform_interface-1.8.0/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/webview_flutter_platform_interface-1.8.1/lib" />
             </list>
           </value>
         </entry>
@@ -775,6 +778,7 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir-0.5.0-11/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_auth-0.5.0-9/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_path-0.5.0-17/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_path-0.5.0-18/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_yaml-0.5.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/fhir_yaml-0.5.2/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/file-6.1.2/lib" />
@@ -817,6 +821,7 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/petitparser-4.4.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/platform-3.1.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/plugin_platform_interface-2.0.2/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/plugin_platform_interface-2.1.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/process-4.2.4/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/pub_semver-2.1.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/quiver-3.0.1+1/lib" />
@@ -848,6 +853,7 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/webview_flutter-3.0.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/webview_flutter_android-2.8.2/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/webview_flutter_platform_interface-1.8.0/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/webview_flutter_platform_interface-1.8.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/webview_flutter_web-0.1.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/webview_flutter_wkwebview-2.7.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/win32-2.3.3/lib" />

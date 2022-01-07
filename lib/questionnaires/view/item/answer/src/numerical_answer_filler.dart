@@ -57,6 +57,7 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
         )
       : _NumberFieldInputControl(
           answerModel,
+          focusNode: firstFocusNode,
           editingController: _editingController,
         );
 }
