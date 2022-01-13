@@ -52,10 +52,6 @@ dev_dependencies:
 
   lint: ^1.8.1
 
-dependency_overrides:
-  fhir:
-    path: /Users/tilo/Projects/fhir/fhir
-
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
