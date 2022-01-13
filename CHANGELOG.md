@@ -18,7 +18,7 @@
 * NarrativeTile uses native WebView when available.
   * supported on Android, iOS, web
   * supports <img> tags, and thus itemMedia, and XHTML with <img>
-* Support for bi-state for boolean (tri-state still supported)
+* Support for bi-state for boolean (tri-state continues to be supported)
   * Less confusing for the average user
 * Moved away from helper methods to small Widgets
 * Converted QuestionnaireTheme to InheritedWidget for alignment with general theming in Flutter

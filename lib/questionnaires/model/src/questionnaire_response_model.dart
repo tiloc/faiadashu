@@ -103,8 +103,7 @@ class QuestionnaireResponseModel {
   }
 
   void _setupLaunchContext() {
-    // RESEARCH: The specification is very vague, but real-world use suggests
-    // that mapping the patient to %patient is the right thing to do.
+    // TODO: Implement https://jira.hl7.org/browse/FHIR-32644
     _launchContextExpressions = [
       ResourceExpressionEvaluator('patient', () => launchContext.patient),
     ];
