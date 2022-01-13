@@ -35,10 +35,6 @@ dependencies:
 
   simple_html_css: ^3.0.1
 
-dependency_overrides:
-  fhir:
-    path: /Users/tilo/Projects/fhir/fhir
-
 dev_dependencies:
   lint: ^1.7.2
 
