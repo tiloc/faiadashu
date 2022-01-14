@@ -2,7 +2,7 @@ import 'package:faiadashu/questionnaires/questionnaires.dart';
 import 'package:flutter/material.dart';
 
 abstract class QuestionnaireItemFiller extends StatefulWidget {
-  final QuestionnaireTheme questionnaireTheme;
+  final QuestionnaireThemeData questionnaireTheme;
   final FillerItemModel fillerItemModel;
 
   String get responseUid => fillerItemModel.nodeUid;
@@ -21,7 +21,7 @@ abstract class QuestionnaireItemFillerState<W extends QuestionnaireItemFiller>
   Widget? get titleWidget => _titleWidget;
 
   QuestionnaireFillerData? _questionnaireFiller;
-  QuestionnaireTheme get questionnaireTheme => widget.questionnaireTheme;
+  QuestionnaireThemeData get questionnaireTheme => widget.questionnaireTheme;
 
   late final FocusNode _focusNode;
   FocusNode get focusNode => _focusNode;

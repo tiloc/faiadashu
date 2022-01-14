@@ -54,6 +54,8 @@ class NarrativeAggregator extends Aggregator<Narrative> {
             ? itemText.xhtmlText
             : null;
 
+    final itemMedia = itemModel.questionnaireItemModel.itemMedia;
+
     if (itemModel is GroupItemModel) {
       if ((usageMode == usageModeDisplayNonEmptyCode ||
               usageMode == usageModeCaptureDisplayNonEmptyCode) &&
@@ -82,13 +84,14 @@ class NarrativeAggregator extends Aggregator<Narrative> {
       throw ArgumentError('Expecting QuestionItemModel', 'itemModel');
     }
 
-    return _addQuestionItemToDiv(div, itemModel, prefixedItemText);
+    return _addQuestionItemToDiv(div, itemModel, prefixedItemText, itemMedia);
   }
 
   bool _addQuestionItemToDiv(
     StringBuffer div,
     QuestionItemModel itemModel,
     String? prefixedItemText,
+    ItemMediaModel? itemMedia,
   ) {
     final usageMode = itemModel.questionnaireItemModel.usageMode;
     if ((usageMode == usageModeDisplayNonEmptyCode ||
@@ -99,6 +102,11 @@ class NarrativeAggregator extends Aggregator<Narrative> {
 
     if (prefixedItemText != null) {
       div.write('<h3>$prefixedItemText</h3>');
+    }
+
+    // TODO: What is the preference? Inline with item text, or emit underneath?
+    if (itemMedia != null) {
+      div.write(itemMedia.toXhtml());
     }
 
     if (itemModel.isUnanswered) {
@@ -127,7 +135,10 @@ class NarrativeAggregator extends Aggregator<Narrative> {
       final filledAnswers = itemModel.answeredAnswerModels;
 
       final repeatPrefix =
-          itemModel.questionnaireItemModel.isRepeating ? '• ' : '';
+          itemModel.questionnaireItemModel.questionnaireItem.repeats?.value ??
+                  false
+              ? '• '
+              : '';
       for (final answerModel in filledAnswers) {
         if (answerModel is NumericalAnswerModel) {
           if (itemModel.questionnaireItemModel.isTotalScore) {
@@ -138,9 +149,19 @@ class NarrativeAggregator extends Aggregator<Narrative> {
             );
           }
         } else {
-          div.write(
-            '<p>$repeatPrefix${answerModel.display.xhtmlTextWithMedia}</p>',
-          );
+          // Output of answer option media for coding items
+          if (answerModel is CodingAnswerModel) {
+            final displayItems = answerModel.toDisplay();
+            for (final displayItem in displayItems) {
+              div.write(
+                '<p>$repeatPrefix${displayItem.xhtmlText}</p>',
+              );
+            }
+          } else {
+            div.write(
+              '<p>$repeatPrefix${answerModel.display.xhtmlText}</p>',
+            );
+          }
         }
       }
     }
@@ -165,7 +186,7 @@ class NarrativeAggregator extends Aggregator<Narrative> {
         in questionnaireResponseModel.orderedFillerItemModels()) {
       generated = generated | _addFillerItemToDiv(div, itemModel);
     }
-    div.write('<p>&nbsp;</p>');
+    div.write('<p>&#160;</p>');
     div.write('</div>');
 
     return Narrative(

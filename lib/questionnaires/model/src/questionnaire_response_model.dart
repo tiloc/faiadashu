@@ -8,11 +8,40 @@ import 'package:fhir/r4/r4.dart';
 import 'package:flutter/foundation.dart';
 
 /// High-level model of a response to a questionnaire.
-class QuestionnaireResponseModel extends ChangeNotifier {
+class QuestionnaireResponseModel {
   static final _logger = Logger(QuestionnaireResponseModel);
+
+  /// Notifies listeners when items have been added or removed dynamically.
+  ///
+  /// This is meant for filler views to update their internal data model.
+  final structuralChangeNotifier = ValueNotifier<int>(-1);
+
+  /// Notifies listeners when the value of any answer has changed.
+  ///
+  /// This is meant for aggregators, such as total score.
+  ///
+  /// Since values also become valid/invalid when enablement changes, this
+  /// will also trigger when enablement has changed.
+  ///
+  /// Since values are also considered new/changed when the structure has changed,
+  /// this will also trigger when structure has changed.
+  final valueChangeNotifier = ValueNotifier<int>(-1);
+
+  // TODO: Notifying on changed validity would allow for richer progress bars.
+  /// Notifies listeners when answered/populated of any answer has changed.
+  ///
+  /// This is meant for progress bars.
+  ///
+  /// Since values also become answered/unanswered when enablement changes, this
+  /// will also trigger when enablement has changed.
+  ///
+  /// Since values are also considered new/changed when the structure has changed,
+  /// this will also trigger when structure has changed.
+  final answeredChangeNotifier = ValueNotifier<int>(-1);
 
   // In which generation were the enabled items last determined?
   int _updateEnabledGeneration = -1;
+
   final List<Aggregator>? _aggregators;
 
   final QuestionnaireModel questionnaireModel;
@@ -24,6 +53,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
   final List<FillerItemModel> _fillerItems = [];
 
+  /// Maps UIDs to [AnswerModel]s.
   final _answerModels = <String, AnswerModel>{};
 
   // Questionnaire-level variables
@@ -40,7 +70,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     // Questionnaire will be evaluated as the root of the QuestionnaireResponse.
     final questionnaireResponseExpression = ResourceExpressionEvaluator(
       'resource',
-      () => questionnaireResponse,
+      () => createQuestionnaireResponseForFhirPath(),
     );
 
     return [
@@ -57,7 +87,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
   late final Iterable<ExpressionEvaluator> _launchContextExpressions;
 
-  bool _enableWhenExpressionsActivated = false;
+  bool _visibilityActivated = false;
 
   /// Constructor for empty model.
   ///
@@ -73,7 +103,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   }
 
   void _setupLaunchContext() {
-    // RESEARCH: Not sure what I truly need to do here???
+    // TODO: Implement https://jira.hl7.org/browse/FHIR-32644
     _launchContextExpressions = [
       ResourceExpressionEvaluator('patient', () => launchContext.patient),
     ];
@@ -96,7 +126,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
         }
 
         final variable = FhirExpressionEvaluator.fromExpression(
-          () => questionnaireResponse,
+          () => createQuestionnaireResponseForFhirPath(),
           variableExpression,
           [..._questionnaireBelowVariablesExpressionEvaluators, ...qLevelVars],
         );
@@ -175,22 +205,29 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     // * error flagging
     // ================================================================
 
+    // Aggregators (the [QuestionnaireResponseAggregator] in particular)
+    // need to be initialized for initialExpression to work.
+    final responseAggregators = questionnaireResponseModel._aggregators;
+    if (responseAggregators != null) {
+      for (final aggregator in responseAggregators) {
+        aggregator.init(questionnaireResponseModel);
+      }
+    }
+
     // Populate initial values if response == null
     if (response == null) {
       questionnaireResponseModel
           .orderedQuestionItemModels()
           .forEach((qim) async {
-        await qim.populateInitialValue();
+        qim.populateInitialValue();
       });
     } else {
       questionnaireResponseModel.populate(response);
     }
 
     // Aggregators can only latch onto the model after its initial structure has been created
-    final responseAggregators = questionnaireResponseModel._aggregators;
     if (responseAggregators != null) {
       for (final aggregator in responseAggregators) {
-        aggregator.init(questionnaireResponseModel);
         // Assumption: aggregators that don't autoAggregate will have their aggregate method invoked manually when it matters.
         if (aggregator.autoAggregate) {
           aggregator.aggregate(notifyListeners: true);
@@ -200,11 +237,18 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
     // Set up calculatedExpressions on items
     questionnaireResponseModel._updateCalculations();
-    questionnaireResponseModel
+    questionnaireResponseModel.valueChangeNotifier
         .addListener(questionnaireResponseModel._updateCalculations);
 
-    // Set up enableWhen behavior on items
-    questionnaireResponseModel._activateEnableBehavior();
+    // Set up dynamic enableWhen behavior on items
+    questionnaireResponseModel._activateEnablement();
+
+    // Calculate visibility for every item
+    for (final fillerItemModel
+        in questionnaireResponseModel.orderedFillerItemModels()) {
+      fillerItemModel.structuralNextGeneration(notifyListeners: false);
+      fillerItemModel.handleResponseStatusChange();
+    }
 
     return questionnaireResponseModel;
   }
@@ -335,22 +379,35 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   }
 
   /// Returns an [Aggregator] of the given type.
+  ///
+  /// Throws StateError if such an Aggregator does not exist.
   T aggregator<T extends Aggregator>() {
     if (_aggregators == null) {
       throw StateError('Aggregators have not been specified in constructor.');
     }
 
-    // FIXME: better handle non-existent aggregator of requested type.
-    return (_aggregators?.firstWhere((aggregator) => aggregator is T) as T?)!;
+    final aggregator =
+        _aggregators?.firstWhere((aggregator) => aggregator is T) as T?;
+
+    if (aggregator == null) {
+      throw StateError('Aggregator not found. Aggregators: $_aggregators');
+    } else {
+      return aggregator;
+    }
   }
 
   /// Changes the [generation] and notifies all listeners.
   ///
   /// Each generation is unique during a run of the application.
-  void nextGeneration({bool notifyListeners = true}) {
+  void nextGeneration({
+    bool notifyListeners = true,
+    bool isValueChange = true,
+    bool isStructuralChange = true,
+    bool isAnsweredChange = true,
+  }) {
     final newGeneration = _generation + 1;
     _logger.debug(
-      'nextGeneration $notifyListeners: $_generation -> $newGeneration',
+      'nextGeneration notify: $notifyListeners|value: $isValueChange|answered: $isAnsweredChange|structural: $isStructuralChange|$_generation -> $newGeneration',
     );
     _generation = newGeneration;
 
@@ -358,26 +415,40 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     _cachedQuestionnaireResponse = null;
 
     if (notifyListeners) {
-      this.notifyListeners();
+      if (isValueChange || isStructuralChange) {
+        valueChangeNotifier.value = newGeneration;
+      }
+      if (isStructuralChange) {
+        structuralChangeNotifier.value = newGeneration;
+      }
+      if (isAnsweredChange || isStructuralChange) {
+        answeredChangeNotifier.value = newGeneration;
+      }
     }
   }
 
   Map<String, dynamic>? _cachedQuestionnaireResponse;
 
   /// INTERNAL ONLY - Returns a FHIR JSON fragment for a node with a given [uid].
-  Map<String, dynamic>? responseItemByUid(String uid) {
+  Map<String, dynamic>? fhirResponseItemByUid(String uid) {
     _cachedQuestionnaireResponse ??=
         aggregator<QuestionnaireResponseAggregator>().aggregateResponseItems();
 
     return _cachedQuestionnaireResponse?[uid] as Map<String, dynamic>?;
   }
 
-  /// Returns a [QuestionnaireResponse].
+  /// Returns a FHIR [QuestionnaireResponse] for use with FHIRPath.
+  ///
+  /// Does not include disabled items, as these should not be visible to FHIRPath.
+  /// Does not include a narrative, as this is costly and not used in real-world.
   ///
   /// The response matches the model as of the current generation.
-  QuestionnaireResponse? get questionnaireResponse {
+  QuestionnaireResponse? createQuestionnaireResponseForFhirPath() {
     _cachedQuestionnaireResponse ??=
-        aggregator<QuestionnaireResponseAggregator>().aggregateResponseItems();
+        aggregator<QuestionnaireResponseAggregator>().aggregateResponseItems(
+      responseStatus: QuestionnaireResponseStatus.completed,
+      generateNarrative: false,
+    );
 
     return _cachedQuestionnaireResponse?[QuestionnaireResponseAggregator
         .questionnaireResponseKey] as QuestionnaireResponse?;
@@ -386,14 +457,15 @@ class QuestionnaireResponseModel extends ChangeNotifier {
   /// Returns a number that indicates whether the model has changed.
   int get generation => _generation;
 
-  QuestionnaireResponseStatus _responseStatus =
-      QuestionnaireResponseStatus.in_progress;
+  final responseStatusNotifier = ValueNotifier<QuestionnaireResponseStatus>(
+    QuestionnaireResponseStatus.in_progress,
+  );
 
-  QuestionnaireResponseStatus get responseStatus => _responseStatus;
+  QuestionnaireResponseStatus get responseStatus =>
+      responseStatusNotifier.value;
 
   set responseStatus(QuestionnaireResponseStatus newStatus) {
-    _responseStatus = newStatus;
-    nextGeneration();
+    responseStatusNotifier.value = newStatus;
   }
 
   void _populateItems(
@@ -526,22 +598,15 @@ class QuestionnaireResponseModel extends ChangeNotifier {
         questionnaireResponse.status ?? QuestionnaireResponseStatus.in_progress;
   }
 
-  Future<void> _updateCalculations() async {
+  void _updateCalculations() {
     orderedResponseItemModels()
         .where((rim) => rim.questionnaireItemModel.isCalculatedExpression)
         .forEach((rim) async {
       if (rim is QuestionItemModel) {
-        await rim.updateCalculatedExpression();
+        rim.updateCalculatedExpression();
       }
     });
   }
-
-  /// Returns a bitfield of the items with `isEnabled` == true.
-  List<bool> get _currentlyEnabledItems => List<bool>.generate(
-        orderedFillerItemModels().length,
-        (index) => orderedFillerItemModels().elementAt(index).isEnabled,
-        growable: false,
-      );
 
   /// Update the current enablement status of all items.
   ///
@@ -559,13 +624,7 @@ class QuestionnaireResponseModel extends ChangeNotifier {
 
     _updateEnabledGeneration = _generation;
 
-    // OPTIMIZE: Is this check worth it?
-    if (!orderedFillerItemModels().any(
-      (fim) =>
-          fim.questionnaireItemModel.isEnabledWhen ||
-          fim.questionnaireItemModel.isEnabledWhenExpression ||
-          fim.questionnaireItemModel.isNestedItem,
-    )) {
+    if (!questionnaireModel.isDynamicallyEnabled) {
       _logger.debug(
         'updateEnabledItems: no conditionally enabled items',
       );
@@ -573,56 +632,77 @@ class QuestionnaireResponseModel extends ChangeNotifier {
       return;
     }
 
-    final previouslyEnabled = _currentlyEnabledItems;
-    _logger.trace('prevEnabled: $previouslyEnabled');
     for (final itemModel in orderedFillerItemModels()) {
-      itemModel.enable();
+      itemModel.nextGenerationEnable();
     }
 
+    bool hasEnablementChanged = false;
     for (final fim in orderedFillerItemModels().where(
-      (fim) =>
-          fim.questionnaireItemModel.isEnabledWhen ||
-          fim.questionnaireItemModel.isEnabledWhenExpression ||
-          fim.questionnaireItemModel.isNestedItem,
+      (fim) => fim.isDynamicallyEnabled,
     )) {
       fim.updateEnabled();
     }
 
-    final nowEnabled = _currentlyEnabledItems;
-    _logger.trace('nowEnabled: $nowEnabled');
+    // Go over all items, since the previous loop would not catch
+    // updates in descendants.
+    for (final fim in orderedFillerItemModels()) {
+      hasEnablementChanged |= fim.enableNextGeneration();
+    }
 
-    if (!listEquals(previouslyEnabled, nowEnabled)) {
-      nextGeneration(notifyListeners: notifyListeners);
+    if (hasEnablementChanged) {
+      nextGeneration(
+        notifyListeners: notifyListeners,
+        isStructuralChange: false,
+      );
     } else {
       _logger.debug('Enabled items unchanged.');
     }
   }
 
-  /// Activate the enable behavior.
+  /// Activate the dynamic enablement and visibility behaviors.
   ///
-  /// Adds the required listeners to evaluate enableWhen and
+  /// * Adds the required listeners to evaluate enableWhen and
   /// enableWhenExpression as items are changed.
-  void _activateEnableBehavior() {
-    final hasEnabledWhenExpressions = orderedFillerItemModels()
-        .any((fim) => fim.questionnaireItemModel.isEnabledWhenExpression);
+  ///
+  /// * Adds the required listeners to update visibility based on
+  /// questionnaire response status
+  ///
+  /// Idempotent: Will only execute once during the lifetime of this model.
+  void _activateEnablement() {
+    if (!_visibilityActivated) {
+      // Initial calculation of all enablement.
+      updateEnabledItems();
 
-    if (hasEnabledWhenExpressions) {
-      // When enableWhenExpression is involved we need to add listeners to every
-      // non-static item (or the overall response model), as we have no way to
-      // find out which items are referenced by the FHIRPath expression.
-      if (!_enableWhenExpressionsActivated) {
-        addListener(() => updateEnabledItems());
-        _enableWhenExpressionsActivated = true;
+      final hasEnabledWhenExpressions = orderedFillerItemModels()
+          .any((fim) => fim.questionnaireItemModel.hasEnabledWhenExpression);
+
+      if (hasEnabledWhenExpressions) {
+        // When enableWhenExpression is involved we need to add listeners to every
+        // non-static item as we have no way to
+        // find out which items are referenced by the FHIRPath expression.
+        for (final itemModel in orderedResponseItemModels()) {
+          itemModel.addListener(() => updateEnabledItems());
+        }
+      } else {
+        // Activate enable behavior on individual items with surgical precision
+        for (final itemModel in orderedFillerItemModels()) {
+          itemModel.activateEnableWhen();
+        }
       }
-    } else {
-      // Activate enable behavior on individual items
-      for (final itemModel in orderedFillerItemModels()) {
-        itemModel.activateEnableBehavior();
-      }
+
+      // Add visibility change on response status change.
+      responseStatusNotifier.addListener(() {
+        for (final itemModel in orderedFillerItemModels()) {
+          itemModel.handleResponseStatusChange();
+        }
+      });
+
+      _visibilityActivated = true;
     }
-
-    updateEnabledItems();
   }
+
+  // TODO: This is only used by QuestionnaireScrollerState
+  // Remove from public API?
 
   /// Returns the index of the first [FillerItemModel] which matches the predicate function.
   ///
@@ -642,6 +722,22 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     }
 
     return notFound;
+  }
+
+  // TODO: Should this live in the model, or should it go to a
+  // class on the view level (QuestionnaireResponseFiller)? Should I mirror
+  // AnimatedList?
+
+  /// Drive all structural model changes to the next stage.
+  ///
+  /// This changes all items in state [StructuralState.adding] to
+  /// [StructuralState.present] and notifies the listeners on the
+  /// items if such a change happened. For items already in state
+  /// [StructuralState.present] this is a no-op.
+  void structuralNextGeneration({bool notifyListeners = true}) {
+    orderedFillerItemModels().forEach((fim) {
+      fim.structuralNextGeneration(notifyListeners: notifyListeners);
+    });
   }
 
   /// Returns the n-th item from the [orderedFillerItemModels].
@@ -718,26 +814,64 @@ class QuestionnaireResponseModel extends ChangeNotifier {
     nextGeneration();
   }
 
-  /// Returns whether the questionnaire meets all completeness criteria.
+  /// Return the [FillerItemModel] that corresponds to the given [uid].
   ///
-  /// Completeness criteria include:
+  /// Will return the parent [QuestionItemModel] if uid corresponds to an answer.
+  FillerItemModel? fillerItemModelByUid(String uid) {
+    final fillerItem =
+        orderedFillerItemModels().firstWhereOrNull((fim) => fim.nodeUid == uid);
+    if (fillerItem != null) {
+      return fillerItem;
+    }
+
+    final answerModel = _answerModels[uid];
+
+    return answerModel == null
+        ? null
+        : answerModel.parentNode! as QuestionItemModel;
+  }
+
+  /// Validates whether the questionnaire meets all completeness criteria.
+  ///
+  /// **Completeness criteria:**
+  ///
   /// * All required fields are filled
   /// * All filled fields are valid
   /// * All expression-based constraints are satisfied
   ///
-  /// Returns true, if everything is complete.
-  /// Returns false, if items are incomplete.
-  Future<bool> get isQuestionnaireComplete async {
+  /// Returns null, if everything is complete.
+  /// Returns a map (UID -> error text) with incomplete entries, if items are incomplete.
+  Map<String, String>? validate({
+    bool updateErrorText = true,
+    bool notifyListeners = false,
+  }) {
+    final invalidMap = <String, String>{};
+
     for (final itemModel in orderedResponseItemModels()) {
-      final isItemComplete = await itemModel.isComplete;
-      if (!isItemComplete) {
-        return false;
+      final errorTexts = itemModel.validate(
+        updateErrorText: updateErrorText,
+        notifyListeners: notifyListeners,
+      );
+      if (errorTexts != null) {
+        _logger.debug('$itemModel is invalid.');
+
+        invalidMap.addAll(errorTexts);
       }
     }
 
-    return true;
+    return invalidMap.isNotEmpty ? invalidMap : null;
   }
 
-  // TODO: Is it enough for this to be a bool? Or should it be a Set of UIDs?
-  final isValid = ValueNotifier<bool?>(null);
+  /// A map of UIDs -> error texts of invalid [ResponseNode]s.
+  /// Is [null] when no items are currently invalid.
+  ///
+  /// This should only be updated when a global response is desired,
+  /// such as the overall filler navigating to an invalid item.
+  ///
+  /// For local responses, only the local error text, data absent reason, etc.
+  /// should be updated.
+  ///
+  /// see: [answeredChangeNotifier]
+  final invalidityNotifier =
+      ValueNotifier<Map<String, String>?>(<String, String>{});
 }

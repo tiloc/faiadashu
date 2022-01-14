@@ -8,6 +8,7 @@ import 'package:simple_html_css/simple_html_css.dart';
 // OPTIMIZE: Can this wrapper around a child be avoided?
 
 /// Display XHTML formatted texts.
+@immutable
 class Xhtml extends StatelessWidget {
   static final Logger _logger = Logger(Xhtml);
 
@@ -30,7 +31,7 @@ class Xhtml extends StatelessWidget {
     final xhtmlString =
         RenderingString.fromText(plainText, extensions: extensions);
 
-    return Xhtml.fromXhtmlString(
+    return Xhtml.fromRenderingString(
       context,
       xhtmlString,
       questionnaireModel: questionnaireModel,
@@ -41,9 +42,9 @@ class Xhtml extends StatelessWidget {
     );
   }
 
-  factory Xhtml.fromXhtmlString(
+  factory Xhtml.fromRenderingString(
     BuildContext context,
-    RenderingString xhtmlString, {
+    RenderingString renderingString, {
     QuestionnaireModel? questionnaireModel,
     double? imageWidth,
     double? imageHeight,
@@ -51,12 +52,12 @@ class Xhtml extends StatelessWidget {
     int maxLines = defaultMaxLines,
     Key? key,
   }) {
-    _logger.trace('enter fromXhtmlString $xhtmlString');
+    _logger.trace('enter fromRenderingString $renderingString');
 
-    final xhtml = xhtmlString.xhtmlText;
-    final plainText = xhtmlString.plainText;
+    final xhtml = renderingString.xhtmlText;
+    final plainText = renderingString.plainText;
 
-    if (xhtmlString.isPlain) {
+    if (renderingString.isPlain) {
       return Xhtml._(
         Text(
           plainText,
@@ -67,18 +68,17 @@ class Xhtml extends StatelessWidget {
       );
     }
 
-    const imgSuffix = "'/>";
-
     for (final contentType in [
       'image/png',
       'image/jpeg',
+      'image/jpg',
     ]) {
       final imgPrefix = "<img src='data:$contentType;base64,";
 
       if (xhtml.startsWith(imgPrefix)) {
         final base64String = xhtml.substring(
           imgPrefix.length,
-          xhtml.length - imgSuffix.length,
+          xhtml.lastIndexOf("'"),
         );
 
         _logger.debug('Length of base64: ${base64String.length}');
@@ -99,7 +99,7 @@ class Xhtml extends StatelessWidget {
     if (xhtml.startsWith(imgHashPrefix)) {
       final elementId = xhtml.substring(
         imgHashPrefix.length,
-        xhtml.length - imgSuffix.length + 1,
+        xhtml.lastIndexOf("'"),
       );
       if (questionnaireModel == null) {
         throw StateError(
@@ -136,7 +136,7 @@ class Xhtml extends StatelessWidget {
             context,
             xhtml,
             defaultTextStyle:
-                defaultTextStyle ?? Theme.of(context).textTheme.bodyText1,
+                defaultTextStyle ?? Theme.of(context).textTheme.bodyText2,
           ),
         ),
       );

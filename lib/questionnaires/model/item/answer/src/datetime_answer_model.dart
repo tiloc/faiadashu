@@ -54,19 +54,18 @@ class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
 
   @override
   String? validateInput(FhirDateTime? inValue) {
+    return validateValue(inValue);
+  }
+
+  @override
+  String? validateValue(FhirDateTime? inValue) {
     return inValue == null || inValue.isValid
         ? null
         : lookupFDashLocalizations(locale).validatorDateTime;
   }
 
   @override
-  String? get isComplete {
-    // TODO: Look at validity?
-    return null;
-  }
-
-  @override
-  bool get isUnanswered => value == null;
+  bool get isEmpty => value == null;
 
   @override
   void populateFromExpression(dynamic evaluationResult) {

@@ -98,6 +98,11 @@ class FDashLocalizationsEn extends FDashLocalizations {
   }
 
   @override
+  String validatorSingleSelectionOrSingleOpenString(Object openLabel) {
+    return 'Either select an option, or enter free text in \"$openLabel\".';
+  }
+
+  @override
   String get dataAbsentReasonAskedDeclinedInputLabel =>
       'I choose not to answer.';
 
@@ -167,4 +172,7 @@ class FDashLocalizationsEn extends FDashLocalizations {
   String fillerAddAnotherItemLabel(Object itemLabel) {
     return 'Add another \"$itemLabel\"';
   }
+
+  @override
+  String get fillerExclusiveOptionLabel => '(exclusive)';
 }

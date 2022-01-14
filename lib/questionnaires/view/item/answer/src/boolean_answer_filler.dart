@@ -4,10 +4,9 @@ import 'package:flutter/material.dart';
 
 class BooleanAnswerFiller extends QuestionnaireAnswerFiller {
   BooleanAnswerFiller(
-    QuestionResponseItemFillerState responseFillerState,
     AnswerModel answerModel, {
     Key? key,
-  }) : super(responseFillerState, answerModel, key: key);
+  }) : super(answerModel, key: key);
   @override
   State<StatefulWidget> createState() => _BooleanItemState();
 }
@@ -23,7 +22,23 @@ class _BooleanItemState extends QuestionnaireAnswerFillerState<Boolean,
   }
 
   @override
-  Widget buildInputControl(BuildContext context) {
+  Widget createInputControl() => _BooleanInputControl(
+        answerModel,
+        focusNode: firstFocusNode,
+      );
+}
+
+class _BooleanInputControl extends AnswerInputControl<BooleanAnswerModel> {
+  const _BooleanInputControl(
+    BooleanAnswerModel answerModel, {
+    FocusNode? focusNode,
+  }) : super(
+          answerModel,
+          focusNode: focusNode,
+        );
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -31,22 +46,28 @@ class _BooleanItemState extends QuestionnaireAnswerFillerState<Boolean,
           height: 8,
         ),
         Checkbox(
-          focusNode: firstFocusNode,
-          value: value?.value,
-          activeColor: (answerModel.errorText != null)
+          focusNode: focusNode,
+          value: (answerModel.isTriState)
+              ? answerModel.value?.value
+              : (answerModel.value?.value != null),
+          activeColor: (answerModel.displayErrorText != null)
               ? Theme.of(context).errorColor
               : null,
-          tristate: true,
-          onChanged: (answerModel.isEnabled)
+          tristate: answerModel.isTriState,
+          onChanged: (answerModel.isControlEnabled)
               ? (newValue) {
-                  firstFocusNode.requestFocus();
-                  value = (newValue != null) ? Boolean(newValue) : null;
+                  focusNode?.requestFocus();
+                  answerModel.value = answerModel.isTriState
+                      ? ((newValue != null) ? Boolean(newValue) : null)
+                      : (newValue ?? false)
+                          ? Boolean(true)
+                          : null;
                 }
               : null,
         ),
-        if (answerModel.errorText != null)
+        if (answerModel.displayErrorText != null)
           Text(
-            answerModel.errorText!,
+            answerModel.displayErrorText!,
             style: Theme.of(context)
                 .textTheme
                 .caption!

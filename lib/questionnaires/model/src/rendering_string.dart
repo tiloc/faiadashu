@@ -9,6 +9,7 @@ import 'package:markdown/markdown.dart';
 /// information regarding styled rendering.
 ///
 /// See: http://hl7.org/fhir/R4/rendering-extensions.html
+@immutable
 class RenderingString with Diagnosticable {
   /// The plain, unstyled text. Suitable as a semantic label.
   final String plainText;
@@ -33,31 +34,6 @@ class RenderingString with Diagnosticable {
   /// The unaltered rendering-markdown extension
   final Markdown? renderingMarkdown;
 
-  /// A media attachment associated with this text
-  final Attachment? mediaAttachment;
-
-  bool get hasMedia => mediaAttachment != null;
-
-  /// For [RenderingString]s without media attachment: same as [xhtmlText].
-  ///
-  /// With media attachment:
-  /// Will place image media into an <img> tag as base64 encoded binary.
-  /// plainText will be used for the alt-attribute.
-  ///
-  /// This will include the media attachment and might thus be very large.
-  ///
-  /// As a fallback, for unsupported media types: same as [xhtmlText].
-  String get xhtmlTextWithMedia {
-    final mediaAttachment = this.mediaAttachment;
-
-    return mediaAttachment == null
-        ? xhtmlText
-        : (mediaAttachment.contentType?.value?.startsWith('image/') ?? false) &&
-                mediaAttachment.data != null
-            ? '<img alt="${_htmlEscape.convert(plainText)}" src="data:${mediaAttachment.contentType?.value!};base64,${mediaAttachment.data!}">'
-            : xhtmlText;
-  }
-
   /// Construct an [RenderingString] from the provided attributes.
   ///
   /// No alterations of the attributes will take place, in particular,
@@ -69,7 +45,6 @@ class RenderingString with Diagnosticable {
     this.renderingStyle,
     this.renderingXhtml,
     this.renderingMarkdown,
-    this.mediaAttachment,
   });
 
   /// Construct an [RenderingString] from plainText and optional extensions.
@@ -87,7 +62,6 @@ class RenderingString with Diagnosticable {
     String plainText, {
     List<FhirExtension>? extensions,
     String? xhtmlText,
-    Attachment? mediaAttachment,
   }) {
     final renderingXhtml = extensions
         ?.extensionOrNull(
@@ -134,7 +108,6 @@ class RenderingString with Diagnosticable {
       renderingStyle: renderingStyle,
       renderingXhtml: renderingXhtml,
       renderingMarkdown: renderingMarkdown,
-      mediaAttachment: mediaAttachment,
     );
   }
 
@@ -147,13 +120,6 @@ class RenderingString with Diagnosticable {
     super.debugFillProperties(properties);
 
     properties.add(StringProperty('plainText', plainText));
-    properties.add(
-      FlagProperty(
-        'media',
-        value: hasMedia,
-        ifTrue: 'HAS MEDIA',
-      ),
-    );
   }
 }
 

@@ -12,11 +12,26 @@ abstract class AnswerModel<I, V> extends ResponseNode {
   V? _value;
 
   V? get value => _value;
+
+  /// Set the [value].
+  ///
+  /// This will also validate it and set the errorText accordingly.
   set value(V? newValue) {
-    if (newValue != _value) {
+    if (_value != newValue) {
+      final isAnswered = responseItemModel.isAnswered;
+      final isUnanswered = responseItemModel.isUnanswered;
+      final isPopulated = responseItemModel.isPopulated;
+
       _value = newValue;
 
-      responseItemModel.onAnswerChanged(this);
+      final isAnsweredChange = isAnswered != responseItemModel.isAnswered ||
+          isUnanswered != responseItemModel.isUnanswered ||
+          isPopulated != responseItemModel.isPopulated;
+
+      responseItemModel.handleChangedAnswer(
+        this,
+        isAnsweredChange: isAnsweredChange,
+      );
     }
   }
 
@@ -33,10 +48,12 @@ abstract class AnswerModel<I, V> extends ResponseNode {
 
   QuestionnaireItem get qi => questionnaireItemModel.questionnaireItem;
 
-  bool get isEnabled =>
-      !questionnaireItemModel.isReadOnly &&
-      !(questionnaireResponseModel.responseStatus ==
-          QuestionnaireResponseStatus.completed);
+  /// Is the control for the answer to be enabled?
+  ///
+  /// * true: users may manipulate the control
+  /// * false: users may not manipulate the control
+  bool get isControlEnabled =>
+      responseItemModel.displayVisibility == DisplayVisibility.shown;
 
   /// Returns the human-readable entry format.
   ///
@@ -60,10 +77,15 @@ abstract class AnswerModel<I, V> extends ResponseNode {
   /// Returns null when [inputValue] is valid, or a localized message when it is not.
   ///
   /// This is used to validate external input from a view.
-  ///
   String? validateInput(I? inputValue);
 
-  /// Returns whether the answer will pass the completeness check.
+  /// Validates a value against the constraints of the answer model.
+  /// Does not change the [value] of the answer model.
+  ///
+  /// Returns null when it is valid, or a localized message when it is not.
+  String? validateValue(V? inputValue);
+
+  /// Validates whether the current [value] will pass the completeness check.
   ///
   /// Completeness means that the validity criteria are met,
   /// in order to submit a [QuestionnaireResponse] as complete.
@@ -73,15 +95,41 @@ abstract class AnswerModel<I, V> extends ResponseNode {
   ///
   /// Returns null when the answer is valid, or an error text,
   /// when it is not.
-  String? get isComplete;
+  ///
+  String? validate({
+    bool updateErrorText = true,
+    bool notifyListeners = false,
+  }) {
+    final newErrorText = validateValue(
+      value,
+    );
+
+    if (errorText == newErrorText) {
+      return newErrorText;
+    }
+
+    if (updateErrorText) {
+      errorText = newErrorText;
+    }
+    if (notifyListeners) {
+      this.notifyListeners();
+    }
+
+    return newErrorText;
+  }
 
   /// Returns whether any answer (valid or invalid) has been provided.
-  bool get isAnswered => !isUnanswered;
+  bool get isNotEmpty => !isEmpty;
 
   /// Returns whether this question is unanswered.
-  bool get isUnanswered;
+  bool get isEmpty;
 
-  String? get errorText => responseItemModel.errorText;
+  String? errorText;
+
+  /// Returns an error text for display in the answer's control.
+  ///
+  /// This might return an error text from the parent [QuestionItemModel].
+  String? get displayErrorText => errorText ?? responseItemModel.errorText;
 
   /// Returns a [QuestionnaireResponseAnswer] based on the current value.
   ///

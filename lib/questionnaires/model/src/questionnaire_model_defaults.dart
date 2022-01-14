@@ -17,6 +17,16 @@ class QuestionnaireModelDefaults {
 
   final RenderingString? Function(FillerItemModel)? prefixBuilder;
 
+  final QuestionnaireDisabledDisplay disabledDisplay;
+
+  /// Returns whether questions should offer an option to not answer the question
+  final bool implicitNullOption;
+
+  /// Returns whether boolean items should be tri-state.
+  ///
+  /// Boolean items will be tri-state if [true], or bi-state if [false].
+  final bool booleanTriState;
+
   /// Returns a prefix, starting with 1, that provides the number
   /// of the [QuestionItemModel] within the ordered sequence of [QuestionItemModels].
   ///
@@ -49,5 +59,8 @@ class QuestionnaireModelDefaults {
     this.sliderMaxValue = defaultSliderMaxValue,
     this.usageMode = usageModeCaptureDisplayNonEmptyCode,
     this.prefixBuilder,
+    this.disabledDisplay = QuestionnaireDisabledDisplay.hidden,
+    this.implicitNullOption = true,
+    this.booleanTriState = false,
   });
 }

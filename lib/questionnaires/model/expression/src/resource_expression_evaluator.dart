@@ -5,10 +5,10 @@ class ResourceExpressionEvaluator extends ExpressionEvaluator {
   final Resource? Function() resourceBuilder;
 
   @override
-  Future<dynamic> fetchValue() {
+  dynamic evaluate({int? generation}) {
     final resource = resourceBuilder.call()?.toJson();
 
-    return Future.value([resource]);
+    return [resource];
   }
 
   ResourceExpressionEvaluator(

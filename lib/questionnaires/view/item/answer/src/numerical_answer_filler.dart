@@ -7,10 +7,9 @@ import 'package:flutter/services.dart';
 /// Filler for answers of type [Integer], [Decimal], and [Quantity].
 class NumericalAnswerFiller extends QuestionnaireAnswerFiller {
   NumericalAnswerFiller(
-    QuestionResponseItemFillerState responseFillerState,
     AnswerModel answerModel, {
     Key? key,
-  }) : super(responseFillerState, answerModel, key: key);
+  }) : super(answerModel, key: key);
 
   @override
   State<NumericalAnswerFiller> createState() => _NumericalAnswerState();
@@ -18,18 +17,16 @@ class NumericalAnswerFiller extends QuestionnaireAnswerFiller {
 
 class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
     NumericalAnswerFiller, NumericalAnswerModel> {
-  late final TextInputFormatter _numberInputFormatter;
   final TextEditingController _editingController = TextEditingController();
 
-  double _sliderValueDuringChange = 0.0;
+  // This is being used like a controller
+  final ValueNotifier<double> _sliderValueDuringChange = ValueNotifier(0.0);
 
   @override
   void postInitState() {
-    _numberInputFormatter =
-        NumericalTextInputFormatter(answerModel.numberFormat);
-
-    final initialValue =
-        (value?.value != null) ? value!.value!.format(locale) : '';
+    final initialValue = (answerModel.value?.value != null)
+        ? answerModel.value!.value!.format(locale)
+        : '';
 
     _editingController.value = TextEditingValue(
       text: initialValue,
@@ -39,12 +36,230 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
     );
 
     const averageDivisor = 2.0;
-    _sliderValueDuringChange = (value != null)
-        ? value!.value!.value!
+    _sliderValueDuringChange.value = (answerModel.value != null)
+        ? answerModel.value!.value!.value!
         : (answerModel.maxValue - answerModel.minValue) / averageDivisor;
+
+    _sliderValueDuringChange.addListener(() {
+      // ignore: no-empty-block
+      setState(() {
+        // Repaint this parent widget when the slider changes.
+      });
+    });
   }
 
-  Widget _buildDropDownFromUnits(BuildContext context) {
+  @override
+  Widget createInputControl() => answerModel.isSliding
+      ? _SliderInputControl(
+          answerModel,
+          focusNode: firstFocusNode,
+          sliderValueDuringChange: _sliderValueDuringChange,
+        )
+      : _NumberFieldInputControl(
+          answerModel,
+          focusNode: firstFocusNode,
+          editingController: _editingController,
+        );
+}
+
+class _SliderInputControl extends AnswerInputControl<NumericalAnswerModel> {
+  final ValueNotifier<double> sliderValueDuringChange;
+
+  const _SliderInputControl(
+    NumericalAnswerModel answerModel, {
+    required this.sliderValueDuringChange,
+    FocusNode? focusNode,
+    Key? key,
+  }) : super(
+          answerModel,
+          focusNode: focusNode,
+          key: key,
+        );
+
+  @override
+  Widget build(BuildContext context) {
+    final answerModel = this.answerModel;
+    final lowerSliderLabel = answerModel.lowerSliderLabel;
+    final upperSliderLabel = answerModel.upperSliderLabel;
+
+    final hasSliderLabels =
+        lowerSliderLabel != null || upperSliderLabel != null;
+
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Slider(
+                focusNode: focusNode,
+                min: answerModel.minValue,
+                max: answerModel.maxValue,
+                divisions: answerModel.sliderDivisions,
+                value: sliderValueDuringChange.value,
+                label: Decimal(sliderValueDuringChange.value).format(locale),
+                // Changes are only propagated to the model at change-end time.
+                // onChange would cause very high-frequency storm of model updates
+                onChanged: answerModel.isControlEnabled
+                    ? (sliderValue) {
+                        sliderValueDuringChange.value = sliderValue;
+                      }
+                    : null, // Method required, or it gets disabled. setState required for updates.
+                onChangeEnd: answerModel.isControlEnabled
+                    ? (sliderValue) {
+                        sliderValueDuringChange.value = sliderValue;
+                        answerModel.value =
+                            answerModel.copyWithValue(Decimal(sliderValue));
+                      }
+                    : null,
+                onChangeStart: (_) {
+                  focusNode?.requestFocus();
+                },
+              ),
+            ),
+            if (answerModel.hasUnitChoices)
+              SizedBox(
+                height: 16,
+                child: _UnitDropDown(
+                  answerModel,
+                ),
+              ),
+          ],
+        ),
+        if (hasSliderLabels)
+          Row(
+            children: [
+              const SizedBox(width: 8.0),
+              if (lowerSliderLabel != null)
+                Xhtml.fromRenderingString(
+                  context,
+                  lowerSliderLabel,
+                  defaultTextStyle: Theme.of(context).textTheme.button,
+                ),
+              const Expanded(child: SizedBox()),
+              if (upperSliderLabel != null)
+                Xhtml.fromRenderingString(
+                  context,
+                  upperSliderLabel,
+                  defaultTextStyle: Theme.of(context).textTheme.button,
+                ),
+              const SizedBox(width: 8.0),
+            ],
+          ),
+        if (hasSliderLabels) const SizedBox(height: 8.0),
+      ],
+    );
+  }
+}
+
+class _NumberFieldInputControl
+    extends AnswerInputControl<NumericalAnswerModel> {
+  final TextEditingController editingController;
+  final TextInputFormatter numberInputFormatter;
+
+  _NumberFieldInputControl(
+    NumericalAnswerModel answerModel, {
+    required this.editingController,
+    FocusNode? focusNode,
+    Key? key,
+  })  : numberInputFormatter =
+            NumericalTextInputFormatter(answerModel.numberFormat),
+        super(
+          answerModel,
+          focusNode: focusNode,
+          key: key,
+        );
+
+  @override
+  Widget build(BuildContext context) {
+    // FIXME: What should be the repaint mechanism for calculated items?
+    // (it is getting repainted currently, but further optimization might break that)
+
+    // Calculated items need an automated entry into the text field.
+    if (itemModel.isCalculated) {
+      final currentValue = (answerModel.value?.value != null)
+          ? answerModel.value!.value!.format(locale)
+          : '';
+
+      editingController.value = TextEditingValue(
+        text: currentValue,
+        selection: TextSelection.fromPosition(
+          TextPosition(offset: currentValue.length),
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.only(top: 8, bottom: 8),
+      child: SizedBox(
+        height: 72, // Same height with and without error text
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: TextFormField(
+                focusNode: focusNode,
+                enabled: answerModel.isControlEnabled,
+                controller: editingController,
+                textAlignVertical: TextAlignVertical.center,
+                textAlign: TextAlign.end,
+                decoration: InputDecoration(
+                  errorText: answerModel.displayErrorText,
+                  errorStyle: (itemModel
+                          .isCalculated) // Force display of error text on calculated item
+                      ? TextStyle(
+                          color: Theme.of(context).errorColor,
+                        )
+                      : null,
+                  hintText: answerModel.entryFormat,
+                  prefixIcon: itemModel.isCalculated
+                      ? Icon(
+                          Icons.calculate,
+                          color: (answerModel.displayErrorText != null)
+                              ? Theme.of(context).errorColor
+                              : null,
+                        )
+                      : null,
+                  suffixIcon: (answerModel.hasUnitChoices)
+                      ? SizedBox(
+                          height: 16,
+                          child: _UnitDropDown(
+                            answerModel,
+                          ),
+                        )
+                      : null,
+                ),
+                inputFormatters: [numberInputFormatter],
+                keyboardType: TextInputType.numberWithOptions(
+                  signed: answerModel.minValue < 0,
+                  decimal: answerModel.maxDecimal > 0,
+                ),
+                validator: (itemModel.isCalculated)
+                    ? null
+                    : (inputValue) {
+                        return answerModel.validateInput(inputValue);
+                      },
+                autovalidateMode: (itemModel.isCalculated)
+                    ? AutovalidateMode.disabled
+                    : AutovalidateMode.always,
+                onChanged: (content) {
+                  answerModel.value = answerModel.copyWithTextInput(content);
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _UnitDropDown extends AnswerInputControl<NumericalAnswerModel> {
+  const _UnitDropDown(
+    NumericalAnswerModel answerModel,
+  ) : super(answerModel);
+
+  @override
+  Widget build(BuildContext context) {
     const unitWidth = 96.0;
 
     return answerModel.hasSingleUnitChoice
@@ -64,9 +279,9 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
               child: DropdownButton<String>(
                 value: answerModel.keyOfUnit,
                 hint: const NullDashText(),
-                onChanged: (answerModel.isEnabled)
+                onChanged: (answerModel.isControlEnabled)
                     ? (String? newValue) {
-                        value = answerModel.copyWithUnit(newValue);
+                        answerModel.value = answerModel.copyWithUnit(newValue);
                       }
                     : null,
                 items: [
@@ -80,150 +295,6 @@ class _NumericalAnswerState extends QuestionnaireAnswerFillerState<Quantity,
                   }).toList(),
                 ],
               ),
-            ),
-          );
-  }
-
-  @override
-  Widget buildInputControl(BuildContext context) {
-    // Calculated items need an automated entry into the text field.
-    if (itemModel.isCalculated) {
-      final currentValue =
-          (value?.value != null) ? value!.value!.format(locale) : '';
-
-      _editingController.value = TextEditingValue(
-        text: currentValue,
-        selection: TextSelection.fromPosition(
-          TextPosition(offset: currentValue.length),
-        ),
-      );
-    }
-
-    final lowerSliderLabel = answerModel.lowerSliderLabel;
-    final upperSliderLabel = answerModel.upperSliderLabel;
-
-    final hasSliderLabels =
-        lowerSliderLabel != null || upperSliderLabel != null;
-
-    return answerModel.isSliding
-        ? Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Slider(
-                      focusNode: firstFocusNode,
-                      min: answerModel.minValue,
-                      max: answerModel.maxValue,
-                      divisions: answerModel.sliderDivisions,
-                      value: _sliderValueDuringChange,
-                      label: Decimal(_sliderValueDuringChange).format(locale),
-                      // Changes are only propagated to the model at change-end time.
-                      // onChange would cause very high-frequency storm of model updates
-                      onChanged: answerModel.isEnabled
-                          ? (sliderValue) {
-                              setState(() {
-                                _sliderValueDuringChange = sliderValue;
-                              });
-                            }
-                          : null, // Method required, or it gets disabled. setState required for updates.
-                      onChangeEnd: answerModel.isEnabled
-                          ? (sliderValue) {
-                              _sliderValueDuringChange = sliderValue;
-                              value = answerModel
-                                  .copyWithValue(Decimal(sliderValue));
-                            }
-                          : null,
-                      onChangeStart: (_) {
-                        firstFocusNode.requestFocus();
-                      },
-                    ),
-                  ),
-                  if (answerModel.hasUnitChoices)
-                    SizedBox(
-                      height: 16,
-                      child: _buildDropDownFromUnits(context),
-                    ),
-                ],
-              ),
-              if (hasSliderLabels)
-                Row(
-                  children: [
-                    const SizedBox(width: 8.0),
-                    if (lowerSliderLabel != null)
-                      Xhtml.fromXhtmlString(
-                        context,
-                        lowerSliderLabel,
-                        defaultTextStyle: Theme.of(context).textTheme.button,
-                      ),
-                    const Expanded(child: SizedBox()),
-                    if (upperSliderLabel != null)
-                      Xhtml.fromXhtmlString(
-                        context,
-                        upperSliderLabel,
-                        defaultTextStyle: Theme.of(context).textTheme.button,
-                      ),
-                    const SizedBox(width: 8.0),
-                  ],
-                ),
-              if (hasSliderLabels) const SizedBox(height: 8.0),
-            ],
-          )
-        : Container(
-            padding: const EdgeInsets.only(top: 8, bottom: 8),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: TextFormField(
-                    focusNode: firstFocusNode,
-                    enabled: answerModel.isEnabled,
-                    controller: _editingController,
-                    textAlignVertical: TextAlignVertical.center,
-                    textAlign: TextAlign.end,
-                    decoration: questionnaireTheme.createDecoration().copyWith(
-                          errorText: answerModel.errorText,
-                          errorStyle: (itemModel
-                                  .isCalculated) // Force display of error text on calculated item
-                              ? TextStyle(
-                                  color: Theme.of(context).errorColor,
-                                )
-                              : null,
-                          hintText: answerModel.entryFormat,
-                          prefixIcon: itemModel.isCalculated
-                              ? Icon(
-                                  Icons.calculate,
-                                  color: (answerModel.errorText != null)
-                                      ? Theme.of(context).errorColor
-                                      : null,
-                                )
-                              : null,
-                          suffixIcon: (answerModel.hasUnitChoices)
-                              ? SizedBox(
-                                  height: 16,
-                                  child: _buildDropDownFromUnits(context),
-                                )
-                              : null,
-                        ),
-                    inputFormatters: [_numberInputFormatter],
-                    keyboardType: TextInputType.numberWithOptions(
-                      signed: answerModel.minValue < 0,
-                      decimal: answerModel.maxDecimal > 0,
-                    ),
-                    validator: (itemModel.isCalculated)
-                        ? null
-                        : (inputValue) {
-                            return answerModel.validateInput(inputValue);
-                          },
-                    autovalidateMode: (itemModel.isCalculated)
-                        ? AutovalidateMode.disabled
-                        : AutovalidateMode.always,
-                    onChanged: (content) {
-                      value = answerModel.copyWithTextInput(content);
-                    },
-                  ),
-                ),
-              ],
             ),
           );
   }

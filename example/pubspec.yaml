@@ -14,18 +14,20 @@ dependencies:
   faiadashu_online:
     path: ../faiadashu_online
 
-  fhir: ^0.5.0-10
+  fhir: ^0.5.0-12
 #  fhir:
 #    path: /Users/tilo/Projects/fhir/fhir
 
-#  fhir_auth: ^0.5.0-8
-  fhir_auth:
-    path: ../../fhir/fhir_auth
+  fhir_auth: ^0.5.0-9
+#  fhir_auth:
+#    path: ../../fhir/fhir_auth
 
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+
+  google_fonts: ^2.1.1
 
   intl: ^0.17.0
 

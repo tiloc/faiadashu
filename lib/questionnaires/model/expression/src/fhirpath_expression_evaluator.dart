@@ -2,7 +2,7 @@ import 'package:faiadashu/logging/logging.dart';
 import 'package:faiadashu/questionnaires/model/expression/expression.dart';
 import 'package:fhir/r4/metadata_types/metadata_types.dart';
 import 'package:fhir/r4/resource/resource.dart';
-import 'package:fhir_path/run_fhir_path.dart';
+import 'package:fhir_path/fhir_path.dart';
 import 'package:flutter/foundation.dart';
 
 class FhirPathExpressionEvaluator extends FhirExpressionEvaluator {
@@ -11,6 +11,11 @@ class FhirPathExpressionEvaluator extends FhirExpressionEvaluator {
   final Resource? Function()? resourceBuilder;
   final String fhirPath;
   final Map<String, dynamic>? Function()? jsonBuilder;
+
+  late final ParserList _parsedFhirPath;
+
+  int? _generation;
+  dynamic _cachedResult;
 
   FhirPathExpressionEvaluator(
     this.resourceBuilder,
@@ -29,10 +34,16 @@ class FhirPathExpressionEvaluator extends FhirExpressionEvaluator {
         '$name has wrong language: ${fhirPathExpression.language.toString()}',
       );
     }
+
+    _parsedFhirPath = parseFhirPath(fhirPath);
   }
 
   @override
-  Future<dynamic> fetchValue() async {
+  dynamic evaluate({int? generation}) {
+    if (generation != null && _generation == generation) {
+      return _cachedResult;
+    }
+
     final upstreamExpressions = this.upstreamExpressions;
 
     final upstreamMap = <String, dynamic>{};
@@ -41,27 +52,39 @@ class FhirPathExpressionEvaluator extends FhirExpressionEvaluator {
       final name = ArgumentError.checkNotNull(upstreamExpression.name);
       final key = '%$name';
 
-      try {
-        final value = await upstreamExpression.fetchValue();
+/*      try {
+        final value = upstreamExpression.evaluate(generation: generation);
 
         upstreamMap[key] = value;
       } catch (ex) {
         // If resolving the value fails: silently put nothing into the map
         // If it was required it will fail later during FHIRPath eval. If not: great!
         _logger.warn('Cannot fetch upstream $upstreamExpression', error: ex);
-      }
+      } */
+      upstreamMap[key] = () {
+        _logger.debug('Lazy eval of: $key');
+
+        return upstreamExpression.evaluate(generation: generation);
+      };
     }
 
     final jsonContext =
         resourceBuilder?.call()?.toJson() ?? jsonBuilder?.call();
-    final fhirPathResult =
-        walkFhirPath(jsonContext, fhirPath, environment: upstreamMap);
+    final fhirPathResult = executeFhirPath(
+      jsonContext,
+      _parsedFhirPath,
+      fhirPath,
+      environment: upstreamMap,
+    );
 
     _logger.debug('${toStringShort()} $fhirPath: $fhirPathResult');
 
-    return Future.value(
-      fhirPathResult,
-    );
+    if (generation != null) {
+      _cachedResult = fhirPathResult;
+      _generation = generation;
+    }
+
+    return fhirPathResult;
   }
 
   @override
@@ -77,11 +100,12 @@ class FhirPathExpressionEvaluator extends FhirExpressionEvaluator {
   ///
   /// Proper behavior is undefined: http://jira.hl7.org/browse/FHIR-33295
   /// Using singleton collection evaluation: https://hl7.org/fhirpath/#singleton-evaluation-of-collections
-  Future<bool> fetchBoolValue({
+  bool fetchBoolValue({
     String? location,
+    int? generation,
     required bool unknownValue,
-  }) async {
-    final fhirPathResult = await fetchValue();
+  }) {
+    final fhirPathResult = evaluate(generation: generation);
 
     if (fhirPathResult == null) {
       return unknownValue;

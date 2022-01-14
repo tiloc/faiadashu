@@ -4,6 +4,25 @@ import 'package:faiadashu/questionnaires/questionnaires.dart';
 import 'package:faiadashu/resource_provider/resource_provider.dart';
 import 'package:fhir/r4.dart';
 
+// TODO: Should this be modeled the same as usageMode?
+
+/// Codes that guide the display of disabled questionnaire items
+enum QuestionnaireDisabledDisplay {
+  /// The item (and its children) should not be visible to the user at all.
+  hidden,
+
+  /// The item (and possibly its children) should not be selectable or editable
+  /// but should still be visible - to allow the user to see what questions
+  /// *could* have been completed had other answers caused the item to be
+  /// enabled.
+  protected,
+
+  /// Same as [protected] for populated items, same as [hidden] for unpopulated items.
+  ///
+  /// see [FillerItemModel.isPopulated]
+  protectedNonEmpty,
+}
+
 /// Models a questionnaire.
 ///
 /// Higher-level abstraction of a FHIR domain [Questionnaire].
@@ -29,7 +48,8 @@ class QuestionnaireModel {
 
   /// Direct access to [FhirResourceProvider]s for special use-cases.
   ///
-  /// see: [getResource] for the preferred access method.
+  /// See also:
+  /// * [getResource], which is the preferred access method.
   final FhirResourceProvider fhirResourceProvider;
 
   final QuestionnaireModelDefaults questionnaireModelDefaults;
@@ -42,6 +62,8 @@ class QuestionnaireModel {
     required this.questionnaireModelDefaults,
   }) {
     _buildOrderedItems();
+
+    _calculateIsDynamicallyEnabled();
   }
 
   /// Create the model for a [Questionnaire].
@@ -363,5 +385,17 @@ class QuestionnaireModel {
     }
 
     return itemModelList;
+  }
+
+  late final bool _isDynamicallyEnabled;
+
+  /// Returns whether any item in this questionnaire is dynamically enabled.
+  bool get isDynamicallyEnabled => _isDynamicallyEnabled;
+
+  void _calculateIsDynamicallyEnabled() {
+    _isDynamicallyEnabled = orderedQuestionnaireItemModels().any(
+      (qim) =>
+          qim.isEnabledWhen || qim.hasEnabledWhenExpression || qim.isNestedItem,
+    );
   }
 }

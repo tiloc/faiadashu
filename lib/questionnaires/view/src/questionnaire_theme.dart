@@ -12,15 +12,34 @@ enum CodingControlPreference {
   expanded,
 }
 
+class QuestionnaireTheme extends InheritedWidget {
+  final QuestionnaireThemeData data;
+
+  const QuestionnaireTheme({
+    required this.data,
+    required Widget child,
+    Key? key,
+  }) : super(key: key, child: child);
+
+  static QuestionnaireThemeData of(BuildContext context) {
+    final inheritedTheme =
+        context.dependOnInheritedWidgetOfExactType<QuestionnaireTheme>();
+
+    return inheritedTheme == null
+        ? const QuestionnaireThemeData()
+        : inheritedTheme.data;
+  }
+
+  @override
+  bool updateShouldNotify(QuestionnaireTheme oldWidget) => false;
+}
+
 /// Create the views for all levels of a questionnaire. Provide styling theme.
-class QuestionnaireTheme {
-  static final _logger = Logger(QuestionnaireTheme);
+class QuestionnaireThemeData {
+  static final _logger = Logger(QuestionnaireThemeData);
 
   /// Returns whether user will be offered option to skip question.
   final bool canSkipQuestions;
-
-  /// Returns whether user will be offered option for a null radio button value.
-  final bool showNullAnswerOption;
 
   /// Returns whether a progress bar/circle is displayed while filling
   final bool showProgress;
@@ -38,21 +57,28 @@ class QuestionnaireTheme {
   static const defaultMaxLinesForTextItem = 4;
   final int maxLinesForTextItem;
 
-  static const defaultLandscapeBreakpoint = 1000.0;
-  final double landscapeBreakpoint;
+  static const defaultMaxItemWidth = 800.0;
+
+  /// The maximum width of the questionnaire items
+  ///
+  /// They will not use more width, even if the display is wider.
+  final double maxItemWidth;
 
   static const defaultCodingControlPreference = CodingControlPreference.compact;
   final CodingControlPreference codingControlPreference;
 
-  const QuestionnaireTheme({
+  final QuestionnaireAnswerFiller Function(AnswerModel, {Key? key})
+      createQuestionnaireAnswerFiller;
+
+  const QuestionnaireThemeData({
     this.canSkipQuestions = false,
-    this.showNullAnswerOption = true,
     this.showProgress = true,
     this.autoCompleteThreshold = defaultAutoCompleteThreshold,
-    this.landscapeBreakpoint = defaultLandscapeBreakpoint,
     this.horizontalCodingBreakpoint = defaultHorizontalCodingBreakpoint,
     this.maxLinesForTextItem = defaultMaxLinesForTextItem,
     this.codingControlPreference = defaultCodingControlPreference,
+    this.maxItemWidth = defaultMaxItemWidth,
+    this.createQuestionnaireAnswerFiller = _createDefaultAnswerFiller,
   });
 
   /// Returns a [QuestionnaireItemFiller] for a given [QuestionnaireResponseFiller].
@@ -86,16 +112,13 @@ class QuestionnaireTheme {
     }
   }
 
-  /// Returns a [QuestionnaireAnswerFiller] for a given [QuestionnaireResponseFiller].
-  ///
-  /// Can be overridden through inheritance of [QuestionnaireTheme].
-  QuestionnaireAnswerFiller createAnswerFiller(
-    QuestionResponseItemFillerState responseFiller,
+  /// Returns a [QuestionnaireAnswerFiller] for a given [AnswerModel].
+  static QuestionnaireAnswerFiller _createDefaultAnswerFiller(
     AnswerModel answerModel, {
     Key? key,
   }) {
     try {
-      final responseModel = responseFiller.responseItemModel;
+      final responseModel = answerModel.responseItemModel;
 
       _logger.debug(
         'Creating AnswerFiller for ${responseModel.questionnaireItemModel} - $answerModel',
@@ -114,19 +137,19 @@ class QuestionnaireTheme {
       }
 
       if (responseModel.questionnaireItemModel.isTotalScore) {
-        return TotalScoreItem(responseFiller, answerModel, key: key);
+        return TotalScoreItem(answerModel, key: key);
       }
 
       if (answerModel is NumericalAnswerModel) {
-        return NumericalAnswerFiller(responseFiller, answerModel, key: key);
+        return NumericalAnswerFiller(answerModel, key: key);
       } else if (answerModel is StringAnswerModel) {
-        return StringAnswerFiller(responseFiller, answerModel, key: key);
+        return StringAnswerFiller(answerModel, key: key);
       } else if (answerModel is DateTimeAnswerModel) {
-        return DateTimeAnswerFiller(responseFiller, answerModel, key: key);
+        return DateTimeAnswerFiller(answerModel, key: key);
       } else if (answerModel is CodingAnswerModel) {
-        return CodingAnswerFiller(responseFiller, answerModel, key: key);
+        return CodingAnswerFiller(answerModel, key: key);
       } else if (answerModel is BooleanAnswerModel) {
-        return BooleanAnswerFiller(responseFiller, answerModel, key: key);
+        return BooleanAnswerFiller(answerModel, key: key);
       } else if (answerModel is UnsupportedAnswerModel) {
         throw QuestionnaireFormatException(
           'Unsupported item type: ${answerModel.qi.type}',
@@ -139,19 +162,11 @@ class QuestionnaireTheme {
       _logger.warn('Cannot create answer filler:', error: exception);
 
       return BrokenAnswerFiller(
-        responseFiller,
         answerModel,
         exception,
         key: key,
       );
     }
-  }
-
-  /// Returns a decoration for [TextFormField]s.
-  ///
-  /// Used for consistent styling of all text fields in the filler.
-  InputDecoration createDecoration() {
-    return const InputDecoration(filled: true);
   }
 
   /// Decorate a [QuestionnaireAnswerFiller] with UI elements.
@@ -180,12 +195,10 @@ class QuestionnaireTheme {
   /// Will be disabled if [callback] is null.
   Widget buildAddRepetition(
     BuildContext context,
-    QuestionResponseItemFillerState responseFiller,
+    ResponseItemModel responseItemModel,
     VoidCallback? callback, {
     Key? key,
   }) {
-    final responseModel = responseFiller.responseItemModel;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -194,8 +207,8 @@ class QuestionnaireTheme {
           key: key,
           label: Text(
             FDashLocalizations.of(context).fillerAddAnotherItemLabel(
-              responseModel.questionnaireItemModel.shortText ??
-                  responseModel.questionnaireItemModel.text?.plainText ??
+              responseItemModel.questionnaireItemModel.shortText ??
+                  responseItemModel.questionnaireItemModel.text?.plainText ??
                   '',
             ),
           ),

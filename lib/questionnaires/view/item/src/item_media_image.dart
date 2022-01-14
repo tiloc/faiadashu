@@ -13,9 +13,28 @@ class ItemMediaImage extends StatelessWidget {
 
   const ItemMediaImage._(this.itemImageWidget, {Key? key}) : super(key: key);
 
+  static Widget? fromItemMedia(
+    ItemMediaModel? itemMediaModel, {
+    Key? key,
+    double? width,
+    double? height,
+  }) {
+    if (itemMediaModel == null) {
+      return null;
+    }
+
+    return ItemMediaImage._fromAttachment(
+      itemMediaModel.attachment,
+      mediaProvider: itemMediaModel.mediaProvider,
+      key: key,
+      width: width,
+      height: height,
+    );
+  }
+
   static Widget? _fromAttachment(
-    Attachment? attachment,
-    QuestionnaireModel questionnaireModel, {
+    Attachment? attachment, {
+    FhirResourceProvider? mediaProvider,
     Key? key,
     double? width,
     double? height,
@@ -42,8 +61,8 @@ class ItemMediaImage extends StatelessWidget {
 
     final itemImageUri = itemImageFhirUri.toString();
 
-    final itemImageWidget = (questionnaireModel.fhirResourceProvider
-            .providerFor(itemImageUri) as AssetImageAttachmentProvider?)
+    final itemImageWidget = (mediaProvider?.providerFor(itemImageUri)
+            as AssetImageAttachmentProvider?)
         ?.getImage(itemImageUri, width: width, height: height);
     if (itemImageWidget == null) {
       _logger.warn('Could not find image asset for $itemImageUri.');
@@ -52,43 +71,6 @@ class ItemMediaImage extends StatelessWidget {
     }
 
     return ItemMediaImage._(itemImageWidget);
-  }
-
-  /// Returns the itemImage [Widget] for a given [QuestionnaireItemModel].
-  ///
-  /// Returns null if no itemImage has been specified for the given item.
-  static Widget? fromAnswerOption(
-    CodingAnswerOptionModel optionModel, {
-    Key? key,
-    double? width,
-    double? height,
-  }) {
-    return _fromAttachment(
-      optionModel.mediaAttachment,
-      optionModel.questionnaireItemModel.questionnaireModel,
-      key: key,
-    );
-  }
-
-  /// Returns the itemImage [Widget] for a given [QuestionnaireItemModel].
-  ///
-  /// Returns null if no itemImage has been specified for the given item.
-  static Widget? fromQuestionnaireItem(
-    QuestionnaireItemModel itemModel, {
-    Key? key,
-    double? width,
-    double? height,
-  }) {
-    final itemImageAttachment = itemModel.questionnaireItem.extension_
-        ?.extensionOrNull(
-          'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemMedia',
-        )
-        ?.valueAttachment;
-
-    return _fromAttachment(
-      itemImageAttachment,
-      itemModel.questionnaireModel,
-    );
   }
 
   @override

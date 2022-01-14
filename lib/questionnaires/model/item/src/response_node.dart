@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 /// Commonalities between all nodes in the response tree.
 ///
 /// Unifies certain aspects of groups and answers.
-abstract class ResponseNode with Diagnosticable {
+abstract class ResponseNode with Diagnosticable, ChangeNotifier {
   final ResponseNode? parentNode;
 
   late final String _nodeUid;

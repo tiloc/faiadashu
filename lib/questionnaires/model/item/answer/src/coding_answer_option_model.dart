@@ -5,8 +5,6 @@ import 'package:faiadashu/questionnaires/model/model.dart';
 import 'package:fhir/r4.dart';
 
 class CodingAnswerOptionModel {
-  static const openChoiceCode = 'x-faiadashu-open-choice';
-
   final String uid;
 
   final QuestionnaireItemModel questionnaireItemModel;
@@ -21,9 +19,9 @@ class CodingAnswerOptionModel {
   /// `choiceColumn` extension is used.
   final String forDisplay;
 
-  final Attachment? mediaAttachment;
+  final ItemMediaModel? itemMedia;
 
-  bool get hasMedia => mediaAttachment != null;
+  bool get hasMedia => itemMedia != null;
 
   final Decimal? fhirOrdinalValue;
   final RenderingString? optionPrefix;
@@ -39,25 +37,12 @@ class CodingAnswerOptionModel {
     required this.questionnaireItemModel,
     required this.optionText,
     required this.forDisplay,
-    this.mediaAttachment,
+    this.itemMedia,
     this.coding,
     this.fhirOrdinalValue,
     this.optionPrefix,
     this.isExclusive = false,
   });
-
-  factory CodingAnswerOptionModel.fromOpenChoice(
-    QuestionnaireItemModel questionnaireItemModel,
-    RenderingString openLabel,
-  ) {
-    return CodingAnswerOptionModel._(
-      uid: openChoiceCode,
-      questionnaireItemModel: questionnaireItemModel,
-      optionText: openLabel,
-      forDisplay: 'ERROR', // will never be used.
-      isExclusive: true,
-    );
-  }
 
   factory CodingAnswerOptionModel.fromValueSetCoding(
     String uid,
@@ -162,7 +147,6 @@ class CodingAnswerOptionModel {
         optionText = RenderingString.fromText(
           plainText,
           extensions: xhtmlExtensions,
-          mediaAttachment: mediaAttachment,
         );
       } else {
         final plainText =
@@ -170,7 +154,6 @@ class CodingAnswerOptionModel {
         forDisplay = _createForDisplay(coding, locale, questionnaireItemModel);
         optionText = RenderingString.fromText(
           plainText,
-          mediaAttachment: mediaAttachment,
         );
       }
     } else {
@@ -187,9 +170,15 @@ class CodingAnswerOptionModel {
       optionText = RenderingString.fromText(
         plainText,
         extensions: xhtmlExtensions,
-        mediaAttachment: mediaAttachment,
       );
     }
+
+    final itemMedia = ItemMediaModel.fromAttachment(
+      mediaAttachment,
+      mediaProvider:
+          questionnaireItemModel.questionnaireModel.fhirResourceProvider,
+      altText: optionText,
+    );
 
     return CodingAnswerOptionModel._(
       uid: uid,
@@ -200,7 +189,7 @@ class CodingAnswerOptionModel {
       fhirOrdinalValue: ordinalValue,
       isExclusive: isExclusive,
       optionPrefix: optionPrefix,
-      mediaAttachment: mediaAttachment,
+      itemMedia: itemMedia,
     );
   }
 
@@ -228,26 +217,21 @@ class CodingAnswerOptionModel {
   }
 
   Coding createFhirCoding() {
-    if (uid != openChoiceCode) {
-      final ordinalExtension = _createOrdinalExtension();
-      final codingExtensions = ordinalExtension;
-      final coding = this.coding;
+    final ordinalExtension = _createOrdinalExtension();
+    final codingExtensions = ordinalExtension;
+    final coding = this.coding;
 
-      // TODO: Emit XHTML
+    // TODO: Emit XHTML
 
-      return coding != null
-          ? coding.copyWith(
-              extension_:
-                  (codingExtensions.isNotEmpty) ? codingExtensions : null,
-              userSelected: Boolean(true),
-            )
-          : Coding(
-              display: forDisplay,
-              userSelected: Boolean(true),
-            );
-    } else {
-      throw StateError('open text option cannot create FHIR Coding.');
-    }
+    return coding != null
+        ? coding.copyWith(
+            extension_: (codingExtensions.isNotEmpty) ? codingExtensions : null,
+            userSelected: Boolean(true),
+          )
+        : Coding(
+            display: forDisplay,
+            userSelected: Boolean(true),
+          );
   }
 
   static List<FhirExtension>? _findChoiceColumns(

@@ -18,7 +18,7 @@ class QuestionnaireResponseFiller extends StatefulWidget {
   final List<Aggregator<dynamic>>? aggregators;
   final void Function(BuildContext context, Uri url)? onLinkTap;
   final void Function(QuestionnaireResponseModel)? onDataAvailable;
-  final QuestionnaireTheme questionnaireTheme;
+  final QuestionnaireThemeData questionnaireTheme;
   final QuestionnaireModelDefaults questionnaireModelDefaults;
 
   final FhirResourceProvider fhirResourceProvider;
@@ -43,7 +43,7 @@ class QuestionnaireResponseFiller extends StatefulWidget {
     this.aggregators,
     this.onDataAvailable,
     this.onLinkTap,
-    this.questionnaireTheme = const QuestionnaireTheme(),
+    this.questionnaireTheme = const QuestionnaireThemeData(),
     this.questionnaireModelDefaults = const QuestionnaireModelDefaults(),
   }) : super(key: key);
 
@@ -67,11 +67,9 @@ class _QuestionnaireResponseFillerState
 
   late final Future<QuestionnaireResponseModel> builderFuture;
   QuestionnaireResponseModel? _questionnaireResponseModel;
-  VoidCallback? _onQuestionnaireResponseModelChangeListenerFunction;
+  VoidCallback? _handleQuestionnaireResponseModelChangeListenerFunction;
   // ignore: use_late_for_private_fields_and_variables
   QuestionnaireFillerData? _questionnaireFillerData;
-
-  int _fillerItemCount = -1;
 
   @override
   void initState() {
@@ -88,29 +86,28 @@ class _QuestionnaireResponseFillerState
   void dispose() {
     _logger.trace('dispose');
 
-    if (_onQuestionnaireResponseModelChangeListenerFunction != null &&
-        _questionnaireResponseModel != null) {
-      _questionnaireResponseModel!
-          .removeListener(_onQuestionnaireResponseModelChangeListenerFunction!);
-      _questionnaireResponseModel = null;
-      _onQuestionnaireResponseModelChangeListenerFunction = null;
+    final qrmListener = _handleQuestionnaireResponseModelChangeListenerFunction;
+
+    if (qrmListener != null) {
+      _questionnaireResponseModel?.structuralChangeNotifier.removeListener(
+        qrmListener,
+      );
     }
+    _questionnaireResponseModel = null;
+    _handleQuestionnaireResponseModelChangeListenerFunction = null;
+
     super.dispose();
   }
 
-  void _onQuestionnaireResponseModelChange() {
-    _logger.trace('_onQuestionnaireResponseModelChange');
-
-    final newFillerItems =
-        _questionnaireResponseModel!.orderedFillerItemModels();
-    final newFillerItemCount = newFillerItems.length;
+  void _handleQuestionnaireResponseModelStructuralChange() {
+    _logger
+        .debug('Response model structure has changed. Updating filler views.');
 
     if (mounted) {
-      setState(() {
-        if (_fillerItemCount != newFillerItemCount) {
-          _logger
-              .debug('Filler item count has changed. Updating filler views.');
-          _fillerItemCount = newFillerItemCount;
+      // This operation is very expensive. Make sure the code only reaches it
+      // when something truly relevant has changed.
+      setState(
+        () {
           _questionnaireFillerData = QuestionnaireFillerData._(
             _questionnaireResponseModel!,
             locale: widget.locale,
@@ -119,7 +116,15 @@ class _QuestionnaireResponseFillerState
             onDataAvailable: widget.onDataAvailable,
             questionnaireTheme: widget.questionnaireTheme,
           );
-        }
+        },
+      );
+
+      // Trigger animation effects for newly added items.
+      // Can only be done after initial frame has been drawn.
+      // This way AnimationXXX Widgets start out in the `adding` state and then
+      // animate towards the fully visible `present` state.
+      WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+        _questionnaireResponseModel?.structuralNextGeneration();
       });
     }
   }
@@ -151,15 +156,14 @@ class _QuestionnaireResponseFillerState
               _logger.debug('FutureBuilder hasData');
               _questionnaireResponseModel = snapshot.data;
 
-              _fillerItemCount =
-                  _questionnaireResponseModel!.orderedFillerItemModels().length;
-
               // OPTIMIZE: There has got to be a more elegant way? Goal is to register the listener exactly once, after the future has completed.
-              if (_onQuestionnaireResponseModelChangeListenerFunction == null) {
-                _onQuestionnaireResponseModelChangeListenerFunction =
-                    () => _onQuestionnaireResponseModelChange();
-                _questionnaireResponseModel!.addListener(
-                  _onQuestionnaireResponseModelChangeListenerFunction!,
+              if (_handleQuestionnaireResponseModelChangeListenerFunction ==
+                  null) {
+                _handleQuestionnaireResponseModelChangeListenerFunction =
+                    () => _handleQuestionnaireResponseModelStructuralChange();
+                _questionnaireResponseModel?.structuralChangeNotifier
+                    .addListener(
+                  _handleQuestionnaireResponseModelChangeListenerFunction!,
                 );
 
                 _questionnaireFillerData = QuestionnaireFillerData._(
@@ -194,7 +198,7 @@ class QuestionnaireFillerData extends InheritedWidget {
 
   final void Function(BuildContext context, Uri url)? onLinkTap;
   final void Function(QuestionnaireResponseModel)? onDataAvailable;
-  final QuestionnaireTheme questionnaireTheme;
+  final QuestionnaireThemeData questionnaireTheme;
   late final List<QuestionnaireItemFiller?> _itemFillers;
   final Map<String, QuestionnaireItemFillerState> _itemFillerStates = {};
   late final int _generation;
@@ -238,6 +242,7 @@ class QuestionnaireFillerData extends InheritedWidget {
   ///
   /// The item filler will be determined as by [itemFillerAt].
   void requestFocus(int index) {
+    assert(index >= 0);
     _logger.trace('requestFocus $index');
     final fillerUid = fillerItemModels.elementAt(index).nodeUid;
     final itemFillerState = _itemFillerStates[fillerUid];
