@@ -8,7 +8,8 @@ abstract class FhirExpressionEvaluator extends ExpressionEvaluator {
     Iterable<ExpressionEvaluator> upstreamExpressions, {
     String? debugLabel,
   }) : super(
-          fhirExpression.name?.value,
+          // Using .value breaks on real-world content with invalid identifiers.
+          fhirExpression.name?.toString(),
           upstreamExpressions,
           debugLabel: debugLabel,
         );
@@ -30,6 +31,11 @@ abstract class FhirExpressionEvaluator extends ExpressionEvaluator {
           debugLabel: debugLabel,
         );
       case ExpressionLanguage.application_x_fhir_query:
+        return FhirQueryExpressionEvaluator(
+          fhirExpression,
+          upstreamExpressions,
+          debugLabel: debugLabel,
+        );
       case ExpressionLanguage.text_cql:
       case ExpressionLanguage.unknown:
         throw UnsupportedError(

@@ -7,8 +7,6 @@ import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-// TODO: Some calculations regarding focus + front matter maybe currently off.
-
 /// Fills a [Questionnaire] through a vertically scrolling input form.
 ///
 /// Takes the [QuestionnaireItemFiller]s as provided by the [QuestionnaireResponseFiller]
@@ -29,14 +27,11 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 /// wraps the list in a ready-made [Scaffold], incl. some commonly used buttons.
 class QuestionnaireScroller extends StatefulWidget {
   final Locale? locale;
-  final List<Widget>? frontMatter;
-  final List<Widget>? backMatter;
   final FhirResourceProvider fhirResourceProvider;
   final LaunchContext launchContext;
   final List<Aggregator<dynamic>>? aggregators;
   final void Function(BuildContext context, Uri url)? onLinkTap;
   final QuestionnairePageScaffoldBuilder scaffoldBuilder;
-  final QuestionnaireTheme questionnaireTheme;
   final QuestionnaireModelDefaults questionnaireModelDefaults;
 
   final void Function(QuestionnaireResponseModel?)?
@@ -47,11 +42,8 @@ class QuestionnaireScroller extends StatefulWidget {
     required this.scaffoldBuilder,
     required this.fhirResourceProvider,
     required this.launchContext,
-    this.frontMatter,
-    this.backMatter,
     this.aggregators,
     this.onLinkTap,
-    this.questionnaireTheme = const QuestionnaireTheme(),
     this.questionnaireModelDefaults = const QuestionnaireModelDefaults(),
     this.onQuestionnaireResponseChanged,
     Key? key,
@@ -96,7 +88,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
     super.dispose();
   }
 
-  void _onQuestionnaireResponseChanged() {
+  void _handleChangedQuestionnaireResponse() {
     widget.onQuestionnaireResponseChanged?.call(_questionnaireResponseModel);
   }
 
@@ -167,17 +159,12 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
       fhirResourceProvider: widget.fhirResourceProvider,
       launchContext: widget.launchContext,
       locale: locale,
-      questionnaireTheme: widget.questionnaireTheme,
       questionnaireModelDefaults: widget.questionnaireModelDefaults,
       builder: (BuildContext context) {
         _belowFillerContext = context;
         final questionnaireFiller = QuestionnaireResponseFiller.of(context);
 
-        final mainMatterLength = questionnaireFiller.fillerItemModels.length;
-        final frontMatterLength = widget.frontMatter?.length ?? 0;
-        final backMatterLength = widget.backMatter?.length ?? 0;
-        final totalLength =
-            frontMatterLength + mainMatterLength + backMatterLength;
+        final totalLength = questionnaireFiller.fillerItemModels.length;
 
         _logger.trace(
           'Scroll position: ${_itemPositionsListener.itemPositions.value}',
@@ -191,33 +178,37 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
             setStateCallback: (fn) {
               setState(fn);
             },
-            child: ScrollablePositionedList.builder(
-              itemScrollController: _listScrollController,
-              itemPositionsListener: _itemPositionsListener,
-              itemCount: totalLength,
-              padding: const EdgeInsets.all(8),
-              minCacheExtent: 200, // Allow tabbing to prev/next items
-              itemBuilder: (BuildContext context, int i) {
-                final frontMatterIndex = (i < frontMatterLength) ? i : -1;
-                final mainMatterIndex = (i >= frontMatterLength &&
-                        i < (frontMatterLength + mainMatterLength))
-                    ? (i - frontMatterLength)
-                    : -1;
-                final backMatterIndex =
-                    (i >= (frontMatterLength + mainMatterLength) &&
-                            i < totalLength)
-                        ? (i - (frontMatterLength + mainMatterLength))
-                        : -1;
-                if (mainMatterIndex != -1) {
-                  return QuestionnaireResponseFiller.of(context)
-                      .itemFillerAt(mainMatterIndex);
-                } else if (backMatterIndex != -1) {
-                  return widget.backMatter![backMatterIndex];
-                } else if (frontMatterIndex != -1) {
-                  return widget.frontMatter![frontMatterIndex];
-                } else {
-                  throw StateError('ListView index out of bounds: $i');
-                }
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                const edgeInsets = 8.0;
+                const twice = 2;
+
+                return ScrollablePositionedList.builder(
+                  itemScrollController: _listScrollController,
+                  itemPositionsListener: _itemPositionsListener,
+                  itemCount: totalLength,
+                  padding: const EdgeInsets.all(edgeInsets),
+                  minCacheExtent: 200, // Allow tabbing to prev/next items
+                  itemBuilder: (BuildContext context, int i) {
+                    return Row(
+                      children: [
+                        Container(
+                          constraints: BoxConstraints(
+                            maxWidth: QuestionnaireTheme.of(context)
+                                .maxItemWidth
+                                .clamp(
+                                  constraints.minWidth,
+                                  constraints.maxWidth - twice * edgeInsets,
+                                ),
+                          ),
+                          child: QuestionnaireResponseFiller.of(context)
+                              .itemFillerAt(i),
+                        ),
+                        const Spacer(),
+                      ],
+                    );
+                  },
+                );
               },
             ),
           ),
@@ -237,23 +228,28 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
 
           if (widget.onQuestionnaireResponseChanged != null) {
             // TODO: Ideally an initial state should be broadcast, but this is leading to exceptions for UI updates/setState.
-            //            _onQuestionnaireResponseChanged();
+            //            _handleChangedQuestionnaireResponse();
 
-            _questionnaireResponseModel
-                ?.addListener(_onQuestionnaireResponseChanged);
+            // FIXME: What is this listening for???
+            _questionnaireResponseModel?.valueChangeNotifier
+                .addListener(_handleChangedQuestionnaireResponse);
           }
 
-          // Listen for new error flags and then scroll to the first one.
-          questionnaireResponseModel.isValid.addListener(() {
-            if (questionnaireResponseModel.isValid.value ?? true) {
+          // Listen for new invalid items and then scroll to the first one.
+          questionnaireResponseModel.invalidityNotifier.addListener(() {
+            final invalidNodes =
+                questionnaireResponseModel.invalidityNotifier.value;
+
+            if (invalidNodes == null) {
               return;
             }
 
+            final firstInvalidUid = invalidNodes.keys.first;
             final firstInvalidItem = questionnaireResponseModel
-                .orderedResponseItemModels()
-                .where((rim) => rim.errorText != null)
-                .first;
-            scrollToItem(firstInvalidItem);
+                .fillerItemModelByUid(firstInvalidUid);
+            if (firstInvalidItem != null) {
+              scrollToItem(firstInvalidItem);
+            }
           });
 
           _focusIndex = questionnaireResponseModel.indexOfFillerItem(
@@ -269,8 +265,8 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
           }
         }
 
-        if (_focusIndex <= 0) {
-          return;
+        if (_focusIndex == -1) {
+          return; // Nothing found, nothing to focus.
         }
 
         _logger.debug(

@@ -12,10 +12,9 @@ import 'package:simple_html_css/simple_html_css.dart';
 /// sundhed.dk questionnaire-feedback extension.
 class TotalScoreItem extends QuestionnaireAnswerFiller {
   TotalScoreItem(
-    QuestionResponseItemFillerState responseItemFillerState,
     AnswerModel answerModel, {
     Key? key,
-  }) : super(responseItemFillerState, answerModel, key: key);
+  }) : super(answerModel, key: key);
   @override
   State<StatefulWidget> createState() => _TotalScoreItemState();
 }
@@ -44,14 +43,14 @@ class _TotalScoreItemState extends State<TotalScoreItem> {
       _logger.debug(
         'Adding listener to ${widget.questionnaireItemModel} for calculated expression',
       );
-      widget.responseItemModel.questionnaireResponseModel
+      widget.responseItemModel.questionnaireResponseModel.valueChangeNotifier
           .addListener(_questionnaireChanged);
     }
   }
 
   @override
   void dispose() {
-    widget.responseItemModel.questionnaireResponseModel
+    widget.responseItemModel.questionnaireResponseModel.valueChangeNotifier
         .removeListener(_questionnaireChanged);
     super.dispose();
   }

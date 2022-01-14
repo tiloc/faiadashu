@@ -14,7 +14,7 @@ description: Faiadashu FHIRDash - Build beautiful healthcare apps fast — use t
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 0.6.0-dev.2
+version: 0.6.0-dev.3
 homepage: https://tiloc.github.io/faiadashu/
 repository: https://github.com/tiloc/faiadashu
 issue_tracker: https://github.com/tiloc/faiadashu/issues
@@ -25,12 +25,12 @@ environment:
 
 dependencies:
   collection: ^1.15.0
-  fhir: ^0.5.0-10
-  fhir_path: ^0.5.0-17
-#  fhir_path:
-#    path: /Users/tilo/Projects/fhir/fhir_path
+  fhir: ^0.5.0-12
+  fhir_path: ^0.5.0-19
 #  fhir:
 #    path: /Users/tilo/Projects/fhir/fhir
+#  fhir_path:
+#    path: /Users/tilo/Projects/fhir/fhir_path
   flutter:
     sdk: flutter
   flutter_localizations:
@@ -41,6 +41,8 @@ dependencies:
   meta: ^1.7.0
   scrollable_positioned_list: ^0.2.3
   simple_html_css: ^3.0.1
+  webview_flutter: ^3.0.0
+  webview_flutter_web: ^0.1.0
 
 dev_dependencies:
   dart_code_metrics: ^4.1.0

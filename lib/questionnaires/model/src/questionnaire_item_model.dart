@@ -46,7 +46,7 @@ class QuestionnaireItemModel with Diagnosticable {
   }
 
   /// Returns whether the item is enabled/disabled through an enabledWhenExpression condition.
-  bool get isEnabledWhenExpression {
+  bool get hasEnabledWhenExpression {
     return questionnaireItem.extension_?.extensionOrNull(
           'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression',
         ) !=
@@ -303,6 +303,17 @@ class QuestionnaireItemModel with Diagnosticable {
         )
         ?.valueString;
   }
+
+  ItemMediaModel? _itemMedia;
+  ItemMediaModel? get itemMedia => _itemMedia ??= ItemMediaModel.fromAttachment(
+        questionnaireItem.extension_
+            ?.extensionOrNull(
+              'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemMedia',
+            )
+            ?.valueAttachment,
+        mediaProvider: questionnaireModel.fhirResourceProvider,
+        altText: text,
+      );
 
   /// Returns the `usageMode` for the item, or the default.
   Code get usageMode {

@@ -182,6 +182,24 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
     if (number == double.nan) {
       return lookupFDashLocalizations(locale).validatorNan;
     }
+
+    final quantity = _valueFromNumber(number);
+
+    return validateValue(quantity);
+  }
+
+  @override
+  String? validateValue(Quantity? inputValue) {
+    if (inputValue == null) {
+      return null;
+    }
+
+    final number = inputValue.value;
+
+    if (number == null) {
+      return null;
+    }
+
     if (number > _maxValue) {
       return lookupFDashLocalizations(locale)
           .validatorMaxValue(Decimal(_maxValue).format(locale));
@@ -288,30 +306,14 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
   }
 
   @override
-  String? get isComplete {
-    // TODO: Check the actual value
-    return null;
-  }
+  bool get isEmpty => (value == null) || (value!.value == null);
 
-  @override
-  bool get isUnanswered => (value == null) || (value!.value == null);
-
-  @override
-  void populateFromExpression(dynamic evaluationResult) {
-    if (evaluationResult == null) {
-      value = null;
-
-      return;
-    }
-
+  Quantity? _valueFromNumber(dynamic inputNumber) {
     final unitCoding = qi.computableUnit;
 
-    // OPTIMIZE: Submit improvement to Grey: Decimal factory should accept Decimal inValue
-    final quantityValue = (evaluationResult is Decimal)
-        ? evaluationResult
-        : Decimal(evaluationResult);
+    final quantityValue = Decimal(inputNumber);
 
-    value = Quantity(
+    return Quantity(
       value: quantityValue,
       unit: unitCoding?.localizedDisplay(locale),
       system: unitCoding?.system,
@@ -332,13 +334,24 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
   }
 
   @override
+  void populateFromExpression(dynamic evaluationResult) {
+    if (evaluationResult == null) {
+      value = null;
+
+      return;
+    }
+
+    value = _valueFromNumber(evaluationResult);
+  }
+
+  @override
   void populate(QuestionnaireResponseAnswer answer) {
     value = answer.valueQuantity ??
         ((answer.valueDecimal != null && answer.valueDecimal!.isValid)
             ? Quantity(value: answer.valueDecimal)
             : (answer.valueInteger != null && answer.valueInteger!.isValid)
                 ? Quantity(
-                    value: Decimal(answer.valueInteger!.value!.toDouble()),
+                    value: Decimal(answer.valueInteger),
                   )
                 : null);
   }

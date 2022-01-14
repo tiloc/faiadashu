@@ -5,20 +5,16 @@ import 'package:flutter/material.dart';
 
 /// Filler for an individual [QuestionnaireResponseAnswer].
 abstract class QuestionnaireAnswerFiller extends StatefulWidget {
-  final QuestionResponseItemFillerState responseFillerState;
   final AnswerModel answerModel;
   final QuestionnaireItemModel questionnaireItemModel;
   final QuestionItemModel responseItemModel;
-  final QuestionnaireTheme questionnaireTheme;
 
   QuestionnaireAnswerFiller(
-    this.responseFillerState,
     this.answerModel, {
     Key? key,
-  })  : responseItemModel = responseFillerState.questionResponseItemModel,
+  })  : responseItemModel = answerModel.responseItemModel,
         questionnaireItemModel =
-            responseFillerState.responseItemModel.questionnaireItemModel,
-        questionnaireTheme = responseFillerState.questionnaireTheme,
+            answerModel.responseItemModel.questionnaireItemModel,
         super(key: key);
 }
 
@@ -32,15 +28,12 @@ abstract class QuestionnaireAnswerFillerState<
   late final Object? answerModelError;
 
   late final FocusNode firstFocusNode;
-  bool _isFocusHookedUp = false;
+  FocusNode? _parentFocusNode;
 
   QuestionnaireItem get qi => widget.questionnaireItemModel.questionnaireItem;
   Locale get locale =>
       widget.responseItemModel.questionnaireResponseModel.locale;
   QuestionnaireItemModel get itemModel => widget.questionnaireItemModel;
-
-  QuestionnaireTheme get questionnaireTheme =>
-      widget.responseFillerState.questionnaireTheme;
 
   QuestionnaireAnswerFillerState();
 
@@ -48,9 +41,9 @@ abstract class QuestionnaireAnswerFillerState<
   void initState() {
     super.initState();
 
-    try {
-      answerModelError = null;
+    Object? answerModelError;
 
+    try {
       firstFocusNode = FocusNode(
         debugLabel:
             'AnswerFiller firstFocusNode: ${widget.responseItemModel.nodeUid}',
@@ -63,9 +56,12 @@ abstract class QuestionnaireAnswerFillerState<
         error: exception,
       );
       answerModelError = exception;
+    } finally {
+      this.answerModelError = answerModelError;
     }
   }
 
+  // TODO: Can this be eliminated in favor of the normal initState?
   /// Initialize the filler after the model has been successfully finished.
   ///
   /// Do not place initialization code into [initState], but place it here.
@@ -75,58 +71,57 @@ abstract class QuestionnaireAnswerFillerState<
 
   @override
   void dispose() {
+    _parentFocusNode?.removeListener(_handleFocusChange);
     firstFocusNode.dispose();
     super.dispose();
   }
 
-  Widget _guardedBuildInputControl(BuildContext context) {
-    if (answerModelError != null) {
-      return BrokenQuestionnaireItem.fromException(answerModelError!);
-    }
-
-    // OPTIMIZE: Is there a more elegant solution? Do I have to unregister the listener?
-    // Listen to the parent FocusNode and become focussed when it does.
-    if (!_isFocusHookedUp) {
-      WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-        // Focus.of could otherwise fail with: Looking up a deactivated widget's ancestor is unsafe.
-        if (mounted) {
-          Focus.maybeOf(context)?.addListener(_focusHasChanged);
-        }
-      });
-      _isFocusHookedUp = true;
-    }
-
-    return buildInputControl(context);
-  }
-
-  void _focusHasChanged() {
-    if ((firstFocusNode.parent?.hasPrimaryFocus ?? false) &&
+  // FIXME: This assumes that questions can only have a single answer.
+  void _handleFocusChange() {
+    if ((_parentFocusNode?.hasPrimaryFocus ?? false) &&
         !firstFocusNode.hasPrimaryFocus) {
       firstFocusNode.requestFocus();
     }
   }
 
-  Widget buildInputControl(BuildContext context);
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
 
-  set value(V? newValue) {
-    if (mounted) {
-      setState(() {
-        // Updating an answer resets its error marker
-        widget.responseItemModel.errorText = null;
-        answerModel.value = newValue;
-      });
-    }
+    _parentFocusNode?.removeListener(_handleFocusChange);
+
+    _parentFocusNode = Focus.maybeOf(context);
+    _abstractLogger.debug('parentFocusNode: $_parentFocusNode');
+
+    _parentFocusNode?.addListener(_handleFocusChange);
   }
 
-  V? get value => answerModel.value;
+  /// Factory method to create an input control for the answer.
+  ///
+  /// Will have guaranteed availability of [answerModel].
+  ///
+  /// Will be invoked everytime the [answerModel] changes.
+  /// Thus, the returned Widget should preferably be const Stateless.
+  Widget createInputControl();
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: widget.responseItemModel.questionnaireResponseModel,
-      builder: (context, _) {
-        return _guardedBuildInputControl(context);
-      },
-    );
+    final answerModelError = this.answerModelError;
+
+    return answerModelError != null
+        ? BrokenQuestionnaireItem.fromException(answerModelError)
+        : AnimatedBuilder(
+            // FIXME: It should be possible to change this to answerModel, but leads to severe malfunctions
+            // Coding answers not working
+            // No redraw when validity of question item changes
+            animation: widget.responseItemModel,
+            builder: (context, _) {
+              try {
+                return createInputControl();
+              } catch (ex) {
+                return BrokenQuestionnaireItem.fromException(ex);
+              }
+            },
+          );
   }
 }

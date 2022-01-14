@@ -155,7 +155,7 @@ class _FhirDateTimePickerState extends State<FhirDateTimePicker> {
               });
               widget.onChanged?.call(null);
             },
-            icon: const Icon(Icons.clear),
+            icon: const Icon(Icons.cancel),
           ),
       ],
     );

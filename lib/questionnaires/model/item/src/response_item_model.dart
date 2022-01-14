@@ -24,7 +24,8 @@ abstract class ResponseItemModel extends FillerItemModel {
 
     _constraintExpression = constraintExpression != null
         ? FhirPathExpressionEvaluator(
-            () => questionnaireResponseModel.questionnaireResponse,
+            () => questionnaireResponseModel
+                .createQuestionnaireResponseForFhirPath(),
             Expression(
               expression: constraintExpression,
               language: ExpressionLanguage.text_fhirpath,
@@ -48,53 +49,60 @@ abstract class ResponseItemModel extends FillerItemModel {
     return returnValue;
   }
 
-  /// Is the item answered?
+  /// Returns a description of the current error situation with this item.
   ///
-  /// Static or read-only items are not answered.
-  /// Items which are not enabled are not answered.
-  bool get isAnswered;
-
-  /// Is the item unanswered?
-  ///
-  /// Static or read-only items are not unanswered.
-  /// Items which are not enabled are not unanswered.
-  bool get isUnanswered;
-
-  /// Is the item invalid?
-  bool get isInvalid;
-
-  /// Returns a description of an error situation with this response item.
+  /// Localized text if an error exists. Or null if no error exists.
   String? errorText;
 
-  Future<bool> get isComplete async {
+  Map<String, String>? validate({
+    bool updateErrorText = true,
+    bool notifyListeners = false,
+  }) {
+    String? newErrorText;
+
     if (questionnaireItemModel.isRequired && isUnanswered) {
-      errorText = lookupFDashLocalizations(questionnaireResponseModel.locale)
+      newErrorText = lookupFDashLocalizations(questionnaireResponseModel.locale)
           .validatorRequiredItem;
-
-      return false;
     }
 
-    if (!await isSatisfyingConstraint) {
-      errorText = questionnaireItemModel.constraintHuman;
+    final constraintError = validateConstraint();
+    newErrorText ??= constraintError;
 
-      return false;
+    if (errorText != newErrorText) {
+      if (updateErrorText) {
+        errorText = newErrorText;
+      }
+      if (notifyListeners) {
+        this.notifyListeners();
+      }
     }
 
-    return true;
+    if (newErrorText == null) {
+      return null;
+    } else {
+      final resultMap = <String, String>{};
+      resultMap[nodeUid] = newErrorText;
+
+      return resultMap;
+    }
   }
 
   /// Returns whether the item is satisfying the `questionnaire-constraint`.
   ///
-  /// Returns true if no constraint is specified.
-  Future<bool> get isSatisfyingConstraint async {
+  /// Returns null if satisfied, or a human-readable text if not satisfied.
+  /// Returns null if no constraint is specified.
+  String? validateConstraint() {
     final constraintExpression = _constraintExpression;
     if (constraintExpression == null) {
-      return true;
+      return null;
     }
 
-    return constraintExpression.fetchBoolValue(
+    final isSatisfied = constraintExpression.fetchBoolValue(
       unknownValue: true,
+      generation: questionnaireResponseModel.generation,
       location: nodeUid,
     );
+
+    return isSatisfied ? null : questionnaireItemModel.constraintHuman;
   }
 }

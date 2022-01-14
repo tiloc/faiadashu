@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:collection/collection.dart';
 import 'package:faiadashu/coding/coding.dart';
 import 'package:faiadashu/fhir_types/fhir_types.dart';
 import 'package:faiadashu/logging/logging.dart';
@@ -22,7 +25,10 @@ class QuestionItemModel extends ResponseItemModel {
   set dataAbsentReason(Code? newDataAbsentReason) {
     if (_dataAbsentReason != newDataAbsentReason) {
       _dataAbsentReason = newDataAbsentReason;
-      nextGeneration();
+      nextGeneration(
+        isStructuralChange: false,
+        isAnsweredChange: true,
+      );
     }
   }
 
@@ -46,7 +52,7 @@ class QuestionItemModel extends ResponseItemModel {
               ...itemWithPredecessorsExpressionEvaluators,
             ],
             jsonBuilder: () =>
-                questionnaireResponseModel.responseItemByUid(nodeUid),
+                questionnaireResponseModel.fhirResponseItemByUid(nodeUid),
           )
         : null;
   }
@@ -62,10 +68,21 @@ class QuestionItemModel extends ResponseItemModel {
   /// Triggers all required activities when any of the answers have changed.
   ///
   /// Creates nested fillers if needed.
-  void onAnswerChanged(AnswerModel answerModel) {
+  void handleChangedAnswer(
+    AnswerModel answerModel, {
+    required bool isAnsweredChange,
+  }) {
+    final flow = Flow.begin();
+    Timeline.startSync('handleChangedAnswer', flow: flow);
+    bool isStructuralChange = false;
+
     if (answerModel.value != null) {
       // An answer has been provided, check whether a nested filler structure needs to be created.
       if (questionnaireItemModel.hasChildren) {
+        final fillerItems = questionnaireResponseModel
+            .orderedFillerItemModels()
+            .toList(growable: false);
+
         // Nested structural items exist. Create fillers.
         final descendantItems =
             questionnaireResponseModel.insertFillerItemsIfAbsent(
@@ -73,25 +90,53 @@ class QuestionItemModel extends ResponseItemModel {
           questionnaireItemModel.children,
         );
 
+        final newFillerItems = questionnaireResponseModel
+            .orderedFillerItemModels()
+            .toList(growable: false);
+
+        isStructuralChange =
+            !const ListEquality().equals(fillerItems, newFillerItems);
+
         // Activate dynamic behavior
         for (final item in descendantItems) {
-          item.activateEnableBehavior();
+          item.activateEnableWhen();
         }
 
         questionnaireResponseModel.updateEnabledItems();
       }
     }
 
-    nextGeneration();
+    // Updates all error texts, but will not notify.
+    validate();
+
+    nextGeneration(
+      flow: Flow.end(flow.id),
+      isAnsweredChange: isAnsweredChange,
+      isStructuralChange: isStructuralChange,
+    );
+    Timeline.finishSync();
   }
 
   /// Changes the generation and notifies all listeners.
   ///
   /// Each generation is unique during a run of the application.
-  void nextGeneration() {
-    questionnaireResponseModel.nextGeneration();
-    // This notifies aggregators on changes to individual items
-    notifyListeners();
+  void nextGeneration({
+    Flow? flow,
+    required bool isAnsweredChange,
+    required bool isStructuralChange,
+  }) {
+    Timeline.timeSync(
+      'QuestionItemModel.nextGeneration',
+      () {
+        questionnaireResponseModel.nextGeneration(
+          isAnsweredChange: isAnsweredChange,
+          isStructuralChange: isStructuralChange,
+        );
+        // This notifies aggregators on changes to individual items
+        notifyListeners();
+      },
+      flow: flow,
+    );
   }
 
   /// Is this response invalid?
@@ -110,7 +155,7 @@ class QuestionItemModel extends ResponseItemModel {
   Decimal? get ordinalValue {
     final answerModel = firstAnswerModel;
 
-    return answerModel.isAnswered &&
+    return answerModel.isNotEmpty &&
             answerModel is CodingAnswerModel &&
             !questionnaireItemModel.isRepeating
         ? answerModel.singleSelection?.fhirOrdinalValue
@@ -131,23 +176,36 @@ class QuestionItemModel extends ResponseItemModel {
   }
 
   @override
-  Future<bool> get isComplete async {
-    // Non-existent answer models can be incomplete, e.g. if minOccurs is not met.
+  Map<String, String>? validate({
+    bool updateErrorText = true,
+    bool notifyListeners = false,
+  }) {
+    // Non-existent answer models can be invalid, e.g. if minOccurs is not met.
     _ensureAnswerModel();
 
-    final isResponseComplete = await super.isComplete;
+    final responseErrorTexts = super.validate(
+          updateErrorText: updateErrorText,
+          notifyListeners: notifyListeners,
+        ) ??
+        <String, String>{};
 
-    bool isAnswersComplete = true;
+    final answersErrorTexts = <String, String>{};
     for (final am in answerModels) {
-      final answerCompletionMessage = am.isComplete;
+      final answerValidationText = am.validate(
+        updateErrorText: updateErrorText,
+        notifyListeners: notifyListeners,
+      );
 
-      if (answerCompletionMessage != null) {
-        isAnswersComplete = false;
-        errorText = answerCompletionMessage;
+      if (answerValidationText != null) {
+        answersErrorTexts[am.nodeUid] = answerValidationText;
       }
     }
 
-    return isResponseComplete && isAnswersComplete;
+    final combinedErrorTexts = responseErrorTexts..addAll(answersErrorTexts);
+
+    return responseErrorTexts.isEmpty && answersErrorTexts.isEmpty
+        ? null
+        : combinedErrorTexts;
   }
 
   @override
@@ -157,7 +215,7 @@ class QuestionItemModel extends ResponseItemModel {
       return false;
     }
 
-    return answerModels.any((am) => am.isAnswered);
+    return answerModels.any((am) => am.isNotEmpty);
   }
 
   @override
@@ -166,10 +224,15 @@ class QuestionItemModel extends ResponseItemModel {
       return false;
     }
 
-    final returnValue = answerModels.every((am) => am.isUnanswered);
+    final returnValue = answerModels.every((am) => am.isEmpty);
     _qimLogger.debug('isUnanswered $nodeUid: $returnValue');
 
     return returnValue;
+  }
+
+  @override
+  bool get isPopulated {
+    return answerModels.any((am) => am.isNotEmpty);
   }
 
   /// Add the next answer to this response.
@@ -202,7 +265,7 @@ class QuestionItemModel extends ResponseItemModel {
 
   /// Returns the [AnswerModel]s which have been answered.
   Iterable<AnswerModel> get answeredAnswerModels {
-    return answerModels.where((am) => am.isAnswered);
+    return answerModels.where((am) => am.isNotEmpty);
   }
 
   /// Returns the [AnswerModel]s which have been answered,
@@ -212,7 +275,7 @@ class QuestionItemModel extends ResponseItemModel {
 
     final latestAnswerModel = this.latestAnswerModel;
 
-    return answerModels.where((am) => am.isAnswered || am == latestAnswerModel);
+    return answerModels.where((am) => am.isNotEmpty || am == latestAnswerModel);
   }
 
   /// Creates a new [AnswerModel] of the type for this question.
@@ -258,52 +321,57 @@ class QuestionItemModel extends ResponseItemModel {
 
   /// Populates the initial value of the item.
   /// Does nothing if initial value is not specified.
-  ///
-  /// Currently only supports 'initialExpression'.
-  Future<void> populateInitialValue() async {
+  void populateInitialValue() {
     _qimLogger.debug('populateInitialValue: $nodeUid');
     if (questionnaireItemModel.hasInitialExpression) {
-      final initialEvaluationResult = await evaluateInitialExpression();
+      final initialEvaluationResult = evaluateInitialExpression();
       firstAnswerModel.populateFromExpression(initialEvaluationResult);
     } else {
       // initial.value[x]
       final initialValues = questionnaireItem.initial;
 
       if (initialValues != null) {
-        final type = questionnaireItem.type;
+        final initialValue = initialValues.first;
 
-        if (type != QuestionnaireItemType.choice &&
-            type != QuestionnaireItemType.open_choice) {
-          if (initialValues.length != 1) {
-            throw QuestionnaireFormatException(
-              'Expected 1 initial value, found ${initialValues.length}',
-              questionnaireItem,
+        switch (questionnaireItem.type) {
+          case QuestionnaireItemType.integer:
+            firstAnswerModel
+                .populateFromExpression(initialValue.valueInteger?.value);
+            break;
+          case QuestionnaireItemType.decimal:
+            firstAnswerModel
+                .populateFromExpression(initialValue.valueDecimal?.value);
+            break;
+          case QuestionnaireItemType.string:
+            firstAnswerModel.populateFromExpression(initialValue.valueString);
+            break;
+          case QuestionnaireItemType.date:
+            firstAnswerModel.populateFromExpression(initialValue.valueDate);
+            break;
+          case QuestionnaireItemType.datetime:
+            firstAnswerModel.populateFromExpression(initialValue.valueDateTime);
+            break;
+          case QuestionnaireItemType.boolean:
+            firstAnswerModel.populateFromExpression(initialValue.valueBoolean);
+            break;
+          case QuestionnaireItemType.choice:
+          case QuestionnaireItemType.open_choice:
+            final initialCodings = initialValues
+                .where((qiv) => qiv.valueCoding != null)
+                .map<Coding>((qiv) => qiv.valueCoding!);
+
+            final initialOpenTexts = initialValues
+                .where((qiv) => qiv.valueString != null)
+                .map<String>((qiv) => qiv.valueString!);
+
+            (firstAnswerModel as CodingAnswerModel)
+                .populateFromCodings(initialCodings, initialOpenTexts);
+            break;
+          default:
+            // TODO: Implement for more types
+            _qimLogger.warn(
+              'No support for initial value on ${questionnaireItem.linkId}.',
             );
-          }
-
-          final initialValue = initialValues.first;
-
-          switch (questionnaireItem.type) {
-            case QuestionnaireItemType.integer:
-              firstAnswerModel
-                  .populateFromExpression(initialValue.valueInteger?.value);
-              break;
-            case QuestionnaireItemType.decimal:
-              firstAnswerModel
-                  .populateFromExpression(initialValue.valueDecimal?.value);
-              break;
-            case QuestionnaireItemType.string:
-              firstAnswerModel.populateFromExpression(initialValue.valueString);
-              break;
-            default:
-              // TODO: Implement for more types
-              _qimLogger.warn(
-                'No support for initial value on ${questionnaireItem.linkId}.',
-              );
-          }
-        } else {
-          _qimLogger
-              .warn('No support for initial on choice or open_choice items.');
         }
       }
     }
@@ -313,7 +381,7 @@ class QuestionItemModel extends ResponseItemModel {
   ///
   /// Returns null if the item does not have an initialExpression,
   /// or it evaluates to an empty list.
-  Future<dynamic> evaluateInitialExpression() async {
+  dynamic evaluateInitialExpression() {
     final fhirPathExpression =
         questionnaireItemModel.questionnaireItem.extension_
             ?.extensionOrNull(
@@ -322,7 +390,7 @@ class QuestionItemModel extends ResponseItemModel {
             ?.valueExpression;
 
     if (fhirPathExpression == null) {
-      return Future.value(null);
+      return null;
     }
 
     final initialExpressionEvaluator = FhirExpressionEvaluator.fromExpression(
@@ -331,23 +399,27 @@ class QuestionItemModel extends ResponseItemModel {
       questionnaireResponseModel.questionnaireLevelExpressionEvaluators,
     );
 
-    final evaluationResult = await initialExpressionEvaluator.fetchValue();
+    final evaluationResult = initialExpressionEvaluator.evaluate(
+      generation: questionnaireResponseModel.generation,
+    );
 
     if (evaluationResult is! List || evaluationResult.isEmpty) {
-      return Future.value(null);
+      return null;
     }
 
-    return Future.value(evaluationResult.first);
+    return evaluationResult.first;
   }
 
-  Future<void> updateCalculatedExpression() async {
+  void updateCalculatedExpression() {
     final calculatedExpression = _calculatedExpression;
     if (calculatedExpression == null) {
       return;
     }
 
     try {
-      final rawEvaluationResult = await calculatedExpression.fetchValue();
+      final rawEvaluationResult = calculatedExpression.evaluate(
+        generation: questionnaireResponseModel.generation,
+      );
 
       _qimLogger.debug('calculatedExpression: $rawEvaluationResult');
 
@@ -356,14 +428,14 @@ class QuestionItemModel extends ResponseItemModel {
               ? rawEvaluationResult.first
               : null;
 
-      // TODO: should this be able to populate multiple answers?
+      // TODO: This should be able to populate multiple answers from a list of results
       // Write the value back to the answer model
       firstAnswerModel.populateFromExpression(evaluationResult);
     } catch (ex) {
       errorText =
           (ex is FhirPathEvaluationException) ? ex.message : ex.toString();
-      questionnaireResponseModel.isValid.value = false;
       _qimLogger.warn('Calculation problem: $_calculatedExpression', error: ex);
+      notifyListeners(); // This could be added to a setter for errorText, but might have side-effects.
     }
   }
 }

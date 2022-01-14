@@ -50,11 +50,12 @@ class _QuestionnaireScrollerPanelState
     );
   }
 
-  void _onQuestionnaireResponseChanged(
+  void _handleChangedQuestionnaireResponse(
     QuestionnaireResponseModel? questionnaireResponseModel,
   ) {
-    final questionnaireResponse =
-        questionnaireResponseModel?.questionnaireResponse;
+    final questionnaireResponse = questionnaireResponseModel
+        ?.aggregator<QuestionnaireResponseAggregator>()
+        .aggregate(containPatient: true);
 
     final FhirResource resource = (questionnaireResponse != null)
         ? FhirResource.fromResource(questionnaireResponse)
@@ -69,7 +70,7 @@ class _QuestionnaireScrollerPanelState
       fhirResourceProvider: _fhirResourceProvider,
       scaffoldBuilder: const _FaiabenchFillerScaffoldBuilder(),
       launchContext: widget.launchContext,
-      onQuestionnaireResponseChanged: _onQuestionnaireResponseChanged,
+      onQuestionnaireResponseChanged: _handleChangedQuestionnaireResponse,
     );
   }
 }

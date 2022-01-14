@@ -3,13 +3,33 @@ import 'package:faiadashu/fhir_types/fhir_types.dart';
 import 'package:faiadashu/logging/logging.dart';
 import 'package:faiadashu/questionnaires/questionnaires.dart';
 import 'package:fhir/r4.dart';
-import 'package:flutter/foundation.dart';
+
+/// Express changes to the response model structure
+enum StructuralState {
+  /// Item has recently been added
+  adding,
+
+  /// Item is present
+  present,
+}
+
+/// Codes that guide the display of questionnaire items
+enum DisplayVisibility {
+  /// Item is fully visible
+  shown,
+
+  /// Item is completely hidden
+  hidden,
+
+  /// Item is visible, but read-only
+  protected,
+}
 
 /// An item entry for a questionnaire filler.
 ///
 /// This is a common base-class for items that can generate responses (questions, groups),
 /// and those that cannot (display).
-abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
+abstract class FillerItemModel extends ResponseNode {
   static final _fimLogger = Logger(FillerItemModel);
 
   final QuestionnaireResponseModel questionnaireResponseModel;
@@ -81,14 +101,14 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
           variableExpression,
           [...itemUpstream, ...qiLevelVars],
           jsonBuilder: () =>
-              questionnaireResponseModel.responseItemByUid(nodeUid),
+              questionnaireResponseModel.fhirResponseItemByUid(nodeUid),
         );
 
         qiLevelVars.add(variable);
       }
     }
 
-    _itemLevelExpressionEvaluators = [...itemUpstream, ...qiLevelVars];
+    _itemLevelExpressionEvaluators = [...qiLevelVars];
   }
 
   /// Returns the [ExpressionEvaluator]s for this item, such as item-level variables
@@ -133,18 +153,27 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
             enableWhenExtensionExpression,
             itemWithPredecessorsExpressionEvaluators,
             jsonBuilder: () =>
-                questionnaireResponseModel.responseItemByUid(nodeUid),
+                questionnaireResponseModel.fhirResponseItemByUid(nodeUid),
           )
         : null;
+
+    _displayVisibility = _calculateDisplayVisibility();
   }
 
   QuestionnaireItem get questionnaireItem =>
       questionnaireItemModel.questionnaireItem;
 
-  /// Activate the enablement behavior for this item.
+  /// Returns whether the enablement of this item can ever change.
+  bool get isDynamicallyEnabled {
+    return questionnaireItemModel.isEnabledWhen ||
+        questionnaireItemModel.hasEnabledWhenExpression ||
+        questionnaireItemModel.isNestedItem;
+  }
+
+  /// Activate the dynamic aspects of enableWhen for this item.
   ///
-  /// Idempotent - does nothing if behavior is already activated.
-  void activateEnableBehavior() {
+  /// Idempotent - does nothing if enableWhen is already activated.
+  void activateEnableWhen() {
     if (!_enableWhenActivated) {
       questionnaireItemModel.forEnableWhens((qew) {
         fromLinkId(qew.question!)
@@ -160,7 +189,7 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
         assert(predecessorResponseNode != null);
         assert(predecessorResponseNode is ResponseItemModel);
 
-        // Update the enable status when the response which owns the parent answer has changed.
+        // Update the enablement status when the response which owns the parent answer has changed.
         (predecessorResponseNode! as ResponseItemModel)
             .addListener(() => questionnaireResponseModel.updateEnabledItems());
       }
@@ -179,7 +208,7 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
 
     if (questionnaireItemModel.isEnabledWhen) {
       _updateEnabledByEnableWhen();
-    } else if (questionnaireItemModel.isEnabledWhenExpression) {
+    } else if (questionnaireItemModel.hasEnabledWhenExpression) {
       _updateEnabledByEnableWhenExpression();
     } else if (questionnaireItemModel.isNestedItem) {
       _updateEnabledByParentAnswer();
@@ -189,26 +218,26 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
   /// Updates the current enablement status of this item, based on enabledWhenExpression.
   ///
   /// Sets the [isEnabled] property
-  Future<void> _updateEnabledByEnableWhenExpression() async {
+  void _updateEnabledByEnableWhenExpression() {
     _fimLogger.trace('Enter _updateEnabledByEnableWhenExpression()');
 
     final enableWhenExpression =
         ArgumentError.checkNotNull(_enableWhenExpression);
 
-    if (!await (enableWhenExpression as FhirPathExpressionEvaluator)
-        .fetchBoolValue(
+    if (!(enableWhenExpression as FhirPathExpressionEvaluator).fetchBoolValue(
       unknownValue: false,
+      generation: questionnaireResponseModel.generation,
       location: nodeUid,
     )) {
-      _disableWithChildren();
+      _nextGenerationDisableWithDescendants();
     }
   }
 
-  void _disableWithChildren() {
-    _isEnabled = false;
+  void _nextGenerationDisableWithDescendants() {
+    _nextGenerationIsEnabled = false;
     for (final child in questionnaireResponseModel
         .orderedFillerItemModelsWithParent(parent: this)) {
-      child._disableWithChildren();
+      child._nextGenerationDisableWithDescendants();
     }
   }
 
@@ -239,7 +268,6 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
     final enableWhenTrigger = _EnableWhenTrigger();
 
     questionnaireItemModel.forEnableWhens((qew) {
-      // TODO: implement the following rule: If enableWhen logic depends on an item that is disabled, the logic should proceed as though the item is not valued - even if a default value or other value might be retained in memory in the event of the item being re-enabled.
       final questionLinkId = qew.question;
       if (questionLinkId == null) {
         throw QuestionnaireFormatException(
@@ -257,6 +285,13 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
         case QuestionnaireEnableWhenOperator.ne:
           _evaluateEqualityOperator(questionLinkId, qew, enableWhenTrigger);
           break;
+        case QuestionnaireEnableWhenOperator.lt:
+        case QuestionnaireEnableWhenOperator.gt:
+        case QuestionnaireEnableWhenOperator.ge:
+        case QuestionnaireEnableWhenOperator.le:
+          _evaluateComparisonOperator(questionLinkId, qew, enableWhenTrigger);
+          break;
+        case QuestionnaireEnableWhenOperator.ne:
         default:
           _fimLogger.warn('Unsupported operator: ${qew.operator_}.');
           // Err on the side of caution: Enable fields when enableWhen cannot be evaluated.
@@ -270,12 +305,12 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
       case QuestionnaireItemEnableBehavior.any:
       case null:
         if (!enableWhenTrigger.anyTriggered) {
-          _disableWithChildren();
+          _nextGenerationDisableWithDescendants();
         }
         break;
       case QuestionnaireItemEnableBehavior.all:
         if (!enableWhenTrigger.allTriggered) {
-          _disableWithChildren();
+          _nextGenerationDisableWithDescendants();
         }
         break;
       case QuestionnaireItemEnableBehavior.unknown:
@@ -283,6 +318,88 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
           'enableWhen with unknown enableBehavior: ${questionnaireItem.enableBehavior}',
           questionnaireItem,
         );
+    }
+  }
+
+  void _evaluateComparisonOperator(
+    String questionLinkId,
+    QuestionnaireEnableWhen qew,
+    _EnableWhenTrigger enableWhenTrigger,
+  ) {
+    final question = fromLinkId(questionLinkId);
+    if (question is QuestionItemModel) {
+      final qim = fromLinkId(questionLinkId) as QuestionItemModel;
+
+      // If enableWhen logic depends on an item that is disabled, the logic
+      // should proceed as though the item is not valued - even if a
+      // default value or other value might be retained in memory in the event
+      // of the item being re-enabled.
+      final firstAnswer = (qim.isEnabled)
+          ? (fromLinkId(questionLinkId) as QuestionItemModel)
+              .answeredAnswerModels
+              .firstOrNull
+          : null;
+
+      if (firstAnswer == null) {
+        return;
+      }
+
+      if (firstAnswer is NumericalAnswerModel) {
+        final answerValue = firstAnswer.value?.value;
+        if (answerValue == null) {
+          return;
+        }
+
+        final comparisonValue = qew.answerDecimal?.value ??
+            qew.answerInteger?.value ??
+            qew.answerQuantity?.value?.value;
+
+        if (comparisonValue == null) {
+          throw QuestionnaireFormatException(
+            'No number for comparison in enableWhen on $questionLinkId',
+          );
+        }
+
+        switch (qew.operator_) {
+          case QuestionnaireEnableWhenOperator.gt:
+            if (answerValue > comparisonValue) {
+              enableWhenTrigger.trigger();
+            }
+            break;
+          case QuestionnaireEnableWhenOperator.ge:
+            if (answerValue >= comparisonValue) {
+              enableWhenTrigger.trigger();
+            }
+            break;
+          case QuestionnaireEnableWhenOperator.lt:
+            if (answerValue < comparisonValue) {
+              enableWhenTrigger.trigger();
+            }
+            break;
+          case QuestionnaireEnableWhenOperator.le:
+            if (answerValue >= comparisonValue) {
+              enableWhenTrigger.trigger();
+            }
+            break;
+          default:
+            _fimLogger.warn(
+              'Unexpected operator: ${qew.operator_} at $questionLinkId.',
+            );
+            enableWhenTrigger.trigger();
+        }
+      } else {
+        _fimLogger.warn(
+          'Unsupported: Item with linkId is not a numerical question: $questionLinkId.',
+        );
+        // Err on the side of caution: Enable fields when enableWhen cannot be evaluated.
+        // See http://hl7.org/fhir/uv/sdc/2019May/expressions.html#missing-information for specification
+        enableWhenTrigger.trigger();
+      }
+    } else {
+      _fimLogger.warn('linkId refers to non-question item: $questionLinkId.');
+      // Err on the side of caution: Enable fields when enableWhen cannot be evaluated.
+      // See http://hl7.org/fhir/uv/sdc/2019May/expressions.html#missing-information for specification
+      enableWhenTrigger.trigger();
     }
   }
 
@@ -295,7 +412,10 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
     if (question is QuestionItemModel) {
       final qim = fromLinkId(questionLinkId) as QuestionItemModel;
 
-      // If enableWhen logic depends on an item that is disabled, the logic should proceed as though the item is not valued - even if a default value or other value might be retained in memory in the event of the item being re-enabled.
+      // If enableWhen logic depends on an item that is disabled, the logic
+      // should proceed as though the item is not valued - even if a
+      // default value or other value might be retained in memory in the event
+      // of the item being re-enabled.
       final firstAnswer = (qim.isEnabled)
           ? (fromLinkId(questionLinkId) as QuestionItemModel)
               .answeredAnswerModels
@@ -310,14 +430,14 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
       } else if (firstAnswer is CodingAnswerModel) {
         if (firstAnswer.equalsCoding(qew.answerCoding)) {
           _fimLogger.debug(
-            'enableWhen: $firstAnswer == ${qew.answerCoding}',
+            'enableWhen: ${firstAnswer.value} == ${qew.answerCoding}',
           );
           if (qew.operator_ == QuestionnaireEnableWhenOperator.eq) {
             enableWhenTrigger.trigger();
           }
         } else {
           _fimLogger.debug(
-            'enableWhen: $firstAnswer != ${qew.answerCoding}',
+            'enableWhen: ${firstAnswer.value} != ${qew.answerCoding}',
           );
           if (qew.operator_ == QuestionnaireEnableWhenOperator.ne) {
             enableWhenTrigger.trigger();
@@ -346,7 +466,10 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
     final rim = fromLinkId(qew.question!);
     final shouldExist = qew.answerBoolean?.value ?? true;
 
-    // If enableWhen logic depends on an item that is disabled, the logic should proceed as though the item is not valued - even if a default value or other value might be retained in memory in the event of the item being re-enabled.
+    // If enableWhen logic depends on an item that is disabled, the logic should
+    // proceed as though the item is not valued - even if a default value or
+    // other value might be retained in memory in the event of the item being
+    // re-enabled.
     if (rim.isEnabled && rim.isAnswered == shouldExist) {
       enableWhenTrigger.trigger();
     }
@@ -356,20 +479,151 @@ abstract class FillerItemModel extends ResponseNode with ChangeNotifier {
   }
 
   void _updateEnabledByParentAnswer() {
-    if ((parentNode! as AnswerModel).isUnanswered) {
-      _disableWithChildren();
+    if ((parentNode! as AnswerModel).isEmpty) {
+      _nextGenerationDisableWithDescendants();
     }
   }
 
-  /// INTERNAL USE: Enable the item.
-  void enable() {
-    _isEnabled = true;
+  /// INTERNAL USE: The item will be enabled in the next generation.
+  void nextGenerationEnable() {
+    _nextGenerationIsEnabled = true;
   }
+
+  /// INTERNAL USE: Enable the item as determined for the next generation.
+  bool enableNextGeneration() {
+    final hasChanged = _isEnabled ^ _nextGenerationIsEnabled;
+
+    if (hasChanged) {
+      _isEnabled = _nextGenerationIsEnabled;
+      _displayVisibility = _calculateDisplayVisibility();
+      notifyListeners();
+    }
+
+    return hasChanged;
+  }
+
+  /// Is the item answered?
+  ///
+  /// Static or read-only items are not answered.
+  /// Items which are not enabled are not answered.
+  bool get isAnswered;
+
+  /// Is the item unanswered?
+  ///
+  /// Static or read-only items are not unanswered.
+  /// Items which are not enabled are not unanswered.
+  bool get isUnanswered;
+
+  /// Is the item invalid?
+  bool get isInvalid;
+
+  /// Does the item have a value?
+  ///
+  /// This is regardless of enabled or read-only status.
+  bool get isPopulated;
+
+  StructuralState _structuralState = StructuralState.adding;
+  StructuralState get structuralState => _structuralState;
+
+  void structuralNextGeneration({bool notifyListeners = true}) {
+    if (structuralState == StructuralState.adding) {
+      _structuralState = StructuralState.present;
+      _displayVisibility = _calculateDisplayVisibility();
+      if (notifyListeners) {
+        this.notifyListeners();
+      }
+    }
+  }
+
+  // TODO: Get this from the R5 extension
+  QuestionnaireDisabledDisplay get disabledDisplay => questionnaireResponseModel
+      .questionnaireModel.questionnaireModelDefaults.disabledDisplay;
+
+  DisplayVisibility _calculateDisplayVisibility() {
+    DisplayVisibility resultVisibility = DisplayVisibility.shown;
+
+    if (questionnaireResponseModel.responseStatus ==
+        QuestionnaireResponseStatus.completed) {
+      resultVisibility =
+          _maxVisibility(resultVisibility, DisplayVisibility.protected);
+    }
+
+    if (isNotEnabled) {
+      switch (disabledDisplay) {
+        case QuestionnaireDisabledDisplay.hidden:
+          resultVisibility =
+              _maxVisibility(resultVisibility, DisplayVisibility.hidden);
+          break;
+        case QuestionnaireDisabledDisplay.protected:
+          resultVisibility =
+              _maxVisibility(resultVisibility, DisplayVisibility.protected);
+          break;
+        case QuestionnaireDisabledDisplay.protectedNonEmpty:
+          resultVisibility = isPopulated
+              ? _maxVisibility(resultVisibility, DisplayVisibility.protected)
+              : _maxVisibility(resultVisibility, DisplayVisibility.hidden);
+          break;
+      }
+    }
+
+    if (questionnaireItemModel.isHidden) {
+      resultVisibility =
+          _maxVisibility(resultVisibility, DisplayVisibility.hidden);
+    }
+
+    if (!questionnaireItemModel.isShownDuringCapture) {
+      resultVisibility =
+          _maxVisibility(resultVisibility, DisplayVisibility.hidden);
+    }
+
+    if (questionnaireItemModel.isReadOnly) {
+      resultVisibility =
+          _maxVisibility(resultVisibility, DisplayVisibility.protected);
+    }
+
+    return resultVisibility;
+  }
+
+  DisplayVisibility _maxVisibility(
+    DisplayVisibility visibility1,
+    DisplayVisibility visibility2,
+  ) {
+    if (visibility1 == DisplayVisibility.hidden ||
+        visibility2 == DisplayVisibility.hidden) {
+      return DisplayVisibility.hidden;
+    }
+    if (visibility1 == DisplayVisibility.protected ||
+        visibility2 == DisplayVisibility.protected) {
+      return DisplayVisibility.protected;
+    }
+
+    return DisplayVisibility.shown;
+  }
+
+  /// Handle changes to a questionnaire response's completion status.
+  ///
+  /// This may affect an items visibility.
+  ///
+  /// **INTERNAL USE ONLY**
+  void handleResponseStatusChange() {
+    // The overall questionnaire response going from amended to completed
+    // might change the visibility
+    final newVisibility = _calculateDisplayVisibility();
+    if (newVisibility != _displayVisibility) {
+      _displayVisibility = newVisibility;
+      notifyListeners();
+    }
+  }
+
+  bool _nextGenerationIsEnabled = true;
 
   bool _isEnabled = true;
   bool get isEnabled => _isEnabled;
 
   bool get isNotEnabled => !_isEnabled;
+
+  late DisplayVisibility _displayVisibility;
+  DisplayVisibility get displayVisibility => _displayVisibility;
 }
 
 class _EnableWhenTrigger {
@@ -394,10 +648,10 @@ class _QuestionnaireItemExpressionEvaluator extends ExpressionEvaluator {
   late final Map<String, dynamic> questionnaireItemJson;
 
   @override
-  Future<dynamic> fetchValue() {
+  dynamic evaluate({int? generation}) {
     final qi = questionnaireItemJson;
 
-    return Future.value([qi]);
+    return [qi];
   }
 
   _QuestionnaireItemExpressionEvaluator(

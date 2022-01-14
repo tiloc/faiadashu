@@ -1,3 +1,51 @@
+## 0.6.0-dev.3
+* ### Faiadashu
+* Reworked visual style
+  * More space after each question
+  * Maximum width is clamped and can be controlled
+  * InputDecorations are now entirely driven by ThemeData
+  * Support link icons is determined by ThemeData (iconTheme)
+  * Style of filler for choice/open-choice/coding is determined by ThemeData
+  * Exclusive choices use checkbox instead of radio button. The old way was more "logical", but looked ugly
+  * Font defaults to bodyText2 (oddly, bodyText1 is not the default for Material widgets)
+  * Removed the ability to put the label to the left of the question (best practice by Norman Nielsen group)
+  * Better alignment + spacing for title elements (leading, help)
+  * Error text doesn't make the text fields jump
+  * Better cross-fades when questions become visible or invisible. 
+* Reverted to the original Flutter Autocomplete widget, and use its new fieldViewBuilder parameter
+  * Better theming
+  * Keyboard navigation
+* NarrativeTile uses native WebView when available.
+  * supported on Android, iOS, web
+  * supports <img> tags, and thus itemMedia, and XHTML with <img>
+* Support for bi-state for boolean (tri-state continues to be supported)
+  * Less confusing for the average user
+* Moved away from helper methods to small Widgets
+* Converted QuestionnaireTheme to InheritedWidget for alignment with general theming in Flutter
+* Support for `initial.value[x]`
+* Reworked the choice/open-choice/coding model.
+* Model visibility similar to R5 `disabledDisplay`
+* Removed centralized `ChangeNotifier` in QuestionnaireResponseModel
+  * Introduce more focussed notifiers 
+  * Drastically reduced number of repaints
+* Put a `RepaintBoundary` around the circular progress
+  * Reduces size of repainted area from full-screen to small rectangle
+* Trained a Skia shader to reduce yank.
+* Parallelize initialization of FHIR resources. Noticeable speed up.
+* Drastic performance optimizations for evaluation of FHIRPath expressions
+* Don't take disabled answers into account for expressions
+* Reverted the async madness
+* Allow each answer to have its own validation outcome `errorText`.
+* Updated dependencies
+* Changed from relative imports to absolute package imports
+
+* ### Faiadashu Online
+* Brought back the login/logout functionality, based on latest `fhir_auth` package.
+
+* ### Faiadashu Example / Gallery
+* Added more functional testing questionnaires
+* More comprehensive demo of theming, including InputDecoration, colors, and font.
+
 ## 0.6.0-dev.2
 * ### Introducing "Faiabench"
   * Using the best of `fhir`, `fhir_path`, and `faiadashu` to offer an IDE-like workbench experience
@@ -8,7 +56,7 @@
 > _Faiabench_ is pushing Dart and Flutter to the limit.
 > * only works on desktops or landscape tablets, due to screen size requirements
 > * requires Flutter 2.8 due to bugs in earlier versions of Flutter
-> * keyboard input to FHIR Path field broken on Mac, due to bugs in macOS Flutter: https://github.com/flutter/flutter/issues/82124
+> * keyboard input to FHIR Path field broken on Mac, due to bugs in macOS Flutter: https://github.com/flutter/flutter/issues/94633
 
 * ### Faiadashu Example / Gallery
 * Added demos of all the new capabilities listed for Faiadashu.

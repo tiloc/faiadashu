@@ -12,7 +12,7 @@ class NullDashText extends StatelessWidget {
             decoration: TextDecoration.lineThrough,
             color: Theme.of(context)
                 .textTheme
-                .bodyText1!
+                .bodyText2!
                 .color!
                 .withOpacity(variant600Opacity),
           ),

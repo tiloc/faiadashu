@@ -31,4 +31,11 @@ class GroupItemModel extends ResponseItemModel {
         .orderedResponseItemModelsWithParent(parent: this)
         .every((rim) => rim.isUnanswered);
   }
+
+  @override
+  bool get isPopulated {
+    return questionnaireResponseModel
+        .orderedResponseItemModelsWithParent(parent: this)
+        .any((rim) => rim.isPopulated);
+  }
 }

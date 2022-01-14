@@ -28,10 +28,33 @@ class BooleanAnswerModel extends AnswerModel<Boolean, Boolean> {
   }
 
   @override
-  String? get isComplete => null;
+  String? validateValue(Boolean? inputValue) {
+    return null;
+  }
 
   @override
-  bool get isUnanswered => value == null;
+  bool get isEmpty => value == null;
+
+  bool get isTriState => questionnaireResponseModel
+      .questionnaireModel.questionnaireModelDefaults.booleanTriState;
+
+  @override
+  void populateFromExpression(dynamic evaluationResult) {
+    if (evaluationResult == null) {
+      value = null;
+
+      return;
+    }
+
+    if (evaluationResult is Boolean) {
+      value = evaluationResult;
+    } else if (evaluationResult is bool) {
+      value = Boolean(evaluationResult);
+    } else {
+      // Non-empty, non-booleans are true
+      value = Boolean(true);
+    }
+  }
 
   @override
   void populate(QuestionnaireResponseAnswer answer) {
