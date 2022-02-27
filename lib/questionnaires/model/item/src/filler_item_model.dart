@@ -291,7 +291,6 @@ abstract class FillerItemModel extends ResponseNode {
         case QuestionnaireEnableWhenOperator.le:
           _evaluateComparisonOperator(questionLinkId, qew, enableWhenTrigger);
           break;
-        case QuestionnaireEnableWhenOperator.ne:
         default:
           _fimLogger.warn('Unsupported operator: ${qew.operator_}.');
           // Err on the side of caution: Enable fields when enableWhen cannot be evaluated.

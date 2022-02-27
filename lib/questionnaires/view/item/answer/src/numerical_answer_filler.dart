@@ -188,10 +188,12 @@ class _NumberFieldInputControl
       );
     }
 
+    final theme = QuestionnaireTheme.of(context);
+
     return Container(
       padding: const EdgeInsets.only(top: 8, bottom: 8),
       child: SizedBox(
-        height: 72, // Same height with and without error text
+        height: theme.textFieldHeight,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

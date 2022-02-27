@@ -44,6 +44,10 @@ class QuestionnaireThemeData {
   /// Returns whether a progress bar/circle is displayed while filling
   final bool showProgress;
 
+  /// Returns height for text field with and without error text
+  double get textFieldHeight => defaultTextFieldHeight;
+  static const defaultTextFieldHeight = 72.0;
+
   static const defaultAutoCompleteThreshold = 10;
 
   /// Coding answers with more than this amount of choices will be shown as auto-complete control

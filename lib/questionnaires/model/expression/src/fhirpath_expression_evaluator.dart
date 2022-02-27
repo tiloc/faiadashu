@@ -71,9 +71,9 @@ class FhirPathExpressionEvaluator extends FhirExpressionEvaluator {
     final jsonContext =
         resourceBuilder?.call()?.toJson() ?? jsonBuilder?.call();
     final fhirPathResult = executeFhirPath(
-      jsonContext,
-      _parsedFhirPath,
-      fhirPath,
+      context: jsonContext,
+      parsedFhirPath: _parsedFhirPath,
+      pathExpression: fhirPath,
       environment: upstreamMap,
     );
 

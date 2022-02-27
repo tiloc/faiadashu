@@ -332,6 +332,8 @@ class CodingAnswerModel extends AnswerModel<OptionsOrString, OptionsOrString> {
     if (maxOccurs != null && totalCount > maxOccurs) {
       return lookupFDashLocalizations(locale).validatorMaxOccurs(maxOccurs);
     }
+
+    return null;
   }
 
   @override

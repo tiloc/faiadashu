@@ -85,10 +85,12 @@ class _StringAnswerInputControl extends AnswerInputControl<StringAnswerModel> {
       StringAnswerKeyboard.multiline: TextInputType.multiline,
     }[answerModel.keyboard]!;
 
+    final theme = QuestionnaireTheme.of(context);
+
     return Container(
       padding: const EdgeInsets.only(top: 8, bottom: 8),
       child: SizedBox(
-        height: 72, // Same height with and without error text
+        height: theme.textFieldHeight,
         child: TextFormField(
           focusNode: focusNode,
           enabled: answerModel.isControlEnabled,

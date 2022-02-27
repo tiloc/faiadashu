@@ -53,6 +53,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData.light().copyWith(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.pink),
         inputDecorationTheme: ThemeData.light().inputDecorationTheme.copyWith(
               filled: true,
             ),
@@ -441,9 +443,10 @@ class _HomePageState extends State<HomePage> {
                 'assets/instruments/hf_instrument.json',
               ),
               _launchQuestionnaire(
-                  'Framingham HCDC',
-                  'Real-world cardiac risk scoring. Very heavy use of FHIRPath.',
-                  'assets/instruments/framingham-hcdc.json'),
+                'Framingham HCDC',
+                'Real-world cardiac risk scoring. Very heavy use of FHIRPath.',
+                'assets/instruments/framingham-hcdc.json',
+              ),
               _launchQuestionnaire(
                 'PRAPARE Survey',
                 'Real-world, mixed-type survey from the US',

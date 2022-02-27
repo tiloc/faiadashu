@@ -208,6 +208,8 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
       return lookupFDashLocalizations(locale)
           .validatorMinValue(Decimal(_minValue).format(locale));
     }
+
+    return null;
   }
 
   /// Returns a modified copy of the current [value].
