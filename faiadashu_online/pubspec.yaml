@@ -11,29 +11,29 @@ repository: https://github.com/tiloc/faiadashu
 issue_tracker: https://github.com/tiloc/faiadashu/issues
 
 environment:
-  sdk: '>=2.15.0 <3.0.0'
-  flutter: '>=2.8.0'
+  sdk: '>=2.16.0 <3.0.0'
+  flutter: '>=2.10.0'
 
 dependencies:
   faiadashu:
     path: ..
 
-  fhir: ^0.5.0-12
-  fhir_auth: ^0.5.0-9
+  fhir: ^0.6.0
+  fhir_auth: ^0.6.0
 #  fhir_auth:
 #    path: ../../fhir/fhir_auth
 
   flutter:
     sdk: flutter
-  logging: ^1.0.1
+  logging: ^1.0.2
 
-  url_launcher: ^6.0.17
+  url_launcher: ^6.0.20
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  lint: ^1.8.1
+  lint: ^1.8.2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -1,7 +1,7 @@
 ## 0.6.0-dev.4
 * ### Faiadashu
 * Update to Flutter 2.10, resolve new linter findings
-* Update to latest fhir_path
+* Update to fhir 0.6 and fhir_path 0.6 releases
 * Prevent input fields from "jumping" when displaying error text
 
 * ### Faiadashu Example / Gallery
