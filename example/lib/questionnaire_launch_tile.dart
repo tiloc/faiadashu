@@ -151,7 +151,7 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
               ]),
               launchContext: widget.launchContext,
               // Callback for supportLink
-              onLinkTap: launchUrl,
+              onLinkTap: launchLink,
               persistentFooterButtons: [
                 Builder(
                   builder: (context) => const QuestionnaireCompleteButton(),

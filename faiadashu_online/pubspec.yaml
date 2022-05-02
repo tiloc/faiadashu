@@ -18,8 +18,8 @@ dependencies:
   faiadashu:
     path: ..
 
-  fhir: ^0.6.0
-  fhir_auth: ^0.6.0
+  fhir: ^0.6.2
+  fhir_auth: ^0.6.1
 #  fhir_auth:
 #    path: ../../fhir/fhir_auth
 

@@ -308,7 +308,7 @@ class _HomePageState extends State<HomePage> {
       ),
       body: SafeArea(
         child: Scrollbar(
-          isAlwaysShown: true,
+          thumbVisibility: true,
           controller: _listScrollController,
           child: ListView(
             controller: _listScrollController,
@@ -485,7 +485,7 @@ class _HomePageState extends State<HomePage> {
                 'assets/instruments/argonaut_sampler.json',
               ),
               QuestionnaireLaunchTile(
-                locale: const Locale('de', 'DE'),
+                locale: const Locale.fromSubtags(languageCode: 'de', countryCode: 'DE'),
                 title: 'Der Argonaut-Fragebogen',
                 subtitle: 'Ein deutsches Beispiel für einen Fragebogen.',
                 fhirResourceProvider: resourceBundleProvider,
@@ -496,7 +496,7 @@ class _HomePageState extends State<HomePage> {
                 uploadResponseFunction: uploadResponseFunction,
               ),
               QuestionnaireLaunchTile(
-                locale: const Locale('ar', 'BH'),
+                locale: const Locale.fromSubtags(languageCode: 'ar', countryCode: 'BH'),
                 title: 'استبيان "أرجونوت"',
                 subtitle: 'مثال على استبيان عربي.',
                 fhirResourceProvider: resourceBundleProvider,
@@ -507,7 +507,7 @@ class _HomePageState extends State<HomePage> {
                 uploadResponseFunction: uploadResponseFunction,
               ),
               QuestionnaireLaunchTile(
-                locale: const Locale('ja', 'JP'),
+                locale: const Locale.fromSubtags(languageCode: 'ja', countryCode: 'JP'),
                 title: 'アルゴノート」のアンケートです。',
                 subtitle: '日本でのアンケートの例です。',
                 fhirResourceProvider: resourceBundleProvider,
@@ -643,7 +643,7 @@ class _CherryBlossomScaffoldBuilder extends QuestionnairePageScaffoldBuilder {
     return Theme(
       data: ThemeData.light().copyWith(
         scrollbarTheme: ThemeData.light().scrollbarTheme.copyWith(
-              isAlwaysShown: true,
+              thumbVisibility: MaterialStateProperty.all(true),
               thumbColor: MaterialStateProperty.all(
                 const Color(0xFF5C1349),
               ),

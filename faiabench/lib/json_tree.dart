@@ -32,7 +32,7 @@ class _JsonTreeState extends State<JsonTree> {
   Widget build(BuildContext context) {
     return SizedBox.expand(
       child: Scrollbar(
-        isAlwaysShown: true,
+        thumbVisibility: true,
         controller: _scrollController,
         child: SingleChildScrollView(
           controller: _scrollController,

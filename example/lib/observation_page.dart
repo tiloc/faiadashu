@@ -124,7 +124,7 @@ class ObservationPage extends ExhibitPage {
           valueStyle: Theme.of(context).textTheme.headline4,
           codeStyle: Theme.of(context).textTheme.subtitle2,
           dateTimeStyle: Theme.of(context).textTheme.caption,
-          locale: const Locale('ar', 'BH'),
+          locale: const Locale.fromSubtags(languageCode: 'ar', countryCode: 'BH'),
         ),
       ],
     );

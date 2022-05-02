@@ -19,23 +19,23 @@ class PrimitivePage extends ExhibitPage {
         Text('Germany', style: Theme.of(context).textTheme.headline6),
         FhirDateTimeText(
           FhirDateTime('2010-02-05 14:02'),
-          locale: const Locale('de', 'DE'),
+          locale: const Locale.fromSubtags(languageCode: 'de', countryCode: 'DE'),
         ),
         const Spacer(),
         Text('Japan', style: Theme.of(context).textTheme.headline6),
         FhirDateTimeText(
           FhirDateTime('2010-02'),
-          locale: const Locale('ja', 'JP'),
+          locale: const Locale.fromSubtags(languageCode: 'ja', countryCode: 'JP'),
         ),
         FhirDateTimeText(
           FhirDateTime('2010-02-05 14:02'),
-          locale: const Locale('ja', 'JP'),
+          locale: const Locale.fromSubtags(languageCode: 'ja', countryCode: 'JP'),
         ),
         const Spacer(),
         Text('Bahrain', style: Theme.of(context).textTheme.headline6),
         FhirDateTimeText(
           FhirDateTime('2010-02-05 14:02'),
-          locale: const Locale('ar', 'BH'),
+          locale: const Locale.fromSubtags(languageCode: 'ar', countryCode: 'BH'),
         ),
       ],
     );

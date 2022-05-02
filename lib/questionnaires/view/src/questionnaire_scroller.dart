@@ -313,7 +313,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
     // showing progress indicator and no scrolling is possible.
     // On the first frame after data is loaded the _listScrollController is not
     // properly attached yet and will throw an exception.
-    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       scrollTo(_focusIndex);
     });
   }
@@ -344,7 +344,7 @@ class _QuestionnaireScrollerState extends State<QuestionnaireScroller> {
     }
 
     if (!_isFocussed) {
-      WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         QuestionnaireResponseFiller.of(_belowFillerContext!)
             .requestFocus(_focusIndex);
       });

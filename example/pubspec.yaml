@@ -6,7 +6,7 @@ environment:
   flutter: '>=2.10.0'
 
 dependencies:
-  collection: ^1.15.0
+  collection: ^1.16.0
 
   faiadashu:
     path: ..
@@ -14,11 +14,11 @@ dependencies:
   faiadashu_online:
     path: ../faiadashu_online
 
-  fhir: ^0.6.0
+  fhir: ^0.6.2
 #  fhir:
 #    path: /Users/tilo/Projects/fhir/fhir
 
-  fhir_auth: ^0.6.0
+  fhir_auth: ^0.6.1
 #  fhir_auth:
 #    path: ../../fhir/fhir_auth
 
@@ -31,9 +31,9 @@ dependencies:
 
   intl: ^0.17.0
 
-  logging: ^1.0.1
+  logging: ^1.0.2
 
-  simple_html_css: ^3.0.1
+  simple_html_css: ^3.0.1+1
 
 dev_dependencies:
   lint: ^1.8.2

@@ -1,11 +1,17 @@
 ## 0.6.0-dev.4
-* ### Faiadashu
+### Faiadashu
 * Update to Flutter 2.10, resolve new linter findings
 * Update to fhir 0.6 and fhir_path 0.6 releases
 * Prevent input fields from "jumping" when displaying error text
 
-* ### Faiadashu Example / Gallery
+* ### Faiadashu Online
+* Migrate to url_launcher 6.1.0.
+
+### Faiadashu Example / Gallery
 * Update to Flutter 2.10 with Material3
+
+### Faiabench
+* Adapt to API changes in fhir_path 0.6
 
 ## 0.6.0-dev.3
 * ### Faiadashu

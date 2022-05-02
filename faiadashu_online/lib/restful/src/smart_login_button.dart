@@ -37,7 +37,7 @@ class _SmartLoginButtonState extends State<SmartLoginButton> {
     }
 
     // Discover the current login status after button is first drawn.
-    SchedulerBinding.instance?.addPostFrameCallback((_) async {
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
       try {
         _loginStatus.value = await widget.client.isLoggedIn()
             ? LoginStatus.loggedIn
@@ -78,7 +78,7 @@ class _SmartLoginButtonState extends State<SmartLoginButton> {
         break;
     }
 
-    WidgetsBinding.instance?.addPostFrameCallback(
+    WidgetsBinding.instance.addPostFrameCallback(
       (_) {
         ScaffoldMessenger.of(context)
           ..removeCurrentSnackBar()

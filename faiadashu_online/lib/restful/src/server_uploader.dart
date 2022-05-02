@@ -10,7 +10,7 @@ Future<Id?> uploadQuestionnaireResponse(
   final _logger = Logger.tag('server_uploader');
 
   _logger.debug(
-    '${resource.resourceTypeString()} to be uploaded:\n${resource.toJson()}',
+    '${resource.resourceTypeString} to be uploaded:\n${resource.toJson()}',
   );
   final request1 = FhirRequest.create(
     base: client.fhirUri!.value!,

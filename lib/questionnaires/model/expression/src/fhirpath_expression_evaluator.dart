@@ -52,15 +52,6 @@ class FhirPathExpressionEvaluator extends FhirExpressionEvaluator {
       final name = ArgumentError.checkNotNull(upstreamExpression.name);
       final key = '%$name';
 
-/*      try {
-        final value = upstreamExpression.evaluate(generation: generation);
-
-        upstreamMap[key] = value;
-      } catch (ex) {
-        // If resolving the value fails: silently put nothing into the map
-        // If it was required it will fail later during FHIRPath eval. If not: great!
-        _logger.warn('Cannot fetch upstream $upstreamExpression', error: ex);
-      } */
       upstreamMap[key] = () {
         _logger.debug('Lazy eval of: $key');
 

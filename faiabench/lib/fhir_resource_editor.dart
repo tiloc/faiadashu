@@ -50,7 +50,8 @@ class _FhirResourceEditorState extends ConsumerState<FhirResourceEditor> {
       try {
         final jsonContext =
             jsonDecode(_codeController!.rawText) as Map<String, dynamic>;
-        final pathResult = walkFhirPath(jsonContext, newPath);
+        final pathResult =
+            walkFhirPath(context: jsonContext, pathExpression: newPath);
         const encoder = JsonEncoder.withIndent('  ');
         _fhirPathOutputController!.text =
             encoder.convert(jsonDecode(jsonEncode(pathResult)));
