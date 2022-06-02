@@ -13,7 +13,7 @@ Future<Id?> uploadQuestionnaireResponse(
     '${resource.resourceTypeString} to be uploaded:\n${resource.toJson()}',
   );
   final request1 = FhirRequest.create(
-    base: client.fhirUri!.value!,
+    base: client.fhirUri.value!,
     resource: resource,
     client: client,
   );

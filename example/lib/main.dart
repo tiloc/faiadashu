@@ -11,9 +11,7 @@ import 'package:faiadashu_example/primitive_page.dart';
 import 'package:faiadashu_example/questionnaire_launch_tile.dart';
 import 'package:faiadashu_online/restful/restful.dart';
 import 'package:fhir/r4.dart';
-import 'package:fhir_auth/r4/scopes/clinical_scope.dart';
-import 'package:fhir_auth/r4/scopes/scopes.dart';
-import 'package:fhir_auth/r4/smart_client/smart_client.dart';
+import 'package:fhir_auth/r4.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -166,7 +164,7 @@ class _HomePageState extends State<HomePage> {
 
   late final FhirResourceProvider resourceBundleProvider;
 
-  late final SmartClient smartClient;
+  late final SmartFhirClient smartClient;
 
   // Patient ID matches a patient on Meld Sandbox server.
   final launchContext = LaunchContext(
@@ -196,7 +194,7 @@ class _HomePageState extends State<HomePage> {
     ]);
 
     // Setup a client for access to a Meld sandbox.
-    smartClient = SmartClient.getSmartClient(
+    smartClient = SmartFhirClient(
       fhirUri: FhirUri('https://gw.interop.community/FaiadashuGallery/data'),
       clientId: '4564f6f7-335f-43d3-8867-a0f4e6f901d6',
       redirectUri: FhirUri('com.legentix.faiagallery://callback'),

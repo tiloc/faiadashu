@@ -1,8 +1,7 @@
 #!/bin/bash
 flutter clean
 # FIXME: --tree-shake-icons is currently broken
-flutter build web --no-tree-shake-icons --csp --source-maps
-sed -i -e 's/\<base href=\"\/\"\>/\<base href=\"\/faidashu\/\"\>/g' build/web/index.html
+flutter build web --no-tree-shake-icons --csp --source-maps --base-href "/faiadashu/"
 
 # shellcheck disable=SC2034
 read  -r -n 1 -p "Press Enter to continue with FTP upload:" waitftpinput

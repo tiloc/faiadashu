@@ -1,17 +1,20 @@
 ## 0.6.0-dev.4
 ### Faiadashu
-* Update to Flutter 2.10, resolve new linter findings
-* Update to fhir 0.6 and fhir_path 0.6 releases
+* Update to Flutter 3.0, resolve new linter findings
+* Update to fhir 0.8.0 and fhir_path 0.8.0 releases
 * Prevent input fields from "jumping" when displaying error text
 
 * ### Faiadashu Online
 * Migrate to url_launcher 6.1.0.
+* Migrate to fhir_at_rest 0.8.3 and fhir_auth 0.8.0
 
 ### Faiadashu Example / Gallery
-* Update to Flutter 2.10 with Material3
+* Update to Flutter 3.0 with Material3
+* Migrate to fhir_auth 0.8.0
 
 ### Faiabench
-* Adapt to API changes in fhir_path 0.6
+* Adapt to API changes in fhir_path 0.8.0
+* Adapt to API changes in multi_split_view 2.0.0
 
 ## 0.6.0-dev.3
 * ### Faiadashu

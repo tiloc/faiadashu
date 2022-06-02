@@ -1,6 +1,7 @@
 import 'package:faiadashu/resource_provider/resource_provider.dart'
     show FhirResourceProvider;
 import 'package:fhir/r4.dart';
+import 'package:fhir_at_rest/r4.dart';
 import 'package:fhir_auth/r4.dart';
 
 /// Provide resources from open or secured FHIR servers.
@@ -27,7 +28,7 @@ class RestfulResourceProvider extends FhirResourceProvider {
   @override
   Future<void> init() async {
     final request = FhirRequest.read(
-      base: client.fhirUri!.value!,
+      base: client.fhirUri.value!,
       type: resourceType,
       id: id,
       client: client,

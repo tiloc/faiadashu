@@ -137,11 +137,13 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-  final _overallSplitController =
-      MultiSplitViewController(weights: [0.3, 0.35, 0.35]);
+  final _overallSplitController = MultiSplitViewController(
+    areas: Area.weights([0.3, 0.35, 0.35]),
+  );
 
-  final _inputPanelSplitController =
-      MultiSplitViewController(weights: [0.2, 0.4, 0.4]);
+  final _inputPanelSplitController = MultiSplitViewController(
+    areas: Area.weights([0.2, 0.4, 0.4]),
+  );
 
   @override
   Widget build(BuildContext context) {
