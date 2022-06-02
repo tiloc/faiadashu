@@ -1,12 +1,12 @@
 import 'package:faiadashu/l10n/l10n.dart';
 import 'package:faiadashu_online/restful/restful.dart';
-import 'package:fhir_auth/fhir_client/fhir_client.dart';
+import 'package:fhir_auth/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 /// A login/logout button for a [FhirClient].
 class SmartLoginButton extends StatefulWidget {
-  final FhirClient client;
+  final SmartFhirClient client;
   final VoidCallback? onLoginChanged;
 
   const SmartLoginButton(this.client, {this.onLoginChanged, Key? key})
