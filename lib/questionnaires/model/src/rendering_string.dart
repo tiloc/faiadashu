@@ -17,7 +17,6 @@ class RenderingString with Diagnosticable {
   /// The XHTML representation of the string.
   ///
   /// Might be constructed by combining plainText with renderStyle
-  /// Will not include the media attachment.
   ///
   /// Is escaped for immediate output.
   final String xhtmlText;

@@ -68,33 +68,21 @@ class Xhtml extends StatelessWidget {
       );
     }
 
-    for (final contentType in [
-      'image/png',
-      'image/jpeg',
-      'image/jpg',
-    ]) {
-      final imgPrefix = "<img src='data:$contentType;base64,";
+    final base64StringFromSrc = _extractBase64FromImgTag(xhtml);
 
-      if (xhtml.startsWith(imgPrefix)) {
-        final base64String = xhtml.substring(
-          imgPrefix.length,
-          xhtml.lastIndexOf("'"),
-        );
-
-        _logger.debug('Length of base64: ${base64String.length}');
-
-        return Xhtml._(
-          Base64Image(
-            base64String,
-            width: imageWidth,
-            height: imageHeight,
-            semanticLabel: plainText,
-            key: key,
-          ),
-        );
-      }
+    if (base64StringFromSrc != null) {
+      return Xhtml._(
+        Base64Image(
+          base64StringFromSrc,
+          width: imageWidth,
+          height: imageHeight,
+          semanticLabel: plainText,
+          key: key,
+        ),
+      );
     }
 
+    // TODO: Could this also have an alt tag?
     const imgHashPrefix = "<img src='#";
     if (xhtml.startsWith(imgHashPrefix)) {
       final elementId = xhtml.substring(
@@ -146,5 +134,30 @@ class Xhtml extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _child;
+  }
+
+  static String? _extractBase64FromImgTag(String imgTag) {
+    for (final contentType in [
+      'image/png',
+      'image/jpeg',
+      'image/jpg',
+    ]) {
+      final scrAttribute = "src='data:$contentType;base64,";
+
+      // Handle img tag with optional attributes, such as 'alt'.
+      if (imgTag.startsWith('<img ') && imgTag.contains(scrAttribute)) {
+        final srcAttributeIndex = imgTag.indexOf(scrAttribute);
+        final base64String = imgTag.substring(
+          srcAttributeIndex + scrAttribute.length,
+          imgTag.indexOf("'", srcAttributeIndex + scrAttribute.length),
+        );
+
+        _logger.debug('Length of base64: ${base64String.length}');
+
+        return base64String;
+      }
+    }
+
+    return null;
   }
 }

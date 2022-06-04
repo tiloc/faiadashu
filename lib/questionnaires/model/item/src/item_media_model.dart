@@ -18,11 +18,15 @@ class ItemMediaModel {
 
   String toXhtml() {
     final altText = this.altText;
-    final altTag = altText != null
-        ? 'alt="${_htmlEscape.convert(altText.plainText)}" '
-        : '';
+    final attachmentTitle = attachment.title;
 
-    return '<img ${altTag}src="data:${attachment.contentType?.value!};base64,${attachment.data!}">';
+    final altTagContent = attachmentTitle != null
+        ? _htmlEscape.convert(attachmentTitle)
+        : altText != null
+            ? _htmlEscape.convert(altText.plainText)
+            : '';
+
+    return '<img alt="$altTagContent" src="data:${attachment.contentType?.value!};base64,${attachment.data!}" />';
   }
 
   static ItemMediaModel? fromAttachment(

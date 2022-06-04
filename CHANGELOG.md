@@ -1,3 +1,11 @@
+## 0.6.0-dev.5
+### Faiadashu
+* Fixes for XHTML compliance of img tag in narrative 
+(would not upload to strictly validating servers before)
+
+### Faiadashu Example / Gallery
+* Fix Beverage IG example for XHTML compliance
+
 ## 0.6.0-dev.4
 ### Faiadashu
 * Update to Flutter 3.0, resolve new linter findings
