@@ -1,5 +1,6 @@
 ## 0.8.0
 Bumping version to 0.8.0 to be aligned with corresponding `fhir` packages.
+Obsoletes the 0.5.x series as the most stable release.
 
 ### Faiadashu
 * Fixes for XHTML compliance of img tag in narrative 
