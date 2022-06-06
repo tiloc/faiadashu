@@ -107,16 +107,22 @@ class _HomePageState extends State<HomePage> {
 
   // Quick-and-dirty upload of QuestionnaireResponse to server
   // Not suitable for production use (no error-handling)
-  Future<void> _uploadResponse(
-    String id,
-    QuestionnaireResponse? response,
+  Future<QuestionnaireResponse?> _uploadQuestionnaireResponse(
+    String questionnairePath,
+    QuestionnaireResponse? questionnaireResponse,
   ) async {
-    if (response == null) {
-      return;
+    if (questionnaireResponse == null) {
+      return null;
     }
     // Upload will also save locally.
-    _savedResponses[id] = response;
-    await uploadQuestionnaireResponse(smartClient, response);
+    final updatedQuestionnaireResponse =
+        await createOrUpdateQuestionnaireResponse(
+      smartClient,
+      questionnaireResponse,
+    );
+    _savedResponses[questionnairePath] = updatedQuestionnaireResponse;
+
+    return updatedQuestionnaireResponse;
   }
 
   // Build up a registry of ValueSets and CodeSystems which are being referenced
@@ -248,7 +254,7 @@ class _HomePageState extends State<HomePage> {
       questionnairePath: questionnairePath,
       saveResponseFunction: _saveResponse,
       restoreResponseFunction: _restoreResponse,
-      uploadResponseFunction: _uploadResponse,
+      uploadResponseFunction: _uploadQuestionnaireResponse,
     );
   }
 
@@ -282,7 +288,7 @@ class _HomePageState extends State<HomePage> {
     // in implicit login, which is OK?
     final uploadResponseFunction =
 //    smartClient.isLoggedIn() ? _uploadResponse : null;
-        _uploadResponse;
+        _uploadQuestionnaireResponse;
 
     return Scaffold(
       appBar: AppBar(
@@ -483,7 +489,10 @@ class _HomePageState extends State<HomePage> {
                 'assets/instruments/argonaut_sampler.json',
               ),
               QuestionnaireLaunchTile(
-                locale: const Locale.fromSubtags(languageCode: 'de', countryCode: 'DE'),
+                locale: const Locale.fromSubtags(
+                  languageCode: 'de',
+                  countryCode: 'DE',
+                ),
                 title: 'Der Argonaut-Fragebogen',
                 subtitle: 'Ein deutsches Beispiel für einen Fragebogen.',
                 fhirResourceProvider: resourceBundleProvider,
@@ -494,7 +503,10 @@ class _HomePageState extends State<HomePage> {
                 uploadResponseFunction: uploadResponseFunction,
               ),
               QuestionnaireLaunchTile(
-                locale: const Locale.fromSubtags(languageCode: 'ar', countryCode: 'BH'),
+                locale: const Locale.fromSubtags(
+                  languageCode: 'ar',
+                  countryCode: 'BH',
+                ),
                 title: 'استبيان "أرجونوت"',
                 subtitle: 'مثال على استبيان عربي.',
                 fhirResourceProvider: resourceBundleProvider,
@@ -505,7 +517,10 @@ class _HomePageState extends State<HomePage> {
                 uploadResponseFunction: uploadResponseFunction,
               ),
               QuestionnaireLaunchTile(
-                locale: const Locale.fromSubtags(languageCode: 'ja', countryCode: 'JP'),
+                locale: const Locale.fromSubtags(
+                  languageCode: 'ja',
+                  countryCode: 'JP',
+                ),
                 title: 'アルゴノート」のアンケートです。',
                 subtitle: '日本でのアンケートの例です。',
                 fhirResourceProvider: resourceBundleProvider,
@@ -628,7 +643,8 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-// Demonstrate the creation of a scrolling questionnaire with no Scaffold.
+// Demonstrate the creation of a scrolling questionnaire with no Scaffold
+// and a unique theme.
 class _CherryBlossomScaffoldBuilder extends QuestionnairePageScaffoldBuilder {
   const _CherryBlossomScaffoldBuilder();
 

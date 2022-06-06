@@ -16,6 +16,6 @@ abstract class AnswerInputControl<A extends AnswerModel>
   const AnswerInputControl(
     this.answerModel, {
     this.focusNode,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 }

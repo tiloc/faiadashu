@@ -183,6 +183,8 @@ class QuestionnaireResponseAggregator
     // Are all minimum fields for SDC profile present?
     bool isValidSdc = true;
 
+    final questionnaireResponseId = questionnaireResponseModel.id;
+
     responseStatus ??= questionnaireResponseModel.responseStatus;
 
     final responseItemRegistry = <String, dynamic>{};
@@ -245,6 +247,7 @@ class QuestionnaireResponseAggregator
         : NarrativeAggregator.emptyNarrative;
 
     final questionnaireResponse = QuestionnaireResponse(
+      id: questionnaireResponseId,
       status: responseStatus,
       meta: meta,
       contained: (contained.isNotEmpty) ? contained : null,
