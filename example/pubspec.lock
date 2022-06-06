@@ -56,14 +56,14 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.6.0-dev.4"
+    version: "0.8.0"
   faiadashu_online:
     dependency: "direct main"
     description:
       path: "../faiadashu_online"
       relative: true
     source: path
-    version: "0.6.0-dev.2"
+    version: "0.8.0"
   ffi:
     dependency: transitive
     description:
@@ -510,7 +510,7 @@ packages:
       name: webview_flutter_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.9.0"
+    version: "1.9.1"
   webview_flutter_web:
     dependency: transitive
     description:
@@ -524,7 +524,7 @@ packages:
       name: webview_flutter_wkwebview
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.8.0"
+    version: "2.8.1"
   win32:
     dependency: transitive
     description:

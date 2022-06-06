@@ -1,4 +1,6 @@
-## 0.6.0-dev.5
+## 0.8.0
+Bumping version to 0.8.0 to be aligned with corresponding `fhir` packages.
+
 ### Faiadashu
 * Fixes for XHTML compliance of img tag in narrative 
 (would not upload to strictly validating servers before)
