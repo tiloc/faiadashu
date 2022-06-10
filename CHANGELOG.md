@@ -1,3 +1,11 @@
+## 0.8.1
+
+### Faiadashu Online
+* Support update of existing resources on FHIR server
+
+### Faiadashu Example / Gallery
+* Break into smaller files
+
 ## 0.8.0
 Bumping version to 0.8.0 to be aligned with corresponding `fhir` packages.
 Obsoletes the 0.5.x series as the most stable release.

@@ -9,25 +9,38 @@ import 'package:fhir_auth/r4.dart';
 /// Returns the [QuestionnaireResponse] with the server-side [Id].
 Future<QuestionnaireResponse> createOrUpdateQuestionnaireResponse(
   FhirClient client,
-  QuestionnaireResponse resource,
+  QuestionnaireResponse questionnaireResponse,
 ) async {
-  // TODO: Implement update path
   final _logger = Logger.tag('server_uploader');
 
+  final baseUri = ArgumentError.checkNotNull(client.fhirUri.value);
+
   _logger.debug(
-    '${resource.resourceTypeString} to be uploaded:\n${resource.toJson()}',
+    '${questionnaireResponse.resourceTypeString} to be uploaded:\n${questionnaireResponse.toJson()}',
   );
-  final createRequest = FhirRequest.create(
-    base: client.fhirUri.value!,
-    resource: resource,
+
+  // Select whether update or create scenario applies
+  final serverRequest = questionnaireResponse.id == null ? FhirRequest.create(
+    base: baseUri,
+    resource: questionnaireResponse,
+    client: client,
+  ) : FhirRequest.update(
+    base: baseUri,
+    resource: questionnaireResponse,
     client: client,
   );
 
   try {
-    final createResponse = await createRequest.request();
-    _logger.debug('Response from upload:\n${createResponse.toJson()}');
+    final serverResponse = await serverRequest.request();
+    _logger.debug('Response from server:\n${serverResponse.toJson()}');
 
-    return createResponse as QuestionnaireResponse;
+    if (serverResponse is QuestionnaireResponse) {
+      return serverResponse;
+    } else if (serverResponse is OperationOutcome) {
+      throw serverResponse;
+    } else {
+      throw Exception('Unexpected response from server:\n${serverResponse.toJson()}');
+    }
   } catch (e) {
     _logger.warn('Upload failed', error: e);
     rethrow;
