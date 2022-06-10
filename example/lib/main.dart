@@ -5,17 +5,18 @@ import 'dart:io';
 import 'package:faiadashu/faiadashu.dart';
 import 'package:faiadashu/logging/logging.dart' as fdashlog;
 import 'package:faiadashu_example/about_page.dart';
+import 'package:faiadashu_example/cherry_blossom_theme.dart';
 import 'package:faiadashu_example/disclaimer_page.dart';
 import 'package:faiadashu_example/observation_page.dart';
 import 'package:faiadashu_example/primitive_page.dart';
 import 'package:faiadashu_example/questionnaire_launch_tile.dart';
+import 'package:faiadashu_example/value_set_provider.dart';
 import 'package:faiadashu_online/restful/restful.dart';
 import 'package:fhir/r4.dart';
 import 'package:fhir_auth/r4.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:logging/logging.dart' as dartlog;
 
 void main() {
@@ -124,49 +125,6 @@ class _HomePageState extends State<HomePage> {
 
     return updatedQuestionnaireResponse;
   }
-
-  // Build up a registry of ValueSets and CodeSystems which are being referenced
-  // in the questionnaires.
-  //
-  // It is typically *NOT* possible to resolve value sets through their URI, as
-  // these do not point to real web-servers.
-  //
-  // This mechanism allows to add them from other sources.
-  final valueSetProvider = AssetResourceProvider.fromMap(<String, String>{
-    'http://hl7.org/fhir/ValueSet/administrative-gender':
-        'assets/valuesets/fhir_valueset_administrative_gender.json',
-    'http://hl7.org/fhir/administrative-gender':
-        'assets/codesystems/fhir_codesystem_administrative_gender.json',
-    'http://hl7.org/fhir/ValueSet/ucum-bodyweight':
-        'assets/valuesets/ucum_bodyweight.json',
-    'http://hl7.org/fhir/ValueSet/iso3166-1-2':
-        'assets/valuesets/fhir_valueset_iso3166_1_2.json',
-    'http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetYesNoUnk':
-        'assets/valuesets/who_cr_valueset_yes_no_unknown.json',
-    'http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetSexAtBirth':
-        'assets/valuesets/who_cr_valueset_sex_at_birth.json',
-    'http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetAgeUnits':
-        'assets/valuesets/who_cr_valueset_age_units.json',
-    'http://loinc.org/vs/LL715-4': 'assets/valuesets/loinc_ll715_4.json',
-    'http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetPregnancyTrimester':
-        'assets/valuesets/who_cr_valueset_pregnancy_trimester.json',
-    'http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetAdmin1':
-        'assets/valuesets/who_cr_valueset_admin_1.json',
-    'http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetPatientOutcome':
-        'assets/valuesets/who_cr_valueset_patient_outcome.json',
-    'http://openhie.github.io/covid-19/ValueSet/WhoCrValueSetTestResult':
-        'assets/valuesets/who_cr_valueset_test_result.json',
-    'http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemPatientOutcome':
-        'assets/codesystems/who_cr_codesystem_patient_outcome.json',
-    'http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemPregnancyTrimester':
-        'assets/codesystems/who_cr_codesystem_pregnancy_trimester.json',
-    'http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemQuestionnaireChoice':
-        'assets/codesystems/who_cr_codesystem_questionnaire_choice.json',
-    'http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemReasonForTesting':
-        'assets/codesystems/who_cr_codesystem_reason_for_testing.json',
-    'http://openhie.github.io/covid-19/CodeSystem/WhoCrCodeSystemComorbidity':
-        'assets/codesystems/who_cr_codesystem_comorbidity.json',
-  });
 
   late final FhirResourceProvider resourceBundleProvider;
 
@@ -354,7 +312,7 @@ class _HomePageState extends State<HomePage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => QuestionnaireScroller(
-                        scaffoldBuilder: const _CherryBlossomScaffoldBuilder(),
+                        scaffoldBuilder: const CherryBlossomScaffoldBuilder(),
                         fhirResourceProvider: RegistryFhirResourceProvider([
                           resourceBundleProvider,
                           AssetResourceProvider.singleton(
@@ -634,128 +592,6 @@ class _HomePageState extends State<HomePage> {
                     ),
                   );
                 },
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// Demonstrate the creation of a scrolling questionnaire with no Scaffold
-// and a unique theme.
-class _CherryBlossomScaffoldBuilder extends QuestionnairePageScaffoldBuilder {
-  const _CherryBlossomScaffoldBuilder();
-
-  @override
-  Widget build(
-    BuildContext context, {
-    required void Function(void Function() p1) setStateCallback,
-    required Widget child,
-  }) {
-    return Theme(
-      data: ThemeData.light().copyWith(
-        scrollbarTheme: ThemeData.light().scrollbarTheme.copyWith(
-              thumbVisibility: MaterialStateProperty.all(true),
-              thumbColor: MaterialStateProperty.all(
-                const Color(0xFF5C1349),
-              ),
-            ),
-        textTheme: GoogleFonts.ralewayTextTheme(),
-        iconTheme: ThemeData.light().iconTheme.copyWith(
-              color: const Color(0xFF5C1349),
-            ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ButtonStyle(
-            textStyle: MaterialStateProperty.all(
-              GoogleFonts.raleway(fontWeight: FontWeight.w600),
-            ),
-            backgroundColor: MaterialStateProperty.all(
-              const Color(0xFF5C1349),
-            ),
-            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-              RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(18.0),
-              ),
-            ),
-          ),
-        ),
-        checkboxTheme: ThemeData.light().checkboxTheme.copyWith(
-              fillColor: MaterialStateProperty.all(
-                const Color(0xFFE30425),
-              ),
-            ),
-        radioTheme: ThemeData.light().radioTheme.copyWith(
-              fillColor: MaterialStateProperty.all(
-                const Color(0xFFE30425),
-              ),
-            ),
-        sliderTheme: ThemeData.light().sliderTheme.copyWith(
-              thumbColor: const Color(0xFFE30425),
-              activeTrackColor: const Color(0xFFE30425),
-              inactiveTrackColor: const Color(0x60E30425),
-            ),
-        inputDecorationTheme: ThemeData.light().inputDecorationTheme.copyWith(
-              enabledBorder: const OutlineInputBorder(
-                borderSide: BorderSide(
-                  width: 2.0,
-                  color: Color.fromRGBO(0, 0, 0, 0.12),
-                ),
-              ),
-              disabledBorder: const OutlineInputBorder(
-                borderSide: BorderSide(
-                  width: 0,
-                  color: Color.fromRGBO(0, 0, 0, 0.0),
-                ),
-              ),
-              focusedErrorBorder: OutlineInputBorder(
-                borderSide: BorderSide(
-                  width: 2.0,
-                  color: ThemeData.light().errorColor,
-                ),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderSide: BorderSide(
-                  width: 2.0,
-                  color: ThemeData.light().errorColor.withOpacity(0.12),
-                ),
-              ),
-              focusedBorder: const OutlineInputBorder(
-                borderSide: BorderSide(
-                  width: 2.0,
-                  color: Color.fromRGBO(0, 0, 0, 0.54),
-                ),
-              ),
-            ),
-      ), // Make it always light
-      // We have to take care of SafeArea ourselves
-      child: SafeArea(
-        // This surround Card provides the Material parent that is required by
-        // the QuestionnaireFiller. Other potential Material parents would be
-        // Scaffolds.
-        child: Card(
-          // This column surrounds the scroller with whimsical add-ons
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Text(
-                  '🦄🌸🦄🌸🦄🌸🦄',
-                  style: Theme.of(context).textTheme.headline4,
-                ),
-              ),
-              Expanded(
-                child: child,
-              ), // This child is the actual scroller
-              const Divider(),
-              // We're putting our own exit button in here
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('桜の園からの帰り道'),
-                ),
               ),
             ],
           ),
