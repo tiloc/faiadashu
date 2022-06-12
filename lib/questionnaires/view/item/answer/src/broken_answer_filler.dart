@@ -7,9 +7,9 @@ class BrokenAnswerFiller extends QuestionnaireAnswerFiller {
   final Object exception;
 
   BrokenAnswerFiller(
-      super.answerModel,
+    super.answerModel,
     this.exception, {
-        super.key,
+    super.key,
   });
 
   @override

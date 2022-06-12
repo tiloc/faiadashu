@@ -7,8 +7,8 @@ import 'package:flutter/services.dart';
 /// Filler for answers of type [Integer], [Decimal], and [Quantity].
 class NumericalAnswerFiller extends QuestionnaireAnswerFiller {
   NumericalAnswerFiller(
-      super.answerModel, {
-        super.key,
+    super.answerModel, {
+    super.key,
   });
 
   @override

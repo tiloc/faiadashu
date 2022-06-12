@@ -1,9 +1,15 @@
 ## 0.8.1
+**[Breaking]** This release is beginning to make use of features in Flutter 3.0.
+It does not work with Flutter 2.*x*.
+
+### Faiadashu
+* Adopt new `super.` syntax from Dart 2.17 / Flutter 3.0 
 
 ### Faiadashu Online
 * Support update of existing resources on FHIR server
 
 ### Faiadashu Example / Gallery
+* Error dialog on failed upload
 * Break into smaller files
 
 ## 0.8.0

@@ -11,7 +11,7 @@ abstract class QuestionnaireAnswerFiller extends StatefulWidget {
 
   QuestionnaireAnswerFiller(
     this.answerModel, {
-        super.key,
+    super.key,
   })  : responseItemModel = answerModel.responseItemModel,
         questionnaireItemModel =
             answerModel.responseItemModel.questionnaireItemModel;

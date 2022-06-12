@@ -3,8 +3,8 @@ import 'package:faiadashu/questionnaires/model/model.dart';
 class GroupItemModel extends ResponseItemModel {
   GroupItemModel(
     super.parentNode,
-      super.questionnaireResponseModel,
-      super.itemModel,
+    super.questionnaireResponseModel,
+    super.itemModel,
   );
 
   @override

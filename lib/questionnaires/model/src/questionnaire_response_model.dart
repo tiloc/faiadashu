@@ -468,7 +468,6 @@ class QuestionnaireResponseModel {
     responseStatusNotifier.value = newStatus;
   }
 
-
   Id? _id;
   Id? get id => _id;
 

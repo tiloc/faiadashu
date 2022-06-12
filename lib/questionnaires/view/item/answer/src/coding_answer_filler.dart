@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 /// Answer questions which require code(s) as a response.
 class CodingAnswerFiller extends QuestionnaireAnswerFiller {
   CodingAnswerFiller(
-      super.answerModel, {
-        super.key,
+    super.answerModel, {
+    super.key,
   });
   @override
   State<StatefulWidget> createState() => _CodingAnswerState();
