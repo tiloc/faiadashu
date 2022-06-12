@@ -107,7 +107,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   // Quick-and-dirty upload of QuestionnaireResponse to server
-  // Not suitable for production use (no error-handling)
+  // Not suitable for production use
   Future<QuestionnaireResponse?> _uploadQuestionnaireResponse(
     String questionnairePath,
     QuestionnaireResponse? questionnaireResponse,
@@ -115,15 +115,38 @@ class _HomePageState extends State<HomePage> {
     if (questionnaireResponse == null) {
       return null;
     }
-    // Upload will also save locally.
-    final updatedQuestionnaireResponse =
-        await createOrUpdateQuestionnaireResponse(
-      smartClient,
-      questionnaireResponse,
-    );
-    _savedResponses[questionnairePath] = updatedQuestionnaireResponse;
+    try {
+      // Upload will also save locally.
+      final updatedQuestionnaireResponse =
+          await createOrUpdateQuestionnaireResponse(
+        smartClient,
+        questionnaireResponse,
+      );
+      _savedResponses[questionnairePath] = updatedQuestionnaireResponse;
 
-    return updatedQuestionnaireResponse;
+      return updatedQuestionnaireResponse;
+    } catch (e) {
+      // Upload failed, but we are saving the QR locally
+      _savedResponses[questionnairePath] = questionnaireResponse;
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Upload failed'),
+          content: Text(e.toString()),
+          scrollable: true,
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Dismiss'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        ),
+      );
+
+      return questionnaireResponse;
+    }
   }
 
   late final FhirResourceProvider resourceBundleProvider;
