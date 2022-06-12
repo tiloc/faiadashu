@@ -15,11 +15,11 @@ class QuestionnaireLaunchTile extends StatefulWidget {
   final Locale? locale;
   final FhirResourceProvider fhirResourceProvider;
   final LaunchContext launchContext;
-  final void Function(String id, QuestionnaireResponse? questionnaireResponse)
+  final void Function(String questionnairePath, QuestionnaireResponse? questionnaireResponse)
       saveResponseFunction;
-  final void Function(String id, QuestionnaireResponse? questionnaireResponse)?
+  final void Function(BuildContext context, String questionnairePath, QuestionnaireResponse? questionnaireResponse)?
       uploadResponseFunction;
-  final QuestionnaireResponse? Function(String id) restoreResponseFunction;
+  final QuestionnaireResponse? Function(String questionnairePath) restoreResponseFunction;
 
   final QuestionnaireModelDefaults questionnaireModelDefaults;
 
@@ -168,6 +168,7 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                         // Generate a response and upload it to a FHIR server.
                         // In a real-world scenario this would have more robust state handling.
                         widget.uploadResponseFunction?.call(
+                          context,
                           widget.questionnairePath,
                           QuestionnaireResponseFiller.of(context)
                               .aggregator<QuestionnaireResponseAggregator>()

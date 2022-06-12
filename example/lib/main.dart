@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:developer' as developer;
 import 'dart:io';
 
@@ -10,10 +9,10 @@ import 'package:faiadashu_example/disclaimer_page.dart';
 import 'package:faiadashu_example/observation_page.dart';
 import 'package:faiadashu_example/primitive_page.dart';
 import 'package:faiadashu_example/questionnaire_launch_tile.dart';
+import 'package:faiadashu_example/questionnaire_response_storage.dart';
 import 'package:faiadashu_example/value_set_provider.dart';
 import 'package:faiadashu_online/restful/restful.dart';
 import 'package:fhir/r4.dart';
-import 'package:fhir_auth/r4.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -84,74 +83,9 @@ class _HomePageState extends State<HomePage> {
 
   final ScrollController _listScrollController = ScrollController();
 
-  final Map<String, QuestionnaireResponse?> _savedResponses = {};
-
-  // Quick-and-dirty in-memory storage for QuestionnaireResponses
-  // Not suitable for production use.
-  void _saveResponse(String id, QuestionnaireResponse? response) {
-    if (response == null) {
-      return;
-    }
-
-    _savedResponses[id] = response;
-  }
-
-  // Quick-and-dirty in-memory storage for QuestionnaireResponses
-  // Not suitable for production use.
-  QuestionnaireResponse? _restoreResponse(String id) {
-    if (_savedResponses.containsKey(id)) {
-      return _savedResponses[id];
-    } else {
-      return null;
-    }
-  }
-
-  // Quick-and-dirty upload of QuestionnaireResponse to server
-  // Not suitable for production use
-  Future<QuestionnaireResponse?> _uploadQuestionnaireResponse(
-    String questionnairePath,
-    QuestionnaireResponse? questionnaireResponse,
-  ) async {
-    if (questionnaireResponse == null) {
-      return null;
-    }
-    try {
-      // Upload will also save locally.
-      final updatedQuestionnaireResponse =
-          await createOrUpdateQuestionnaireResponse(
-        smartClient,
-        questionnaireResponse,
-      );
-      _savedResponses[questionnairePath] = updatedQuestionnaireResponse;
-
-      return updatedQuestionnaireResponse;
-    } catch (e) {
-      // Upload failed, but we are saving the QR locally
-      _savedResponses[questionnairePath] = questionnaireResponse;
-      await showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Upload failed'),
-          content: Text(e.toString()),
-          scrollable: true,
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Dismiss'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        ),
-      );
-
-      return questionnaireResponse;
-    }
-  }
+  late final QuestionnaireResponseStorage questionnaireResponseStorage;
 
   late final FhirResourceProvider resourceBundleProvider;
-
-  late final SmartFhirClient smartClient;
 
   // Patient ID matches a patient on Meld Sandbox server.
   final launchContext = LaunchContext(
@@ -180,43 +114,23 @@ class _HomePageState extends State<HomePage> {
       valueSetProvider
     ]);
 
-    // Setup a client for access to a Meld sandbox.
-    smartClient = SmartFhirClient(
+    questionnaireResponseStorage = QuestionnaireResponseStorage(
       fhirUri: FhirUri('https://gw.interop.community/FaiadashuGallery/data'),
       clientId: '4564f6f7-335f-43d3-8867-a0f4e6f901d6',
       redirectUri: FhirUri('com.legentix.faiagallery://callback'),
-      scopes: Scopes(
-        clinicalScopes: [
-          ClinicalScope(
-            Role.patient,
-            R4ResourceType.Patient,
-            Interaction.any,
-          ),
-          ClinicalScope(
-            Role.patient,
-            R4ResourceType.QuestionnaireResponse,
-            Interaction.any,
-          ),
-        ],
-        openid: true,
-        offlineAccess: true,
-      ).scopesList(),
     );
+
   }
 
   @override
   void dispose() {
-    try {
-      unawaited(smartClient.logout());
-    } catch (e) {
-      _logger.warn('Could not log out', error: e);
-    }
+    questionnaireResponseStorage.dispose();
     super.dispose();
   }
 
   /// Schedules repaint after login / logout.
   void _onLoginChanged() {
-    _logger.debug('_onLoginChanged: ${smartClient.isLoggedIn()}');
+    _logger.debug('_onLoginChanged: ${questionnaireResponseStorage.smartClient.isLoggedIn()}');
     setState(() {
       // Rebuild
     });
@@ -233,9 +147,9 @@ class _HomePageState extends State<HomePage> {
       fhirResourceProvider: resourceBundleProvider,
       launchContext: launchContext,
       questionnairePath: questionnairePath,
-      saveResponseFunction: _saveResponse,
-      restoreResponseFunction: _restoreResponse,
-      uploadResponseFunction: _uploadQuestionnaireResponse,
+      saveResponseFunction: questionnaireResponseStorage.saveToMemory,
+      restoreResponseFunction: questionnaireResponseStorage.restoreFromMemory,
+      uploadResponseFunction: questionnaireResponseStorage.uploadToServer,
     );
   }
 
@@ -269,7 +183,7 @@ class _HomePageState extends State<HomePage> {
     // in implicit login, which is OK?
     final uploadResponseFunction =
 //    smartClient.isLoggedIn() ? _uploadResponse : null;
-        _uploadQuestionnaireResponse;
+        questionnaireResponseStorage.uploadToServer;
 
     return Scaffold(
       appBar: AppBar(
@@ -288,7 +202,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         actions: [
-          SmartLoginButton(smartClient, onLoginChanged: _onLoginChanged)
+          SmartLoginButton(questionnaireResponseStorage.smartClient, onLoginChanged: _onLoginChanged)
         ],
       ),
       body: SafeArea(
@@ -306,8 +220,8 @@ class _HomePageState extends State<HomePage> {
                 fhirResourceProvider: resourceBundleProvider,
                 launchContext: launchContext,
                 questionnairePath: 'assets/instruments/beverage_ig.json',
-                saveResponseFunction: _saveResponse,
-                restoreResponseFunction: _restoreResponse,
+                saveResponseFunction: questionnaireResponseStorage.saveToMemory,
+                restoreResponseFunction: questionnaireResponseStorage.restoreFromMemory,
                 uploadResponseFunction: uploadResponseFunction,
                 questionnaireModelDefaults: QuestionnaireModelDefaults(
                   prefixBuilder: (fim) {
@@ -450,8 +364,8 @@ class _HomePageState extends State<HomePage> {
                 ]),
                 launchContext: launchContext,
                 questionnairePath: 'assets/instruments/bluebook.json',
-                saveResponseFunction: _saveResponse,
-                restoreResponseFunction: _restoreResponse,
+                saveResponseFunction: questionnaireResponseStorage.saveToMemory,
+                restoreResponseFunction: questionnaireResponseStorage.restoreFromMemory,
                 uploadResponseFunction: uploadResponseFunction,
               ),
               _launchQuestionnaire(
@@ -479,8 +393,8 @@ class _HomePageState extends State<HomePage> {
                 fhirResourceProvider: resourceBundleProvider,
                 launchContext: launchContext,
                 questionnairePath: 'assets/instruments/argonaut_sampler.json',
-                saveResponseFunction: _saveResponse,
-                restoreResponseFunction: _restoreResponse,
+                saveResponseFunction: questionnaireResponseStorage.saveToMemory,
+                restoreResponseFunction: questionnaireResponseStorage.restoreFromMemory,
                 uploadResponseFunction: uploadResponseFunction,
               ),
               QuestionnaireLaunchTile(
@@ -493,8 +407,8 @@ class _HomePageState extends State<HomePage> {
                 fhirResourceProvider: resourceBundleProvider,
                 launchContext: launchContext,
                 questionnairePath: 'assets/instruments/argonaut_sampler.json',
-                saveResponseFunction: _saveResponse,
-                restoreResponseFunction: _restoreResponse,
+                saveResponseFunction: questionnaireResponseStorage.saveToMemory,
+                restoreResponseFunction: questionnaireResponseStorage.restoreFromMemory,
                 uploadResponseFunction: uploadResponseFunction,
               ),
               QuestionnaireLaunchTile(
@@ -507,8 +421,8 @@ class _HomePageState extends State<HomePage> {
                 fhirResourceProvider: resourceBundleProvider,
                 launchContext: launchContext,
                 questionnairePath: 'assets/instruments/argonaut_sampler.json',
-                saveResponseFunction: _saveResponse,
-                restoreResponseFunction: _restoreResponse,
+                saveResponseFunction: questionnaireResponseStorage.saveToMemory,
+                restoreResponseFunction: questionnaireResponseStorage.restoreFromMemory,
                 uploadResponseFunction: uploadResponseFunction,
               ),
               _headline(
