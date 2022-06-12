@@ -214,7 +214,7 @@ class CodingAnswerModel extends AnswerModel<OptionsOrString, OptionsOrString> {
   final int minOccurs;
   final int? maxOccurs;
 
-  CodingAnswerModel(QuestionItemModel responseModel)
+  CodingAnswerModel(super.responseModel)
       : minOccurs = responseModel.questionnaireItem.extension_
                 ?.extensionOrNull(
                   'http://hl7.org/fhir/StructureDefinition/questionnaire-minOccurs',
@@ -227,8 +227,7 @@ class CodingAnswerModel extends AnswerModel<OptionsOrString, OptionsOrString> {
               'http://hl7.org/fhir/StructureDefinition/questionnaire-maxOccurs',
             )
             ?.valueInteger
-            ?.value,
-        super(responseModel) {
+            ?.value {
     _createAnswerOptions();
   }
 

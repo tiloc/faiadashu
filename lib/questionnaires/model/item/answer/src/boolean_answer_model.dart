@@ -2,7 +2,7 @@ import 'package:faiadashu/questionnaires/model/model.dart';
 import 'package:fhir/r4.dart';
 
 class BooleanAnswerModel extends AnswerModel<Boolean, Boolean> {
-  BooleanAnswerModel(QuestionItemModel responseModel) : super(responseModel);
+  BooleanAnswerModel(super.responseModel);
 
   @override
   QuestionnaireResponseAnswer? createFhirAnswer(

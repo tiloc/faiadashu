@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 
 class BooleanAnswerFiller extends QuestionnaireAnswerFiller {
   BooleanAnswerFiller(
-    AnswerModel answerModel, {
-    Key? key,
-  }) : super(answerModel, key: key);
+      super.answerModel, {
+        super.key,
+  });
   @override
   State<StatefulWidget> createState() => _BooleanItemState();
 }

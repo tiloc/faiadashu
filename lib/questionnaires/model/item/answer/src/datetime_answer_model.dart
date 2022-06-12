@@ -11,7 +11,7 @@ import 'package:fhir/r4.dart'
         Time;
 
 class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
-  DateTimeAnswerModel(QuestionItemModel responseModel) : super(responseModel);
+  DateTimeAnswerModel(super.responseModel);
 
   @override
   RenderingString get display => (value != null)

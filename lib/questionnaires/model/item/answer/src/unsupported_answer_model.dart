@@ -3,8 +3,7 @@ import 'package:fhir/r4.dart';
 
 /// A pseudo-model for a questionnaire item of an unsupported type.
 class UnsupportedAnswerModel extends AnswerModel<Object, Object> {
-  UnsupportedAnswerModel(QuestionItemModel responseModel)
-      : super(responseModel);
+  UnsupportedAnswerModel(super.responseModel);
 
   @override
   QuestionnaireResponseAnswer? createFhirAnswer(

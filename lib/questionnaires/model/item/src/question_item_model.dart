@@ -35,14 +35,10 @@ class QuestionItemModel extends ResponseItemModel {
   late final FhirExpressionEvaluator? _calculatedExpression;
 
   QuestionItemModel(
-    ResponseNode? parentNode,
-    QuestionnaireResponseModel questionnaireResponseModel,
-    QuestionnaireItemModel itemModel,
-  ) : super(
-          parentNode,
-          questionnaireResponseModel,
-          itemModel,
-        ) {
+    super.parentNode,
+    super.questionnaireResponseModel,
+    super.itemModel,
+  ) {
     final calculatedExpression = questionnaireItemModel.calculatedExpression;
     _calculatedExpression = (calculatedExpression != null)
         ? FhirExpressionEvaluator.fromExpression(

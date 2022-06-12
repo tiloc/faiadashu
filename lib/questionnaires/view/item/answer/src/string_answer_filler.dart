@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 
 class StringAnswerFiller extends QuestionnaireAnswerFiller {
   StringAnswerFiller(
-    AnswerModel answerModel, {
-    Key? key,
-  }) : super(answerModel, key: key);
+      super.answerModel, {
+        super.key,
+  });
   @override
   State<StatefulWidget> createState() => _StringAnswerState();
 }

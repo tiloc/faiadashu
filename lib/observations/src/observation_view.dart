@@ -15,7 +15,7 @@ class ObservationView extends StatelessWidget {
 
   ObservationView(
     Observation observation, {
-    Key? key,
+    super.key,
     this.locale,
     TextStyle? valueStyle,
     TextStyle? unitStyle,
@@ -39,8 +39,7 @@ class ObservationView extends StatelessWidget {
           observation.effectiveDateTime,
           locale: locale,
           style: dateTimeStyle,
-        ),
-        super(key: key);
+        );
 
   @override
   Widget build(BuildContext context) {

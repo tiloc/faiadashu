@@ -66,12 +66,12 @@ abstract class FillerItemModel extends ResponseNode {
   late final Iterable<ExpressionEvaluator> _itemLevelExpressionEvaluators;
 
   Iterable<ExpressionEvaluator> get _itemBelowVariablesExpressionEvaluators {
-    final qitemExpression =
+    final qItemExpression =
         _QuestionnaireItemExpressionEvaluator(questionnaireItem);
 
     return [
       ...questionnaireResponseModel.questionnaireLevelExpressionEvaluators,
-      qitemExpression,
+      qItemExpression,
     ];
   }
 
@@ -135,10 +135,10 @@ abstract class FillerItemModel extends ResponseNode {
   }
 
   FillerItemModel(
-    ResponseNode? parentNode,
+    super.parentNode,
     this.questionnaireResponseModel,
     this.questionnaireItemModel,
-  ) : super(parentNode) {
+  ) {
     _buildItemLevelExpressionEvaluators();
 
     final enableWhenExtensionExpression = questionnaireItem.extension_

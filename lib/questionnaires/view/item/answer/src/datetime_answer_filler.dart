@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 
 class DateTimeAnswerFiller extends QuestionnaireAnswerFiller {
   DateTimeAnswerFiller(
-    AnswerModel answerModel, {
-    Key? key,
-  }) : super(answerModel, key: key);
+      super.answerModel, {
+        super.key,
+  });
   @override
   State<StatefulWidget> createState() => _DateTimeAnswerState();
 }

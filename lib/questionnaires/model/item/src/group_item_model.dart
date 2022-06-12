@@ -2,14 +2,10 @@ import 'package:faiadashu/questionnaires/model/model.dart';
 
 class GroupItemModel extends ResponseItemModel {
   GroupItemModel(
-    ResponseNode? parentNode,
-    QuestionnaireResponseModel questionnaireResponseModel,
-    QuestionnaireItemModel itemModel,
-  ) : super(
-          parentNode,
-          questionnaireResponseModel,
-          itemModel,
-        );
+    super.parentNode,
+      super.questionnaireResponseModel,
+      super.itemModel,
+  );
 
   @override
   bool get isInvalid {

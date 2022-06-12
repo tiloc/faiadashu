@@ -12,14 +12,10 @@ abstract class ResponseItemModel extends FillerItemModel {
   late final FhirPathExpressionEvaluator? _constraintExpression;
 
   ResponseItemModel(
-    ResponseNode? parentNode,
-    QuestionnaireResponseModel questionnaireResponseModel,
-    QuestionnaireItemModel questionnaireItemModel,
-  ) : super(
-          parentNode,
-          questionnaireResponseModel,
-          questionnaireItemModel,
-        ) {
+    super.parentNode,
+    super.questionnaireResponseModel,
+    super.questionnaireItemModel,
+  ) {
     final constraintExpression = questionnaireItemModel.constraintExpression;
 
     _constraintExpression = constraintExpression != null

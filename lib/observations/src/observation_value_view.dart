@@ -19,14 +19,14 @@ class ObservationValueView extends StatelessWidget {
 
   const ObservationValueView(
     this._observation, {
-    Key? key,
+    super.key,
     this.locale,
     this.valueStyle,
     this.unitStyle,
     this.componentSeparator = ' | ',
     this.unknownUnitText = '',
     this.unknownValueText = '?',
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
