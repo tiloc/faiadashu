@@ -1,4 +1,3 @@
-import 'package:faiadashu/questionnaires/model/item/answer/answer.dart';
 import 'package:faiadashu/questionnaires/view/view.dart';
 import 'package:flutter/material.dart';
 

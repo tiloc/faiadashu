@@ -88,20 +88,20 @@ class _HomePageState extends State<HomePage> {
   late final FhirResourceProvider resourceBundleProvider;
 
   // Patient ID matches a patient on Meld Sandbox server.
-  final launchContext = LaunchContext(
-    patient: Patient(
-      id: Id('smart-880378'),
-      name: [
-        HumanName(
-          given: ['Amy', 'R'],
-          family: 'Lee',
-          use: HumanNameUse.official,
-        )
-      ],
-      birthDate: Date('1999-12-08'),
-      gender: PatientGender.female,
-    ),
+  final sandboxPatient = Patient(
+    id: Id('smart-880378'),
+    name: [
+      HumanName(
+        given: ['Amy', 'R'],
+        family: 'Lee',
+        use: HumanNameUse.official,
+      )
+    ],
+    birthDate: Date('1999-12-08'),
+    gender: PatientGender.female,
   );
+
+  late final LaunchContext launchContext;
 
   @override
   void initState() {
@@ -113,6 +113,10 @@ class _HomePageState extends State<HomePage> {
       ),
       valueSetProvider
     ]);
+
+    launchContext = LaunchContext(
+      patient: sandboxPatient,
+    );
 
     questionnaireResponseStorage = QuestionnaireResponseStorage(
       fhirUri: FhirUri('https://gw.interop.community/FaiadashuGallery/data'),
