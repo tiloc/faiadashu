@@ -5,7 +5,7 @@ import 'fdash_localizations.g.dart';
 
 /// The translations for Arabic (`ar`).
 class FDashLocalizationsAr extends FDashLocalizations {
-  FDashLocalizationsAr([String locale = 'ar']) : super(locale);
+  FDashLocalizationsAr([super.locale = 'ar']);
 
   @override
   String get validatorRequiredItem => 'هذا السؤال يحتاج إلى أن يكتمل.';

@@ -2,7 +2,7 @@ import 'package:faiabench/exhibit_page.dart';
 import 'package:flutter/material.dart';
 
 class DisclaimerPage extends ExhibitPage {
-  const DisclaimerPage({Key? key}) : super(key: key);
+  const DisclaimerPage({super.key});
 
   @override
   Widget buildExhibit(BuildContext context) {

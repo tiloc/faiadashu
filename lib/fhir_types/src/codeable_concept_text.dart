@@ -11,8 +11,8 @@ class CodeableConceptText extends StatelessWidget {
     this.codeableConcept, {
     this.style,
     this.locale,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

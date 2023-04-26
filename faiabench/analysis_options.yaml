@@ -28,7 +28,6 @@ dart_code_metrics:
     - prefer-trailing-comma
     - prefer-conditional-expressions
     - no-equal-then-else
-    - no-magic-number
     - prefer-single-widget-per-file:
         ignore-private-widgets: true
   anti-patterns:

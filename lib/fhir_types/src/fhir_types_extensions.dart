@@ -191,9 +191,9 @@ extension FDashCodeableConceptExtension on CodeableConcept {
 
   bool containsCoding(String? system, String code) {
     return coding?.firstWhereOrNull(
-          (_coding) =>
-              (_coding.code?.toString() == code) &&
-              (_coding.system?.toString() == system),
+          (coding) =>
+              (coding.code?.toString() == code) &&
+              (coding.system?.toString() == system),
         ) !=
         null;
   }

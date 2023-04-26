@@ -4,7 +4,7 @@ import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
 class ObservationPage extends ExhibitPage {
-  ObservationPage({Key? key}) : super(key: key);
+  ObservationPage({super.key});
 
   final bpObservation = Observation(
     effectiveDateTime: FhirDateTime(DateTime.now()),
@@ -103,28 +103,29 @@ class ObservationPage extends ExhibitPage {
       children: [
         ObservationView(
           bpObservation,
-          valueStyle: Theme.of(context).textTheme.headline4,
-          codeStyle: Theme.of(context).textTheme.subtitle2,
-          dateTimeStyle: Theme.of(context).textTheme.caption,
+          valueStyle: Theme.of(context).textTheme.headlineMedium,
+          codeStyle: Theme.of(context).textTheme.titleSmall,
+          dateTimeStyle: Theme.of(context).textTheme.bodySmall,
         ),
         const SizedBox(
           height: 16,
         ),
         ObservationView(
           bpObservationWHR,
-          valueStyle: Theme.of(context).textTheme.headline4,
-          codeStyle: Theme.of(context).textTheme.subtitle2,
-          dateTimeStyle: Theme.of(context).textTheme.caption,
+          valueStyle: Theme.of(context).textTheme.headlineMedium,
+          codeStyle: Theme.of(context).textTheme.titleSmall,
+          dateTimeStyle: Theme.of(context).textTheme.bodySmall,
         ),
         const SizedBox(
           height: 16,
         ),
         ObservationView(
           bpObservationWHR,
-          valueStyle: Theme.of(context).textTheme.headline4,
-          codeStyle: Theme.of(context).textTheme.subtitle2,
-          dateTimeStyle: Theme.of(context).textTheme.caption,
-          locale: const Locale.fromSubtags(languageCode: 'ar', countryCode: 'BH'),
+          valueStyle: Theme.of(context).textTheme.headlineMedium,
+          codeStyle: Theme.of(context).textTheme.titleSmall,
+          dateTimeStyle: Theme.of(context).textTheme.bodySmall,
+          locale:
+              const Locale.fromSubtags(languageCode: 'ar', countryCode: 'BH'),
         ),
       ],
     );

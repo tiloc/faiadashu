@@ -5,7 +5,7 @@ import 'fdash_localizations.g.dart';
 
 /// The translations for Japanese (`ja`).
 class FDashLocalizationsJa extends FDashLocalizations {
-  FDashLocalizationsJa([String locale = 'ja']) : super(locale);
+  FDashLocalizationsJa([super.locale = 'ja']);
 
   @override
   String get validatorRequiredItem => 'この質問は完了する必要があります。';

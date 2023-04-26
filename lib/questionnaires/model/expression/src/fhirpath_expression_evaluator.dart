@@ -31,7 +31,7 @@ class FhirPathExpressionEvaluator extends FhirExpressionEvaluator {
         ) {
     if (fhirPathExpression.language != ExpressionLanguage.text_fhirpath) {
       throw ArgumentError(
-        '$name has wrong language: ${fhirPathExpression.language.toString()}',
+        '$name has wrong language: ${fhirPathExpression.language}',
       );
     }
 

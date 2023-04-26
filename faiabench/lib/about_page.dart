@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:simple_html_css/simple_html_css.dart';
 
 class AboutPage extends ExhibitPage {
-  const AboutPage({Key? key}) : super(key: key);
+  const AboutPage({super.key});
 
   @override
   Widget buildExhibit(BuildContext context) {
@@ -20,7 +20,7 @@ class AboutPage extends ExhibitPage {
     <p><b>I love the sound of it.</b><br>
     <div style="font-size: 10px; color:#888888">私はその音が大好きです。</div></p> 
     ''',
-        defaultTextStyle: Theme.of(context).textTheme.bodyText1,
+        defaultTextStyle: Theme.of(context).textTheme.bodyLarge,
       ),
     );
   }

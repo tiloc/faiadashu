@@ -9,7 +9,7 @@ import 'package:flutter/services.dart';
 /// "Drawer" which contains the narrative for a questionnaire.
 /// To be used with the drawer or endDrawer parameter of a [Scaffold].
 class NarrativeDrawer extends StatefulWidget {
-  const NarrativeDrawer({Key? key}) : super(key: key);
+  const NarrativeDrawer({super.key});
 
   @override
   State<StatefulWidget> createState() => _NarrativeDrawerState();
@@ -55,7 +55,7 @@ class _NarrativeDrawerState extends State<NarrativeDrawer> {
                       !_drawerMode
                           ? FDashLocalizations.of(context).narrativePageTitle
                           : 'FHIR R4 JSON',
-                      style: Theme.of(context).textTheme.headline5,
+                      style: Theme.of(context).textTheme.headlineSmall,
                     ),
                     secondary: IconButton(
                       icon: const Icon(Icons.copy),

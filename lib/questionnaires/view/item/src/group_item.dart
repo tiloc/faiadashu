@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 /// A view for filler items of type "group".
 class GroupItem extends ResponseItemFiller {
   GroupItem(
-    QuestionnaireFillerData questionnaireFiller,
-    ResponseItemModel responseItemModel, {
-    Key? key,
-  }) : super(questionnaireFiller, responseItemModel, key: key);
+    super.questionnaireFiller,
+    super.responseItemModel, {
+    super.key,
+  });
 
   @override
   State<StatefulWidget> createState() => _GroupItemState();
@@ -43,9 +43,10 @@ class _GroupItemState extends ResponseItemFillerState<GroupItem> {
                       padding: const EdgeInsets.only(top: 4.0),
                       child: Text(
                         errorText,
-                        style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                              color: Theme.of(context).errorColor,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium!.copyWith(
+                                  color: Theme.of(context).colorScheme.error,
+                                ),
                       ),
                     ),
                 ],
