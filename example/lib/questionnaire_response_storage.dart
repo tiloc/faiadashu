@@ -21,28 +21,31 @@ class QuestionnaireResponseStorage {
 
   final SmartFhirClient smartClient;
 
-  QuestionnaireResponseStorage({required this.fhirUri, required this.clientId, required this.redirectUri}) :
-    smartClient = SmartFhirClient(
-      fhirUri: fhirUri,
-      clientId: clientId,
-      redirectUri: redirectUri,
-      scopes: Scopes(
-        clinicalScopes: [
-          ClinicalScope(
-            Role.patient,
-            R4ResourceType.Patient,
-            Interaction.any,
-          ),
-          ClinicalScope(
-            Role.patient,
-            R4ResourceType.QuestionnaireResponse,
-            Interaction.any,
-          ),
-        ],
-        openid: true,
-        offlineAccess: true,
-      ).scopesList(),
-    );
+  QuestionnaireResponseStorage(
+      {required this.fhirUri,
+      required this.clientId,
+      required this.redirectUri})
+      : smartClient = SmartFhirClient(
+          fhirUri: fhirUri,
+          clientId: clientId,
+          redirectUri: redirectUri,
+          scopes: Scopes(
+            clinicalScopes: [
+              ClinicalScope(
+                Role.patient,
+                R4ResourceType.Patient,
+                Interaction.any,
+              ),
+              ClinicalScope(
+                Role.patient,
+                R4ResourceType.QuestionnaireResponse,
+                Interaction.any,
+              ),
+            ],
+            openid: true,
+            offlineAccess: true,
+          ).scopesList(),
+        );
 
   final Map<String, QuestionnaireResponse?> _savedResponses = {};
 
@@ -66,17 +69,17 @@ class QuestionnaireResponseStorage {
 
   // Upload of QuestionnaireResponse to server (plus saves in-memory).
   Future<QuestionnaireResponse?> uploadToServer(
-      BuildContext context,
-      String questionnairePath,
-      QuestionnaireResponse? questionnaireResponse,
-      ) async {
+    BuildContext context,
+    String questionnairePath,
+    QuestionnaireResponse? questionnaireResponse,
+  ) async {
     if (questionnaireResponse == null) {
       return null;
     }
     try {
       // Upload will also save locally.
       final updatedQuestionnaireResponse =
-      await createOrUpdateQuestionnaireResponse(
+          await createOrUpdateQuestionnaireResponse(
         smartClient,
         questionnaireResponse,
       );

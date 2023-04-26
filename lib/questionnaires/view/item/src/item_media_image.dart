@@ -11,7 +11,7 @@ class ItemMediaImage extends StatelessWidget {
 
   final Widget itemImageWidget;
 
-  const ItemMediaImage._(this.itemImageWidget, {Key? key}) : super(key: key);
+  const ItemMediaImage._(this.itemImageWidget);
 
   static Widget? fromItemMedia(
     ItemMediaModel? itemMediaModel, {

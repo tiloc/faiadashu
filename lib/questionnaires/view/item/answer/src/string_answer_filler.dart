@@ -47,15 +47,10 @@ class _StringAnswerInputControl extends AnswerInputControl<StringAnswerModel> {
   final TextEditingController editingController;
 
   const _StringAnswerInputControl(
-    StringAnswerModel answerModel, {
+    super.answerModel, {
     required this.editingController,
-    FocusNode? focusNode,
-    Key? key,
-  }) : super(
-          answerModel,
-          focusNode: focusNode,
-          key: key,
-        );
+    super.focusNode,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +99,7 @@ class _StringAnswerInputControl extends AnswerInputControl<StringAnswerModel> {
             errorStyle: (itemModel
                     .isCalculated) // Force display of error text on calculated item
                 ? TextStyle(
-                    color: Theme.of(context).errorColor,
+                    color: Theme.of(context).colorScheme.error,
                   )
                 : null,
             hintText: answerModel.entryFormat,
@@ -112,7 +107,7 @@ class _StringAnswerInputControl extends AnswerInputControl<StringAnswerModel> {
                 ? Icon(
                     Icons.calculate,
                     color: (answerModel.displayErrorText != null)
-                        ? Theme.of(context).errorColor
+                        ? Theme.of(context).colorScheme.error
                         : null,
                   )
                 : null,

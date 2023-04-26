@@ -43,13 +43,13 @@ class BrokenQuestionnaireItem extends StatelessWidget {
             if (cause != null)
               SelectableText(
                 cause.toString(),
-                style: Theme.of(context).textTheme.headline6?.copyWith(
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       color: Theme.of(context).cardColor,
                     ),
               ),
             SelectableText(
               message,
-              style: Theme.of(context).textTheme.subtitle1?.copyWith(
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: Colors.yellow,
                   ),
             ),

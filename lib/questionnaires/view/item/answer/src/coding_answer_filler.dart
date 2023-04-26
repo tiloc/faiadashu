@@ -32,14 +32,9 @@ class _CodingAnswerState extends QuestionnaireAnswerFillerState<OptionsOrString,
 
 class _CodingInputControl extends AnswerInputControl<CodingAnswerModel> {
   const _CodingInputControl(
-    CodingAnswerModel answerModel, {
-    Key? key,
-    FocusNode? focusNode,
-  }) : super(
-          answerModel,
-          key: key,
-          focusNode: focusNode,
-        );
+    super.answerModel, {
+    super.focusNode,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -122,9 +117,8 @@ class _StyledOption extends StatefulWidget {
 
   const _StyledOption(
     this.answerModel,
-    this.optionModel, {
-    super.key,
-  });
+    this.optionModel,
+  );
 
   @override
   _StyledOptionState createState() => _StyledOptionState();
@@ -190,8 +184,7 @@ class _CheckboxChoice extends StatelessWidget {
   final CodingAnswerOptionModel answerOption;
   final CodingAnswerModel answerModel;
 
-  const _CheckboxChoice(this.answerModel, this.answerOption, {Key? key})
-      : super(key: key);
+  const _CheckboxChoice(this.answerModel, this.answerOption);
 
   @override
   Widget build(BuildContext context) {
@@ -225,7 +218,7 @@ class _CheckboxChoice extends StatelessWidget {
 class _NullRadioChoice extends StatelessWidget {
   final CodingAnswerModel answerModel;
 
-  const _NullRadioChoice(this.answerModel, {Key? key}) : super(key: key);
+  const _NullRadioChoice(this.answerModel);
 
   @override
   Widget build(BuildContext context) {
@@ -249,8 +242,7 @@ class _RadioChoice extends StatelessWidget {
   final CodingAnswerOptionModel answerOption;
   final CodingAnswerModel answerModel;
 
-  const _RadioChoice(this.answerModel, this.answerOption, {Key? key})
-      : super(key: key);
+  const _RadioChoice(this.answerModel, this.answerOption);
 
   @override
   Widget build(BuildContext context) {
@@ -280,14 +272,9 @@ class _RadioChoice extends StatelessWidget {
 
 class _CodingDropdown extends AnswerInputControl<CodingAnswerModel> {
   const _CodingDropdown(
-    CodingAnswerModel answerModel, {
-    Key? key,
-    FocusNode? focusNode,
-  }) : super(
-          answerModel,
-          key: key,
-          focusNode: focusNode,
-        );
+    super.answerModel, {
+    super.focusNode,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -336,15 +323,10 @@ class _CodingDropdown extends AnswerInputControl<CodingAnswerModel> {
 
 class _VerticalCodingChoices extends AnswerInputControl<CodingAnswerModel> {
   const _VerticalCodingChoices(
-    CodingAnswerModel answerModel,
+    super.answerModel,
     this.choices, {
-    Key? key,
-    FocusNode? focusNode,
-  }) : super(
-          answerModel,
-          key: key,
-          focusNode: focusNode,
-        );
+    super.focusNode,
+  });
 
   final List<Widget> choices;
 
@@ -371,14 +353,9 @@ class _CodingChoices extends AnswerInputControl<CodingAnswerModel> {
   late final List<Widget> _choices;
 
   _CodingChoices(
-    CodingAnswerModel answerModel, {
-    Key? key,
-    FocusNode? focusNode,
-  }) : super(
-          answerModel,
-          focusNode: focusNode,
-          key: key,
-        ) {
+    super.answerModel, {
+    super.focusNode,
+  }) {
     _choices = _createChoices();
   }
 
@@ -431,15 +408,10 @@ class _CodingChoices extends AnswerInputControl<CodingAnswerModel> {
 
 class _HorizontalCodingChoices extends AnswerInputControl<CodingAnswerModel> {
   const _HorizontalCodingChoices(
-    CodingAnswerModel answerModel,
+    super.answerModel,
     this.choices, {
-    Key? key,
-    FocusNode? focusNode,
-  }) : super(
-          answerModel,
-          focusNode: focusNode,
-          key: key,
-        );
+    super.focusNode,
+  });
 
   final List<Widget> choices;
 
@@ -476,8 +448,7 @@ class _CodingChoiceDecorator extends StatelessWidget {
     this.answerModel, {
     this.focusNode,
     this.child,
-    Key? key,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -512,14 +483,9 @@ class _CodingChoiceDecorator extends StatelessWidget {
 
 class _CodingAutoComplete extends AnswerInputControl<CodingAnswerModel> {
   const _CodingAutoComplete(
-    CodingAnswerModel answerModel, {
-    Key? key,
-    FocusNode? focusNode,
-  }) : super(
-          answerModel,
-          key: key,
-          focusNode: focusNode,
-        );
+    super.answerModel, {
+    super.focusNode,
+  });
 
   Widget _fieldViewBuilder(
     BuildContext context,
@@ -579,7 +545,7 @@ class _CodingAutoComplete extends AnswerInputControl<CodingAnswerModel> {
 class _OpenStringInputControl extends StatefulWidget {
   final CodingAnswerModel answerModel;
 
-  const _OpenStringInputControl(this.answerModel, {Key? key}) : super(key: key);
+  const _OpenStringInputControl(this.answerModel);
 
   @override
   _OpenStringInputControlState createState() => _OpenStringInputControlState();
@@ -606,7 +572,7 @@ class _OpenStringInputControlState extends State<_OpenStringInputControl> {
           answerModel.openLabel,
           defaultTextStyle: Theme.of(context)
               .textTheme
-              .bodyText2
+              .bodyMedium
               ?.copyWith(fontWeight: FontWeight.w500),
         ),
         const SizedBox(
@@ -638,12 +604,11 @@ class _OpenStringInputControlState extends State<_OpenStringInputControl> {
 
 class _FDashAutocompleteField extends StatelessWidget {
   const _FDashAutocompleteField({
-    Key? key,
     required this.answerModel,
     required this.focusNode,
     required this.textEditingController,
     required this.onFieldSubmitted,
-  }) : super(key: key);
+  });
 
   final AnswerModel answerModel;
 

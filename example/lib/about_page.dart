@@ -4,7 +4,7 @@ import 'package:simple_html_css/simple_html_css.dart';
 import 'exhibit_page.dart';
 
 class AboutPage extends ExhibitPage {
-  const AboutPage({Key? key}) : super(key: key);
+  const AboutPage({super.key});
 
   @override
   Widget buildExhibit(BuildContext context) {

@@ -66,15 +66,10 @@ class _SliderInputControl extends AnswerInputControl<NumericalAnswerModel> {
   final ValueNotifier<double> sliderValueDuringChange;
 
   const _SliderInputControl(
-    NumericalAnswerModel answerModel, {
+    super.answerModel, {
     required this.sliderValueDuringChange,
-    FocusNode? focusNode,
-    Key? key,
-  }) : super(
-          answerModel,
-          focusNode: focusNode,
-          key: key,
-        );
+    super.focusNode,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -157,17 +152,11 @@ class _NumberFieldInputControl
   final TextInputFormatter numberInputFormatter;
 
   _NumberFieldInputControl(
-    NumericalAnswerModel answerModel, {
+    super.answerModel, {
     required this.editingController,
-    FocusNode? focusNode,
-    Key? key,
-  })  : numberInputFormatter =
-            NumericalTextInputFormatter(answerModel.numberFormat),
-        super(
-          answerModel,
-          focusNode: focusNode,
-          key: key,
-        );
+    super.focusNode,
+  }) : numberInputFormatter =
+            NumericalTextInputFormatter(answerModel.numberFormat);
 
   @override
   Widget build(BuildContext context) {
@@ -217,7 +206,7 @@ class _NumberFieldInputControl
                       ? Icon(
                           Icons.calculate,
                           color: (answerModel.displayErrorText != null)
-                              ? Theme.of(context).errorColor
+                              ? Theme.of(context).colorScheme.error
                               : null,
                         )
                       : null,
@@ -257,8 +246,8 @@ class _NumberFieldInputControl
 
 class _UnitDropDown extends AnswerInputControl<NumericalAnswerModel> {
   const _UnitDropDown(
-    NumericalAnswerModel answerModel,
-  ) : super(answerModel);
+    super.answerModel,
+  );
 
   @override
   Widget build(BuildContext context) {

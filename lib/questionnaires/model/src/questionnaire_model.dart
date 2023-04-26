@@ -260,7 +260,7 @@ class QuestionnaireModel {
             final codeSystem =
                 getResource(valueSetInclude.system.toString()) as CodeSystem;
             _logger.debug(
-              'Processing included CodeSystem ${codeSystem.url.toString()}',
+              'Processing included CodeSystem ${codeSystem.url}',
             );
             if (codeSystem.concept != null) {
               for (final concept in codeSystem.concept!) {

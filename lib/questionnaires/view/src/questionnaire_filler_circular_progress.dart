@@ -14,8 +14,8 @@ class QuestionnaireFillerCircularProgress extends StatelessWidget {
 
   const QuestionnaireFillerCircularProgress({
     this.radius = defaultRadius,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

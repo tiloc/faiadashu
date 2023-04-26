@@ -14,8 +14,8 @@ class FhirDateTimeText extends StatelessWidget {
     this.style,
     this.defaultText = '',
     this.locale,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

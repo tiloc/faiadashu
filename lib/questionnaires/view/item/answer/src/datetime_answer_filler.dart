@@ -32,12 +32,9 @@ class _DateTimeAnswerState extends QuestionnaireAnswerFillerState<FhirDateTime,
 
 class _DateTimeInputControl extends AnswerInputControl<DateTimeAnswerModel> {
   const _DateTimeInputControl(
-    DateTimeAnswerModel answerModel, {
-    FocusNode? focusNode,
-  }) : super(
-          answerModel,
-          focusNode: focusNode,
-        );
+    super.answerModel, {
+    super.focusNode,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +67,7 @@ class _DateTimeInputControl extends AnswerInputControl<DateTimeAnswerModel> {
           errorStyle: (itemModel
                   .isCalculated) // Force display of error text on calculated item
               ? TextStyle(
-                  color: Theme.of(context).errorColor,
+                  color: Theme.of(context).colorScheme.error,
                 )
               : null,
         ),
