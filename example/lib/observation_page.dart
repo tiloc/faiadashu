@@ -4,7 +4,7 @@ import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
 class ObservationPage extends ExhibitPage {
-  ObservationPage({Key? key}) : super(key: key);
+  ObservationPage({super.key});
 
   final bpObservation = Observation(
     effectiveDateTime: FhirDateTime(DateTime.now()),
@@ -124,7 +124,8 @@ class ObservationPage extends ExhibitPage {
           valueStyle: Theme.of(context).textTheme.headline4,
           codeStyle: Theme.of(context).textTheme.subtitle2,
           dateTimeStyle: Theme.of(context).textTheme.caption,
-          locale: const Locale.fromSubtags(languageCode: 'ar', countryCode: 'BH'),
+          locale:
+              const Locale.fromSubtags(languageCode: 'ar', countryCode: 'BH'),
         ),
       ],
     );

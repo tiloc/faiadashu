@@ -133,14 +133,14 @@ class _SliderInputControl extends AnswerInputControl<NumericalAnswerModel> {
                 Xhtml.fromRenderingString(
                   context,
                   lowerSliderLabel,
-                  defaultTextStyle: Theme.of(context).textTheme.button,
+                  defaultTextStyle: Theme.of(context).textTheme.labelLarge,
                 ),
               const Expanded(child: SizedBox()),
               if (upperSliderLabel != null)
                 Xhtml.fromRenderingString(
                   context,
                   upperSliderLabel,
-                  defaultTextStyle: Theme.of(context).textTheme.button,
+                  defaultTextStyle: Theme.of(context).textTheme.labelLarge,
                 ),
               const SizedBox(width: 8.0),
             ],
@@ -209,7 +209,7 @@ class _NumberFieldInputControl
                   errorStyle: (itemModel
                           .isCalculated) // Force display of error text on calculated item
                       ? TextStyle(
-                          color: Theme.of(context).errorColor,
+                          color: Theme.of(context).colorScheme.error,
                         )
                       : null,
                   hintText: answerModel.entryFormat,
@@ -271,7 +271,7 @@ class _UnitDropDown extends AnswerInputControl<NumericalAnswerModel> {
             width: unitWidth,
             child: Text(
               answerModel.unitChoices.first.localizedDisplay(locale),
-              style: Theme.of(context).textTheme.subtitle1,
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
           )
         : Container(

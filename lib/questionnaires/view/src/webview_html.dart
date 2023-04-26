@@ -12,22 +12,25 @@ Widget createWebView(String xhtml, {Key? key}) => _FullHtmlViewer(
 class _FullHtmlViewer extends StatelessWidget {
   final String xhtml;
 
-  const _FullHtmlViewer(this.xhtml, {Key? key}) : super(key: key);
+  const _FullHtmlViewer(this.xhtml, {super.key});
 
   @override
   Widget build(BuildContext context) {
-    // required while web support is in preview
-    WebView.platform = WebWebViewPlatform();
-
     final dataUrl = Uri.dataFromString(
       xhtml,
       mimeType: 'text/html',
       encoding: Encoding.getByName('utf-8'),
     ).toString();
 
+    ;
+
     return SizedBox.expand(
-      child: WebView(
-        initialUrl: dataUrl,
+      child: WebViewWidget(
+        controller: WebViewController.fromPlatformCreationParams(
+          const PlatformWebViewControllerCreationParams(),
+        )..loadRequest(
+            Uri.parse(dataUrl),
+          ),
       ),
     );
   }

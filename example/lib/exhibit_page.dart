@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 abstract class ExhibitPage extends StatelessWidget {
-  const ExhibitPage({Key? key}) : super(key: key);
+  const ExhibitPage({super.key});
 
   String get title;
 

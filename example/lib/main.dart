@@ -44,7 +44,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +71,7 @@ class MyApp extends StatelessWidget {
 }
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -123,7 +123,6 @@ class _HomePageState extends State<HomePage> {
       clientId: '4564f6f7-335f-43d3-8867-a0f4e6f901d6',
       redirectUri: FhirUri('com.legentix.faiagallery://callback'),
     );
-
   }
 
   @override
@@ -134,7 +133,9 @@ class _HomePageState extends State<HomePage> {
 
   /// Schedules repaint after login / logout.
   void _onLoginChanged() {
-    _logger.debug('_onLoginChanged: ${questionnaireResponseStorage.smartClient.isLoggedIn()}');
+    _logger.debug(
+      '_onLoginChanged: ${questionnaireResponseStorage.smartClient.isLoggedIn()}',
+    );
     setState(() {
       // Rebuild
     });
@@ -171,7 +172,7 @@ class _HomePageState extends State<HomePage> {
               title,
               style: Theme.of(context)
                   .textTheme
-                  .headline6
+                  .titleLarge
                   ?.copyWith(fontWeight: FontWeight.bold),
             ),
             Text(subtitle)
@@ -206,7 +207,10 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         actions: [
-          SmartLoginButton(questionnaireResponseStorage.smartClient, onLoginChanged: _onLoginChanged)
+          SmartLoginButton(
+            questionnaireResponseStorage.smartClient,
+            onLoginChanged: _onLoginChanged,
+          )
         ],
       ),
       body: SafeArea(
@@ -225,7 +229,8 @@ class _HomePageState extends State<HomePage> {
                 launchContext: launchContext,
                 questionnairePath: 'assets/instruments/beverage_ig.json',
                 saveResponseFunction: questionnaireResponseStorage.saveToMemory,
-                restoreResponseFunction: questionnaireResponseStorage.restoreFromMemory,
+                restoreResponseFunction:
+                    questionnaireResponseStorage.restoreFromMemory,
                 uploadResponseFunction: uploadResponseFunction,
                 questionnaireModelDefaults: QuestionnaireModelDefaults(
                   prefixBuilder: (fim) {
@@ -369,7 +374,8 @@ class _HomePageState extends State<HomePage> {
                 launchContext: launchContext,
                 questionnairePath: 'assets/instruments/bluebook.json',
                 saveResponseFunction: questionnaireResponseStorage.saveToMemory,
-                restoreResponseFunction: questionnaireResponseStorage.restoreFromMemory,
+                restoreResponseFunction:
+                    questionnaireResponseStorage.restoreFromMemory,
                 uploadResponseFunction: uploadResponseFunction,
               ),
               _launchQuestionnaire(
@@ -398,7 +404,8 @@ class _HomePageState extends State<HomePage> {
                 launchContext: launchContext,
                 questionnairePath: 'assets/instruments/argonaut_sampler.json',
                 saveResponseFunction: questionnaireResponseStorage.saveToMemory,
-                restoreResponseFunction: questionnaireResponseStorage.restoreFromMemory,
+                restoreResponseFunction:
+                    questionnaireResponseStorage.restoreFromMemory,
                 uploadResponseFunction: uploadResponseFunction,
               ),
               QuestionnaireLaunchTile(
@@ -412,7 +419,8 @@ class _HomePageState extends State<HomePage> {
                 launchContext: launchContext,
                 questionnairePath: 'assets/instruments/argonaut_sampler.json',
                 saveResponseFunction: questionnaireResponseStorage.saveToMemory,
-                restoreResponseFunction: questionnaireResponseStorage.restoreFromMemory,
+                restoreResponseFunction:
+                    questionnaireResponseStorage.restoreFromMemory,
                 uploadResponseFunction: uploadResponseFunction,
               ),
               QuestionnaireLaunchTile(
@@ -426,7 +434,8 @@ class _HomePageState extends State<HomePage> {
                 launchContext: launchContext,
                 questionnairePath: 'assets/instruments/argonaut_sampler.json',
                 saveResponseFunction: questionnaireResponseStorage.saveToMemory,
-                restoreResponseFunction: questionnaireResponseStorage.restoreFromMemory,
+                restoreResponseFunction:
+                    questionnaireResponseStorage.restoreFromMemory,
                 uploadResponseFunction: uploadResponseFunction,
               ),
               _headline(

@@ -8,12 +8,11 @@ import 'package:flutter/material.dart';
 /// Contains information such as title and publisher.
 class QuestionnaireInformationTile extends StatelessWidget {
   final Questionnaire questionnaire;
-  const QuestionnaireInformationTile(this.questionnaire, {Key? key})
-      : super(key: key);
+  const QuestionnaireInformationTile(this.questionnaire, {super.key});
 
   @override
   Widget build(BuildContext context) {
-    final defaultTextStyle = Theme.of(context).textTheme.subtitle1;
+    final defaultTextStyle = Theme.of(context).textTheme.titleMedium;
 
     return Column(
       children: [

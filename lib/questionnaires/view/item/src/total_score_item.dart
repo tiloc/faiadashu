@@ -107,14 +107,14 @@ class _TotalScoreItemState extends State<TotalScoreItem> {
             const SizedBox(height: 32),
             Text(
               FDashLocalizations.of(context).aggregationTotalScoreTitle,
-              style: Theme.of(context).textTheme.headline3,
+              style: Theme.of(context).textTheme.displaySmall,
             ),
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 200),
               child: Text(
                 scoreText,
                 key: ValueKey<String>(scoreText),
-                style: Theme.of(context).textTheme.headline1,
+                style: Theme.of(context).textTheme.displayLarge,
               ),
             ),
             AnimatedSwitcher(

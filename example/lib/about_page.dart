@@ -21,7 +21,7 @@ class AboutPage extends ExhibitPage {
     <p><b>I love the sound of it.</b><br>
     <div style="font-size: 10px; color:#888888">私はその音が大好きです。</div></p> 
     ''',
-        defaultTextStyle: Theme.of(context).textTheme.bodyText1,
+        defaultTextStyle: Theme.of(context).textTheme.bodyLarge,
       ),
     );
   }

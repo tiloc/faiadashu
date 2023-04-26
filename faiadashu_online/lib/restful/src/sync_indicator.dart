@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 class SyncIndicator extends StatefulWidget {
   final Color? color;
 
-  const SyncIndicator({this.color, Key? key}) : super(key: key);
+  const SyncIndicator({this.color, super.key});
 
   @override
   // ignore: library_private_types_in_public_api

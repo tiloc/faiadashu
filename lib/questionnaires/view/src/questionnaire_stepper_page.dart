@@ -8,19 +8,13 @@ import 'package:flutter/material.dart';
 /// see [QuestionnaireScrollerPage]
 class QuestionnaireStepperPage extends QuestionnaireStepper {
   const QuestionnaireStepperPage({
-    Locale? locale,
-    required FhirResourceProvider fhirResourceProvider,
-    required LaunchContext launchContext,
-    QuestionnaireModelDefaults questionnaireModelDefaults =
-        const QuestionnaireModelDefaults(),
-    Key? key,
+    super.locale,
+    required super.fhirResourceProvider,
+    required super.launchContext,
+    super.questionnaireModelDefaults,
+    super.key,
   }) : super(
-          locale: locale,
           scaffoldBuilder: const DefaultQuestionnairePageScaffoldBuilder(),
-          fhirResourceProvider: fhirResourceProvider,
-          launchContext: launchContext,
-          questionnaireModelDefaults: questionnaireModelDefaults,
-          key: key,
         );
 
   @override

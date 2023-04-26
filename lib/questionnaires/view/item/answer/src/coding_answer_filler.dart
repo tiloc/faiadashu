@@ -56,8 +56,8 @@ class _CodingInputControl extends AnswerInputControl<CodingAnswerModel> {
             errorText ?? '',
             style: Theme.of(context)
                 .textTheme
-                .caption
-                ?.copyWith(color: Theme.of(context).errorColor),
+                .bodySmall
+                ?.copyWith(color: Theme.of(context).colorScheme.error),
           ),
         ),
       ],
@@ -123,8 +123,8 @@ class _StyledOption extends StatefulWidget {
   const _StyledOption(
     this.answerModel,
     this.optionModel, {
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _StyledOptionState createState() => _StyledOptionState();

@@ -11,8 +11,7 @@ import 'package:flutter/material.dart';
 class QuestionnaireCompleteButton extends StatefulWidget {
   final VoidCallback? onCompleted;
 
-  const QuestionnaireCompleteButton({this.onCompleted, Key? key})
-      : super(key: key);
+  const QuestionnaireCompleteButton({this.onCompleted, super.key});
 
   @override
   // ignore: library_private_types_in_public_api

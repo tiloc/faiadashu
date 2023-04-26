@@ -22,8 +22,8 @@ class NarrativeTile extends StatefulWidget {
   const NarrativeTile({
     this.questionnaireResponseModel,
     this.narrative,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<StatefulWidget> createState() => _NarrativeTileState();

@@ -55,7 +55,7 @@ class _NarrativeDrawerState extends State<NarrativeDrawer> {
                       !_drawerMode
                           ? FDashLocalizations.of(context).narrativePageTitle
                           : 'FHIR R4 JSON',
-                      style: Theme.of(context).textTheme.headline5,
+                      style: Theme.of(context).textTheme.headlineSmall,
                     ),
                     secondary: IconButton(
                       icon: const Icon(Icons.copy),

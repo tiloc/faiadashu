@@ -124,7 +124,7 @@ class Xhtml extends StatelessWidget {
             context,
             xhtml,
             defaultTextStyle:
-                defaultTextStyle ?? Theme.of(context).textTheme.bodyText2,
+                defaultTextStyle ?? Theme.of(context).textTheme.bodyMedium,
           ),
         ),
       );
