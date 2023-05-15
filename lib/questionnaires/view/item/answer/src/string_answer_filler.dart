@@ -1,5 +1,4 @@
 import 'package:faiadashu/questionnaires/questionnaires.dart';
-import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
 class StringAnswerFiller extends QuestionnaireAnswerFiller {
@@ -91,7 +90,7 @@ class _StringAnswerInputControl extends AnswerInputControl<StringAnswerModel> {
           enabled: answerModel.isControlEnabled,
           keyboardType: keyboardType,
           controller: editingController,
-          maxLines: (qi.type == QuestionnaireItemType.text)
+          maxLines: (qi.type.value == 'text')
               ? QuestionnaireTheme.of(context).maxLinesForTextItem
               : 1,
           decoration: InputDecoration(

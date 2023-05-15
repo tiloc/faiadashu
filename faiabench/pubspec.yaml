@@ -26,8 +26,8 @@ dependencies:
   collection: ^1.17.0
   faiadashu:
     path: ..
-  fhir: ^0.8.0
-  fhir_path: ^0.8.0
+  fhir: ^0.9.0
+  fhir_path: ^0.9.0
   flutter:
     sdk: flutter
   flutter_highlight: ^0.7.0

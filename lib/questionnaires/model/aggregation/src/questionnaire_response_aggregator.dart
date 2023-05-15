@@ -18,11 +18,10 @@ class QuestionnaireResponseAggregator
 
   QuestionnaireResponseItem? _fromQuestionItem(
     QuestionItemModel itemModel,
-    QuestionnaireResponseStatus responseStatus,
+    Code responseStatus,
     Map<String, dynamic> responseItemRegistry,
   ) {
-    if (responseStatus == QuestionnaireResponseStatus.completed &&
-        !itemModel.isEnabled) {
+    if (responseStatus.value == 'completed' && !itemModel.isEnabled) {
       return null;
     }
 
@@ -89,11 +88,10 @@ class QuestionnaireResponseAggregator
 
   QuestionnaireResponseItem? _fromGroupItem(
     GroupItemModel itemModel,
-    QuestionnaireResponseStatus responseStatus,
+    Code responseStatus,
     Map<String, dynamic> responseItemRegistry,
   ) {
-    if (responseStatus == QuestionnaireResponseStatus.completed &&
-        !itemModel.isEnabled) {
+    if (responseStatus.value == 'completed' && !itemModel.isEnabled) {
       return null;
     }
 
@@ -118,7 +116,7 @@ class QuestionnaireResponseAggregator
 
   List<QuestionnaireResponseItem>? _fromResponseItems(
     ResponseNode? parentNode,
-    QuestionnaireResponseStatus responseStatus,
+    Code responseStatus,
     Map<String, dynamic> responseItemRegistry,
   ) {
     final responseItems = <QuestionnaireResponseItem>[];
@@ -154,7 +152,7 @@ class QuestionnaireResponseAggregator
 
   @override
   QuestionnaireResponse? aggregate({
-    QuestionnaireResponseStatus? responseStatus,
+    Code? responseStatus,
     bool notifyListeners = false,
     bool containPatient = false,
   }) {
@@ -173,7 +171,7 @@ class QuestionnaireResponseAggregator
   }
 
   Map<String, dynamic> aggregateResponseItems({
-    QuestionnaireResponseStatus? responseStatus,
+    Code? responseStatus,
     bool notifyListeners = false,
     bool containPatient = false,
     bool generateNarrative = true,

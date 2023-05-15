@@ -38,6 +38,7 @@ abstract class FhirExpressionEvaluator extends ExpressionEvaluator {
         );
       case ExpressionLanguage.text_cql:
       case ExpressionLanguage.unknown:
+      default:
         throw UnsupportedError(
           'Expressions of type ${fhirExpression.language} are unsupported.',
         );

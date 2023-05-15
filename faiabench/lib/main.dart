@@ -20,23 +20,28 @@ import 'filler_inputs.dart';
 
 final questionnaireProvider =
     StateNotifierProvider<FhirResourceNotifier, AsyncValue<FhirResource>>(
-        (ref) {
-  return FhirResourceNotifier('assets/initial/bluebook-questionnaire.json');
-});
+  (ref) {
+    return FhirResourceNotifier(
+      'assets/initial/bluebook-questionnaire.json',
+    );
+  },
+);
 
 final populateQuestionnaireResponseProvider =
     StateNotifierProvider<FhirResourceNotifier, AsyncValue<FhirResource>>(
-        (ref) {
-  return FhirResourceNotifier(
-    'assets/initial/bluebook-questionnaire-response.json',
-  );
-});
+  (ref) {
+    return FhirResourceNotifier(
+      'assets/initial/bluebook-questionnaire-response.json',
+    );
+  },
+);
 
 final launchContextProvider =
     StateNotifierProvider<FhirResourceNotifier, AsyncValue<FhirResource>>(
-        (ref) {
-  return FhirResourceNotifier('assets/initial/launch-context.json');
-});
+  (ref) {
+    return FhirResourceNotifier('assets/initial/launch-context.json');
+  },
+);
 
 final fillerInputsProvider = Provider<FillerInputs?>((ref) {
   final questionnaire = ref.watch(questionnaireProvider).value;
@@ -65,9 +70,10 @@ final fillerInputsProvider = Provider<FillerInputs?>((ref) {
 
 final fillerOutputProvider =
     StateNotifierProvider<FhirResourceNotifier, AsyncValue<FhirResource>>(
-        (ref) {
-  return FhirResourceNotifier(null);
-});
+  (ref) {
+    return FhirResourceNotifier(null);
+  },
+);
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

@@ -209,9 +209,12 @@ class _HorizontalAnswerFillersState extends State<_HorizontalAnswerFillers> {
               context,
               answerFiller,
               hasMoreThanOneAnswer &&
-                      widget.questionResponseItemModel
-                              .questionnaireResponseModel.responseStatus ==
-                          QuestionnaireResponseStatus.in_progress
+                      widget
+                              .questionResponseItemModel
+                              .questionnaireResponseModel
+                              .responseStatus
+                              .value ==
+                          'in_progress'
                   ? () {
                       _removeAnswerFiller(answerFiller);
                     }
@@ -238,8 +241,8 @@ class _HorizontalAnswerFillersState extends State<_HorizontalAnswerFillers> {
           ...decoratedAnswerFillers,
         if (isRepeating &&
             widget.questionResponseItemModel.questionnaireResponseModel
-                    .responseStatus ==
-                QuestionnaireResponseStatus.in_progress)
+                    .responseStatus.value ==
+                'in_progress')
           widget.questionnaireTheme.buildAddRepetition(
             context,
             widget.questionResponseItemModel,

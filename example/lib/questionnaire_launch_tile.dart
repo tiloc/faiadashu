@@ -179,8 +179,7 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                           QuestionnaireResponseFiller.of(context)
                               .aggregator<QuestionnaireResponseAggregator>()
                               .aggregate(
-                                responseStatus:
-                                    QuestionnaireResponseStatus.completed,
+                                responseStatus: Code('completed'),
                               ),
                         );
                         ScaffoldMessenger.of(context).showSnackBar(

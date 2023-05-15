@@ -134,8 +134,8 @@ class QuestionnaireItemModel with Diagnosticable {
   bool get isTotalScore {
     // Checking for read-only is relevant,
     // as there are also input fields (e.g. pain score) with unit {score}.
-    return (questionnaireItem.type == QuestionnaireItemType.quantity ||
-            questionnaireItem.type == QuestionnaireItemType.decimal) &&
+    return (questionnaireItem.type == Code('quantity') ||
+            questionnaireItem.type == Code('decimal')) &&
         ((questionnaireItem.readOnly == Boolean(true) &&
                 questionnaireItem.computableUnit?.display == '{score}') ||
             questionnaireItem.extension_
@@ -180,15 +180,15 @@ class QuestionnaireItemModel with Diagnosticable {
   /// Is this itemModel unable to hold a value?
   bool get isStatic => isGroup || isDisplay;
 
-  bool get isGroup => questionnaireItem.type == QuestionnaireItemType.group;
+  bool get isGroup => questionnaireItem.type == Code('group');
 
-  bool get isDisplay => questionnaireItem.type == QuestionnaireItemType.display;
+  bool get isDisplay => questionnaireItem.type == Code('display');
 
   bool get isQuestion => !isDisplay && !isGroup;
 
   bool get isCodingType {
-    return questionnaireItem.type == QuestionnaireItemType.choice ||
-        questionnaireItem.type == QuestionnaireItemType.open_choice;
+    return questionnaireItem.type == Code('choice') ||
+        questionnaireItem.type == Code('open_choice');
   }
 
   /// Is this item not changeable by end-users?

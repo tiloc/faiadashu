@@ -21,11 +21,11 @@ class QuestionnaireResponseStorage {
 
   final SmartFhirClient smartClient;
 
-  QuestionnaireResponseStorage(
-      {required this.fhirUri,
-      required this.clientId,
-      required this.redirectUri})
-      : smartClient = SmartFhirClient(
+  QuestionnaireResponseStorage({
+    required this.fhirUri,
+    required this.clientId,
+    required this.redirectUri,
+  }) : smartClient = SmartFhirClient(
           fhirUri: fhirUri,
           clientId: clientId,
           redirectUri: redirectUri,

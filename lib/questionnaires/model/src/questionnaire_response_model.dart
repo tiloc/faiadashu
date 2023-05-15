@@ -446,7 +446,7 @@ class QuestionnaireResponseModel {
   QuestionnaireResponse? createQuestionnaireResponseForFhirPath() {
     _cachedQuestionnaireResponse ??=
         aggregator<QuestionnaireResponseAggregator>().aggregateResponseItems(
-      responseStatus: QuestionnaireResponseStatus.completed,
+      responseStatus: Code('completed'),
       generateNarrative: false,
     );
 
@@ -457,19 +457,18 @@ class QuestionnaireResponseModel {
   /// Returns a number that indicates whether the model has changed.
   int get generation => _generation;
 
-  final responseStatusNotifier = ValueNotifier<QuestionnaireResponseStatus>(
-    QuestionnaireResponseStatus.in_progress,
+  final responseStatusNotifier = ValueNotifier<Code>(
+    Code('in_progress'),
   );
 
-  QuestionnaireResponseStatus get responseStatus =>
-      responseStatusNotifier.value;
+  Code get responseStatus => responseStatusNotifier.value;
 
-  set responseStatus(QuestionnaireResponseStatus newStatus) {
+  set responseStatus(Code newStatus) {
     responseStatusNotifier.value = newStatus;
   }
 
-  Id? _id;
-  Id? get id => _id;
+  String? _id;
+  String? get id => _id;
 
   void _populateItems(
     ResponseNode? parentNode,
@@ -599,8 +598,7 @@ class QuestionnaireResponseModel {
       questionnaireResponseItems,
     );
 
-    responseStatus =
-        questionnaireResponse.status ?? QuestionnaireResponseStatus.in_progress;
+    responseStatus = questionnaireResponse.status ?? Code('in_progress');
   }
 
   void _updateCalculations() {

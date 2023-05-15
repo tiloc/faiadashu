@@ -5,7 +5,6 @@ import 'package:fhir/r4.dart'
     show
         Date,
         FhirDateTime,
-        QuestionnaireItemType,
         QuestionnaireResponseAnswer,
         QuestionnaireResponseItem,
         Time;
@@ -30,17 +29,17 @@ class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
       return null;
     }
 
-    if (itemType == QuestionnaireItemType.date) {
+    if (itemType.value == 'date') {
       return QuestionnaireResponseAnswer(
         valueDate: Date(value!.value),
         item: items,
       );
-    } else if (itemType == QuestionnaireItemType.datetime) {
+    } else if (itemType.value == 'datetime') {
       return QuestionnaireResponseAnswer(
         valueDateTime: value,
         item: items,
       );
-    } else if (itemType == QuestionnaireItemType.time) {
+    } else if (itemType.value == 'time') {
       return QuestionnaireResponseAnswer(
         valueTime: Time(
           value!.value!.toIso8601String().substring('yyyy-MM-ddT'.length),
