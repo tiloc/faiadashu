@@ -17,8 +17,8 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  google_fonts: ^2.1.1
-  intl: ^0.17.0
+  google_fonts: ^4.0.4
+  intl: ^0.18.1
   logging: ^1.0.2
   simple_html_css: ^4.0.0
 
