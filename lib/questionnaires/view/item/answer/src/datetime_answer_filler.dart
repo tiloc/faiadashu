@@ -1,6 +1,6 @@
 import 'package:faiadashu/fhir_types/fhir_types.dart';
 import 'package:faiadashu/questionnaires/questionnaires.dart';
-import 'package:fhir/r4.dart' show Date, FhirDateTime, Time;
+import 'package:fhir/r4.dart' show FhirDate, FhirDateTime, FhirTime;
 import 'package:flutter/material.dart';
 
 class DateTimeAnswerFiller extends QuestionnaireAnswerFiller {
@@ -43,9 +43,9 @@ class _DateTimeInputControl extends AnswerInputControl<DateTimeAnswerModel> {
 
     final pickerType = ArgumentError.checkNotNull(
       const {
-        'date': Date,
+        'date': FhirDate,
         'datetime': FhirDateTime,
-        'time': Time,
+        'time': FhirTime,
       }[itemType.value],
     );
 

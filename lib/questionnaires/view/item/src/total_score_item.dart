@@ -22,7 +22,7 @@ class TotalScoreItem extends QuestionnaireAnswerFiller {
 class _TotalScoreItemState extends State<TotalScoreItem> {
   static final _logger = Logger(_TotalScoreItemState);
 
-  Decimal? calcResult;
+  FhirDecimal? calcResult;
 
   _TotalScoreItemState();
 

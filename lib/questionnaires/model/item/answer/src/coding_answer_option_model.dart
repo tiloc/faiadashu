@@ -23,7 +23,7 @@ class CodingAnswerOptionModel {
 
   bool get hasMedia => itemMedia != null;
 
-  final Decimal? fhirOrdinalValue;
+  final FhirDecimal? fhirOrdinalValue;
   final RenderingString? optionPrefix;
   final bool isExclusive;
 
@@ -226,11 +226,11 @@ class CodingAnswerOptionModel {
     return coding != null
         ? coding.copyWith(
             extension_: (codingExtensions.isNotEmpty) ? codingExtensions : null,
-            userSelected: Boolean(true),
+            userSelected: FhirBoolean(true),
           )
         : Coding(
             display: forDisplay,
-            userSelected: Boolean(true),
+            userSelected: FhirBoolean(true),
           );
   }
 
@@ -276,7 +276,7 @@ class CodingAnswerOptionModel {
           choiceColumnExt.extension_
               ?.extensionOrNull('forDisplay')
               ?.valueBoolean ==
-          Boolean(true),
+          FhirBoolean(true),
     );
 
     final forDisplayPath =
