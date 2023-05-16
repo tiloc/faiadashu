@@ -11,7 +11,6 @@ import 'package:faiadashu_example/primitive_page.dart';
 import 'package:faiadashu_example/questionnaire_launch_tile.dart';
 import 'package:faiadashu_example/questionnaire_response_storage.dart';
 import 'package:faiadashu_example/value_set_provider.dart';
-import 'package:faiadashu_online/restful/restful.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -89,7 +88,7 @@ class _HomePageState extends State<HomePage> {
 
   // Patient ID matches a patient on Meld Sandbox server.
   final sandboxPatient = Patient(
-    id: 'smart-880378',
+    fhirId: 'smart-880378',
     name: [
       HumanName(
         given: ['Amy', 'R'],
@@ -97,8 +96,8 @@ class _HomePageState extends State<HomePage> {
         use: HumanNameUse.official,
       )
     ],
-    birthDate: Date('1999-12-08'),
-    gender: Code('female'),
+    birthDate: FhirDate('1999-12-08'),
+    gender: FhirCode('female'),
   );
 
   late final LaunchContext launchContext;
@@ -206,12 +205,6 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
-        actions: [
-          SmartLoginButton(
-            questionnaireResponseStorage.smartClient,
-            onLoginChanged: _onLoginChanged,
-          )
-        ],
       ),
       body: SafeArea(
         child: Scrollbar(
@@ -260,7 +253,6 @@ class _HomePageState extends State<HomePage> {
                       builder: (context) => QuestionnaireScroller(
                         scaffoldBuilder: const CherryBlossomScaffoldBuilder(),
                         fhirResourceProvider: RegistryFhirResourceProvider([
-                          resourceBundleProvider,
                           AssetResourceProvider.singleton(
                             questionnaireResourceUri,
                             'assets/instruments/sdc_demo.json',

@@ -1,8 +1,6 @@
 import 'package:faiadashu/l10n/l10n.dart';
 import 'package:faiadashu/questionnaires/questionnaires.dart';
 import 'package:faiadashu/resource_provider/resource_provider.dart';
-import 'package:faiadashu_online/restful/restful.dart';
-import 'package:faiadashu_online/url_launch/src/url_launcher.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -156,8 +154,6 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                 widget.fhirResourceProvider,
               ]),
               launchContext: widget.launchContext,
-              // Callback for supportLink
-              onLinkTap: launchLink,
               persistentFooterButtons: [
                 Builder(
                   builder: (context) => const QuestionnaireCompleteButton(),
@@ -179,7 +175,7 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                           QuestionnaireResponseFiller.of(context)
                               .aggregator<QuestionnaireResponseAggregator>()
                               .aggregate(
-                                responseStatus: Code('completed'),
+                                responseStatus: FhirCode('completed'),
                               ),
                         );
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -191,9 +187,6 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                                   FDashLocalizations.of(context)
                                       .handlingUploading,
                                 ),
-                                SyncIndicator(
-                                  color: Theme.of(context).colorScheme.primary,
-                                )
                               ],
                             ),
                           ),
