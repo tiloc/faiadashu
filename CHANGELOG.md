@@ -1,3 +1,12 @@
+## 0.9.0-alpha.1
+**[Breaking]** This alpha release is beginning to use Flutter 3.10.0 and fhir 0.11.0. 
+
+### Faiadashu
+* Flutter 3.10.0 and fhir 0.11.0 support
+
+### Faiadashu Online
+* Temporary disabled while fhir_auth has not support fhir 0.11.0.
+
 ## 0.8.1
 **[Breaking]** This release is beginning to make use of features in Flutter 3.0.
 It does not work with Flutter 2.*x*.
