@@ -37,10 +37,10 @@ packages:
     dependency: "direct main"
     description:
       name: collection
-      sha256: f092b211a4319e98e5ff58223576de6c2803db36221657b46c82574721240687
+      sha256: "4a07be6cb69c84d677a6c3096fcf960cc3285a8330b4603e0d463d15d9bd934c"
       url: "https://pub.dev"
     source: hosted
-    version: "1.17.2"
+    version: "1.17.1"
   crypto:
     dependency: transitive
     description:
@@ -68,18 +68,18 @@ packages:
     dependency: "direct main"
     description:
       name: fhir
-      sha256: "723019952463deec3e2d96bde386ef25f5c006e0c07db68be5706a583e0070c1"
+      sha256: "9ec0effb3c42925f054d0a7b89e84a225dbcb882a7bde44707ce52252da292a9"
       url: "https://pub.dev"
     source: hosted
-    version: "0.10.0"
+    version: "0.11.0"
   fhir_path:
     dependency: transitive
     description:
       name: fhir_path
-      sha256: a9b671630d8a1ad44b03bfdeb46611ba80044fdf2c1d147423df602ee57728d1
+      sha256: "4ec5d166afd7210f38c34ab8a647b34028e9a87fcc697d9533bf2f56663d9df0"
       url: "https://pub.dev"
     source: hosted
-    version: "0.10.0"
+    version: "0.11.0"
   file:
     dependency: transitive
     description:
@@ -147,10 +147,10 @@ packages:
     dependency: "direct main"
     description:
       name: intl
-      sha256: "3bc132a9dbce73a7e4a21a17d06e1878839ffbf975568bc875c60537824b0c4d"
+      sha256: a3715e3bc90294e971cb7dc063fbf3cd9ee0ebf8604ffeafabd9e6f16abbdbe6
       url: "https://pub.dev"
     source: hosted
-    version: "0.18.1"
+    version: "0.18.0"
   js:
     dependency: transitive
     description:
@@ -267,10 +267,10 @@ packages:
     dependency: transitive
     description:
       name: petitparser
-      sha256: "49392a45ced973e8d94a85fdb21293fbb40ba805fc49f2965101ae748a3683b4"
+      sha256: cb3798bef7fc021ac45b308f4b51208a152792445cce0448c9a4ba5879dd8750
       url: "https://pub.dev"
     source: hosted
-    version: "5.1.0"
+    version: "5.4.0"
   platform:
     dependency: transitive
     description:
@@ -432,18 +432,18 @@ packages:
     dependency: transitive
     description:
       name: xml
-      sha256: "979ee37d622dec6365e2efa4d906c37470995871fe9ae080d967e192d88286b5"
+      sha256: "5bc72e1e45e941d825fd7468b9b4cc3b9327942649aeb6fc5cdbf135f0a86e84"
       url: "https://pub.dev"
     source: hosted
-    version: "6.2.2"
+    version: "6.3.0"
   xml2json:
     dependency: transitive
     description:
       name: xml2json
-      sha256: c8cb35b83cce879c2ea86951fd257f4e765b0030a0298b35cf94f2b3d0f32095
+      sha256: c39bf22898b4458ccca91d5087ba86ebda078f0e2291bd73de80372a37d83e52
       url: "https://pub.dev"
     source: hosted
-    version: "5.3.6"
+    version: "6.0.0"
   yaml:
     dependency: transitive
     description:

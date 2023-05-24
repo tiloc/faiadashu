@@ -35,7 +35,7 @@ dependencies:
     sdk: flutter
   flutter_riverpod: ^2.3.0
   highlight: ^0.7.0
-  intl: ^0.18.1
+  intl: ^0.18.0
   logging: ^1.0.1
   multi_split_view: ^2.0.0
   simple_html_css: ^4.0.0
