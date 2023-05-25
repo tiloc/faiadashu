@@ -179,6 +179,8 @@ class _NumberFieldInputControl
 
     final theme = QuestionnaireTheme.of(context);
 
+    final displayUnits = answerModel.qi.computableUnit?.display;
+
     return Container(
       padding: const EdgeInsets.only(top: 8, bottom: 8),
       child: SizedBox(
@@ -217,6 +219,9 @@ class _NumberFieldInputControl
                             answerModel,
                           ),
                         )
+                      : null,
+                  suffix: displayUnits != null
+                      ? Text(' $displayUnits')
                       : null,
                 ),
                 inputFormatters: [numberInputFormatter],

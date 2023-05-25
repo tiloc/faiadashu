@@ -5,7 +5,7 @@ description: Faiadashu Online - Functionalities for faiadashu that connect to FH
 # pub.dev using `pub publish`. This is preferred for private packages.
 publish_to: none
 
-version: 0.9.0-alpha.1
+version: 0.9.0-dev.1
 homepage: https://tiloc.github.io/faiadashu/
 repository: https://github.com/tiloc/faiadashu
 issue_tracker: https://github.com/tiloc/faiadashu/issues
