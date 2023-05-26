@@ -158,6 +158,18 @@ class NumericalAnswerModel extends AnswerModel<String, Quantity> {
         },
         context: qi.linkId,
       );
+    } else {
+      final unitOptionUri = FhirUri(
+        'http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption',
+      );
+      qi.extension_
+          ?.where((e) => e.url == unitOptionUri)
+          .map((e) => e.valueCoding)
+          .forEach((coding) {
+        if (coding != null) {
+          _units[keyForUnitChoice(coding)] = coding;
+        }
+      });
     }
   }
 

@@ -1,6 +1,7 @@
 ## 0.9.0-dev.1
 ### Faiadashu
 * Added displaying units in numeric answer input
+* Added questionnaire-unitOption extension support to make ability choose quantity units in numeric answers
 
 ## 0.9.0-alpha.1
 **[Breaking]** This alpha release is beginning to use Flutter 3.10.0 and fhir 0.11.0. 
