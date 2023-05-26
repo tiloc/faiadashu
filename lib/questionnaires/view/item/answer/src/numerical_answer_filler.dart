@@ -179,7 +179,10 @@ class _NumberFieldInputControl
 
     final theme = QuestionnaireTheme.of(context);
 
-    final displayUnits = answerModel.qi.computableUnit?.display;
+    final displayUnit = answerModel.hasSingleUnitChoice
+        ? answerModel.unitChoices.first
+        : answerModel.qi.computableUnit;
+    final suffixText = displayUnit?.localizedDisplay(locale);
 
     return Container(
       padding: const EdgeInsets.only(top: 8, bottom: 8),
@@ -212,7 +215,8 @@ class _NumberFieldInputControl
                               : null,
                         )
                       : null,
-                  suffixIcon: (answerModel.hasUnitChoices)
+                  suffixIcon: (answerModel.hasUnitChoices &&
+                      !answerModel.hasSingleUnitChoice)
                       ? SizedBox(
                           height: 16,
                           child: _UnitDropDown(
@@ -220,9 +224,10 @@ class _NumberFieldInputControl
                           ),
                         )
                       : null,
-                  suffix: displayUnits != null
-                      ? Text(' $displayUnits')
-                      : null,
+                  suffixText: suffixText != null ? ' $suffixText' : null,
+                  suffixStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      height: 1,
+                  ),
                 ),
                 inputFormatters: [numberInputFormatter],
                 keyboardType: TextInputType.numberWithOptions(
@@ -256,21 +261,17 @@ class _UnitDropDown extends AnswerInputControl<NumericalAnswerModel> {
 
   @override
   Widget build(BuildContext context) {
-    const unitWidth = 96.0;
-
     return answerModel.hasSingleUnitChoice
         ? Container(
             alignment: Alignment.topLeft,
             padding: const EdgeInsets.only(left: 8, top: 10),
-            width: unitWidth,
             child: Text(
               answerModel.unitChoices.first.localizedDisplay(locale),
               style: Theme.of(context).textTheme.bodyMedium,
             ),
           )
         : Container(
-            padding: const EdgeInsets.only(left: 8),
-            width: unitWidth,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<String>(
                 value: answerModel.keyOfUnit,
