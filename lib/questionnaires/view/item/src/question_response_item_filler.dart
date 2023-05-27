@@ -52,7 +52,7 @@ class QuestionResponseItemFillerState
     super.dispose();
   }
 
-  void _setDataAbsentReason(Code? dataAbsentReason) {
+  void _setDataAbsentReason(FhirCode? dataAbsentReason) {
     if (mounted) {
       setState(() {
         questionResponseItemModel.dataAbsentReason = dataAbsentReason;
@@ -146,9 +146,8 @@ class _HorizontalAnswerFillers extends StatefulWidget {
 
   const _HorizontalAnswerFillers(
     this.questionResponseItemModel,
-    this.questionnaireTheme, {
-    Key? key,
-  }) : super(key: key);
+    this.questionnaireTheme,
+  );
 
   @override
   _HorizontalAnswerFillersState createState() =>
@@ -210,9 +209,12 @@ class _HorizontalAnswerFillersState extends State<_HorizontalAnswerFillers> {
               context,
               answerFiller,
               hasMoreThanOneAnswer &&
-                      widget.questionResponseItemModel
-                              .questionnaireResponseModel.responseStatus ==
-                          QuestionnaireResponseStatus.in_progress
+                      widget
+                              .questionResponseItemModel
+                              .questionnaireResponseModel
+                              .responseStatus
+                              .value ==
+                          'in_progress'
                   ? () {
                       _removeAnswerFiller(answerFiller);
                     }
@@ -239,8 +241,8 @@ class _HorizontalAnswerFillersState extends State<_HorizontalAnswerFillers> {
           ...decoratedAnswerFillers,
         if (isRepeating &&
             widget.questionResponseItemModel.questionnaireResponseModel
-                    .responseStatus ==
-                QuestionnaireResponseStatus.in_progress)
+                    .responseStatus.value ==
+                'in_progress')
           widget.questionnaireTheme.buildAddRepetition(
             context,
             widget.questionResponseItemModel,

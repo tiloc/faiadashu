@@ -19,7 +19,7 @@ Widget createWebView(String xhtml, {Key? key}) =>
 class _FullHtmlViewer extends StatelessWidget {
   final String xhtml;
 
-  const _FullHtmlViewer(this.xhtml, {Key? key}) : super(key: key);
+  const _FullHtmlViewer(this.xhtml, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -30,8 +30,11 @@ class _FullHtmlViewer extends StatelessWidget {
     ).toString();
 
     return SizedBox.expand(
-      child: WebView(
-        initialUrl: dataUrl,
+      child: WebViewWidget(
+        controller: WebViewController()
+          ..loadRequest(
+            Uri.parse(dataUrl),
+          ),
       ),
     );
   }
@@ -40,7 +43,7 @@ class _FullHtmlViewer extends StatelessWidget {
 class _SimpleHtmlViewer extends StatelessWidget {
   final String xhtml;
 
-  const _SimpleHtmlViewer(this.xhtml, {Key? key}) : super(key: key);
+  const _SimpleHtmlViewer(this.xhtml, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +52,7 @@ class _SimpleHtmlViewer extends StatelessWidget {
         child: HTML.toRichText(
           context,
           xhtml,
-          defaultTextStyle: Theme.of(context).textTheme.bodyText2,
+          defaultTextStyle: Theme.of(context).textTheme.bodyMedium,
         ),
       ),
     );

@@ -18,8 +18,8 @@ class QuestionnaireStepper extends StatefulWidget {
     required this.fhirResourceProvider,
     required this.launchContext,
     this.questionnaireModelDefaults = const QuestionnaireModelDefaults(),
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<StatefulWidget> createState() => QuestionnaireStepperState();
@@ -74,10 +74,10 @@ class QuestionnaireStepperState extends State<QuestionnaireStepper> {
                   Expanded(
                     child: Column(
                       children: [
-                        ValueListenableBuilder<Decimal>(
+                        ValueListenableBuilder<FhirDecimal>(
                           builder: (
                             BuildContext context,
-                            Decimal value,
+                            FhirDecimal value,
                             Widget? child,
                           ) {
                             final scoreString = value.value!.round().toString();
@@ -88,7 +88,8 @@ class QuestionnaireStepperState extends State<QuestionnaireStepper> {
                                 FDashLocalizations.of(context)
                                     .aggregationScore(scoreString),
                                 key: ValueKey<String>(scoreString),
-                                style: Theme.of(context).textTheme.headline4,
+                                style:
+                                    Theme.of(context).textTheme.headlineMedium,
                               ),
                             );
                           },

@@ -20,23 +20,28 @@ import 'filler_inputs.dart';
 
 final questionnaireProvider =
     StateNotifierProvider<FhirResourceNotifier, AsyncValue<FhirResource>>(
-        (ref) {
-  return FhirResourceNotifier('assets/initial/bluebook-questionnaire.json');
-});
+  (ref) {
+    return FhirResourceNotifier(
+      'assets/initial/bluebook-questionnaire.json',
+    );
+  },
+);
 
 final populateQuestionnaireResponseProvider =
     StateNotifierProvider<FhirResourceNotifier, AsyncValue<FhirResource>>(
-        (ref) {
-  return FhirResourceNotifier(
-    'assets/initial/bluebook-questionnaire-response.json',
-  );
-});
+  (ref) {
+    return FhirResourceNotifier(
+      'assets/initial/bluebook-questionnaire-response.json',
+    );
+  },
+);
 
 final launchContextProvider =
     StateNotifierProvider<FhirResourceNotifier, AsyncValue<FhirResource>>(
-        (ref) {
-  return FhirResourceNotifier('assets/initial/launch-context.json');
-});
+  (ref) {
+    return FhirResourceNotifier('assets/initial/launch-context.json');
+  },
+);
 
 final fillerInputsProvider = Provider<FillerInputs?>((ref) {
   final questionnaire = ref.watch(questionnaireProvider).value;
@@ -65,9 +70,10 @@ final fillerInputsProvider = Provider<FillerInputs?>((ref) {
 
 final fillerOutputProvider =
     StateNotifierProvider<FhirResourceNotifier, AsyncValue<FhirResource>>(
-        (ref) {
-  return FhirResourceNotifier(null);
-});
+  (ref) {
+    return FhirResourceNotifier(null);
+  },
+);
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -108,7 +114,7 @@ final splitViewThemeData = MultiSplitViewThemeData(
 );
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +135,7 @@ class MyApp extends StatelessWidget {
 }
 
 class HomePage extends ConsumerStatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   // ignore: library_private_types_in_public_api

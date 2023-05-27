@@ -6,8 +6,6 @@ import 'package:faiabench/fhir_resource_notifier.dart';
 import 'package:fhir_path/fhir_path.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_highlight/themes/github.dart';
-import 'package:flutter_highlight/themes/monokai-sublime.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:highlight/languages/javascript.dart';
 import 'package:highlight/languages/json.dart';
@@ -29,8 +27,8 @@ class FhirResourceEditor extends ConsumerStatefulWidget {
     this.showFhirPath = true,
     this.fhirPathOutputMinLines = 3,
     this.fhirPathOutputMaxLines = 3,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   // ignore: library_private_types_in_public_api
@@ -45,11 +43,12 @@ class _FhirResourceEditorState extends ConsumerState<FhirResourceEditor> {
 
   bool _fhirPathVisible = false;
 
-  void _fhirPathChanged(String newPath) {
+  void _fhirPathChanged() {
+    final newPath = _fhirPathController?.text ?? '';
     setState(() {
       try {
         final jsonContext =
-            jsonDecode(_codeController!.rawText) as Map<String, dynamic>;
+            jsonDecode(_codeController!.text) as Map<String, dynamic>;
         final pathResult =
             walkFhirPath(context: jsonContext, pathExpression: newPath);
         const encoder = JsonEncoder.withIndent('  ');
@@ -69,26 +68,24 @@ class _FhirResourceEditorState extends ConsumerState<FhirResourceEditor> {
     _codeController = CodeController(
       text: '',
       language: json,
-      theme: monokaiSublimeTheme,
     );
 
     _fhirPathController = CodeController(
       text: '',
       language: javascript,
-      theme: githubTheme,
-      onChange: _fhirPathChanged,
     );
+    _fhirPathController?.addListener(_fhirPathChanged);
 
     _fhirPathOutputController = CodeController(
       text: '',
       language: json,
-      theme: githubTheme,
     );
   }
 
   @override
   void dispose() {
     _codeController?.dispose();
+    _fhirPathController?.removeListener(_fhirPathChanged);
     _fhirPathController?.dispose();
     _fhirPathOutputController?.dispose();
     _scrollController?.dispose();
@@ -126,9 +123,9 @@ class _FhirResourceEditorState extends ConsumerState<FhirResourceEditor> {
                   height: 120,
                   child: Stack(
                     children: [
-                      Container(
+                      const ColoredBox(
                         color: Colors.black54,
-                        child: const SizedBox.expand(),
+                        child: SizedBox.expand(),
                       ),
                       Column(
                         mainAxisSize: MainAxisSize.min,
@@ -155,7 +152,7 @@ class _FhirResourceEditorState extends ConsumerState<FhirResourceEditor> {
                             onPressed: () async {
                               await Clipboard.setData(
                                 ClipboardData(
-                                  text: codeController.rawText.trim(),
+                                  text: codeController.text.trim(),
                                 ),
                               );
 
@@ -218,7 +215,7 @@ class _FhirResourceEditorState extends ConsumerState<FhirResourceEditor> {
                 if (widget.showSubmitButton)
                   IconButton(
                     onPressed: () {
-                      final rawText = codeController.rawText.trim();
+                      final rawText = codeController.text.trim();
 
                       final fhirResource = (rawText.isNotEmpty)
                           ? FhirResource.fromJsonString(rawText)
@@ -227,7 +224,8 @@ class _FhirResourceEditorState extends ConsumerState<FhirResourceEditor> {
                       if (fhirResource.hasError) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            backgroundColor: Theme.of(context).errorColor,
+                            backgroundColor:
+                                Theme.of(context).colorScheme.error,
                             content: Text(fhirResource.errorMessage!),
                           ),
                         );

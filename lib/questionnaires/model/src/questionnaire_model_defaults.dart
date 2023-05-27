@@ -13,7 +13,7 @@ class QuestionnaireModelDefaults {
   static const defaultSliderMaxValue = 100.0;
   final double sliderMaxValue;
 
-  final Code usageMode;
+  final FhirCode usageMode;
 
   final RenderingString? Function(FillerItemModel)? prefixBuilder;
 

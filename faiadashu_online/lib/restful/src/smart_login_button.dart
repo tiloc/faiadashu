@@ -9,8 +9,7 @@ class SmartLoginButton extends StatefulWidget {
   final SmartFhirClient client;
   final VoidCallback? onLoginChanged;
 
-  const SmartLoginButton(this.client, {this.onLoginChanged, Key? key})
-      : super(key: key);
+  const SmartLoginButton(this.client, {this.onLoginChanged, super.key});
 
   @override
   // ignore: library_private_types_in_public_api

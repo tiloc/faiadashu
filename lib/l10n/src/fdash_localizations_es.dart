@@ -5,7 +5,7 @@ import 'fdash_localizations.g.dart';
 
 /// The translations for Spanish Castilian (`es`).
 class FDashLocalizationsEs extends FDashLocalizations {
-  FDashLocalizationsEs([String locale = 'es']) : super(locale);
+  FDashLocalizationsEs([super.locale = 'es']);
 
   @override
   String get validatorRequiredItem => 'Esta pregunta debe ser completada.';

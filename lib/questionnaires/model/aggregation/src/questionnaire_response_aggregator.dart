@@ -18,11 +18,10 @@ class QuestionnaireResponseAggregator
 
   QuestionnaireResponseItem? _fromQuestionItem(
     QuestionItemModel itemModel,
-    QuestionnaireResponseStatus responseStatus,
+    FhirCode responseStatus,
     Map<String, dynamic> responseItemRegistry,
   ) {
-    if (responseStatus == QuestionnaireResponseStatus.completed &&
-        !itemModel.isEnabled) {
+    if (responseStatus.value == 'completed' && !itemModel.isEnabled) {
       return null;
     }
 
@@ -89,11 +88,10 @@ class QuestionnaireResponseAggregator
 
   QuestionnaireResponseItem? _fromGroupItem(
     GroupItemModel itemModel,
-    QuestionnaireResponseStatus responseStatus,
+    FhirCode responseStatus,
     Map<String, dynamic> responseItemRegistry,
   ) {
-    if (responseStatus == QuestionnaireResponseStatus.completed &&
-        !itemModel.isEnabled) {
+    if (responseStatus.value == 'completed' && !itemModel.isEnabled) {
       return null;
     }
 
@@ -118,7 +116,7 @@ class QuestionnaireResponseAggregator
 
   List<QuestionnaireResponseItem>? _fromResponseItems(
     ResponseNode? parentNode,
-    QuestionnaireResponseStatus responseStatus,
+    FhirCode responseStatus,
     Map<String, dynamic> responseItemRegistry,
   ) {
     final responseItems = <QuestionnaireResponseItem>[];
@@ -154,7 +152,7 @@ class QuestionnaireResponseAggregator
 
   @override
   QuestionnaireResponse? aggregate({
-    QuestionnaireResponseStatus? responseStatus,
+    FhirCode? responseStatus,
     bool notifyListeners = false,
     bool containPatient = false,
   }) {
@@ -173,7 +171,7 @@ class QuestionnaireResponseAggregator
   }
 
   Map<String, dynamic> aggregateResponseItems({
-    QuestionnaireResponseStatus? responseStatus,
+    FhirCode? responseStatus,
     bool notifyListeners = false,
     bool containPatient = false,
     bool generateNarrative = true,
@@ -197,7 +195,7 @@ class QuestionnaireResponseAggregator
     final questionnaireVersion =
         questionnaireResponseModel.questionnaireModel.questionnaire.version;
     final questionnaireCanonical = (questionnaireUrl != null)
-        ? Canonical(
+        ? FhirCanonical(
             "$questionnaireUrl${(questionnaireVersion != null) ? '|$questionnaireVersion' : ''}",
           )
         : null;
@@ -227,17 +225,17 @@ class QuestionnaireResponseAggregator
     }
 
     final profiles = [
-      Canonical(
+      FhirCanonical(
         'http://hl7.org/fhir/4.0/StructureDefinition/QuestionnaireResponse',
       ),
       if (isValidSdc)
-        Canonical(
+        FhirCanonical(
           'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaireresponse',
         ),
     ];
 
     final meta = (profiles.isNotEmpty)
-        ? Meta(profile: profiles.isNotEmpty ? profiles : null)
+        ? FhirMeta(profile: profiles.isNotEmpty ? profiles : null)
         : null;
 
     final narrative = generateNarrative
@@ -247,7 +245,7 @@ class QuestionnaireResponseAggregator
         : NarrativeAggregator.emptyNarrative;
 
     final questionnaireResponse = QuestionnaireResponse(
-      id: questionnaireResponseId,
+      fhirId: questionnaireResponseId,
       status: responseStatus,
       meta: meta,
       contained: (contained.isNotEmpty) ? contained : null,
@@ -255,7 +253,7 @@ class QuestionnaireResponseAggregator
       item: responseItems,
       authored: FhirDateTime(DateTime.now()),
       text: (narrative?.status == NarrativeStatus.empty) ? null : narrative,
-      language: Code(locale.toLanguageTag()),
+      language: FhirCode(locale.toLanguageTag()),
       subject: subjectReference,
       questionnaireElement: (questionnaireTitle != null)
           ? Element(

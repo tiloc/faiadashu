@@ -66,15 +66,10 @@ class _SliderInputControl extends AnswerInputControl<NumericalAnswerModel> {
   final ValueNotifier<double> sliderValueDuringChange;
 
   const _SliderInputControl(
-    NumericalAnswerModel answerModel, {
+    super.answerModel, {
     required this.sliderValueDuringChange,
-    FocusNode? focusNode,
-    Key? key,
-  }) : super(
-          answerModel,
-          focusNode: focusNode,
-          key: key,
-        );
+    super.focusNode,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +91,7 @@ class _SliderInputControl extends AnswerInputControl<NumericalAnswerModel> {
                 max: answerModel.maxValue,
                 divisions: answerModel.sliderDivisions,
                 value: sliderValueDuringChange.value,
-                label: Decimal(sliderValueDuringChange.value).format(locale),
+                label: FhirDecimal(sliderValueDuringChange.value).format(locale),
                 // Changes are only propagated to the model at change-end time.
                 // onChange would cause very high-frequency storm of model updates
                 onChanged: answerModel.isControlEnabled
@@ -108,7 +103,7 @@ class _SliderInputControl extends AnswerInputControl<NumericalAnswerModel> {
                     ? (sliderValue) {
                         sliderValueDuringChange.value = sliderValue;
                         answerModel.value =
-                            answerModel.copyWithValue(Decimal(sliderValue));
+                            answerModel.copyWithValue(FhirDecimal(sliderValue));
                       }
                     : null,
                 onChangeStart: (_) {
@@ -133,14 +128,14 @@ class _SliderInputControl extends AnswerInputControl<NumericalAnswerModel> {
                 Xhtml.fromRenderingString(
                   context,
                   lowerSliderLabel,
-                  defaultTextStyle: Theme.of(context).textTheme.button,
+                  defaultTextStyle: Theme.of(context).textTheme.labelLarge,
                 ),
               const Expanded(child: SizedBox()),
               if (upperSliderLabel != null)
                 Xhtml.fromRenderingString(
                   context,
                   upperSliderLabel,
-                  defaultTextStyle: Theme.of(context).textTheme.button,
+                  defaultTextStyle: Theme.of(context).textTheme.labelLarge,
                 ),
               const SizedBox(width: 8.0),
             ],
@@ -157,17 +152,11 @@ class _NumberFieldInputControl
   final TextInputFormatter numberInputFormatter;
 
   _NumberFieldInputControl(
-    NumericalAnswerModel answerModel, {
+    super.answerModel, {
     required this.editingController,
-    FocusNode? focusNode,
-    Key? key,
-  })  : numberInputFormatter =
-            NumericalTextInputFormatter(answerModel.numberFormat),
-        super(
-          answerModel,
-          focusNode: focusNode,
-          key: key,
-        );
+    super.focusNode,
+  }) : numberInputFormatter =
+            NumericalTextInputFormatter(answerModel.numberFormat);
 
   @override
   Widget build(BuildContext context) {
@@ -190,6 +179,11 @@ class _NumberFieldInputControl
 
     final theme = QuestionnaireTheme.of(context);
 
+    final displayUnit = answerModel.hasSingleUnitChoice
+        ? answerModel.unitChoices.first
+        : answerModel.qi.computableUnit;
+    final suffixText = displayUnit?.localizedDisplay(locale);
+
     return Container(
       padding: const EdgeInsets.only(top: 8, bottom: 8),
       child: SizedBox(
@@ -209,7 +203,7 @@ class _NumberFieldInputControl
                   errorStyle: (itemModel
                           .isCalculated) // Force display of error text on calculated item
                       ? TextStyle(
-                          color: Theme.of(context).errorColor,
+                          color: Theme.of(context).colorScheme.error,
                         )
                       : null,
                   hintText: answerModel.entryFormat,
@@ -217,11 +211,12 @@ class _NumberFieldInputControl
                       ? Icon(
                           Icons.calculate,
                           color: (answerModel.displayErrorText != null)
-                              ? Theme.of(context).errorColor
+                              ? Theme.of(context).colorScheme.error
                               : null,
                         )
                       : null,
-                  suffixIcon: (answerModel.hasUnitChoices)
+                  suffixIcon: (answerModel.hasUnitChoices &&
+                      !answerModel.hasSingleUnitChoice)
                       ? SizedBox(
                           height: 16,
                           child: _UnitDropDown(
@@ -229,6 +224,10 @@ class _NumberFieldInputControl
                           ),
                         )
                       : null,
+                  suffixText: suffixText != null ? ' $suffixText' : null,
+                  suffixStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      height: 1,
+                  ),
                 ),
                 inputFormatters: [numberInputFormatter],
                 keyboardType: TextInputType.numberWithOptions(
@@ -257,26 +256,22 @@ class _NumberFieldInputControl
 
 class _UnitDropDown extends AnswerInputControl<NumericalAnswerModel> {
   const _UnitDropDown(
-    NumericalAnswerModel answerModel,
-  ) : super(answerModel);
+    super.answerModel,
+  );
 
   @override
   Widget build(BuildContext context) {
-    const unitWidth = 96.0;
-
     return answerModel.hasSingleUnitChoice
         ? Container(
             alignment: Alignment.topLeft,
             padding: const EdgeInsets.only(left: 8, top: 10),
-            width: unitWidth,
             child: Text(
               answerModel.unitChoices.first.localizedDisplay(locale),
-              style: Theme.of(context).textTheme.subtitle1,
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
           )
         : Container(
-            padding: const EdgeInsets.only(left: 8),
-            width: unitWidth,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<String>(
                 value: answerModel.keyOfUnit,
@@ -294,7 +289,7 @@ class _UnitDropDown extends AnswerInputControl<NumericalAnswerModel> {
                       value: answerModel.keyForUnitChoice(value),
                       child: Text(value.localizedDisplay(locale)),
                     );
-                  }).toList(),
+                  }),
                 ],
               ),
             ),

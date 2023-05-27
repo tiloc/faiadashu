@@ -30,8 +30,8 @@ class FhirDateTimePicker extends StatefulWidget {
     this.locale,
     this.focusNode,
     this.enabled = true,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   // ignore: library_private_types_in_public_api
@@ -61,7 +61,7 @@ class _FhirDateTimePickerState extends State<FhirDateTimePicker> {
   Future<void> _showPicker(Locale locale) async {
     DateTime dateTime = DateTime(1970);
 
-    if (widget.pickerType != Time) {
+    if (widget.pickerType != FhirTime) {
       final date = await showDatePicker(
         initialDate: _dateTimeValue?.value ?? DateTime.now(),
         firstDate: widget.firstDate,
@@ -76,7 +76,8 @@ class _FhirDateTimePickerState extends State<FhirDateTimePicker> {
       dateTime = date.toLocal();
     }
 
-    if (widget.pickerType == FhirDateTime || widget.pickerType == Time) {
+    if (mounted &&
+        (widget.pickerType == FhirDateTime || widget.pickerType == FhirTime)) {
       final time = await showTimePicker(
         initialTime:
             TimeOfDay.fromDateTime(_dateTimeValue?.value ?? DateTime.now()),
@@ -105,12 +106,12 @@ class _FhirDateTimePickerState extends State<FhirDateTimePicker> {
 
     final fhirDateTime = FhirDateTime.fromDateTime(
       dateTime,
-      (widget.pickerType == Date)
+      (widget.pickerType == FhirDate)
           ? DateTimePrecision.YYYYMMDD
           : DateTimePrecision.FULL,
     );
     setState(() {
-      _dateTimeFieldController.text = (widget.pickerType == Time)
+      _dateTimeFieldController.text = (widget.pickerType == FhirTime)
           ? DateFormat.jm(locale.toString()).format(dateTime)
           : fhirDateTime.format(locale);
     });
@@ -136,7 +137,7 @@ class _FhirDateTimePickerState extends State<FhirDateTimePicker> {
           enabled: widget.enabled,
           textAlignVertical: TextAlignVertical.center,
           decoration: widget.decoration?.copyWith(
-            prefixIcon: (widget.pickerType == Time)
+            prefixIcon: (widget.pickerType == FhirTime)
                 ? const Icon(Icons.access_time)
                 : const Icon(Icons.calendar_today_outlined),
           ),

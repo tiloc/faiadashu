@@ -17,9 +17,9 @@ class QuestionnaireTheme extends InheritedWidget {
 
   const QuestionnaireTheme({
     required this.data,
-    required Widget child,
-    Key? key,
-  }) : super(key: key, child: child);
+    required super.child,
+    super.key,
+  });
 
   static QuestionnaireThemeData of(BuildContext context) {
     final inheritedTheme =

@@ -15,8 +15,8 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
     this.leading,
     this.help,
     required this.semanticsLabel,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   static Widget? fromFillerItem({
     required FillerItemModel fillerItem,
@@ -91,7 +91,7 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
                   HTML.toTextSpan(
                     context,
                     htmlTitleText,
-                    defaultTextStyle: Theme.of(context).textTheme.bodyText2,
+                    defaultTextStyle: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ],
               ),
@@ -132,7 +132,7 @@ class QuestionnaireItemFillerTitle extends StatelessWidget {
 class _QuestionnaireItemFillerHelp extends StatefulWidget {
   final QuestionnaireItemModel ql;
 
-  const _QuestionnaireItemFillerHelp(this.ql, {Key? key}) : super(key: key);
+  const _QuestionnaireItemFillerHelp(this.ql, {super.key});
 
   @override
   State<StatefulWidget> createState() => _QuestionnaireItemFillerHelpState();
@@ -163,7 +163,7 @@ class _QuestionnaireItemFillerHelpState
           content: Xhtml.fromRenderingString(
             context,
             questionnaireItemModel.text ?? RenderingString.nullText,
-            defaultTextStyle: Theme.of(context).textTheme.bodyText2,
+            defaultTextStyle: Theme.of(context).textTheme.bodyMedium,
           ),
           actions: <Widget>[
             OutlinedButton(
@@ -185,8 +185,7 @@ class _QuestionnaireItemFillerSupportLink extends StatelessWidget {
   static final _logger = Logger(_QuestionnaireItemFillerSupportLink);
   final Uri supportLink;
 
-  const _QuestionnaireItemFillerSupportLink(this.supportLink, {Key? key})
-      : super(key: key);
+  const _QuestionnaireItemFillerSupportLink(this.supportLink, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -194,7 +193,7 @@ class _QuestionnaireItemFillerSupportLink extends StatelessWidget {
       mouseCursor: SystemMouseCursors.help,
       icon: const Icon(Icons.help),
       onPressed: () {
-        _logger.debug("supportLink '${supportLink.toString()}'");
+        _logger.debug("supportLink '$supportLink'");
         QuestionnaireResponseFiller.of(context)
             .onLinkTap
             ?.call(context, supportLink);
@@ -205,9 +204,8 @@ class _QuestionnaireItemFillerSupportLink extends StatelessWidget {
 
 class _QuestionnaireItemFillerTitleLeading extends StatelessWidget {
   final Widget _leadingWidget;
-  const _QuestionnaireItemFillerTitleLeading._(Widget leadingWidget, {Key? key})
-      : _leadingWidget = leadingWidget,
-        super(key: key);
+  const _QuestionnaireItemFillerTitleLeading._(Widget leadingWidget)
+      : _leadingWidget = leadingWidget;
 
   static Widget? fromFillerItem(
     FillerItemModel fillerItemModel, {
