@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:faiadashu/fhir_types/fhir_types.dart';
 import 'package:faiadashu/logging/logging.dart';
 import 'package:faiadashu/questionnaires/questionnaires.dart';
@@ -54,12 +56,15 @@ class QuestionnaireModel {
 
   final QuestionnaireModelDefaults questionnaireModelDefaults;
 
+  final Locale? locale;
+
   static final _logger = Logger(QuestionnaireModel);
 
   QuestionnaireModel._({
     required this.questionnaire,
     required this.fhirResourceProvider,
     required this.questionnaireModelDefaults,
+    this.locale,
   }) {
     _buildOrderedItems();
 
@@ -79,6 +84,7 @@ class QuestionnaireModel {
   static Future<QuestionnaireModel> fromFhirResourceBundle({
     required FhirResourceProvider fhirResourceProvider,
     required QuestionnaireModelDefaults questionnaireModelDefaults,
+    Locale? locale,
   }) async {
     _logger.debug('QuestionnaireModel.fromFhirResourceBundle');
 
@@ -93,6 +99,7 @@ class QuestionnaireModel {
       questionnaire: questionnaire,
       fhirResourceProvider: fhirResourceProvider,
       questionnaireModelDefaults: questionnaireModelDefaults,
+      locale: locale,
     );
 
     await questionnaireModel.fhirResourceProvider.init();
@@ -361,6 +368,7 @@ class QuestionnaireModel {
         linkId,
         parent,
         level,
+        locale,
       ),
     );
   }

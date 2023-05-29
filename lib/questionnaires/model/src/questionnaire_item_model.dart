@@ -1,6 +1,7 @@
-import 'dart:core';
+import 'dart:ui';
 
 import 'package:collection/collection.dart';
+import 'package:faiadashu/extensions/string_extension.dart';
 import 'package:faiadashu/fhir_types/fhir_types.dart';
 import 'package:faiadashu/questionnaires/questionnaires.dart';
 import 'package:fhir/r4.dart';
@@ -20,6 +21,7 @@ class QuestionnaireItemModel with Diagnosticable {
   final QuestionnaireItemModel? parent;
   final QuestionnaireModel questionnaireModel;
   final int level;
+  final Locale? locale;
 
   /// Returns whether the item has an initial value.
   ///
@@ -342,5 +344,6 @@ class QuestionnaireItemModel with Diagnosticable {
     this.linkId,
     this.parent,
     this.level,
+    this.locale,
   );
 }

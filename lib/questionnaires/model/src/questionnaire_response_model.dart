@@ -170,6 +170,7 @@ class QuestionnaireResponseModel {
     final questionnaireModel = await QuestionnaireModel.fromFhirResourceBundle(
       fhirResourceProvider: fhirResourceProvider,
       questionnaireModelDefaults: questionnaireModelDefaults,
+      locale: locale,
     );
 
     final questionnaireResponseModel = QuestionnaireResponseModel._(
