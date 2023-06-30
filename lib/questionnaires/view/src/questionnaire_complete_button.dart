@@ -39,7 +39,7 @@ class _QuestionnaireCompleteButtonState
         }
 
         final newResponseStatus = (currentResponseStatus.value == 'completed')
-            ? FhirCode('in_progress')
+            ? FhirCode('in-progress')
             : FhirCode('completed');
 
         setState(() {

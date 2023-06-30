@@ -458,7 +458,7 @@ class QuestionnaireResponseModel {
   int get generation => _generation;
 
   final responseStatusNotifier = ValueNotifier<FhirCode>(
-    FhirCode('in_progress'),
+    FhirCode('in-progress'),
   );
 
   FhirCode get responseStatus => responseStatusNotifier.value;
@@ -598,7 +598,7 @@ class QuestionnaireResponseModel {
       questionnaireResponseItems,
     );
 
-    responseStatus = questionnaireResponse.status ?? FhirCode('in_progress');
+    responseStatus = questionnaireResponse.status ?? FhirCode('in-progress');
   }
 
   void _updateCalculations() {

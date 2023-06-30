@@ -214,7 +214,7 @@ class _HorizontalAnswerFillersState extends State<_HorizontalAnswerFillers> {
                               .questionnaireResponseModel
                               .responseStatus
                               .value ==
-                          'in_progress'
+                          'in-progress'
                   ? () {
                       _removeAnswerFiller(answerFiller);
                     }
@@ -242,7 +242,7 @@ class _HorizontalAnswerFillersState extends State<_HorizontalAnswerFillers> {
         if (isRepeating &&
             widget.questionResponseItemModel.questionnaireResponseModel
                     .responseStatus.value ==
-                'in_progress')
+                'in-progress')
           widget.questionnaireTheme.buildAddRepetition(
             context,
             widget.questionResponseItemModel,
