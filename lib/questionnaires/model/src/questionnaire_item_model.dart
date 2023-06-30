@@ -95,9 +95,9 @@ class QuestionnaireItemModel with Diagnosticable {
   /// This will not return `true` for repeating `choice` or `open-choice` items,
   /// as these are multiple choice, rather than truly repeating.
   bool get isRepeating =>
-      questionnaireItem.repeats == Boolean(true) && !isCodingType;
+      questionnaireItem.repeats == FhirBoolean(true) && !isCodingType;
 
-  bool get isRequired => questionnaireItem.required_ == Boolean(true);
+  bool get isRequired => questionnaireItem.required_ == FhirBoolean(true);
 
   bool get hasConstraint => constraintExpression != null;
 
@@ -134,9 +134,9 @@ class QuestionnaireItemModel with Diagnosticable {
   bool get isTotalScore {
     // Checking for read-only is relevant,
     // as there are also input fields (e.g. pain score) with unit {score}.
-    return (questionnaireItem.type == Code('quantity') ||
-            questionnaireItem.type == Code('decimal')) &&
-        ((questionnaireItem.readOnly == Boolean(true) &&
+    return (questionnaireItem.type == FhirCode('quantity') ||
+            questionnaireItem.type == FhirCode('decimal')) &&
+        ((questionnaireItem.readOnly == FhirBoolean(true) &&
                 questionnaireItem.computableUnit?.display == '{score}') ||
             questionnaireItem.extension_
                     ?.firstWhereOrNull(
@@ -153,7 +153,7 @@ class QuestionnaireItemModel with Diagnosticable {
   static const String calculatedExpressionExtensionUrl =
       'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression';
 
-  Expression? get calculatedExpression {
+  FhirExpression? get calculatedExpression {
     return questionnaireItem.extension_
         ?.firstWhereOrNull(
           (ext) =>
@@ -180,15 +180,15 @@ class QuestionnaireItemModel with Diagnosticable {
   /// Is this itemModel unable to hold a value?
   bool get isStatic => isGroup || isDisplay;
 
-  bool get isGroup => questionnaireItem.type == Code('group');
+  bool get isGroup => questionnaireItem.type == FhirCode('group');
 
-  bool get isDisplay => questionnaireItem.type == Code('display');
+  bool get isDisplay => questionnaireItem.type == FhirCode('display');
 
   bool get isQuestion => !isDisplay && !isGroup;
 
   bool get isCodingType {
-    return questionnaireItem.type == Code('choice') ||
-        questionnaireItem.type == Code('open_choice');
+    return questionnaireItem.type == FhirCode('choice') ||
+        questionnaireItem.type == FhirCode('open_choice');
   }
 
   /// Is this item not changeable by end-users?
@@ -197,7 +197,7 @@ class QuestionnaireItemModel with Diagnosticable {
   /// This does not consider the completion status of the questionnaire.
   bool get isReadOnly {
     return isStatic ||
-        questionnaireItem.readOnly == Boolean(true) ||
+        questionnaireItem.readOnly == FhirBoolean(true) ||
         isHidden ||
         isCalculated;
   }
@@ -316,7 +316,7 @@ class QuestionnaireItemModel with Diagnosticable {
       );
 
   /// Returns the `usageMode` for the item, or the default.
-  Code get usageMode {
+  FhirCode get usageMode {
     return questionnaireItem.extension_?.usageMode ??
         questionnaireModel.questionnaireModelDefaults.usageMode;
   }

@@ -5,7 +5,7 @@ import 'package:faiadashu/logging/logging.dart';
 import 'package:fhir/r4.dart';
 import 'package:intl/intl.dart';
 
-extension FDashTimeExtension on Time {
+extension FDashTimeExtension on FhirTime {
   String format(Locale locale, {String defaultText = ''}) {
     final localeCode = locale.toString();
     if (!isValid) {
@@ -17,7 +17,7 @@ extension FDashTimeExtension on Time {
   }
 }
 
-extension FDashDateExtension on Date {
+extension FDashDateExtension on FhirDate {
   String format(Locale locale, {String defaultText = ''}) {
     final localeCode = locale.toString();
     final DateFormat dateFormat;
@@ -73,8 +73,8 @@ extension FDashDateTimeExtension on FhirDateTime {
   }
 }
 
-extension FDashDecimalExtension on Decimal {
-  static final _logger = Logger(Decimal);
+extension FDashDecimalExtension on FhirDecimal {
+  static final _logger = Logger(FhirDecimal);
 
   String format(Locale locale) {
     if (!isValid) {
@@ -210,6 +210,10 @@ extension FDashPatientExtension on Patient {
 
     return Reference(type: FhirUri('Patient'), reference: 'Patient/$id');
   }
+}
+
+extension ResoureExtension on Resource {
+  String? get id => fhirId;
 }
 
 /// Access to [FhirExtension]s from a List.

@@ -52,7 +52,7 @@ class QuestionResponseItemFillerState
     super.dispose();
   }
 
-  void _setDataAbsentReason(Code? dataAbsentReason) {
+  void _setDataAbsentReason(FhirCode? dataAbsentReason) {
     if (mounted) {
       setState(() {
         questionResponseItemModel.dataAbsentReason = dataAbsentReason;

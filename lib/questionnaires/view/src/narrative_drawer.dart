@@ -73,7 +73,7 @@ class _NarrativeDrawerState extends State<NarrativeDrawer> {
                                 : QuestionnaireResponseFiller.of(context)
                                     .aggregator<NarrativeAggregator>()
                                     .aggregate()
-                                    ?.div,
+                                    ?.div ?? '',
                           ),
                         ).then((_) {
                           ScaffoldMessenger.of(context).showSnackBar(

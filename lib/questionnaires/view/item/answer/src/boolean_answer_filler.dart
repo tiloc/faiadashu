@@ -11,7 +11,7 @@ class BooleanAnswerFiller extends QuestionnaireAnswerFiller {
   State<StatefulWidget> createState() => _BooleanItemState();
 }
 
-class _BooleanItemState extends QuestionnaireAnswerFillerState<Boolean,
+class _BooleanItemState extends QuestionnaireAnswerFillerState<FhirBoolean,
     BooleanAnswerFiller, BooleanAnswerModel> {
   _BooleanItemState();
 
@@ -55,9 +55,9 @@ class _BooleanInputControl extends AnswerInputControl<BooleanAnswerModel> {
               ? (newValue) {
                   focusNode?.requestFocus();
                   answerModel.value = answerModel.isTriState
-                      ? ((newValue != null) ? Boolean(newValue) : null)
+                      ? ((newValue != null) ? FhirBoolean(newValue) : null)
                       : (newValue ?? false)
-                          ? Boolean(true)
+                          ? FhirBoolean(true)
                           : null;
                 }
               : null,

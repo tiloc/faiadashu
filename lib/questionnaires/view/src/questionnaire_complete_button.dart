@@ -39,8 +39,8 @@ class _QuestionnaireCompleteButtonState
         }
 
         final newResponseStatus = (currentResponseStatus.value == 'completed')
-            ? Code('in_progress')
-            : Code('completed');
+            ? FhirCode('in_progress')
+            : FhirCode('completed');
 
         setState(() {
           qrm.responseStatus = newResponseStatus;

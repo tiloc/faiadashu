@@ -15,14 +15,14 @@ import 'package:fhir_path/fhir_path.dart';
 class QuestionItemModel extends ResponseItemModel {
   static final _qimLogger = Logger(QuestionItemModel);
 
-  Code? _dataAbsentReason;
+  FhirCode? _dataAbsentReason;
 
   /// Reason why this response is empty.
   ///
   /// see [DataAbsentReason]
-  Code? get dataAbsentReason => _dataAbsentReason;
+  FhirCode? get dataAbsentReason => _dataAbsentReason;
 
-  set dataAbsentReason(Code? newDataAbsentReason) {
+  set dataAbsentReason(FhirCode? newDataAbsentReason) {
     if (_dataAbsentReason != newDataAbsentReason) {
       _dataAbsentReason = newDataAbsentReason;
       nextGeneration(
@@ -148,7 +148,7 @@ class QuestionItemModel extends ResponseItemModel {
   /// Returns a [Decimal] value which can be added to a score.
   ///
   /// Returns null if not applicable (either question unanswered, or wrong type)
-  Decimal? get ordinalValue {
+  FhirDecimal? get ordinalValue {
     final answerModel = firstAnswerModel;
 
     return answerModel.isNotEmpty &&

@@ -12,7 +12,7 @@ class ObservationPage extends ExhibitPage {
       coding: [
         Coding(
           system: FhirUri('http://loinc.org'),
-          code: Code('55284-4'),
+          code: FhirCode('55284-4'),
           display: 'BP sys/dias',
         )
       ],
@@ -23,24 +23,24 @@ class ObservationPage extends ExhibitPage {
           coding: [
             Coding(
               system: FhirUri('http://loinc.org'),
-              code: Code('8480-6'),
+              code: FhirCode('8480-6'),
               display: 'BP sys',
             )
           ],
         ),
-        valueQuantity: Quantity(value: Decimal(140.0), unit: 'mmHg'),
+        valueQuantity: Quantity(value: FhirDecimal(140.0), unit: 'mmHg'),
       ),
       ObservationComponent(
         code: CodeableConcept(
           coding: [
             Coding(
               system: FhirUri('http://loinc.org'),
-              code: Code('8462-4'),
+              code: FhirCode('8462-4'),
               display: 'BP dias',
             )
           ],
         ),
-        valueQuantity: Quantity(value: Decimal(87.0), unit: 'mmHg'),
+        valueQuantity: Quantity(value: FhirDecimal(87.0), unit: 'mmHg'),
       ),
     ],
   );
@@ -51,7 +51,7 @@ class ObservationPage extends ExhibitPage {
       coding: [
         Coding(
           system: FhirUri('http://example.org'),
-          code: Code('BPHR'),
+          code: FhirCode('BPHR'),
           display: 'BP sys/dias + HR',
         )
       ],
@@ -62,36 +62,36 @@ class ObservationPage extends ExhibitPage {
           coding: [
             Coding(
               system: FhirUri('http://loinc.org'),
-              code: Code('8480-6'),
+              code: FhirCode('8480-6'),
               display: 'BP sys',
             )
           ],
         ),
-        valueQuantity: Quantity(value: Decimal(140.0), unit: 'mmHg'),
+        valueQuantity: Quantity(value: FhirDecimal(140.0), unit: 'mmHg'),
       ),
       ObservationComponent(
         code: CodeableConcept(
           coding: [
             Coding(
               system: FhirUri('http://loinc.org'),
-              code: Code('8462-4'),
+              code: FhirCode('8462-4'),
               display: 'BP dias',
             )
           ],
         ),
-        valueQuantity: Quantity(value: Decimal(87.3), unit: 'mmHg'),
+        valueQuantity: Quantity(value: FhirDecimal(87.3), unit: 'mmHg'),
       ),
       ObservationComponent(
         code: CodeableConcept(
           coding: [
             Coding(
               system: FhirUri('http://loinc.org'),
-              code: Code('8867-4'),
+              code: FhirCode('8867-4'),
               display: 'Heart rate',
             )
           ],
         ),
-        valueQuantity: Quantity(value: Decimal(68.0), unit: '/min'),
+        valueQuantity: Quantity(value: FhirDecimal(68.0), unit: '/min'),
       ),
     ],
   );

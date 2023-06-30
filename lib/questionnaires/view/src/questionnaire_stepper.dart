@@ -74,10 +74,10 @@ class QuestionnaireStepperState extends State<QuestionnaireStepper> {
                   Expanded(
                     child: Column(
                       children: [
-                        ValueListenableBuilder<Decimal>(
+                        ValueListenableBuilder<FhirDecimal>(
                           builder: (
                             BuildContext context,
-                            Decimal value,
+                            FhirDecimal value,
                             Widget? child,
                           ) {
                             final scoreString = value.value!.round().toString();

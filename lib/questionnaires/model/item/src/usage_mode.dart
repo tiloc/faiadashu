@@ -14,7 +14,7 @@ final usageModeCaptureDisplay = Coding(
   system: usageModeSystem,
 );
 
-const usageModeCaptureDisplayCode = Code.asConst('capture-display');
+const usageModeCaptureDisplayCode = FhirCode.asConst('capture-display');
 
 /// Render the item only when capturing data.
 final usageModeCapture = Coding(
@@ -23,7 +23,7 @@ final usageModeCapture = Coding(
   system: usageModeSystem,
 );
 
-const usageModeCaptureCode = Code.asConst('capture');
+const usageModeCaptureCode = FhirCode.asConst('capture');
 
 /// Render the item only when displaying data.
 final usageModeDisplay = Coding(
@@ -32,7 +32,7 @@ final usageModeDisplay = Coding(
   system: usageModeSystem,
 );
 
-const usageModeDisplayCode = Code.asConst('display');
+const usageModeDisplayCode = FhirCode.asConst('display');
 
 /// Render the item only when displaying a completed form and the item has been answered (or has child items that have been answered).
 final usageModeDisplayNonEmpty = Coding(
@@ -41,7 +41,7 @@ final usageModeDisplayNonEmpty = Coding(
   system: usageModeSystem,
 );
 
-const usageModeDisplayNonEmptyCode = Code.asConst('display-non-empty');
+const usageModeDisplayNonEmptyCode = FhirCode.asConst('display-non-empty');
 
 /// Render the item when capturing data or when displaying a completed form and the item has been answered (or has child items that have been answered).
 final usageModeCaptureDisplayNonEmpty = Coding(
@@ -51,10 +51,10 @@ final usageModeCaptureDisplayNonEmpty = Coding(
 );
 
 const usageModeCaptureDisplayNonEmptyCode =
-    Code.asConst('capture-display-non-empty');
+    FhirCode.asConst('capture-display-non-empty');
 
 extension UsageModeExtension on List<FhirExtension> {
-  Code? get usageMode {
+  FhirCode? get usageMode {
     return extensionOrNull(usageModeExtensionUrl)?.valueCode;
   }
 }

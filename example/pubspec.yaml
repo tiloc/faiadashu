@@ -9,16 +9,13 @@ dependencies:
   collection: ^1.17.0
   faiadashu:
     path: ..
-  faiadashu_online:
-    path: ../faiadashu_online
-  fhir: ^0.9.0
-  fhir_auth: ^0.9.0
+  fhir: ^0.10.0
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  google_fonts: ^2.1.1
-  intl: ^0.17.0
+  google_fonts: ^4.0.4
+  intl: ^0.18.1
   logging: ^1.0.2
   simple_html_css: ^4.0.0
 

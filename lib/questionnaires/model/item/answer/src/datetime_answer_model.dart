@@ -3,11 +3,11 @@ import 'package:faiadashu/l10n/l10n.dart';
 import 'package:faiadashu/questionnaires/model/model.dart';
 import 'package:fhir/r4.dart'
     show
-        Date,
+        FhirDate,
         FhirDateTime,
         QuestionnaireResponseAnswer,
         QuestionnaireResponseItem,
-        Time;
+        FhirTime;
 
 class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
   DateTimeAnswerModel(super.responseModel);
@@ -31,7 +31,7 @@ class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
 
     if (itemType.value == 'date') {
       return QuestionnaireResponseAnswer(
-        valueDate: Date(value!.value),
+        valueDate: FhirDate(value!.value),
         item: items,
       );
     } else if (itemType.value == 'datetime') {
@@ -41,7 +41,7 @@ class DateTimeAnswerModel extends AnswerModel<FhirDateTime, FhirDateTime> {
       );
     } else if (itemType.value == 'time') {
       return QuestionnaireResponseAnswer(
-        valueTime: Time(
+        valueTime: FhirTime(
           value!.value!.toIso8601String().substring('yyyy-MM-ddT'.length),
         ),
         item: items,

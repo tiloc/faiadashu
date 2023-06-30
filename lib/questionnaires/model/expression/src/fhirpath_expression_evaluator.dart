@@ -19,7 +19,7 @@ class FhirPathExpressionEvaluator extends FhirExpressionEvaluator {
 
   FhirPathExpressionEvaluator(
     this.resourceBuilder,
-    Expression fhirPathExpression,
+    FhirExpression fhirPathExpression,
     Iterable<ExpressionEvaluator> upstreamExpressions, {
     this.jsonBuilder,
     String? debugLabel,
@@ -29,7 +29,7 @@ class FhirPathExpressionEvaluator extends FhirExpressionEvaluator {
           upstreamExpressions,
           debugLabel: debugLabel,
         ) {
-    if (fhirPathExpression.language != ExpressionLanguage.text_fhirpath) {
+    if (fhirPathExpression.language != FhirExpressionLanguage.text_fhirpath) {
       throw ArgumentError(
         '$name has wrong language: ${fhirPathExpression.language}',
       );

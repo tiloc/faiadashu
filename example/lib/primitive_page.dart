@@ -1,5 +1,5 @@
 import 'package:faiadashu/fhir_types/fhir_types.dart';
-import 'package:fhir/primitive_types/fhir_date_time.dart';
+import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 
 import 'exhibit_page.dart';
