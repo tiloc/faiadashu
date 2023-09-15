@@ -35,7 +35,7 @@ class QuestionnaireResponseFiller extends StatefulWidget {
           );
 
   const QuestionnaireResponseFiller({
-    Key? key,
+    super.key,
     required this.locale,
     required this.builder,
     required this.fhirResourceProvider,
@@ -45,7 +45,7 @@ class QuestionnaireResponseFiller extends StatefulWidget {
     this.onLinkTap,
     this.questionnaireTheme = const QuestionnaireThemeData(),
     this.questionnaireModelDefaults = const QuestionnaireModelDefaults(),
-  }) : super(key: key);
+  });
 
   static QuestionnaireFillerData of(BuildContext context) {
     final result =
@@ -205,7 +205,6 @@ class QuestionnaireFillerData extends InheritedWidget {
 
   QuestionnaireFillerData._(
     this.questionnaireResponseModel, {
-    Key? key,
     required this.locale,
     this.onDataAvailable,
     this.onLinkTap,
@@ -217,7 +216,7 @@ class QuestionnaireFillerData extends InheritedWidget {
           questionnaireResponseModel.orderedFillerItemModels().length,
           null,
         ),
-        super(key: key, child: Builder(builder: builder)) {
+        super(child: Builder(builder: builder)) {
     _logger.trace('constructor _');
     onDataAvailable?.call(questionnaireResponseModel);
   }

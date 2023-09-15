@@ -152,7 +152,7 @@ class CodingAnswerModel extends AnswerModel<OptionsOrString, OptionsOrString> {
 
   bool get isCheckbox => qi.isItemControl('check-box');
 
-  bool get isOptionsOrString => qi.type == QuestionnaireItemType.open_choice;
+  bool get isOptionsOrString => qi.type.value == 'open_choice';
 
   RenderingString get openLabel => RenderingString.fromText(
         qi.extension_

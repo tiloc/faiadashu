@@ -2,42 +2,25 @@ name: faiadashu_example
 description: Gallery app for Faiadashu™
 
 environment:
-  sdk: '>=2.17.0 <3.0.0'
+  sdk: '>=2.18.4 <3.0.0'
   flutter: '>=3.0.0'
 
 dependencies:
-  collection: ^1.16.0
-
+  collection: ^1.17.0
   faiadashu:
     path: ..
-
-  faiadashu_online:
-    path: ../faiadashu_online
-
-  fhir: ^0.8.0
-#  fhir:
-#    path: /Users/tilo/Projects/fhir/fhir
-
-  fhir_auth: ^0.8.0
-#  fhir_auth:
-#    path: ../../fhir/fhir_auth
-
+  fhir: ^0.10.0
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-
-  google_fonts: ^2.1.1
-
-  intl: ^0.17.0
-
+  google_fonts: ^4.0.4
+  intl: ^0.18.1
   logging: ^1.0.2
-
-  simple_html_css: ^3.0.1+1
+  simple_html_css: ^4.0.0
 
 dev_dependencies:
-  lint: ^1.8.2
-
+  lint: ^2.0.1
 
 flutter:
   uses-material-design: true

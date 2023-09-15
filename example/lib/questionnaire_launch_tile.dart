@@ -1,8 +1,6 @@
 import 'package:faiadashu/l10n/l10n.dart';
 import 'package:faiadashu/questionnaires/questionnaires.dart';
 import 'package:faiadashu/resource_provider/resource_provider.dart';
-import 'package:faiadashu_online/restful/restful.dart';
-import 'package:faiadashu_online/url_launch/src/url_launcher.dart';
 import 'package:fhir/r4.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -15,11 +13,17 @@ class QuestionnaireLaunchTile extends StatefulWidget {
   final Locale? locale;
   final FhirResourceProvider fhirResourceProvider;
   final LaunchContext launchContext;
-  final void Function(String questionnairePath, QuestionnaireResponse? questionnaireResponse)
-      saveResponseFunction;
-  final void Function(BuildContext context, String questionnairePath, QuestionnaireResponse? questionnaireResponse)?
-      uploadResponseFunction;
-  final QuestionnaireResponse? Function(String questionnairePath) restoreResponseFunction;
+  final void Function(
+    String questionnairePath,
+    QuestionnaireResponse? questionnaireResponse,
+  ) saveResponseFunction;
+  final void Function(
+    BuildContext context,
+    String questionnairePath,
+    QuestionnaireResponse? questionnaireResponse,
+  )? uploadResponseFunction;
+  final QuestionnaireResponse? Function(String questionnairePath)
+      restoreResponseFunction;
 
   final QuestionnaireModelDefaults questionnaireModelDefaults;
 
@@ -34,8 +38,8 @@ class QuestionnaireLaunchTile extends StatefulWidget {
     this.uploadResponseFunction,
     required this.restoreResponseFunction,
     this.questionnaireModelDefaults = const QuestionnaireModelDefaults(),
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   // ignore: library_private_types_in_public_api
@@ -89,13 +93,13 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
           var countString = '';
           if (snapshot.hasData) {
             // FIXME: Sometimes these stats are not being shown. Handle snapshot error.
-            final _questionnaireResponseModel = snapshot.data!;
-            final _numberCompleted =
-                _questionnaireResponseModel.count((rim) => rim.isAnswered);
-            final _totalNumber =
-                _questionnaireResponseModel.count((rim) => rim.isAnswerable);
-            countString = 'Completed: $_numberCompleted / $_totalNumber '
-                '(${_percentPattern.format(_numberCompleted / _totalNumber)})';
+            final questionnaireResponseModel = snapshot.data!;
+            final numberCompleted =
+                questionnaireResponseModel.count((rim) => rim.isAnswered);
+            final totalNumber =
+                questionnaireResponseModel.count((rim) => rim.isAnswerable);
+            countString = 'Completed: $numberCompleted / $totalNumber '
+                '(${_percentPattern.format(numberCompleted / totalNumber)})';
           }
 
           return (widget.subtitle != null)
@@ -150,8 +154,6 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                 widget.fhirResourceProvider,
               ]),
               launchContext: widget.launchContext,
-              // Callback for supportLink
-              onLinkTap: launchLink,
               persistentFooterButtons: [
                 Builder(
                   builder: (context) => const QuestionnaireCompleteButton(),
@@ -173,8 +175,7 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                           QuestionnaireResponseFiller.of(context)
                               .aggregator<QuestionnaireResponseAggregator>()
                               .aggregate(
-                                responseStatus:
-                                    QuestionnaireResponseStatus.completed,
+                                responseStatus: FhirCode('completed'),
                               ),
                         );
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -186,9 +187,6 @@ class _QuestionnaireLaunchTileState extends State<QuestionnaireLaunchTile> {
                                   FDashLocalizations.of(context)
                                       .handlingUploading,
                                 ),
-                                SyncIndicator(
-                                  color: Theme.of(context).colorScheme.primary,
-                                )
                               ],
                             ),
                           ),

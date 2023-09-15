@@ -9,22 +9,22 @@ class CherryBlossomScaffoldBuilder extends QuestionnairePageScaffoldBuilder {
 
   @override
   Widget build(
-      BuildContext context, {
-        required void Function(void Function() p1) setStateCallback,
-        required Widget child,
-      }) {
+    BuildContext context, {
+    required void Function(void Function() p1) setStateCallback,
+    required Widget child,
+  }) {
     return Theme(
       data: ThemeData.light().copyWith(
         scrollbarTheme: ThemeData.light().scrollbarTheme.copyWith(
-          thumbVisibility: MaterialStateProperty.all(true),
-          thumbColor: MaterialStateProperty.all(
-            const Color(0xFF5C1349),
-          ),
-        ),
+              thumbVisibility: MaterialStateProperty.all(true),
+              thumbColor: MaterialStateProperty.all(
+                const Color(0xFF5C1349),
+              ),
+            ),
         textTheme: GoogleFonts.ralewayTextTheme(),
         iconTheme: ThemeData.light().iconTheme.copyWith(
-          color: const Color(0xFF5C1349),
-        ),
+              color: const Color(0xFF5C1349),
+            ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(
             textStyle: MaterialStateProperty.all(
@@ -41,52 +41,52 @@ class CherryBlossomScaffoldBuilder extends QuestionnairePageScaffoldBuilder {
           ),
         ),
         checkboxTheme: ThemeData.light().checkboxTheme.copyWith(
-          fillColor: MaterialStateProperty.all(
-            const Color(0xFFE30425),
-          ),
-        ),
+              fillColor: MaterialStateProperty.all(
+                const Color(0xFFE30425),
+              ),
+            ),
         radioTheme: ThemeData.light().radioTheme.copyWith(
-          fillColor: MaterialStateProperty.all(
-            const Color(0xFFE30425),
-          ),
-        ),
+              fillColor: MaterialStateProperty.all(
+                const Color(0xFFE30425),
+              ),
+            ),
         sliderTheme: ThemeData.light().sliderTheme.copyWith(
-          thumbColor: const Color(0xFFE30425),
-          activeTrackColor: const Color(0xFFE30425),
-          inactiveTrackColor: const Color(0x60E30425),
-        ),
+              thumbColor: const Color(0xFFE30425),
+              activeTrackColor: const Color(0xFFE30425),
+              inactiveTrackColor: const Color(0x60E30425),
+            ),
         inputDecorationTheme: ThemeData.light().inputDecorationTheme.copyWith(
-          enabledBorder: const OutlineInputBorder(
-            borderSide: BorderSide(
-              width: 2.0,
-              color: Color.fromRGBO(0, 0, 0, 0.12),
+              enabledBorder: const OutlineInputBorder(
+                borderSide: BorderSide(
+                  width: 2.0,
+                  color: Color.fromRGBO(0, 0, 0, 0.12),
+                ),
+              ),
+              disabledBorder: const OutlineInputBorder(
+                borderSide: BorderSide(
+                  width: 0,
+                  color: Color.fromRGBO(0, 0, 0, 0.0),
+                ),
+              ),
+              focusedErrorBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  width: 2.0,
+                  color: ThemeData.light().colorScheme.error,
+                ),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  width: 2.0,
+                  color: ThemeData.light().colorScheme.error.withOpacity(0.12),
+                ),
+              ),
+              focusedBorder: const OutlineInputBorder(
+                borderSide: BorderSide(
+                  width: 2.0,
+                  color: Color.fromRGBO(0, 0, 0, 0.54),
+                ),
+              ),
             ),
-          ),
-          disabledBorder: const OutlineInputBorder(
-            borderSide: BorderSide(
-              width: 0,
-              color: Color.fromRGBO(0, 0, 0, 0.0),
-            ),
-          ),
-          focusedErrorBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-              width: 2.0,
-              color: ThemeData.light().errorColor,
-            ),
-          ),
-          errorBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-              width: 2.0,
-              color: ThemeData.light().errorColor.withOpacity(0.12),
-            ),
-          ),
-          focusedBorder: const OutlineInputBorder(
-            borderSide: BorderSide(
-              width: 2.0,
-              color: Color.fromRGBO(0, 0, 0, 0.54),
-            ),
-          ),
-        ),
       ), // Make it always light
       // We have to take care of SafeArea ourselves
       child: SafeArea(
@@ -101,7 +101,7 @@ class CherryBlossomScaffoldBuilder extends QuestionnairePageScaffoldBuilder {
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Text(
                   '🦄🌸🦄🌸🦄🌸🦄',
-                  style: Theme.of(context).textTheme.headline4,
+                  style: Theme.of(context).textTheme.headlineMedium,
                 ),
               ),
               Expanded(

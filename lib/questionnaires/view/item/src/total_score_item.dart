@@ -12,9 +12,9 @@ import 'package:simple_html_css/simple_html_css.dart';
 /// sundhed.dk questionnaire-feedback extension.
 class TotalScoreItem extends QuestionnaireAnswerFiller {
   TotalScoreItem(
-    AnswerModel answerModel, {
-    Key? key,
-  }) : super(answerModel, key: key);
+    super.answerModel, {
+    super.key,
+  });
   @override
   State<StatefulWidget> createState() => _TotalScoreItemState();
 }
@@ -22,7 +22,7 @@ class TotalScoreItem extends QuestionnaireAnswerFiller {
 class _TotalScoreItemState extends State<TotalScoreItem> {
   static final _logger = Logger(_TotalScoreItemState);
 
-  Decimal? calcResult;
+  FhirDecimal? calcResult;
 
   _TotalScoreItemState();
 
@@ -107,14 +107,14 @@ class _TotalScoreItemState extends State<TotalScoreItem> {
             const SizedBox(height: 32),
             Text(
               FDashLocalizations.of(context).aggregationTotalScoreTitle,
-              style: Theme.of(context).textTheme.headline3,
+              style: Theme.of(context).textTheme.displaySmall,
             ),
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 200),
               child: Text(
                 scoreText,
                 key: ValueKey<String>(scoreText),
-                style: Theme.of(context).textTheme.headline1,
+                style: Theme.of(context).textTheme.displayLarge,
               ),
             ),
             AnimatedSwitcher(

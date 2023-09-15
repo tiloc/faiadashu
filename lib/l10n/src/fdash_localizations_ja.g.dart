@@ -1,32 +1,35 @@
 // ignore_for_file: avoid_escaping_inner_quotes, unnecessary_brace_in_string_interps, unnecessary_string_escapes, always_use_package_imports
 
 import 'package:intl/intl.dart' as intl;
+
 import 'fdash_localizations.g.dart';
 
 /// The translations for Japanese (`ja`).
 class FDashLocalizationsJa extends FDashLocalizations {
-  FDashLocalizationsJa([super.locale = 'ja']);
+  FDashLocalizationsJa([String locale = 'ja']) : super(locale);
 
   @override
   String get validatorRequiredItem => 'この質問は完了する必要があります。';
 
   @override
-  String validatorMinLength(int minLength) {
-    return intl.Intl.pluralLogic(
+  String validatorMinLength(num minLength) {
+    String _temp0 = intl.Intl.pluralLogic(
       minLength,
       locale: localeName,
-      one: '最低1文字入力してください',
       other: '最低$minLength文字入力してください。',
+      one: '最低1文字入力してください',
     );
+    return '$_temp0';
   }
 
   @override
-  String validatorMaxLength(int maxLength) {
-    return intl.Intl.pluralLogic(
+  String validatorMaxLength(num maxLength) {
+    String _temp0 = intl.Intl.pluralLogic(
       maxLength,
       locale: localeName,
       other: '最大$maxLength文字まで入力できます。',
     );
+    return '$_temp0';
   }
 
   @override
@@ -78,27 +81,25 @@ class FDashLocalizationsJa extends FDashLocalizations {
   String get validatorDateTime => '有効な日付と時刻を入力してください。';
 
   @override
-  String validatorMinOccurs(int minOccurs) {
-    final String pluralString = intl.Intl.pluralLogic(
+  String validatorMinOccurs(num minOccurs) {
+    String _temp0 = intl.Intl.pluralLogic(
       minOccurs,
       locale: localeName,
-      one: '少なくとも1つの選択肢を選ぶ',
       other: '$minOccurs以上の選択肢を選ぶ',
+      one: '少なくとも1つの選択肢を選ぶ',
     );
-
-    return '${pluralString}。';
+    return '$_temp0。';
   }
 
   @override
-  String validatorMaxOccurs(int maxOccurs) {
-    final String pluralString = intl.Intl.pluralLogic(
+  String validatorMaxOccurs(num maxOccurs) {
+    String _temp0 = intl.Intl.pluralLogic(
       maxOccurs,
       locale: localeName,
-      one: '選択肢を1つまで選ぶ',
       other: '$maxOccurs選択肢を1つまで選ぶ',
+      one: '選択肢を1つまで選ぶ',
     );
-
-    return '${pluralString}。';
+    return '$_temp0。';
   }
 
   @override

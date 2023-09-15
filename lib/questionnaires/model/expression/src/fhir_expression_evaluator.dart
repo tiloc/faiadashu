@@ -4,7 +4,7 @@ import 'package:fhir/r4/resource/resource.dart';
 
 abstract class FhirExpressionEvaluator extends ExpressionEvaluator {
   FhirExpressionEvaluator(
-    Expression fhirExpression,
+    FhirExpression fhirExpression,
     Iterable<ExpressionEvaluator> upstreamExpressions, {
     String? debugLabel,
   }) : super(
@@ -16,13 +16,13 @@ abstract class FhirExpressionEvaluator extends ExpressionEvaluator {
 
   factory FhirExpressionEvaluator.fromExpression(
     Resource? Function()? resourceBuilder,
-    Expression fhirExpression,
+    FhirExpression fhirExpression,
     Iterable<ExpressionEvaluator> upstreamExpressions, {
     Map<String, dynamic>? Function()? jsonBuilder,
     String? debugLabel,
   }) {
     switch (ArgumentError.checkNotNull(fhirExpression.language)) {
-      case ExpressionLanguage.text_fhirpath:
+      case FhirExpressionLanguage.text_fhirpath:
         return FhirPathExpressionEvaluator(
           resourceBuilder,
           fhirExpression,
@@ -30,14 +30,15 @@ abstract class FhirExpressionEvaluator extends ExpressionEvaluator {
           jsonBuilder: jsonBuilder,
           debugLabel: debugLabel,
         );
-      case ExpressionLanguage.application_x_fhir_query:
+      case FhirExpressionLanguage.application_x_fhir_query:
         return FhirQueryExpressionEvaluator(
           fhirExpression,
           upstreamExpressions,
           debugLabel: debugLabel,
         );
-      case ExpressionLanguage.text_cql:
-      case ExpressionLanguage.unknown:
+      case FhirExpressionLanguage.text_cql:
+      case FhirExpressionLanguage.unknown:
+      default:
         throw UnsupportedError(
           'Expressions of type ${fhirExpression.language} are unsupported.',
         );

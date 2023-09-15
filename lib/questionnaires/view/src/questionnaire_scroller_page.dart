@@ -24,8 +24,8 @@ class QuestionnaireScrollerPage extends StatelessWidget {
     this.aggregators,
     this.onLinkTap,
     this.questionnaireModelDefaults = const QuestionnaireModelDefaults(),
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

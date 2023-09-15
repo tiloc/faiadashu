@@ -10,13 +10,12 @@ class QuestionnaireLoadingIndicator extends StatelessWidget {
 
   QuestionnaireLoadingIndicator(
     AsyncSnapshot<QuestionnaireResponseModel> snapshot, {
-    Key? key,
+    super.key,
   })  : state = snapshot.connectionState,
         hasError = snapshot.hasError,
         detail = (snapshot.hasData)
             ? snapshot.data?.questionnaireModel.title
-            : snapshot.error,
-        super(key: key);
+            : snapshot.error;
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +46,7 @@ class QuestionnaireLoadingIndicator extends StatelessWidget {
           if (detail != null)
             Text(
               detail.toString(),
-              style: Theme.of(context).textTheme.subtitle1,
+              style: Theme.of(context).textTheme.titleMedium,
             ),
         ],
       ),

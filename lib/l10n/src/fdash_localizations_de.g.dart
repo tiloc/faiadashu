@@ -1,31 +1,35 @@
 // ignore_for_file: avoid_escaping_inner_quotes, unnecessary_brace_in_string_interps, unnecessary_string_escapes, always_use_package_imports
 
 import 'package:intl/intl.dart' as intl;
+
 import 'fdash_localizations.g.dart';
 
 /// The translations for German (`de`).
 class FDashLocalizationsDe extends FDashLocalizations {
-  FDashLocalizationsDe([super.locale = 'de']);
+  FDashLocalizationsDe([String locale = 'de']) : super(locale);
 
   @override
   String get validatorRequiredItem => 'Füllen sie dieses Pflichtfeld aus.';
 
   @override
-  String validatorMinLength(int minLength) {
-    return intl.Intl.pluralLogic(
+  String validatorMinLength(num minLength) {
+    String _temp0 = intl.Intl.pluralLogic(
       minLength,
       locale: localeName,
       other: 'Mind. $minLength Zeichen eingeben.',
+      one: 'Mind. ein Zeichen eingeben.',
     );
+    return '$_temp0';
   }
 
   @override
-  String validatorMaxLength(int maxLength) {
-    return intl.Intl.pluralLogic(
+  String validatorMaxLength(num maxLength) {
+    String _temp0 = intl.Intl.pluralLogic(
       maxLength,
       locale: localeName,
       other: 'Bis zu $maxLength Zeichen eingeben.',
     );
+    return '$_temp0';
   }
 
   @override
@@ -77,23 +81,25 @@ class FDashLocalizationsDe extends FDashLocalizations {
   String get validatorDateTime => 'Gültiges Datum/Zeit eingeben.';
 
   @override
-  String validatorMinOccurs(int minOccurs) {
-    return intl.Intl.pluralLogic(
+  String validatorMinOccurs(num minOccurs) {
+    String _temp0 = intl.Intl.pluralLogic(
       minOccurs,
       locale: localeName,
-      one: 'Mind. eine Auswahl.',
       other: 'Mind. $minOccurs auswählen.',
+      one: 'Mind. eine Auswahl.',
     );
+    return '$_temp0';
   }
 
   @override
-  String validatorMaxOccurs(int maxOccurs) {
-    return intl.Intl.pluralLogic(
+  String validatorMaxOccurs(num maxOccurs) {
+    String _temp0 = intl.Intl.pluralLogic(
       maxOccurs,
       locale: localeName,
-      one: 'Höchstens eine Auswahl.',
       other: 'Bis zu $maxOccurs auswählen.',
+      one: 'Höchstens eine Auswahl.',
     );
+    return '$_temp0';
   }
 
   @override

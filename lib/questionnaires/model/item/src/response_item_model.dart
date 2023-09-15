@@ -22,9 +22,9 @@ abstract class ResponseItemModel extends FillerItemModel {
         ? FhirPathExpressionEvaluator(
             () => questionnaireResponseModel
                 .createQuestionnaireResponseForFhirPath(),
-            Expression(
+            FhirExpression(
               expression: constraintExpression,
-              language: ExpressionLanguage.text_fhirpath,
+              language: FhirExpressionLanguage.text_fhirpath,
             ),
             [
               ...itemWithPredecessorsExpressionEvaluators,

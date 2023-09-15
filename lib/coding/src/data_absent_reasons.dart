@@ -14,7 +14,7 @@ final dataAbsentReasonMasked = Coding(
   system: dataAbsentReasonSystem,
 );
 
-const dataAbsentReasonMaskedCode = Code.asConst('masked');
+const dataAbsentReasonMaskedCode = FhirCode.asConst('masked');
 
 /// This information has not been sought (e.g., patient was not asked)
 final dataAbsentReasonNotAsked = Coding(
@@ -23,7 +23,7 @@ final dataAbsentReasonNotAsked = Coding(
   system: dataAbsentReasonSystem,
 );
 
-const dataAbsentReasonNotAskedCode = Code.asConst('not-asked');
+const dataAbsentReasonNotAskedCode = FhirCode.asConst('not-asked');
 
 /// Information was sought but not found (e.g., patient was asked but didn't know)
 final dataAbsentReasonAskedButUnknown = Coding(
@@ -32,7 +32,7 @@ final dataAbsentReasonAskedButUnknown = Coding(
   system: dataAbsentReasonSystem,
 );
 
-const dataAbsentReasonAskedButUnknownCode = Code.asConst('asked-unknown');
+const dataAbsentReasonAskedButUnknownCode = FhirCode.asConst('asked-unknown');
 
 /// The source was asked but declined to answer.
 final dataAbsentReasonAskedButDeclined = Coding(
@@ -41,7 +41,7 @@ final dataAbsentReasonAskedButDeclined = Coding(
   system: dataAbsentReasonSystem,
 );
 
-const dataAbsentReasonAskedButDeclinedCode = Code.asConst('asked-declined');
+const dataAbsentReasonAskedButDeclinedCode = FhirCode.asConst('asked-declined');
 
 /// Information is not available at this time but it is expected that it will be available later.
 final dataAbsentReasonTemporarilyUnknown = Coding(
@@ -50,11 +50,11 @@ final dataAbsentReasonTemporarilyUnknown = Coding(
   system: dataAbsentReasonSystem,
 );
 
-const dataAbsentReasonTempUnknownCode = Code.asConst('temp-unknown');
+const dataAbsentReasonTempUnknownCode = FhirCode.asConst('temp-unknown');
 
-const dataAbsentReasonAsTextCode = Code.asConst('as-text');
+const dataAbsentReasonAsTextCode = FhirCode.asConst('as-text');
 
-const dataAbsentReasonErrorCode = Code.asConst('error');
+const dataAbsentReasonErrorCode = FhirCode.asConst('error');
 
 // Some system or workflow process error means that the information is not available.
 final dataAbsentReasonError = Coding(
@@ -75,7 +75,7 @@ final dataAbsentReasonAsText = Coding(
 );
 
 extension DataAbsentReasonExtension on List<FhirExtension> {
-  Code? get dataAbsentReason {
+  FhirCode? get dataAbsentReason {
     return extensionOrNull(dataAbsentReasonExtensionUrl)?.valueCode;
   }
 }

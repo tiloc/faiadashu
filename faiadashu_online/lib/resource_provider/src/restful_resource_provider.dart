@@ -9,7 +9,7 @@ class RestfulResourceProvider extends FhirResourceProvider {
   late final Resource? resource;
   final String uri;
   final R4ResourceType resourceType;
-  final Id id;
+  final String id;
   FhirClient client;
 
   RestfulResourceProvider(

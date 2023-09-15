@@ -42,9 +42,9 @@ class StringAnswerModel extends AnswerModel<String, String> {
         ?.valueCode
         ?.value;
 
-    keyboard = (qi.type == QuestionnaireItemType.text)
+    keyboard = (qi.type.value == 'text')
         ? StringAnswerKeyboard.multiline
-        : (qi.type == QuestionnaireItemType.url)
+        : (qi.type.value == 'url')
             ? StringAnswerKeyboard.url
             : (keyboardExtension == 'email')
                 ? StringAnswerKeyboard.email
@@ -81,7 +81,7 @@ class StringAnswerModel extends AnswerModel<String, String> {
       return lookupFDashLocalizations(locale).validatorMaxLength(maxLength!);
     }
 
-    if (qi.type == QuestionnaireItemType.url) {
+    if (qi.type.value == 'url') {
       if (!_urlRegExp.hasMatch(inputValue)) {
         return lookupFDashLocalizations(locale).validatorUrl;
       }
@@ -116,7 +116,7 @@ class StringAnswerModel extends AnswerModel<String, String> {
         : null;
 
     return (value != null && value.isNotEmpty)
-        ? (qi.type != QuestionnaireItemType.url)
+        ? (qi.type.value != 'url')
             ? QuestionnaireResponseAnswer(
                 valueString: value,
                 extension_: dataAbsentReasonExtension,
