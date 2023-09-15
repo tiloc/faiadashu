@@ -1,0 +1,102 @@
+{
+    "@@locale": "fr",
+    "validatorRequiredItem": "Cette question doit être complétée.",
+    "validatorMinLength": "{minLength, plural, =1 {Entrez au moins un caractère.} other {Entrez au moins {minLength} caractères.}}",
+    "@validatorMinLength": {
+        "placeholders": {
+            "minLength": {}
+        }
+    },
+    "validatorMaxLength": "{maxLength, plural, other{Entrez jusqu'à {maxLength} caractères.}}",
+    "@validatorMaxLength": {
+        "placeholders": {
+            "maxLength": {}
+        }
+    },
+    "validatorUrl": "Entrez une URL valide au format https://...",
+    "validatorRegExp": "Entrez une réponse valide.",
+    "validatorEntryFormat": "Entrez dans le format {entryFormat}.",
+    "@validatorEntryFormat": {
+        "placeholders": {
+            "entryFormat": {
+                "type": "String"
+            }
+        }
+    },
+    "validatorNan": "Entrez un nombre valide.",
+    "validatorMinValue": "Entrez un nombre de {minValue} ou supérieur.",
+    "@validatorMinValue": {
+        "placeholders": {
+            "minValue": {
+                "type": "String"
+            }
+        }
+    },
+    "validatorMaxValue": "Entrez un nombre jusqu'à {maxValue}.",
+    "@validatorMaxValue": {
+        "placeholders": {
+            "maxValue": {
+                "type": "String"
+            }
+        }
+    },
+    "dataAbsentReasonAskedDeclined": "Je choisis de ne pas répondre.",
+    "narrativePageTitle": "Narratif",
+    "questionnaireGenericTitle": "Sondage",
+    "questionnaireUnknownTitle": "Sans titre",
+    "questionnaireUnknownPublisher": "Éditeur inconnu",
+    "validatorDate": "Entrez une date valide.",
+    "validatorTime": "Entrez une heure valide.",
+    "validatorDateTime": "Entrez une date et une heure valides.",
+    "validatorMinOccurs": "{minOccurs, plural, =1 {Sélectionnez au moins une option.} other {Sélectionnez {minOccurs} options ou plus.}}",
+    "@validatorMinOccurs": {
+        "placeholders": {
+            "minOccurs": {}
+        }
+    },
+    "validatorMaxOccurs": "{maxOccurs, plural, =1 {Sélectionnez jusqu'à une option.} other {Sélectionnez jusqu'à {maxOccurs} options.}}",
+    "@validatorMaxOccurs": {
+        "placeholders": {
+            "maxOccurs": {}
+        }
+    },
+    "validatorSingleSelectionOrSingleOpenString": "Sélectionnez une option ou saisissez du texte libre dans \"{openLabel}\".",
+    "@validatorSingleSelectionOrSingleOpenString": {
+        "placeholders": {
+            "openLabel": {}
+        }
+    },
+    "dataAbsentReasonAskedDeclinedInputLabel": "Je choisis de ne pas répondre.",
+    "dataAbsentReasonAskedDeclinedOutput": "Refusé de répondre",
+    "dataAbsentReasonAsTextOutput": "[COMME TEXTE]",
+    "autoCompleteSearchTermInput": "Entrez un terme de recherche…",
+    "responseStatusToCompleteButtonLabel": "Compléter",
+    "responseStatusToInProgressButtonLabel": "Modifier",
+    "progressQuestionnaireLoading": "L'enquête est en cours de chargement…",
+    "handlingSaveButtonLabel": "Enregistrer",
+    "handlingUploadButtonLabel": "Télécharger",
+    "handlingUploading": "Téléchargement de l'enquête…",
+    "loginStatusLoggingIn": "Connexion en cours…",
+    "loginStatusLoggedIn": "Connecté…",
+    "loginStatusLoggingOut": "Déconnexion en cours…",
+    "loginStatusLoggedOut": "Déconnecté…",
+    "loginStatusUnknown": "Pas sûr de ce qui se passe ?",
+    "loginStatusError": "Quelque chose s'est mal passé.",
+    "handlingSaved": "Enquête enregistrée.",
+    "handlingUploaded": "Enquête téléchargée.",
+    "aggregationScore": "Score : {score}",
+    "@aggregationScore": {
+        "placeholders": {
+            "score": {}
+        }
+    },
+    "aggregationTotalScoreTitle": "Score total",
+    "fillerOpenCodingOtherLabel": "Autre",
+    "fillerAddAnotherItemLabel": "Ajouter un autre \"{itemLabel}\"",
+    "@fillerAddAnotherItemLabel": {
+        "placeholders": {
+            "itemLabel": {}
+        }
+    },
+    "fillerExclusiveOptionLabel": "(exclusif)"
+}
